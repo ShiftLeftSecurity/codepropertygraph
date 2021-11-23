@@ -12,7 +12,7 @@ trait MethodTraversalImplicits {
   implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I): MethodTraversal[I, Single, Nothing] = {
     new MethodTraversal(trav: Single[I])
   }
-  implicit def toMethodTraversalGeneric[I <: nodes.Method, IT[_] <: Option[_]](trav: IT[I]): MethodTraversal[I, IT, Nothing] = {
+  implicit def toMethodTraversalGeneric[I <: nodes.Method](trav: Option[I]): MethodTraversal[I, Option, Nothing] = {
     new MethodTraversal(trav)
   }
   implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C])

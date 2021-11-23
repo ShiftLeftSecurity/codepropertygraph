@@ -12,7 +12,7 @@ trait AstNodeTraversalImplicits {
   implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I): AstNodeTraversal[I, Single, Nothing] = {
     new AstNodeTraversal(trav: Single[I])
   }
-  implicit def toAstNodeTraversalGeneric[I <: AstNode, IT[_] <: Option[_]](trav: IT[I]): AstNodeTraversal[I, IT, Nothing] = {
+  implicit def toAstNodeTraversalGeneric[I <: AstNode](trav: Option[I]): AstNodeTraversal[I, Option, Nothing] = {
     new AstNodeTraversal(trav)
   }
   implicit def toAstNodeTraversalIterOnceOps[I <: AstNode, CC[_], C](trav: IterableOnceOps[I, CC, C])

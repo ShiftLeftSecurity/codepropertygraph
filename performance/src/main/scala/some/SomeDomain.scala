@@ -11,7 +11,7 @@ object SomeDomain {
       new SynthExt(p: Single[I])
     }
 
-    implicit def toSynthOption[I <: D1, IT[_] <: Option[_]](trav: IT[I]): SynthExt[I, IT, Nothing] = {
+    implicit def toSynthOption[I <: D1](trav: Option[I]): SynthExt[I, Option, Nothing] = {
       new SynthExt(trav)
     }
 

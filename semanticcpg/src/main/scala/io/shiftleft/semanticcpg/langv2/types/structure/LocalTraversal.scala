@@ -11,7 +11,7 @@ trait LocalTraversalImplicits {
   implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I): LocalTraversal[I, Single, Nothing] = {
     new LocalTraversal(trav: Single[I])
   }
-  implicit def toLocalTraversalGeneric[I <: nodes.Local, IT[_] <: Option[_]](trav: IT[I]): LocalTraversal[I, IT, Nothing] = {
+  implicit def toLocalTraversalGeneric[I <: nodes.Local](trav: Option[I]): LocalTraversal[I, Option, Nothing] = {
     new LocalTraversal(trav)
   }
   implicit def toLocalTraversalIterOnceOps[I <: nodes.Local, CC[_], C](trav: IterableOnceOps[I, CC, C])
