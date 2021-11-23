@@ -8,22 +8,22 @@ import scala.collection.IterableOnceOps
 
 object SomeDomain {
     implicit def toSynthSingle[I <: D1](p: I) = {
-      new SynthExt[SingleTravTypes](p: Single[I])
+      new SynthExt[I, Single, SingleMarker](p: Single[I])
     }
 
     implicit def toSynthOption[I <: D1](trav: Option[I]) = {
-      new SynthExt[OptionTravTypes](trav)
+      new SynthExt[I, Option, OptionMarker](trav)
     }
 
     implicit def toSynthIter[I <: D1, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-      new SynthExt[IterableOnceOpsTravTypes[CC, C]](trav)
+      new SynthExt[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
     }
 
-  class SynthExt[TT <: TravTypes](val trav: TT#Collection[D1]) extends AnyVal {
-    def toD2(implicit ops: TravOps[TT]) = {
+  class SynthExt[I <: D1, IT[_], Marker](val trav: IT[D1]) extends AnyVal {
+    def toD2(implicit ops: TravOps[IT, Marker]) = {
       trav.map(_.x)
     }
-    def toD2Multi(implicit ops: TravOps[TT]) = {
+    def toD2Multi(implicit ops: TravOps[IT, Marker]) = {
       trav.flatMap(Iterator.single)
     }
   }

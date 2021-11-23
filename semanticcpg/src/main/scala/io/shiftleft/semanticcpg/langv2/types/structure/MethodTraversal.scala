@@ -10,13 +10,13 @@ import scala.jdk.CollectionConverters._
 
 trait MethodTraversalImplicits {
   implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I) = {
-    new MethodTraversal[I, SingleTravTypes](trav: Single[I])
+    new MethodTraversal[I, Single, SingleMarker](trav: Single[I])
   }
-  implicit def toMethodTraversalGeneric[I <: nodes.Method, T[_] <: SupportedTypes[_]](trav: TravTypesFor[T]#Collection[I]) = {
-    new MethodTraversal[I, TravTypesFor[T]](trav)
+  implicit def toMethodTraversalGeneric[I <: nodes.Method](trav: Option[I]) = {
+    new MethodTraversal[I, Option, OptionMarker](trav)
   }
   implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
-    new MethodTraversal[I, IterableOnceOpsTravTypes[CC, C]](trav)
+    new MethodTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)
   }
 }
 
@@ -24,13 +24,13 @@ trait MethodTraversalImplicits {
   * A method, function, or procedure
   * */
 @help.Traversal(elementType = classOf[nodes.Method])
-class MethodTraversal[I <: nodes.Method, TT <: TravTypes](val trav: TT#Collection[I]) extends AnyVal {
+class MethodTraversal[I <: nodes.Method, IT[_], Marker](val trav: IT[I]) extends AnyVal {
 
   /**
     * Traverse to parameters of the method
     * */
   @Doc("All parameters")
-  def parameter(implicit ops1: TravOps[TT]) = {
+  def parameter(implicit ops1: TravOps[IT, Marker]) = {
     ops1.oneToMany(trav)(_._astOut.asScala.collect { case par: nodes.MethodParameterIn => par })
   }
 
@@ -38,7 +38,7 @@ class MethodTraversal[I <: nodes.Method, TT <: TravTypes](val trav: TT#Collectio
     * Traverse to formal return parameter
     * */
   @Doc("All formal return parameters")
-  def methodReturn(implicit ops1: TravOps[TT]) = {
+  def methodReturn(implicit ops1: TravOps[IT, Marker]) = {
     ops1.oneToOne(trav)(_._astOut.asScala.collectFirst { case ret: nodes.MethodReturn => ret }.get)
   }
 
