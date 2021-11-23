@@ -119,7 +119,7 @@ class MyTestNew {
   def syntheticIterableNew(state: MyState) = {
     //toSynth(state.d1:: Nil).toD2Multi
     //val y: TravOps[Iterable, IterableTypes[Iterable, Iterable[Any]]] = toIt2Ops
-    val x: List[D2] = List(state.d1).toD2(toIt2Ops)
+    val x: List[D2] = List(state.d1).toD2
     x
   }
 
@@ -129,6 +129,8 @@ class MyTestNew {
   }
 
   def compileTest(state: MyState) = {
+    val a: D2 = state.d1.toD2
+    val b: Option[D2] = Option(state.d1).toD2
     val c = toSynthIter(Array(state.d1).view.slice(1,2)).toD2
     val d: View[D2] = c
   }

@@ -10,10 +10,10 @@ import scala.jdk.CollectionConverters._
 
 trait AstNodeTraversalImplicits {
   implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I) = {
-    new AstNodeTraversal[I, Single, SingleMarker](trav: Single[I])
+    new AstNodeTraversal[I, Single, DefaultMarker](trav: Single[I])
   }
-  implicit def toAstNodeTraversalGeneric[I <: AstNode](trav: Option[I]) = {
-    new AstNodeTraversal[I, Option, OptionMarker](trav)
+  implicit def toAstNodeTraversalGeneric[I <: AstNode, IT[_] <: Option[_]](trav: IT[I]) = {
+    new AstNodeTraversal[I, IT, DefaultMarker](trav)
   }
   implicit def toAstNodeTraversalIterOnceOps[I <: AstNode, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
     new AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)

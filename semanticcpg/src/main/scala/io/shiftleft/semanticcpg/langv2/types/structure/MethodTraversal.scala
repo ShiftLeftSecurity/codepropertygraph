@@ -10,10 +10,10 @@ import scala.jdk.CollectionConverters._
 
 trait MethodTraversalImplicits {
   implicit def toMethodTraversalSingle[I <: nodes.Method](trav: I) = {
-    new MethodTraversal[I, Single, SingleMarker](trav: Single[I])
+    new MethodTraversal[I, Single, DefaultMarker](trav: Single[I])
   }
-  implicit def toMethodTraversalGeneric[I <: nodes.Method](trav: Option[I]) = {
-    new MethodTraversal[I, Option, OptionMarker](trav)
+  implicit def toMethodTraversalGeneric[I <: nodes.Method, IT[_] <: Option[_]](trav: IT[I]) = {
+    new MethodTraversal[I, IT, DefaultMarker](trav)
   }
   implicit def toMethodTraversalIterOnceOps[I <: nodes.Method, CC[_], C](trav: IterableOnceOps[I, CC, C]) = {
     new MethodTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterMarker[CC, C]](trav)

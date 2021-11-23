@@ -16,7 +16,7 @@ trait AnyTraversalImplicits {
 class AnyTraversal[I, IT[_], Marker](val trav: IT[I]) extends AnyVal {
 
   def cast[A](implicit ops: TravOps[IT, Marker]): ops.CCOneToOne[A] = {
-    ops.cast(trav)
+    trav.asInstanceOf[ops.CCOneToOne[A]]
   }
 
   def map[O](f: I => O)(implicit ops: TravOps[IT, Marker]): ops.CCOneToOne[O] = {

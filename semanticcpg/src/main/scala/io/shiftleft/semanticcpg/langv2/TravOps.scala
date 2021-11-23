@@ -21,10 +21,9 @@ trait TravOps[_Collection[_], Marker] {
   def oneToOption[I, O](trav: Collection[I])(f: I => Option[O]): CCOneToOption[O]
   def oneToBoolean[I](trav: Collection[I])(f: I => Boolean): CCOneToBoolean[I]
   def oneToMany[I, O](trav: Collection[I])(f: I => Iterator[O]): CCOneToMany[O]
-  def cast[T](trav: Collection[_]): CCOneToOne[T] = trav.asInstanceOf[CCOneToOne[T]]
 }
 
-object SingleOps extends TravOps[Single, SingleMarker] {
+object SingleOps extends TravOps[Single, DefaultMarker] {
   override type CCOneToOne[T] = T
   override type CCOneToOption[T] = Option[T]
   override type CCOneToBoolean[T] = Option[T]
@@ -51,7 +50,7 @@ object SingleOps extends TravOps[Single, SingleMarker] {
   }
 }
 
-object OptionOps extends TravOps[Option, OptionMarker] {
+object OptionOps extends TravOps[Option, DefaultMarker] {
   override type CCOneToOne[T] = Option[T]
   override type CCOneToOption[T] = Option[T]
   override type CCOneToBoolean[T] = Option[T]
