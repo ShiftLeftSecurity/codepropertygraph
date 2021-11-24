@@ -8,20 +8,16 @@ import scala.collection.IterableOnceOps
 import scala.jdk.CollectionConverters._
 
 trait LocalTraversalImplicits {
-  implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I): LocalTraversal[I, Single, Nothing] = {
+  implicit def toLocalTraversalSingle[I <: nodes.Local](trav: I): LocalTraversal[I, Single] = {
     new LocalTraversal(trav: Single[I])
   }
-  implicit def toLocalTraversalGeneric[I <: nodes.Local](trav: Option[I]): LocalTraversal[I, Option, Nothing] = {
+  implicit def toLocalTraversalGeneric[I <: nodes.Local, IT[_]](trav: IT[I]): LocalTraversal[I, IT] = {
     new LocalTraversal(trav)
-  }
-  implicit def toLocalTraversalIterOnceOps[I <: nodes.Local, CC[_], C](trav: IterableOnceOps[I, CC, C])
-  : LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
-    new LocalTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
   }
 }
 
-class LocalTraversal[I <: nodes.Local, IT[_], Marker](val trav: IT[I]) extends AnyVal {
-  def referencingIdentifiers(implicit ops1: TravOps[IT, Marker]): ops1.CCOneToMany[Identifier] = {
+class LocalTraversal[I <: nodes.Local, IT[_]](val trav: IT[I]) extends AnyVal {
+  def referencingIdentifiers(implicit ops1: TravOps[IT]): ops1.CCOneToMany[Identifier] = {
     trav.flatMap(_._refIn.asScala.filter(_.label == NodeTypes.IDENTIFIER)
       .cast[Identifier])
   }
