@@ -19,12 +19,12 @@ object SomeDomain {
       new SynthExt[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
     }
 
-  class SynthExt[I <: D1, IT[_], Marker](val trav: IT[I]) extends AnyVal {
-    def toD2(implicit ops: TravOps[IT, Marker]) = {
-      trav.map(_.x)
+  class SynthExt[I <: D1, IT[_], Marker](val in: IT[I]) extends AnyVal {
+    def toD2(implicit applier: ToOne[IT, Marker]) = {
+      applier.apply(in)(_.x)
     }
-    def toD2Multi(implicit ops: TravOps[IT, Marker]) = {
-      trav.flatMap(Iterator.single)
+    def toD2Multi(implicit applier: ToMany[IT, Marker]) = {
+      applier.apply(in)(Iterator.single)
     }
   }
 

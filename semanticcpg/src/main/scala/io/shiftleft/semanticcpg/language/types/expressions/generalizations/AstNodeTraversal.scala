@@ -3,7 +3,6 @@ package io.shiftleft.semanticcpg.language.types.expressions.generalizations
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, nodes}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.langv2._
 import io.shiftleft.semanticcpg.langv3.{Helper, Kernel1ToN, Kernel1ToO}
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}

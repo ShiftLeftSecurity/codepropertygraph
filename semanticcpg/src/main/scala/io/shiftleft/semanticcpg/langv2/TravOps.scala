@@ -2,106 +2,118 @@ package io.shiftleft.semanticcpg.langv2
 
 import scala.collection.IterableOnceOps
 
-/** Traversal operations trait.
-  * Implementations of this trait handle the basic traversal operations for the
-  * different kind of input traversal types.
- *
-  * @tparam InputTraversal Input traversal type. Abbreviated in other generics as IT.
-  * @tparam FlatMapTraversal Flat map operation output traversal type.
-  *                          Abbreviated in other generics as FT.
-  */
-trait TravOps[_Collection[_], ExtraTypes] {
-  type Collection[T] = _Collection[T]
-  type CCOneToOne[_]
-  type CCOneToOption[_]
-  type CCOneToBoolean[_]
-  type CCOneToMany[_]
-
-  def oneToOne[I, O](trav: Collection[I])(f: I => O): CCOneToOne[O]
-  def oneToOption[I, O](trav: Collection[I])(f: I => Option[O]): CCOneToOption[O]
-  def oneToBoolean[I](trav: Collection[I])(f: I => Boolean): CCOneToBoolean[I]
-  def oneToMany[I, O](trav: Collection[I])(f: I => Iterator[O]): CCOneToMany[O]
-}
-
-object SingleOps extends TravOps[Single, Nothing] {
-  override type CCOneToOne[T] = T
-  override type CCOneToOption[T] = Option[T]
-  override type CCOneToBoolean[T] = Option[T]
-  override type CCOneToMany[T] = Seq[T]
-
-  override def oneToOne[I, O](trav: this.Collection[I])(f: I => O): CCOneToOne[O] = {
-    f(trav)
-  }
-
-  override def oneToOption[I, O](trav: this.Collection[I])(f: I => Option[O]): CCOneToOption[O] = {
-    f(trav)
-  }
-
-  override def oneToBoolean[I](trav: this.Collection[I])(f: I => Boolean): CCOneToBoolean[I] = {
-    if (f(trav)) {
-      Some(trav)
-    } else {
-      None
-    }
-  }
-
-  override def oneToMany[I, O](trav: this.Collection[I])(f: I => Iterator[O]): CCOneToMany[O] = {
-    Seq.from(f(trav))
-  }
-}
-
-object OptionOps extends TravOps[Option, Nothing] {
-  override type CCOneToOne[T] = Option[T]
-  override type CCOneToOption[T] = Option[T]
-  override type CCOneToBoolean[T] = Option[T]
-  override type CCOneToMany[T] = Seq[T]
-
-  override def oneToOne[I, O](trav: this.Collection[I])(f: I => O): CCOneToOne[O] = {
-    trav.map(f)
-  }
-
-  override def oneToOption[I, O](trav: this.Collection[I])(f: I => Option[O]): CCOneToOption[O] = {
-    trav.flatMap(f)
-  }
-
-  override def oneToBoolean[I](trav: this.Collection[I])(f: I => Boolean): CCOneToBoolean[I] = {
-    trav.filter(f)
-  }
-
-  override def oneToMany[I, O](trav: this.Collection[I])(f: I => Iterator[O]): CCOneToMany[O] = {
-    trav match {
-      case Some(t) =>
-        Seq.from(f(t))
-      case None =>
-        Seq.empty
-    }
-  }
-}
-
 class IterTypes[_CC[_], _C] {
   type CC[T] = _CC[T]
   type C = _C
 }
 
-class IterableOnceOpsOps[CC[_], C] extends TravOps[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
-  override type CCOneToOne[T] = CC[T]
-  override type CCOneToOption[T] = CC[T]
-  override type CCOneToBoolean[T] = C
-  override type CCOneToMany[T] = CC[T]
+trait ToOne[_IN[_], ExtraTypes] {
+  type IN[T] = _IN[T]
+  type OUT[_]
 
-  override def oneToOne[I, O](trav: this.Collection[I])(f: I => O): CCOneToOne[O] = {
-    trav.map(f)
-  }
+  def apply[I, O](in: IN[I])(f: I => O): OUT[O]
+}
 
-  override def oneToOption[I, O](trav: this.Collection[I])(f: I => Option[O]): CCOneToOption[O] = {
-    trav.flatMap(f)
-  }
+object SingleToOne extends ToOne[Single, Nothing] {
+  override type OUT[T] = T
 
-  override def oneToBoolean[I](trav: this.Collection[I])(f: I => Boolean): CCOneToBoolean[I] = {
-    trav.filter(f)
-  }
+  override def apply[I, O](in: IN[I])(f: I => O): OUT[O] = f(in)
+}
 
-  override def oneToMany[I, O](trav: this.Collection[I])(f: I => Iterator[O]): CCOneToMany[O] = {
-    trav.flatMap(f)
-  }
+object OptionToOne extends ToOne[Option, Nothing] {
+  override type OUT[T] = Option[T]
+
+  override def apply[I, O](in: IN[I])(f: I => O): OUT[O] = in.map(f)
+}
+
+class IterToOne[CC[_], C] extends ToOne[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
+  override type OUT[T] = CC[T]
+
+  override def apply[I, O](in: IN[I])(f: I => O): OUT[O] = in.map(f)
+}
+
+trait ToBoolean[_IN[_], ExtraTypes] {
+  type IN[T] = _IN[T]
+  type OUT[_]
+
+  def apply[I, O](in: IN[I])(f: I => Boolean): OUT[I]
+}
+
+object SingleToBoolean extends ToBoolean[Single, Nothing] {
+  override type OUT[T] = Option[T]
+
+  override def apply[I, O](in: IN[I])(f: I => Boolean): OUT[I] =
+    if (f(in)) {
+      Some(in)
+    } else {
+      None
+    }
+}
+
+object OptionToBoolean extends ToBoolean[Option, Nothing] {
+  override type OUT[T] = Option[T]
+
+  override def apply[I, O](in: IN[I])(f: I => Boolean): OUT[I] = in.filter(f)
+}
+
+class IterToBoolean[CC[_], C] extends ToBoolean[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
+  override type OUT[T] = C
+
+  override def apply[I, O](in: IN[I])(f: I => Boolean): OUT[I] = in.filter(f)
+}
+
+trait ToOption[_IN[_], ExtraTypes] {
+  type IN[T] = _IN[T]
+  type OUT[_]
+
+  def apply[I, O](in: IN[I])(f: I => Option[O]): OUT[O]
+}
+
+object SingleToOption extends ToOption[Single, Nothing] {
+  override type OUT[T] = Option[T]
+
+  override def apply[I, O](in: IN[I])(f: I => Option[O]): OUT[O] = f(in)
+}
+
+object OptionToOption extends ToOption[Option, Nothing] {
+  override type OUT[T] = Option[T]
+
+  override def apply[I, O](in: IN[I])(f: I => Option[O]): OUT[O] = in.flatMap(f)
+}
+
+class IterToOption[CC[_], C] extends ToOption[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
+  override type OUT[T] = CC[T]
+
+  override def apply[I, O](in: IN[I])(f: I => Option[O]): OUT[O] = in.flatMap(f)
+}
+
+trait ToMany[_IN[_], ExtraTypes] {
+  type IN[T] = _IN[T]
+  type OUT[_]
+
+  def apply[I, O](in: IN[I])(f: I => IterableOnce[O]): OUT[O]
+}
+
+object SingleToMany extends ToMany[Single, Nothing] {
+  override type OUT[T] = Seq[T]
+
+  override def apply[I, O](in: IN[I])(f: I => IterableOnce[O]): OUT[O] = Seq.from(f(in))
+}
+
+object OptionToMany extends ToMany[Option, Nothing] {
+  override type OUT[T] = Seq[T]
+
+  override def apply[I, O](in: IN[I])(f: I => IterableOnce[O]): OUT[O] =
+    in match {
+      case Some(i) =>
+        Seq.from(f(i))
+      case None =>
+        Seq.empty
+    }
+}
+
+class IterToMany[CC[_], C] extends ToMany[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
+  override type OUT[T] = CC[T]
+
+  override def apply[I, O](in: IN[I])(f: I => IterableOnce[O]): OUT[O] = in.flatMap(f)
 }

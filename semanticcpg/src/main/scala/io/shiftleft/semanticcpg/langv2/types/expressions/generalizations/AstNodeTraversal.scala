@@ -9,34 +9,34 @@ import scala.jdk.CollectionConverters._
 
 
 trait AstNodeTraversalImplicits {
-  implicit def toAstNodeTraversalSingle[I <: AstNode](trav: I): AstNodeTraversal[I, Single, Nothing] = {
-    new AstNodeTraversal(trav: Single[I])
+  implicit def toAstNodeTraversalSingle[I <: AstNode](in: I): AstNodeTraversal[I, Single, Nothing] = {
+    new AstNodeTraversal(in: Single[I])
   }
-  implicit def toAstNodeTraversalGeneric[I <: AstNode](trav: Option[I]): AstNodeTraversal[I, Option, Nothing] = {
-    new AstNodeTraversal(trav)
+  implicit def toAstNodeTraversalOption[I <: AstNode](in: Option[I]): AstNodeTraversal[I, Option, Nothing] = {
+    new AstNodeTraversal(in)
   }
-  implicit def toAstNodeTraversalIterOnceOps[I <: AstNode, CC[_], C](trav: IterableOnceOps[I, CC, C])
+  implicit def toAstNodeTraversalIter[I <: AstNode, CC[_], C](in: IterableOnceOps[I, CC, C])
   : AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
-    new AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
+    new AstNodeTraversal[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](in)
   }
 
 }
 
-class AstNodeTraversal[I <: AstNode, IT[_], Marker](val trav: IT[I])
+class AstNodeTraversal[I <: AstNode, IT[_], Marker](val in: IT[I])
   extends AnyVal {
 
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
   @Doc("All nodes of the abstract syntax tree")
-  def ast(implicit ops1: TravOps[IT, Marker]) =
-    trav.rFlatMap(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
+  def ast(implicit applier: ToMany[IT, Marker]) =
+    in.rFlatMap(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
 
   /**
     * Traverse only to AST nodes that are expressions
     * */
-  def isExpression(implicit ops1: TravOps[IT, Marker]) =
-    trav.collectAll[Expression]
+  def isExpression(implicit applier: ToBoolean[IT, Marker]) =
+    in.collectAll[Expression]
 
 }
 
