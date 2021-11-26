@@ -90,18 +90,17 @@ object Cfg extends SchemaBase {
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)
 
-    // TODO: Should this perhaps be in Hidden? Can I access cfgNode base type from Hidden?
+    // TODO: Should this perhaps be in Hidden and/or Pdg? Can I access cfgNode base type from these classes?
     val dataFlow = builder
       .addEdgeType(
         name = "DATA_FLOW",
-        comment =
-          """
+        comment = """
             |EXPERIMENTAL: This edge indicates data flow between two CFG nodes. This is calculated on calls to
             |reachableBy using REACHING_DEFs edges and used to store cached data to improve the performance of
             |incremental data flow analysis.""".stripMargin
       )
       // TODO: Advise on protoId
-      .protoId(19)
+      .protoId(12345)
 
     block.addOutEdge(edge = dataFlow, inNode = cfgNode)
     callNode.addOutEdge(edge = dataFlow, inNode = cfgNode)
