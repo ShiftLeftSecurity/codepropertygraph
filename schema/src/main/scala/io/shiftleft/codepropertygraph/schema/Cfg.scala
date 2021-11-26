@@ -102,15 +102,7 @@ object Cfg extends SchemaBase {
       // TODO: Advise on protoId
       .protoId(12345)
 
-    block.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    callNode.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    controlStructure.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    jumpTarget.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    identifier.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    literal.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    methodRef.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    typeRef.addOutEdge(edge = dataFlow, inNode = cfgNode)
-    unknown.addOutEdge(edge = dataFlow, inNode = cfgNode)
+    cfgNode.addOutEdge(edge = dataFlow, inNode = cfgNode)
   }
 
 }
