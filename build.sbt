@@ -68,7 +68,6 @@ lazy val domainClasses = Projects.domainClasses
 lazy val protoBindings = Projects.protoBindings
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val semanticcpg = Projects.semanticcpg
-lazy val macros = Projects.macros
 lazy val schema2json = Projects.schema2json
 
 // Once sbt-scalafmt is at version > 2.x, use scalafmtAll
