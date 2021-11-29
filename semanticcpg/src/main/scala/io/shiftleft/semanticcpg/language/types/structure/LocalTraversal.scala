@@ -5,7 +5,6 @@ import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language.MySteps._
 import io.shiftleft.semanticcpg.language.EPipe
-import io.shiftleft.semanticcpg.langv2._
 import io.shiftleft.semanticcpg.langv3.{Helper, Kernel1ToN, Kernel1ToO}
 import overflowdb.traversal.Traversal
 

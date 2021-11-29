@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.langv2
 
 import scala.collection.IterableOnceOps
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.Seq
 
 class IterTypes[_CC[T], _C] {
   type CC[T] = _CC[T]
@@ -172,5 +173,33 @@ class IterToGlobal[CC[_], C] extends ToGlobal[({type X[A] = IterableOnceOps[A, C
         }.asInstanceOf[CC[O]]
     }
   }
+}
 
+trait ToGlobalEnd[_IN[_], ExtraTypes] {
+  type IN[T] = _IN[T]
+
+  def apply[I, O](in: IN[I])(f: Seq[I] => O): O
+}
+
+object SingleToGlobalEnd extends ToGlobalEnd[Single, Nothing] {
+  override def apply[I, O](in: IN[I])(f: Seq[I] => O): O = {
+    f(in::Nil)
+  }
+}
+
+object OptionToGlobalEnd extends ToGlobalEnd[Option, Nothing] {
+  override def apply[I, O](in: IN[I])(f: Seq[I] => O): O = {
+    in match {
+      case Some(i) =>
+        f(i::Nil)
+      case None =>
+        f(Nil)
+    }
+  }
+}
+
+class IterToGlobalEnd[CC[_], C] extends ToGlobalEnd[({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] {
+  override def apply[I, O](in: IN[I])(f: Seq[I] => O): O = {
+    f(in.toSeq)
+  }
 }
