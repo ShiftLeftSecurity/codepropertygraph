@@ -1,5 +1,7 @@
 package io.shiftleft.semanticcpg
 
+import scala.collection.IterableOnceOps
+
 package object langv2 extends ExtensionClassImplicits with AnyTraversalImplicits with InstanceOfOpsImplicits {
   type Single[T] = T
 
@@ -22,5 +24,10 @@ package object langv2 extends ExtensionClassImplicits with AnyTraversalImplicits
   implicit val optionToMany: OptionToMany.type = OptionToMany
   private val _iterToMany = new IterToMany()
   implicit def iterToMany[CC[_], C]: IterToMany[CC, C] = _iterToMany.asInstanceOf[IterToMany[CC, C]]
+
+  implicit val singleToGlobal: SingleToGlobal.type = SingleToGlobal
+  implicit val optionToGlobal: OptionToGlobal.type = OptionToGlobal
+  private val _iterToGlobal = new IterToGlobal()
+  implicit def iterToGlobal[CC[_], C]: IterToGlobal[CC, C] = _iterToGlobal.asInstanceOf[IterToGlobal[CC, C]]
 
 }

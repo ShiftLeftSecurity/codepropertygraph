@@ -43,4 +43,8 @@ class MethodTraversal[I <: nodes.Method, IT[_], Marker](val in: IT[I]) extends A
     applier.apply(in)(_._astOut.asScala.collectFirst { case ret: nodes.MethodReturn => ret }.get)
   }
 
+  //def toParameterCount(implicit applier: ToGlobal[IT, Marker]) = {
+  //  applier.apply(in)(_.map(_.parameter).size)
+  //}
+
 }

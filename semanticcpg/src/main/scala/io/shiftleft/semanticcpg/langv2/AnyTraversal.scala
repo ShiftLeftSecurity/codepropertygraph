@@ -36,7 +36,7 @@ class AnyTraversal[I, IT[_], Marker](val trav: IT[I]) extends AnyVal {
     applier.apply(trav)(i => new RepeatStepIterator(i, f, behaviour))
   }
 
-  @deprecated("Use rFlatMap instead")
+  //@deprecated("Use rFlatMap instead")
   def repeat[O <: I](f: I => Iterator[O], g: RepeatBehaviourBuilder[I] => RepeatBehaviourBuilder[I] = identity)(
     implicit applier: ToMany[IT, Marker]): applier.OUT[I] = {
     rFlatMap(f, g)

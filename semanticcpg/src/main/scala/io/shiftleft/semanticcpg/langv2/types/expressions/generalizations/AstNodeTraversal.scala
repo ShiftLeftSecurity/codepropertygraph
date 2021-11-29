@@ -29,8 +29,9 @@ class AstNodeTraversal[I <: AstNode, IT[_], Marker](val in: IT[I])
     * Nodes of the AST rooted in this node, including the node itself.
     * */
   @Doc("All nodes of the abstract syntax tree")
-  def ast(implicit applier: ToMany[IT, Marker]) =
-    in.rFlatMap(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
+  def ast(implicit applier: ToMany[IT, Marker]) = {
+    in.repeat(_._astOut.asScala.asInstanceOf[Iterator[I]], _.emit)
+  }
 
   /**
     * Traverse only to AST nodes that are expressions

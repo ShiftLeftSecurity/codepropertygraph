@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 import MyTests._
 import io.shiftleft.semanticcpg.language.types.structure.LocalReferencingIdentifiers
 
-import scala.collection.{View, mutable}
+import scala.collection.{IterableOnceOps, SeqOps, View, mutable}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import org.openjdk.jmh.infra.Blackhole
 import overflowdb.traversal.Traversal
@@ -133,6 +133,13 @@ class MyTestNew {
     val b: Option[D2] = Option(state.d1).toD2
     val c = toSynthIter(Array(state.d1).view.slice(1,2)).toD2
     val d: View[D2] = c
+    val z: scala.collection.Seq[Int] = ArrayBuffer.empty[Int]
+
+    Iterable.single(state.d1).toD2Multi
+    Iterator.single(state.d1).toD2Multi
+
+    val a1 = Iterable.single(state.d1).doGlobal
+    val a2 = Iterator.single(state.d1).doGlobal
   }
 }
 

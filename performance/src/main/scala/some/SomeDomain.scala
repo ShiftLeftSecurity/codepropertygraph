@@ -15,7 +15,8 @@ object SomeDomain {
       new SynthExt(trav)
     }
 
-    implicit def toSynthIter[I <: D1, CC[_], C](trav: IterableOnceOps[I, CC, C]): SynthExt[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
+    implicit def toSynthIter[I <: D1, CC[_], C](trav: IterableOnceOps[I, CC, C])
+    : SynthExt[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]] = {
       new SynthExt[I, ({type X[A] = IterableOnceOps[A, CC, C]})#X, IterTypes[CC, C]](trav)
     }
 
@@ -25,6 +26,9 @@ object SomeDomain {
     }
     def toD2Multi(implicit applier: ToMany[IT, Marker]) = {
       applier.apply(in)(Iterator.single)
+    }
+    def doGlobal(implicit applier: ToGlobal[IT, Marker]) = {
+      applier.apply(in)(x => x)
     }
   }
 
