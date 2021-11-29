@@ -1,12 +1,13 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.utils.ExecutionContextProvider
+import org.slf4j.MDC
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
@@ -16,6 +17,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   def partIterator: Iterator[T]
 
   def runOnPart(part: T): Iterator[DiffGraph]
+
+  implicit val executionContext: ExecutionContext = ExecutionContextProvider.getExecutionContext
 
   override def createAndApply(): Unit = {
     withWriter() { writer =>
@@ -32,7 +35,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   private def withWriter[X](serializedCpg: SerializedCpg = new SerializedCpg(),
                             prefix: String = "",
                             inverse: Boolean = false)(f: Writer => Unit): Unit = {
-    val writer = new Writer(serializedCpg, prefix, inverse)
+    val writer = new Writer(serializedCpg, prefix, inverse, MDC.getCopyOfContextMap())
     val writerThread = new Thread(writer)
     writerThread.setName("Writer")
     writerThread.start()
@@ -88,7 +91,11 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     }
   }
 
-  private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
+  private class Writer(serializedCpg: SerializedCpg,
+                       prefix: String,
+                       inverse: Boolean,
+                       mdc: java.util.Map[String, String])
+      extends Runnable {
 
     case class DiffGraphAndKeyPool(diffGraph: Option[DiffGraph], keyPool: Option[KeyPool])
 
@@ -100,6 +107,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
     override def run(): Unit = {
       try {
+        MDC.setContextMap(mdc)
         var terminate = false
         var index: Int = 0
         while (!terminate) {
@@ -184,10 +192,11 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     nParts = parts.size
     val partIter = parts.iterator
     val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
-    val writer = new Writer(serializedCpg, prefix, inverse)
+    val writer = new Writer(serializedCpg, prefix, inverse, MDC.getCopyOfContextMap())
     val writerThread = new Thread(writer)
     writerThread.setName("Writer")
     writerThread.start()
+    implicit val ec: ExecutionContext = ExecutionContextProvider.getExecutionContext
     try {
       try {
         // The idea is that we have a ringbuffer completionQueue that contains the workunits that are currently in-flight.
@@ -232,12 +241,17 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     }
   }
 
-  private class Writer(serializedCpg: SerializedCpg, prefix: String, inverse: Boolean) extends Runnable {
+  private class Writer(serializedCpg: SerializedCpg,
+                       prefix: String,
+                       inverse: Boolean,
+                       mdc: java.util.Map[String, String])
+      extends Runnable {
 
     val queue = new LinkedBlockingQueue[Option[DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
 
     override def run(): Unit = {
       try {
+        MDC.setContextMap(mdc)
         var terminate = false
         var index: Int = 0
         val doSerialize = serializedCpg != null && !serializedCpg.isEmpty

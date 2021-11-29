@@ -1,10 +1,9 @@
 package io.shiftleft.passes
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
-class ParallelIteratorExecutor[T](iterator: Iterator[T]) {
+class ParallelIteratorExecutor[T](iterator: Iterator[T])(implicit executionContext: ExecutionContext) {
   def map[D](func: T => D): Iterator[D] = {
     val futures = Future.traverse(iterator) { element =>
       Future {
