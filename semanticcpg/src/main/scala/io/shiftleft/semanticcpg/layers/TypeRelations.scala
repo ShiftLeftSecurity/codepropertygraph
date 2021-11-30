@@ -4,8 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.passes.CpgPassBase
 import io.shiftleft.semanticcpg.passes.typerelations.{AliasLinkerPass, TypeHierarchyPass}
 
-import scala.annotation.nowarn
-
 object TypeRelations {
   val overlayName: String = "typerel"
   val description: String = "Type relations layer (hierarchy and aliases)"
@@ -15,11 +13,9 @@ object TypeRelations {
     new TypeHierarchyPass(cpg),
     new AliasLinkerPass(cpg),
   )
-
 }
 
-@nowarn
-class TypeRelations(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
+class TypeRelations extends LayerCreator {
   override val overlayName: String = TypeRelations.overlayName
   override val description: String = TypeRelations.description
   override val dependsOn = List(Base.overlayName)
@@ -32,4 +28,6 @@ class TypeRelations(optionsUnused: LayerCreatorOptions = null) extends LayerCrea
     }
   }
 
+  // Layers need one-arg constructor, because they're called by reflection from io.joern.console.Run
+  def this(optionsUnused: LayerCreatorOptions) = this()
 }

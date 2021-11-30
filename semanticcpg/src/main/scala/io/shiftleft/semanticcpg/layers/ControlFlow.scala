@@ -8,8 +8,6 @@ import io.shiftleft.semanticcpg.passes.controlflow.CfgCreationPass
 import io.shiftleft.semanticcpg.passes.controlflow.cfgdominator.CfgDominatorPass
 import io.shiftleft.semanticcpg.passes.controlflow.codepencegraph.CdgPass
 
-import scala.annotation.nowarn
-
 object ControlFlow {
   val overlayName: String = "controlflow"
   val description: String = "Control flow layer (including dominators and CDG edges)"
@@ -29,8 +27,7 @@ object ControlFlow {
 
 }
 
-@nowarn
-class ControlFlow(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
+class ControlFlow extends LayerCreator {
   override val overlayName: String = ControlFlow.overlayName
   override val description: String = ControlFlow.description
   override val dependsOn = List(Base.overlayName)
@@ -42,4 +39,7 @@ class ControlFlow(optionsUnused: LayerCreatorOptions = null) extends LayerCreato
         runPass(pass, context, storeUndoInfo, index)
     }
   }
+
+  // LayerCreators need one-arg constructor, because they're called by reflection from io.joern.console.Run
+  def this(optionsUnused: LayerCreatorOptions) = this()
 }
