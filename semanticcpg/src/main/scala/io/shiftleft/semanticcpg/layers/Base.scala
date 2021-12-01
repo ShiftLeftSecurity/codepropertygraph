@@ -3,18 +3,7 @@ package io.shiftleft.semanticcpg.layers
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.PropertyNames
 import io.shiftleft.passes.CpgPassBase
-import io.shiftleft.semanticcpg.passes.base.{
-  AstLinkerPass,
-  ContainsEdgePass,
-  FileCreationPass,
-  MethodDecoratorPass,
-  MethodStubCreator,
-  NamespaceCreator,
-  TypeDeclStubCreator,
-  TypeUsagePass
-}
-
-import scala.annotation.nowarn
+import io.shiftleft.semanticcpg.passes.base._
 
 object Base {
   val overlayName: String = "base"
@@ -34,8 +23,7 @@ object Base {
 
 }
 
-@nowarn
-class Base(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
+class Base extends LayerCreator {
   override val overlayName: String = Base.overlayName
   override val description: String = Base.description
 
@@ -48,4 +36,6 @@ class Base(optionsUnused: LayerCreatorOptions = null) extends LayerCreator {
     }
   }
 
+  // LayerCreators need one-arg constructor, because they're called by reflection from io.joern.console.Run
+  def this(optionsUnused: LayerCreatorOptions) = this()
 }
