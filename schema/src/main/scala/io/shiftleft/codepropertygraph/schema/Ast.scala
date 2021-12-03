@@ -399,7 +399,7 @@ object Ast extends SchemaBase {
 
     method
       .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One, stepNameOut = "parameter", stepNameOutDoc = "Parameters of the method")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)

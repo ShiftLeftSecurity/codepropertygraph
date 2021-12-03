@@ -14,13 +14,6 @@ import overflowdb.traversal.{Traversal, help}
 class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
 
   /**
-    * Traverse to parameters of the method
-    * */
-  @Doc("All parameters")
-  def parameter: Traversal[MethodParameterIn] =
-    traversal.flatMap(_.parameter)
-
-  /**
     * Traverse to formal return parameter
     * */
   @Doc("All formal return parameters")
