@@ -477,7 +477,7 @@ object Ast extends SchemaBase {
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     namespaceBlock
-      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne, stepNameIn = "namespaceBlock")
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
     namespace.extendz(astNode)
