@@ -69,7 +69,7 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     * methods which we may modify on a per-node-type basis, typically via
     * implicits of type Show[NodeType].
     * */
-  @Doc("execute this traversal and pretty print the results")
+  @Doc(info = "execute this traversal and pretty print the results")
   def p(implicit show: Show[A] = Show.default): List[String] =
     traversal.toList.map(show.apply)
 
@@ -79,11 +79,11 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     *  inspection of the results of `toList` in order to export the data
     *  for processing with other tools.
     * */
-  @Doc("execute traversal and convert the result to json")
+  @Doc(info = "execute traversal and convert the result to json")
   def toJson: String = toJson(pretty = false)
 
   /** Execute traversal and convert the result to pretty json. */
-  @Doc("execute traversal and convert the result to pretty json")
+  @Doc(info = "execute traversal and convert the result to pretty json")
   def toJsonPretty: String = toJson(pretty = true)
 
   protected def toJson(pretty: Boolean): String = {

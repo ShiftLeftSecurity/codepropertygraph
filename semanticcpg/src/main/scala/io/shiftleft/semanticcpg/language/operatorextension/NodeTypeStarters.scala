@@ -14,11 +14,11 @@ object NodeTypeStarters {
 class NodeTypeStarters(cpg: Cpg) {
   import NodeTypeStarters._
 
-  @Doc("All assignments")
+  @Doc(info = "All assignments")
   def assignment: Traversal[opnodes.Assignment] =
     cpg.call.name(assignmentPattern).map(new opnodes.Assignment(_))
 
-  @Doc("All arithmetic operations")
+  @Doc(info = "All arithmetic operations")
   def arithmetic: Traversal[opnodes.Arithmetic] =
     cpg.call.name(arithmeticPattern).map(new opnodes.Arithmetic(_))
 }
