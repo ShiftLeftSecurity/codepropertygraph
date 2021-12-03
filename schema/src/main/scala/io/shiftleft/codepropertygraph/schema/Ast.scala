@@ -398,8 +398,19 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     method
-      .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
+      .addOutEdge(
+        edge = ast,
+        inNode = methodReturn,
+        cardinalityOut = Cardinality.One,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "methodReturn",
+        stepNameOutDoc = "Formal return parameters"
+      )
+      .addOutEdge(edge = ast,
+                  inNode = methodParameterIn,
+                  cardinalityIn = Cardinality.One,
+                  stepNameOut = "parameter",
+                  stepNameOutDoc = "Parameters of the method")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)

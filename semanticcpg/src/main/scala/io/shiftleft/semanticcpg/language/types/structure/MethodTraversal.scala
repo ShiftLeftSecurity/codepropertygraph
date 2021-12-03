@@ -14,20 +14,6 @@ import overflowdb.traversal.{Traversal, help}
 class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
 
   /**
-    * Traverse to parameters of the method
-    * */
-  @Doc("All parameters")
-  def parameter: Traversal[MethodParameterIn] =
-    traversal.flatMap(_.parameter)
-
-  /**
-    * Traverse to formal return parameter
-    * */
-  @Doc("All formal return parameters")
-  def methodReturn: Traversal[MethodReturn] =
-    traversal.map(_.methodReturn)
-
-  /**
     * All control structures of this method
     * */
   @Doc("Control structures (source frontends only)")
@@ -176,7 +162,7 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     */
   @Doc("Last control flow graph node")
   def cfgLast: Traversal[Expression] =
-    methodReturn.cfgLast
+    traversal.methodReturn.cfgLast
 
   /**
     * Traverse to block
