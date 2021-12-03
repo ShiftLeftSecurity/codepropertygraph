@@ -71,7 +71,7 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
   /**
     * Outgoing call sites
     * */
-  @Doc("Call sites (outgoing calls)")
+  @Doc(info = "Call sites (outgoing calls)")
   def call: Traversal[Call] =
     traversal.out(EdgeTypes.CONTAINS).collectAll[Call]
 

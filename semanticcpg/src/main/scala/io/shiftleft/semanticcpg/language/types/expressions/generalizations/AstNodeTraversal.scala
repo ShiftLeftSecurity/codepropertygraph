@@ -12,7 +12,7 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-  @Doc("All nodes of the abstract syntax tree")
+  @Doc(info = "All nodes of the abstract syntax tree")
   def ast: Traversal[AstNode] =
     traversal.repeat(_.out(EdgeTypes.AST))(_.emit).cast[AstNode]
 
@@ -27,7 +27,7 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
   def containsCallTo(regex: String): Traversal[A] =
     traversal.filter(_.ast.isCall.name(regex).size > 0)
 
-  @Doc("Depth of the abstract syntax tree")
+  @Doc(info = "Depth of the abstract syntax tree")
   def depth: Traversal[Int] =
     traversal.map(_.depth)
 

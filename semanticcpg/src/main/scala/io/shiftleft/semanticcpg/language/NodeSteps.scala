@@ -17,12 +17,12 @@ import overflowdb.traversal.{Traversal, help}
 class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
   @Doc(
-    "The source file this code is in",
-    """
+    info = "The source file this code is in",
+    longInfo = """
       |Not all but most node in the graph can be associated with
       |a specific source file they appear in. `file` provides
       |the file node that represents that source file.
-      |""".stripMargin
+      |"""
   )
   def file: Traversal[File] =
     traversal
@@ -35,8 +35,8 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       .cast[File]
 
   @Doc(
-    "Location, including filename and line number",
-    """
+    info = "Location, including filename and line number",
+    longInfo = """
       |Most nodes of the graph can be associated with a specific
       |location in code, and `location` provides this location.
       |The return value is an object providing, e.g., filename,
@@ -44,30 +44,30 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       |string. For example `.location.lineNumber` provides access
       |to the line number alone, without requiring any parsing
       |on the user's side.
-      |""".stripMargin
+      |"""
   )
   def location(implicit finder: NodeExtensionFinder): Traversal[NewLocation] =
     traversal.map(_.location)
 
   @Doc(
-    "Display code (with syntax highlighting)",
-    """
+    info = "Display code (with syntax highlighting)",
+    longInfo = """
       |For methods, dump the method code. For expressions,
       |dump the method code along with an arrow pointing
       |to the expression. Uses ansi-color highlighting.
       |This only works for source frontends.
-      |""".stripMargin
+      |"""
   )
   def dump(implicit finder: NodeExtensionFinder): List[String] =
     _dump(highlight = true)
 
   @Doc(
-    "Display code (without syntax highlighting)",
-    """
+    info = "Display code (without syntax highlighting)",
+    longInfo = """
       |For methods, dump the method code. For expressions,
       |dump the method code along with an arrow pointing
       |to the expression. No color highlighting.
-      |""".stripMargin
+      |"""
   )
   def dumpRaw(implicit finder: NodeExtensionFinder): List[String] =
     _dump(highlight = false)
@@ -86,20 +86,20 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
       .repeat(_.in(edgeType))(_.until(_.in(edgeType).count.filter(_ == 0)))
 
   @Doc(
-    "Tag node with `tagName`",
-    """
+    info = "Tag node with `tagName`",
+    longInfo = """
       |This method can be used to tag nodes in the graph such that
       |they can later be looked up easily via `cpg.tag`. Tags are
       |key value pairs, and they can be created with `newTagNodePair`.
       |Since in many cases, a key alone is sufficient, we provide the
       |utility method `newTagNode(key)`, which is equivalent to
       |`newTagNode(key, "")`.
-      |""".stripMargin,
-    """.newTagNode("foo")"""
+      |""",
+    example = """.newTagNode("foo")"""
   )
   def newTagNode(tagName: String): NewTagNodePairTraversal = newTagNodePair(tagName, "")
 
-  @Doc("Tag node with (`tagName`, `tagValue`)", "", """.newTagNodePair("key","val")""")
+  @Doc(info = "Tag node with (`tagName`, `tagValue`)", longInfo = "", example = """.newTagNodePair("key","val")""")
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePairTraversal = {
     new NewTagNodePairTraversal(
       traversal.map { node =>
@@ -110,13 +110,13 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
     )
   }
 
-  @Doc("Tags attached to this node")
+  @Doc(info = "Tags attached to this node")
   def tagList: List[List[TagBase]] =
     traversal.map { taggedNode =>
       taggedNode.tagList.l
     }.l
 
-  @Doc("Tags attached to this node")
+  @Doc(info = "Tags attached to this node")
   def tag: Traversal[Tag] = {
     traversal.flatMap { node =>
       node.tag

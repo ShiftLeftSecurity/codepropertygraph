@@ -9,7 +9,7 @@ import overflowdb.traversal.{Traversal, help}
 class BlockTraversal(val traversal: Traversal[Block]) extends AnyVal {
 
   /** Traverse to locals of this block. */
-  @Doc("Traverse to locals of this block.")
+  @Doc(info = "Traverse to locals of this block.")
   def local: Traversal[Local] =
     traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.LOCAL).cast[Local]
 }
