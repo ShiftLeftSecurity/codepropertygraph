@@ -129,7 +129,8 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
     * Traverse to the methods local variables
     * */
   @Doc(info = "Local variables declared in the method")
-  def local: Traversal[Local] = block.ast.isLocal
+  def local: Traversal[Local] =
+    traversal.block.ast.isLocal
 
   /**
     * Traverse to literals of method
@@ -165,16 +166,10 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
   def cfgLast: Traversal[Expression] =
     traversal.methodReturn.cfgLast
 
-  /**
-    * Traverse to block
-    * */
-  @Doc(info = "Root of the abstract syntax tree")
-  def block: Traversal[Block] =
-    traversal.flatMap(_.block)
-
   /** Traverse to method body (alias for `block`) */
   @Doc(info = "Alias for `block`")
-  def body: Traversal[Block] = block
+  def body: Traversal[Block] =
+    traversal.block
 
   /** Traverse to namespace */
   @Doc(info = "Namespace this method is declared in")

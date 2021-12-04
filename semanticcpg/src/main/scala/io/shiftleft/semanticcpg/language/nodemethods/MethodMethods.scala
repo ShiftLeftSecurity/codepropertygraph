@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{Block, CfgNode, Local, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Local, Method, NewLocation}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.{HasLocation, LocationCreator, NodeOrdering, toCfgNodeMethods}
 import overflowdb.traversal.Traversal
@@ -8,9 +8,6 @@ import overflowdb.traversal.Traversal
 import scala.jdk.CollectionConverters._
 
 class MethodMethods(val method: Method) extends AnyVal with NodeExtension with HasLocation {
-
-  def block: Block =
-    method._blockViaAstOut
 
   def local: Traversal[Local] =
     method._blockViaContainsOut.flatMap(_._localViaAstOut)
