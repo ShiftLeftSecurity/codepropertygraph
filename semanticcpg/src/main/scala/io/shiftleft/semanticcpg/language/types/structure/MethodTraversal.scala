@@ -4,14 +4,14 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
+import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{Traversal, help}
 
 /**
   * A method, function, or procedure
   * */
 @help.Traversal(elementType = classOf[Method])
-class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
+class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
 
   /**
     * All control structures of this method
@@ -113,8 +113,9 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     * but only referenced in the CPG.
     * */
   @Doc(info = "External methods (called, but no body available)")
-  def external: Traversal[Method] =
+  def external: Traversal[Method] = {
     traversal.has(Properties.IS_EXTERNAL -> true)
+  }
 
   /**
     * Traverse to internal methods, that is, methods for which
