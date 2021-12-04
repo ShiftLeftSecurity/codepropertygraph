@@ -170,7 +170,7 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
     * */
   @Doc(info = "Root of the abstract syntax tree")
   def block: Traversal[Block] =
-    traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[Block]
+    traversal.flatMap(_.block)
 
   /** Traverse to method body (alias for `block`) */
   @Doc(info = "Alias for `block`")
