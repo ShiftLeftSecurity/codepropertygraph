@@ -19,7 +19,7 @@ object CallGraph extends SchemaBase {
     new Schema(builder, methodSchema, astSchema: Ast.Schema)
 
   class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, astSchema: Ast.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import astSchema._
 

@@ -23,7 +23,7 @@ object Binding extends SchemaBase {
     import typeDeclSchema._
     import methodSchema._
 
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val binding: NodeType = builder
       .addNodeType(
