@@ -132,13 +132,6 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
   def local: Traversal[Local] =
     traversal.block.ast.isLocal
 
-  /**
-    * Traverse to literals of method
-    * */
-  @Doc(info = "Literals used in the method")
-  def literal: Traversal[Literal] =
-    traversal.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[Literal]
-
   @Doc(info = "Top level expressions (\"Statements\")")
   def topLevelExpressions: Traversal[Expression] =
     traversal
