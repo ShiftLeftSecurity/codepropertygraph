@@ -46,7 +46,7 @@ object LocationCreator {
 
       val namespaceOption = for {
         tpe <- typeOption
-        namespaceBlock <- tpe._namespaceBlockViaAstIn
+        namespaceBlock <- tpe.namespaceBlock
         namespace <- namespaceBlock._namespaceViaRefOut.nextOption()
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")

@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{
   AbstractNode,
   AstNode,
-  Binding,
   Block,
   Call,
   CfgNode,
@@ -30,7 +29,6 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
 }
 import io.shiftleft.codepropertygraph.generated.traversal.NodeTraversalImplicits
 import io.shiftleft.semanticcpg.language.bindingextension.{
-  BindingTraversal,
   MethodTraversal => BindingMethodTraversal,
   TypeDeclTraversal => BindingTypeDeclTraversal
 }
@@ -116,8 +114,6 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   // / Call graph extension
 
   // Binding extensions
-  implicit def toBinding[A](a: A)(implicit f: A => Traversal[Binding]): BindingTraversal =
-    new BindingTraversal(f(a))
   implicit def toMethodForBindingExt[A](a: A)(implicit f: A => Traversal[Method]): BindingMethodTraversal =
     new BindingMethodTraversal(f(a))
   implicit def toTypeDeclForBindingExt[A](a: A)(implicit f: A => Traversal[TypeDecl]): BindingTypeDeclTraversal =
