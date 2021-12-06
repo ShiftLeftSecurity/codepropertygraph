@@ -153,13 +153,6 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
     traversal.flatMap(_.cfgNode)
 
   /**
-    *  Traverse to first expression in CFG.
-    */
-  @Doc(info = "First control flow graph node")
-  def cfgFirst: Traversal[CfgNode] =
-    traversal.flatMap(_.cfgFirst)
-
-  /**
     *  Traverse to last expression in CFG.
     */
   @Doc(info = "Last control flow graph node")
