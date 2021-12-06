@@ -18,12 +18,6 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
   def controlStructure: Traversal[ControlStructure] =
     method.ast.isControlStructure
 
-  /**
-    * Traverse to literals of method
-    * */
-  def literal: Traversal[Literal] =
-    method._literalViaContainsOut
-
   def numberOfLines: Int = {
     if (method.lineNumber.isDefined && method.lineNumberEnd.isDefined) {
       method.lineNumberEnd.get - method.lineNumber.get + 1
