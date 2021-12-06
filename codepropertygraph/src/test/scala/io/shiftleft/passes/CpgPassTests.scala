@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.nio.file.Files
 import scala.jdk.CollectionConverters._
 
 class CpgPassTests extends AnyWordSpec with Matchers {
@@ -42,7 +43,7 @@ class CpgPassTests extends AnyWordSpec with Matchers {
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()
         file.exists shouldBe true
-        file.size should not be 0
+        Files.size(file.path) should not be 0
       }
     }
 

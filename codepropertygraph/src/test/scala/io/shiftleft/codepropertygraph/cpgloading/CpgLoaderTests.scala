@@ -67,7 +67,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       cpg.graph.addNode("METHOD")
       // ...
 
-      cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array()
+      cpg.graph.indexManager.getIndexedNodeProperties.size shouldBe 0
       // Now create indexes
       CpgLoader.createIndexes(cpg)
       cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array("FULL_NAME")

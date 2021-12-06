@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.base
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{NamespaceBlock, NewNamespace}
+import io.shiftleft.codepropertygraph.generated.nodes.NewNamespace
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 
@@ -21,9 +21,7 @@ class NamespaceCreator(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.namespaceBlock
-      .groupBy { nb: NamespaceBlock =>
-        nb.name
-      }
+      .groupBy(_.name)
       .foreach {
         case (name: String, blocks) =>
           val namespace = NewNamespace().name(name)

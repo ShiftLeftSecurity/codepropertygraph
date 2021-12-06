@@ -9,6 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
 
+import java.nio.file.Files
 import scala.jdk.CollectionConverters._
 
 class ParallelCpgPassTests extends AnyWordSpec with Matchers {
@@ -35,7 +36,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
   "ParallelCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.nodes.map(_.property(Properties.NAME)).toSet shouldBe Set("foo", "bar")
+      cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
     }
 
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
@@ -46,7 +47,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()
         file.exists shouldBe true
-        file.size should not be 0
+        Files.size(file.path) should not be 0
       }
     }
 
