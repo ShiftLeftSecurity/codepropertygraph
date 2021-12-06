@@ -8,4 +8,4 @@ Compile / sourceGenerators += Projects.schema / Compile / generateDomainClasses
  * we're trying to minimise them on a best effort basis, but don't want
  * to fail the build because of them
  */
-Compile / scalacOptions -= "-Xfatal-warnings" 
+Compile / scalacOptions --= Seq("-Xfatal-warnings", "-Wunused", "-Ywarn-unused")
