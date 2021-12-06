@@ -48,11 +48,9 @@ object Binding extends SchemaBase {
       )
       .protoId(155)
 
-    typeDecl
-      .addOutEdge(edge = binds, inNode = binding, cardinalityIn = EdgeType.Cardinality.One)
+    typeDecl.addOutEdge(edge = binds, inNode = binding, cardinalityIn = EdgeType.Cardinality.One, stepNameIn = "bindingTypeDecl")
 
-    binding
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = EdgeType.Cardinality.One, stepNameOut = "boundMethod")
+    binding.addOutEdge(edge = ref, inNode = method, cardinalityOut = EdgeType.Cardinality.One, stepNameOut = "boundMethod")
 
   }
 
