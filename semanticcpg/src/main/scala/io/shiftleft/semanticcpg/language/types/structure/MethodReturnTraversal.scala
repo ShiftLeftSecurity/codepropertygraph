@@ -31,7 +31,7 @@ class MethodReturnTraversal(val traversal: Traversal[MethodReturn]) extends AnyV
     *  Can be multiple.
     */
   @Doc(info = "traverse to last expressions in CFG (can be multiple)")
-  def cfgLast: Traversal[Expression] =
+  def cfgLast: Traversal[CfgNode] =
     traversal.in(EdgeTypes.CFG).cast[Expression]
 
   /**

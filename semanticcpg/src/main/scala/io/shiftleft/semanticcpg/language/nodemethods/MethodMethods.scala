@@ -9,6 +9,9 @@ import scala.jdk.CollectionConverters._
 
 class MethodMethods(val method: Method) extends AnyVal with NodeExtension with HasLocation {
 
+  def cfgFirst: Traversal[CfgNode] =
+    method._cfgNodeViaCfgOut
+
   def local: Traversal[Local] =
     method._blockViaContainsOut.flatMap(_._localViaAstOut)
 

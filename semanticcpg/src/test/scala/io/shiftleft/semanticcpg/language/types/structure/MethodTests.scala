@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Literal, Method, TypeDecl}
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Expression, Literal, Method, TypeDecl}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -78,15 +78,15 @@ class MethodTests extends AnyWordSpec with Matchers {
     }
 
     "expand to first expression" in {
-      val expressions: List[Expression] =
-        cpg.method.name("foo").cfgFirst.toList
+      val expressions: List[CfgNode] =
+        cpg.method.name("foo").cfgFirst.l
 
       expressions.size shouldBe 1
       expressions.head.code shouldBe "call"
     }
 
     "expand to last expression" in {
-      val expressions: List[Expression] =
+      val expressions: List[CfgNode] =
         cpg.method.name("foo").cfgLast.toList
 
       expressions.size shouldBe 1
