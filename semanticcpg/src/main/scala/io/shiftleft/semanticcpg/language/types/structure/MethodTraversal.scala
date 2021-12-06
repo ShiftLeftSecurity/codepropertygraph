@@ -4,14 +4,14 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
+import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{Traversal, help}
 
 /**
   * A method, function, or procedure
   * */
 @help.Traversal(elementType = classOf[Method])
-class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
+class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
 
   /**
     * All control structures of this method
@@ -113,8 +113,9 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     * but only referenced in the CPG.
     * */
   @Doc(info = "External methods (called, but no body available)")
-  def external: Traversal[Method] =
+  def external: Traversal[Method] = {
     traversal.has(Properties.IS_EXTERNAL -> true)
+  }
 
   /**
     * Traverse to internal methods, that is, methods for which
@@ -128,7 +129,8 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     * Traverse to the methods local variables
     * */
   @Doc(info = "Local variables declared in the method")
-  def local: Traversal[Local] = block.ast.isLocal
+  def local: Traversal[Local] =
+    traversal.block.ast.isLocal
 
   /**
     * Traverse to literals of method
@@ -151,29 +153,16 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
     traversal.flatMap(_.cfgNode)
 
   /**
-    *  Traverse to first expression in CFG.
-    */
-  @Doc(info = "First control flow graph node")
-  def cfgFirst: Traversal[Expression] =
-    traversal.out(EdgeTypes.CFG).cast[Expression]
-
-  /**
     *  Traverse to last expression in CFG.
     */
   @Doc(info = "Last control flow graph node")
-  def cfgLast: Traversal[Expression] =
+  def cfgLast: Traversal[CfgNode] =
     traversal.methodReturn.cfgLast
-
-  /**
-    * Traverse to block
-    * */
-  @Doc(info = "Root of the abstract syntax tree")
-  def block: Traversal[Block] =
-    traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.BLOCK).cast[Block]
 
   /** Traverse to method body (alias for `block`) */
   @Doc(info = "Alias for `block`")
-  def body: Traversal[Block] = block
+  def body: Traversal[Block] =
+    traversal.block
 
   /** Traverse to namespace */
   @Doc(info = "Namespace this method is declared in")

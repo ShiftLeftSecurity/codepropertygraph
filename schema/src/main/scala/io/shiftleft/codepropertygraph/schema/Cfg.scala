@@ -63,7 +63,10 @@ object Cfg extends SchemaBase {
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = cfgNode)
+      .addOutEdge(edge = cfg,
+                  inNode = cfgNode,
+                  stepNameOut = "cfgFirst",
+                  stepNameOutDoc = "First control flow graph node")
 
     fieldIdentifier
       .addOutEdge(edge = cfg, inNode = cfgNode)

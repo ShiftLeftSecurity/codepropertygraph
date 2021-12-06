@@ -412,7 +412,14 @@ object Ast extends SchemaBase {
                   stepNameOut = "parameter",
                   stepNameOutDoc = "Parameters of the method")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
+      .addOutEdge(
+        edge = ast,
+        inNode = block,
+        cardinalityOut = Cardinality.One,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "block",
+        stepNameOutDoc = "Root of the abstract syntax tree"
+      )
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
 
     ret

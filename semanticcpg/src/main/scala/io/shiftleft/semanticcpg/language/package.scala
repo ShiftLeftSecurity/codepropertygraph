@@ -92,7 +92,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
     new IdentifierTraversal(f(a))
   implicit def toMember[A](a: A)(implicit f: A => Traversal[Member]): MemberTraversal = new MemberTraversal(f(a))
   implicit def toLocal[A](a: A)(implicit f: A => Traversal[Local]): LocalTraversal = new LocalTraversal(f(a))
-  implicit def toMethod[A](a: A)(implicit f: A => Traversal[Method]): OriginalMethod = new OriginalMethod(f(a))
+  implicit def toMethod[A](traversal: IterableOnce[Method]): OriginalMethod = new OriginalMethod(traversal)
   implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[MethodParameterIn]): MethodParameterTraversal =
     new MethodParameterTraversal(f(a))
   implicit def toMethodParameterOut[A](a: A)(
