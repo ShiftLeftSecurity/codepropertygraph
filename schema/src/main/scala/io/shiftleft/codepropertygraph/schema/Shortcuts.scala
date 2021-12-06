@@ -70,7 +70,10 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = callNode)
       .addOutEdge(edge = contains, inNode = identifier)
       .addOutEdge(edge = contains, inNode = fieldIdentifier)
-      .addOutEdge(edge = contains, inNode = literal, stepNameOut = "literal", stepNameOutDoc = "Literals used in the method")
+      .addOutEdge(edge = contains,
+                  inNode = literal,
+                  stepNameOut = "literal",
+                  stepNameOutDoc = "Literals used in the method")
       .addOutEdge(edge = contains, inNode = ret)
       .addOutEdge(edge = contains, inNode = methodRef)
       .addOutEdge(edge = contains, inNode = typeRef)

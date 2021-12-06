@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, ControlStructure, Literal, Local, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, ControlStructure, Local, Method, NewLocation}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
