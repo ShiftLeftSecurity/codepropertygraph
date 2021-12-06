@@ -52,7 +52,7 @@ object Binding extends SchemaBase {
       .addOutEdge(edge = binds, inNode = binding, cardinalityIn = EdgeType.Cardinality.One)
 
     binding
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = EdgeType.Cardinality.One)
+      .addOutEdge(edge = ref, inNode = method, cardinalityOut = EdgeType.Cardinality.One, stepNameOut = "boundMethod")
 
   }
 
