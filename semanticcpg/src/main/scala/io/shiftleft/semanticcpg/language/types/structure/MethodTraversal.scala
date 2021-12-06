@@ -137,7 +137,7 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
     * */
   @Doc(info = "Literals used in the method")
   def literal: Traversal[Literal] =
-    traversal.out(EdgeTypes.CONTAINS).hasLabel(NodeTypes.LITERAL).cast[Literal]
+    traversal.flatMap(_.literal)
 
   @Doc(info = "Top level expressions (\"Statements\")")
   def topLevelExpressions: Traversal[Expression] =

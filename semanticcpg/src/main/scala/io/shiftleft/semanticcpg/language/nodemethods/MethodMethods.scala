@@ -1,6 +1,6 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, ControlStructure, Local, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, ControlStructure, Literal, Local, Method, NewLocation}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
@@ -17,6 +17,12 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
     * */
   def controlStructure: Traversal[ControlStructure] =
     method.ast.isControlStructure
+
+  /**
+    * Traverse to literals of method
+    * */
+  def literal: Traversal[Literal] =
+    method._literalViaContainsOut
 
   def numberOfLines: Int = {
     if (method.lineNumber.isDefined && method.lineNumberEnd.isDefined) {
