@@ -4,11 +4,11 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.semanticcpg.testing.MockCpg
-import org.json4s.JString
+import org.json4s._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal.{Traversal, jIteratortoTraversal}
+import overflowdb.traversal._
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -57,7 +57,7 @@ class StepsTest extends AnyWordSpec with Matchers {
         val results: List[Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
-        results.toSet shouldBe methods.toSet
+        results.toSetMutable shouldBe methods.toSetMutable
       }
     }
   }
@@ -257,16 +257,16 @@ class StepsTest extends AnyWordSpec with Matchers {
     methodParameterOut.head.typ.name.head shouldBe "paramtype"
 
     def methodReturn = cpg.methodReturn.typeFullNameExact("int")
-    methodReturn.method.name.toSet shouldBe Set("foo", "woo")
-    methodReturn.map(_.method.name).toSet shouldBe Set("foo", "woo")
+    methodReturn.method.name.toSetMutable shouldBe Set("foo", "woo")
+    methodReturn.map(_.method.name).toSetMutable shouldBe Set("foo", "woo")
 
     def namespace = cpg.namespace.name("anamespace")
-    namespace.typeDecl.name.toSet shouldBe Set("AClass")
-    namespace.head.typeDecl.name.toSet shouldBe Set("AClass")
+    namespace.typeDecl.name.toSetMutable shouldBe Set("AClass")
+    namespace.head.typeDecl.name.toSetMutable shouldBe Set("AClass")
 
     def namespaceBlock = cpg.namespaceBlock.name("anamespace")
-    namespaceBlock.typeDecl.name.toSet shouldBe Set("AClass")
-    namespaceBlock.flatMap(_.typeDecl.name).toSet shouldBe Set("AClass")
+    namespaceBlock.typeDecl.name.toSetMutable shouldBe Set("AClass")
+    namespaceBlock.flatMap(_.typeDecl.name).toSetMutable shouldBe Set("AClass")
 
     def file = cpg.file.name("afile.c")
     file.typeDecl.name.head shouldBe "AClass"
@@ -312,8 +312,8 @@ class StepsTest extends AnyWordSpec with Matchers {
     local.head.typeFullName shouldBe "alocaltype"
 
     // modifierAccessors
-    method.modifier.modifierType.toSet shouldBe Set("modifiertype")
-    method.head.modifier.modifierType.toSet shouldBe Set("modifiertype")
+    method.modifier.modifierType.toSetMutable shouldBe Set("modifiertype")
+    method.head.modifier.modifierType.toSetMutable shouldBe Set("modifiertype")
   }
 
 }

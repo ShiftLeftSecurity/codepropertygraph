@@ -2,6 +2,7 @@ package io.shiftleft.semanticcpg.layers
 
 import better.files.File
 import io.shiftleft.semanticcpg.testing.MockCpg
+import java.nio.file.Files
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -24,8 +25,8 @@ class DumpCdgTests extends AnyWordSpec with Matchers {
         new DumpCdg(opts).run(context)
         (tmpDir / "0-cdg.dot").exists shouldBe true
         (tmpDir / "1-cdg.dot").exists shouldBe true
-        (tmpDir / "0-cdg.dot").size should not be 0
-        (tmpDir / "1-cdg.dot").size should not be 0
+        Files.size((tmpDir / "0-cdg.dot").path) should not be 0
+        Files.size((tmpDir / "1-cdg.dot").path) should not be 0
       }
     }
 
