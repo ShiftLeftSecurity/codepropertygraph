@@ -1,6 +1,14 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, ControlStructure, Local, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  Block,
+  CfgNode,
+  ControlStructure,
+  Local,
+  Method,
+  NewLocation,
+  TypeDecl
+}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
@@ -56,6 +64,16 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
       )
     )
   }
+
+  /**
+    * The type declaration associated with this method, e.g., the class it is defined in.
+    * */
+  def definingTypeDecl: Traversal[TypeDecl] =
+    Traversal.fromSingle(method).definingTypeDecl
+
+  /** Traverse to method body (alias for `block`) */
+  def body: Traversal[Block] =
+    method.block
 
   override def location: NewLocation = {
     LocationCreator(

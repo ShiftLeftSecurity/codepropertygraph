@@ -53,12 +53,11 @@ object DotSerializer {
 
   private def toCfgNode(node: StoredNode): CfgNode = {
     node match {
-      case node: Identifier        => node.parentExpression.get
-      case node: MethodRef         => node.parentExpression.get
-      case node: Literal           => node.parentExpression.get
-      case node: MethodParameterIn => node.method
-      case node: MethodParameterOut =>
-        node.method.methodReturn
+      case node: Identifier         => node.parentExpression.get
+      case node: MethodRef          => node.parentExpression.get
+      case node: Literal            => node.parentExpression.get
+      case node: MethodParameterIn  => node.method
+      case node: MethodParameterOut => node.method.methodReturn
       case node: Call if MemberAccess.isGenericMemberAccessName(node.name) =>
         node.parentExpression.get
       case node: CallRepr     => node
