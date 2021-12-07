@@ -6,7 +6,8 @@ val overflowdbVersion = "1.83"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "2.13.7",
+    scalaVersion := "3.1.0",
+    crossScalaVersions := Seq("2.13.7", "3.1.0"),
     resolvers ++= Seq(
       Resolver.mavenLocal,
       "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"
@@ -76,14 +77,23 @@ addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  "-Ywarn-unused", // required by scalafix
   "-Xfatal-warnings",
   "-language:implicitConversions",
-  "-Ycache-macro-class-loader:last-modified",
-  "-Ybackend-parallelism",
-  "4",
-  "-target:jvm-1.8"
+) ++ (
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((3, _)) => Seq(
+          "-Xtarget:8"
+          )
+    case _ => Seq(
+          "-target:jvm-1.8",
+          "-Ywarn-unused", // required by scalafix
+          "-Ycache-macro-class-loader:last-modified",
+          "-Ybackend-parallelism",
+          "4",
+      )   
+  }
 )
+
 ThisBuild / compile / javacOptions ++= Seq(
   "-g", //debug symbols
   "-source", "1.8",
