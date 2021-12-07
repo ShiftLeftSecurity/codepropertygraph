@@ -7,6 +7,7 @@ import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.Node
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help}
+import overflowdb.traversal._
 
 /**
   * Steps for all node types

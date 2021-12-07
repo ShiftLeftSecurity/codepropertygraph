@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.propertyaccessors
 import io.shiftleft.codepropertygraph.generated.nodes.Modifier
 import io.shiftleft.codepropertygraph.generated.{ModifierTypes, NodeTypes, Properties}
 import overflowdb._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class ModifierAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
 

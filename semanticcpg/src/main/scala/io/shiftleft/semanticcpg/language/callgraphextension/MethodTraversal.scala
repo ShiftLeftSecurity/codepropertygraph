@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{PathAwareTraversal, Traversal}
+import overflowdb.traversal._
 
 class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
 

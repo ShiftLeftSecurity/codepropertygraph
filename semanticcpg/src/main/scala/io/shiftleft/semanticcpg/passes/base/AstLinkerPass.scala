@@ -11,6 +11,7 @@ import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
   namespaceBlockFullNameToNode,
   typeDeclFullNameToNode
 }
+import overflowdb.traversal._
 
 class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
 

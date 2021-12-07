@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.NewNode
 import io.shiftleft.passes.DiffGraph
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 trait HasStoreMethod {
   def store()(implicit diffBuilder: DiffGraph.Builder): Unit

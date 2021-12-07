@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Member, Type, TypeDecl}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   * A member variable of a class/type.

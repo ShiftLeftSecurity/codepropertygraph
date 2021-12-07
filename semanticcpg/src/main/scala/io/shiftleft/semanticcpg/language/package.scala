@@ -43,7 +43,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
 import io.shiftleft.semanticcpg.language.types.expressions.{CallTraversal => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{MethodTraversal => OriginalMethod, _}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   Language for traversing the code property graph

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.{CustomSerializer, Extraction}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 import overflowdb.traversal.help.DocFinder._
 import overflowdb.traversal.help.{Doc, TraversalHelp}
 

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.nodes.{Literal, Method}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   A literal, e.g., a constant string or number

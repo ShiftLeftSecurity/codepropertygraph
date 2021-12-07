@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.generated.nodes.Expression
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class TargetTraversal(val traversal: Traversal[Expression]) extends AnyVal {
 

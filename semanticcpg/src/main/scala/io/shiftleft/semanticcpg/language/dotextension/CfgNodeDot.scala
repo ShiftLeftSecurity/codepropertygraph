@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.dotextension
 
 import io.shiftleft.codepropertygraph.generated.nodes.Method
 import io.shiftleft.semanticcpg.dotgenerator.{DotCdgGenerator, DotCfgGenerator}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class CfgNodeDot(val traversal: Traversal[Method]) extends AnyVal {
 
