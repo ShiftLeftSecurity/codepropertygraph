@@ -2,9 +2,10 @@ package io.shiftleft.semanticcpg.layers
 
 import better.files.File
 import io.shiftleft.semanticcpg.testing.MockCpg
-import java.nio.file.Files
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import java.nio.file.Files
 
 class DumpAstTests extends AnyWordSpec with Matchers {
 

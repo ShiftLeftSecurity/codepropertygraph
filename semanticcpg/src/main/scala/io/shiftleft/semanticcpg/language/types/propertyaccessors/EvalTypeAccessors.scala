@@ -1,10 +1,9 @@
 package io.shiftleft.semanticcpg.language.types.propertyaccessors
 
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Properties}
-import overflowdb.Node
 import overflowdb.traversal._
 import overflowdb.traversal.filter.P
-import overflowdb.toPropertyKeyOps
+import overflowdb.{Node, toPropertyKeyOps}
 
 class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
 
