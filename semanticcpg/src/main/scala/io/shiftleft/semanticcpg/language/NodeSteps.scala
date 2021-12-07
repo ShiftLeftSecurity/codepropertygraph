@@ -5,8 +5,8 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.codedumper.CodeDumper
 import overflowdb.Node
+import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{Traversal, help}
 
 /**
   * Steps for all node types

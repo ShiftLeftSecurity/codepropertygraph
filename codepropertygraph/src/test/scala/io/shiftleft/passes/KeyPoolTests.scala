@@ -39,7 +39,7 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
 
     "return empty iterator when asked to create 0 partitions" in {
       val keyPool = new IntervalKeyPool(1, 1000)
-      keyPool.split(0) shouldBe Iterator()
+      keyPool.split(0).hasNext shouldBe false
     }
 
   }

@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.operatorextension
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
 import io.shiftleft.semanticcpg.language.operatorextension.nodemethods._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 trait Implicits {
   implicit def toNodeTypeStartersOperatorExtension(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)

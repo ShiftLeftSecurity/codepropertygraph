@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, MethodRef}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class MethodRefTraversal(val traversal: Traversal[MethodRef]) extends AnyVal {
 

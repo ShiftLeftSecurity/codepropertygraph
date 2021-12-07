@@ -5,6 +5,8 @@ import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.nio.file.Files
+
 class DumpAstTests extends AnyWordSpec with Matchers {
 
   "DumpAst" should {
@@ -23,8 +25,8 @@ class DumpAstTests extends AnyWordSpec with Matchers {
         new DumpAst(opts).run(context)
         (tmpDir / "0-ast.dot").exists shouldBe true
         (tmpDir / "1-ast.dot").exists shouldBe true
-        (tmpDir / "0-ast.dot").size should not be 0
-        (tmpDir / "1-ast.dot").size should not be 0
+        Files.size((tmpDir / "0-ast.dot").path) should not be 0
+        Files.size((tmpDir / "1-ast.dot").path) should not be 0
       }
     }
 

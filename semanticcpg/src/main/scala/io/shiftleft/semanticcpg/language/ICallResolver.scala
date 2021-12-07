@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.{CallRepr, Method}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._

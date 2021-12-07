@@ -14,7 +14,7 @@ class MemberTests extends AnyWordSpec with Matchers {
 
   "Member traversals" should {
     "should find two members: `member` and `static_member`" in {
-      cpg.member.name.toSet shouldBe Set("amember")
+      cpg.member.name.toSetMutable shouldBe Set("amember")
     }
 
     "filter by modifier" in {

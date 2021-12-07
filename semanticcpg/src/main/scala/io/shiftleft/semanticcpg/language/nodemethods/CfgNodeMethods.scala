@@ -4,7 +4,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
