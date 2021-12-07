@@ -36,7 +36,7 @@ object Hidden extends SchemaBase {
     import callGraph._
     import typeDeclSchema._
 
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     /*
      * Closure bindings

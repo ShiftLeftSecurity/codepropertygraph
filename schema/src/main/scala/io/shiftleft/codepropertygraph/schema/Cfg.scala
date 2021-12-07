@@ -22,7 +22,7 @@ object Cfg extends SchemaBase {
     new Schema(builder, methodSchema, ast)
 
   class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
 

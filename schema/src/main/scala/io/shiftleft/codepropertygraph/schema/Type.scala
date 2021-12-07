@@ -22,7 +22,7 @@ object Type extends SchemaBase {
   class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
     import base._
     import fs._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     // Properties
 

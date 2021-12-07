@@ -17,7 +17,7 @@ object Comment extends SchemaBase {
   class Schema(builder: SchemaBuilder, astSchema: Ast.Schema, fs: FileSystem.Schema) {
     import astSchema._
     import fs._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
 // node types
     val comment: NodeType = builder

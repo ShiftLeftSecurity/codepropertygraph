@@ -38,7 +38,7 @@ object TagsAndLocation extends SchemaBase {
     import ast._
     import fs._
     import callGraph._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
     val symbol = builder

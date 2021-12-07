@@ -18,7 +18,7 @@ object Finding extends SchemaBase {
     new Schema(builder, base)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import base._
 
 // node properties

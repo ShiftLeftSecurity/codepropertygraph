@@ -43,7 +43,7 @@ object Ast extends SchemaBase {
                methodSchema: Method.Schema,
                typeSchema: Type.Schema,
                fs: FileSystem.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
