@@ -89,7 +89,6 @@ object Cfg extends SchemaBase {
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)
-
   }
 
 }
