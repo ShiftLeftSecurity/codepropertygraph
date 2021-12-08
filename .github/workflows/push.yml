@@ -22,7 +22,7 @@ jobs:
         distribution: 'adopt'
         java-version: 11
     - name: Compile and run tests
-      run: sbt compile test
+      run: sbt +test
     - name: Check formatting
       run: sbt scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
     - run: echo "Previous step failed because code is not formatted. Run 'sbt format'"
