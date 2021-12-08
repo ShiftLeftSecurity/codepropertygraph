@@ -59,8 +59,7 @@ object Shortcuts extends SchemaBase {
       )
       .protoId(12)
 
-    methodParameterIn
-      .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
+    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut)
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
@@ -82,52 +81,39 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = jumpTarget)
       .addOutEdge(edge = contains, inNode = unknown)
 
-    methodParameterIn
-      .addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
+    methodParameterIn.addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
 
-    methodParameterOut
-      .addOutEdge(edge = evalType, inNode = tpe)
+    methodParameterOut.addOutEdge(edge = evalType, inNode = tpe)
 
-    methodReturn
-      .addOutEdge(edge = evalType, inNode = tpe)
+    methodReturn.addOutEdge(edge = evalType, inNode = tpe)
 
     methodRef
       .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
       .addOutEdge(edge = evalType, inNode = tpe)
 
-    typeRef
-      .addOutEdge(edge = evalType, inNode = tpe)
+    typeRef.addOutEdge(edge = evalType, inNode = tpe)
 
-    tpe
-      .addOutEdge(edge = ref, inNode = typeDecl)
+    tpe.addOutEdge(edge = ref, inNode = typeDecl)
 
-    typeDecl
-      .addOutEdge(edge = contains, inNode = method)
+    typeDecl.addOutEdge(edge = contains, inNode = method)
 
-    member
-      .addOutEdge(edge = evalType, inNode = tpe)
+    member.addOutEdge(edge = evalType, inNode = tpe)
 
-    literal
-      .addOutEdge(edge = evalType, inNode = tpe)
+    literal.addOutEdge(edge = evalType, inNode = tpe)
 
     callNode
       .addOutEdge(edge = ref, inNode = member)
       .addOutEdge(edge = evalType, inNode = tpe)
 
-    local
-      .addOutEdge(edge = evalType, inNode = tpe)
+    local.addOutEdge(edge = evalType, inNode = tpe)
 
-    identifier
-      .addOutEdge(edge = evalType, inNode = tpe)
+    identifier.addOutEdge(edge = evalType, inNode = tpe)
 
-    block
-      .addOutEdge(edge = evalType, inNode = tpe)
+    block.addOutEdge(edge = evalType, inNode = tpe)
 
-    controlStructure
-      .addOutEdge(edge = evalType, inNode = tpe)
+    controlStructure.addOutEdge(edge = evalType, inNode = tpe)
 
-    unknown
-      .addOutEdge(edge = evalType, inNode = tpe)
+    unknown.addOutEdge(edge = evalType, inNode = tpe)
 
   }
 
