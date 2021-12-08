@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{EdgeType, NodeBaseType, NodeType, SchemaBuilder, SchemaInfo}
+import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Hidden extends SchemaBase {
   override def index: Int = -1
