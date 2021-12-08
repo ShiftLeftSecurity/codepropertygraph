@@ -394,7 +394,7 @@ object Ast extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One, stepNameIn = "typeDecl", stepNameInDoc = "The type declaration this member is defined in")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     method
