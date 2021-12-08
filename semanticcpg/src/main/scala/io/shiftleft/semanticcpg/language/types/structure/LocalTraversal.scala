@@ -31,11 +31,4 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
   def referencingIdentifiers: Traversal[Identifier] =
     traversal.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
 
-  /**
-    * The type of the local.
-    *
-    * Unfortunately, `type` is a keyword, so we use `typ` here.
-    * */
-  def typ: Traversal[Type] =
-    traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
 }

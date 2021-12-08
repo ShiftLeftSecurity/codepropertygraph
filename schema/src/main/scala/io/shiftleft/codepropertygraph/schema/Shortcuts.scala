@@ -105,7 +105,7 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = ref, inNode = member)
       .addOutEdge(edge = evalType, inNode = tpe)
 
-    local.addOutEdge(edge = evalType, inNode = tpe)
+    local.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "The type of the local.")
 
     identifier.addOutEdge(edge = evalType, inNode = tpe)
 
