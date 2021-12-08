@@ -27,7 +27,7 @@ class CpgSchema(builder: SchemaBuilder) {
   val tagsAndLocation = TagsAndLocation(builder, base, typeSchema, method, ast, fs, callGraph)
   val binding = Binding(builder, base, typeSchema, method)
   val finding = Finding(builder, base)
-  val hidden = Hidden(builder, base, method, typeSchema, ast, fs, callGraph)
+  val hidden = Hidden(builder, base, method, typeSchema, ast, cfg, fs, callGraph)
   val protoSerialize = ProtoSerialize(builder, ast)
 }
 

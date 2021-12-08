@@ -18,14 +18,16 @@ object Hidden extends SchemaBase {
             methodSchema: Method.Schema,
             typeDecl: Type.Schema,
             ast: Ast.Schema,
+            cfg: Cfg.Schema,
             fs: FileSystem.Schema,
-            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, fs, callGraph)
+            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
 
   class Schema(builder: SchemaBuilder,
                base: Base.Schema,
                methodSchema: Method.Schema,
                typeDeclSchema: Type.Schema,
                astSchema: Ast.Schema,
+               cfg: Cfg.Schema,
                fsSchema: FileSystem.Schema,
                callGraph: CallGraph.Schema) {
 
@@ -227,6 +229,18 @@ object Hidden extends SchemaBase {
     block.addOutEdge(edge = ast, inNode = importNode)
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
+
+    val dataFlow = builder
+      .addEdgeType(
+        name = "DATA_FLOW",
+        comment = """
+                    |EXPERIMENTAL: This edge indicates data flow between two CFG nodes. This is calculated on calls to
+                    |reachableBy using REACHING_DEFs edges and used to store cached data to improve the performance of
+                    |incremental data flow analysis.""".stripMargin
+      )
+      .protoId(12345)
+
+    cfg.cfgNode.addOutEdge(edge = dataFlow, inNode = cfg.cfgNode)
   }
 
 }
