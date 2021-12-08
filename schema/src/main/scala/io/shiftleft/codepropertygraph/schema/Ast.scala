@@ -440,7 +440,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeRef)
       .addOutEdge(edge = ast, inNode = ret)
       .addOutEdge(edge = ast, inNode = block, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = local)
+      .addOutEdge(edge = ast, inNode = local, stepNameIn = "definingBlock", stepNameInDoc = "The block in which local is declared.")
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)

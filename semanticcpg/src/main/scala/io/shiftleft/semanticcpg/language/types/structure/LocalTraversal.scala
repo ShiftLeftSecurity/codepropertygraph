@@ -20,12 +20,6 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
   }
 
   /**
-    * The block in which local is declared.
-    */
-  def definingBlock: Traversal[Block] =
-    traversal.in(EdgeTypes.AST).cast[Block]
-
-  /**
     * Places (identifier) where this local is being referenced
     * */
   def referencingIdentifiers: Traversal[Identifier] =
