@@ -24,7 +24,7 @@ jobs:
     - name: Compile and run tests
       run: sbt +test
     - name: Check formatting
-      run: sbt scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
+      run: sbt ++2.13.7 scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
     - run: echo "Previous step failed because code is not formatted. Run 'sbt format'"
       if: ${{ failure() }}
 
