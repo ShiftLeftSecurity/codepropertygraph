@@ -565,20 +565,14 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = block)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    ret
-      .addOutEdge(edge = ast, inNode = callNode)
+    ret.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
+    unknown.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = condition, inNode = callNode)
 
     block
       .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
-
-    unknown
-      .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = condition, inNode = callNode)
+      .addOutEdge(edge = ast, inNode = local, stepNameOut = "local", stepNameOutDoc = "Traverse to locals of this block.")
 
     // To refactor
 
@@ -586,8 +580,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne, stepNameIn = "referencingIdentifiers", stepNameInDoc = "Places (identifier) where this local is being referenced")
       .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
 
-    namespaceBlock
-      .addOutEdge(edge = ref, inNode = namespace)
+    namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
   }
 
