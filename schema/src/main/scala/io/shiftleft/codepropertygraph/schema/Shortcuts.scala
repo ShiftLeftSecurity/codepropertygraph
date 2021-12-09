@@ -59,7 +59,7 @@ object Shortcuts extends SchemaBase {
       )
       .protoId(12)
 
-    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut)
+    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut, stepNameIn = "asInput")
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
@@ -82,9 +82,7 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = unknown)
 
     methodParameterIn.addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
-
-    methodParameterOut.addOutEdge(edge = evalType, inNode = tpe)
-
+    methodParameterOut.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "Traverse to parameter type")
     methodReturn.addOutEdge(edge = evalType, inNode = tpe)
 
     methodRef
@@ -92,13 +90,9 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = evalType, inNode = tpe)
 
     typeRef.addOutEdge(edge = evalType, inNode = tpe)
-
     tpe.addOutEdge(edge = ref, inNode = typeDecl)
-
     typeDecl.addOutEdge(edge = contains, inNode = method)
-
     member.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "Traverse to member type")
-
     literal.addOutEdge(edge = evalType, inNode = tpe)
 
     callNode
@@ -106,15 +100,10 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = evalType, inNode = tpe)
 
     local.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "The type of the local.")
-
     identifier.addOutEdge(edge = evalType, inNode = tpe)
-
     block.addOutEdge(edge = evalType, inNode = tpe)
-
     controlStructure.addOutEdge(edge = evalType, inNode = tpe)
-
     unknown.addOutEdge(edge = evalType, inNode = tpe)
-
   }
 
 }
