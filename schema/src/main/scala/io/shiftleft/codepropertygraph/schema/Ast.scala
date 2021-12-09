@@ -583,7 +583,7 @@ object Ast extends SchemaBase {
     // To refactor
 
     identifier
-      .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne, stepNameIn = "referencingIdentifiers", stepNameInDoc = "Places (identifier) where this local is being referenced")
       .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
 
     namespaceBlock

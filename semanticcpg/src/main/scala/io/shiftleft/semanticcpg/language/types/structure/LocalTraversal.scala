@@ -19,10 +19,4 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
     //definingBlock.method
   }
 
-  /**
-    * Places (identifier) where this local is being referenced
-    * */
-  def referencingIdentifiers: Traversal[Identifier] =
-    traversal.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
-
 }
