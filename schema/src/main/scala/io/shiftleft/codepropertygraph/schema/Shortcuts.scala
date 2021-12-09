@@ -97,7 +97,7 @@ object Shortcuts extends SchemaBase {
 
     typeDecl.addOutEdge(edge = contains, inNode = method)
 
-    member.addOutEdge(edge = evalType, inNode = tpe)
+    member.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "Traverse to member type")
 
     literal.addOutEdge(edge = evalType, inNode = tpe)
 
