@@ -234,7 +234,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     def member = cpg.member.name("amember")
     member.typeDecl.name.head shouldBe "AClass"
-    member.head.typeDecl.name.head shouldBe "AClass"
+    member.head.typeDecl.name shouldBe "AClass"
 
     def local = cpg.local.name("local")
     local.typ.name.head shouldBe "alocaltype"
