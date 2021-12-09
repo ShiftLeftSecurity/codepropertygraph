@@ -59,8 +59,7 @@ object Namespace extends SchemaBase {
       .protoId(40)
       .addProperties(name)
 
-    namespaceBlock
-      .addOutEdge(edge = sourceFile, inNode = file)
+    namespaceBlock.addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "namespaceBlock")
 
   }
 

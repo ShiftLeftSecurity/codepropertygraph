@@ -3,13 +3,10 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 
 object Comment extends SchemaBase {
+  def index = 12
+  override def providedByFrontend = true
 
-  def index: Int = 12
-  override def providedByFrontend: Boolean = true
-
-  override def description: String =
-    """
-      |""".stripMargin
+  override def description = ""
 
   def apply(builder: SchemaBuilder, ast: Ast.Schema, fs: FileSystem.Schema) =
     new Schema(builder, ast, fs)
@@ -19,7 +16,6 @@ object Comment extends SchemaBase {
     import fs._
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
-// node types
     val comment: NodeType = builder
       .addNodeType(
         name = "COMMENT",
@@ -29,13 +25,8 @@ object Comment extends SchemaBase {
       .addProperties(filename)
       .extendz(astNode)
 
-// node relations
-    comment
-      .addOutEdge(edge = sourceFile, inNode = comment)
-
-    file
-      .addOutEdge(edge = ast, inNode = comment)
-
+    comment.addOutEdge(edge = sourceFile, inNode = comment, stepNameOut = "file")
+    file.addOutEdge(edge = ast, inNode = comment, stepNameOut = "comment")
   }
 
 }

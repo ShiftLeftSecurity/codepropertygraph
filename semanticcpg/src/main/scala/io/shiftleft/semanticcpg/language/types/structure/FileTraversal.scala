@@ -9,20 +9,8 @@ import overflowdb.traversal._
   * */
 class FileTraversal(val traversal: Traversal[File]) extends AnyVal {
 
-  def typeDecl: Traversal[TypeDecl] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.TYPE_DECL).cast[TypeDecl]
-
   def namespace: Traversal[Namespace] =
     traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).out(EdgeTypes.REF).cast[Namespace]
-
-  def namespaceBlock: Traversal[NamespaceBlock] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[NamespaceBlock]
-
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.SOURCE_FILE).hasLabel(NodeTypes.METHOD).cast[Method]
-
-  def comment: Traversal[Comment] =
-    traversal.out(EdgeTypes.AST).hasLabel(NodeTypes.COMMENT).cast[Comment]
 
 }
 
