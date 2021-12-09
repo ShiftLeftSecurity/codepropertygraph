@@ -37,7 +37,7 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
     parameterOut.typeFullName shouldBe "some.Type"
     parameterOut.lineNumber.get shouldBe 10
 
-    parameterOut._methodViaAstIn.next() shouldBe method
+    parameterOut.method shouldBe method
   }
 
 }

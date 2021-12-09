@@ -32,7 +32,4 @@ class MethodParameterOutTraversal(val traversal: Traversal[MethodParameterOut]) 
       if arg.argumentIndex == paramOut.order
     } yield arg
 
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.AST).cast[Method]
-
 }
