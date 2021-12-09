@@ -394,7 +394,11 @@ object Ast extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = ast,
+                  inNode = member,
+                  cardinalityIn = Cardinality.One,
+                  stepNameIn = "typeDecl",
+                  stepNameInDoc = "The type declaration this member is defined in")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     method
@@ -440,7 +444,10 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeRef)
       .addOutEdge(edge = ast, inNode = ret)
       .addOutEdge(edge = ast, inNode = block, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = local)
+      .addOutEdge(edge = ast,
+                  inNode = local,
+                  stepNameIn = "definingBlock",
+                  stepNameInDoc = "The block in which local is declared.")
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)
@@ -565,29 +572,31 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = block)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    ret
-      .addOutEdge(edge = ast, inNode = callNode)
+    ret.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
+    unknown.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = condition, inNode = callNode)
 
     block
       .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
-
-    unknown
-      .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = condition, inNode = callNode)
+      .addOutEdge(edge = ast,
+                  inNode = local,
+                  stepNameOut = "local",
+                  stepNameOutDoc = "Traverse to locals of this block.")
 
     // To refactor
 
     identifier
-      .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = ref,
+        inNode = local,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        stepNameIn = "referencingIdentifiers",
+        stepNameInDoc = "Places (identifier) where this local is being referenced"
+      )
       .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
 
-    namespaceBlock
-      .addOutEdge(edge = ref, inNode = namespace)
+    namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
   }
 

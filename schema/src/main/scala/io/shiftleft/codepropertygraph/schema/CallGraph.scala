@@ -62,8 +62,7 @@ object CallGraph extends SchemaBase {
       .mandatory(PropertyDefaults.String)
       .protoId(54)
 
-    expression
-      .addProperties(argumentIndex, argumentName)
+    expression.addProperties(argumentIndex, argumentName)
 
     val evaluationStrategy = builder
       .addProperty(

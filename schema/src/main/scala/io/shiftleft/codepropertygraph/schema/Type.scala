@@ -188,7 +188,7 @@ object Type extends SchemaBase {
     typeDecl
       .addOutEdge(edge = inheritsFrom, inNode = tpe)
       .addOutEdge(edge = aliasOf, inNode = tpe)
-      .addOutEdge(edge = sourceFile, inNode = file)
+      .addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "typeDecl")
 
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)

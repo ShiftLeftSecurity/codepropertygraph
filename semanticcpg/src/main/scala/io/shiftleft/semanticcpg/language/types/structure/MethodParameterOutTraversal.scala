@@ -23,25 +23,16 @@ class MethodParameterOutTraversal(val traversal: Traversal[MethodParameterOut]) 
   def indexTo(num: Int): Traversal[MethodParameterOut] =
     traversal.filter(_.order <= num)
 
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.AST).cast[Method]
-
   def argument: Traversal[Expression] =
     for {
       paramOut <- traversal
-      method <- paramOut._methodViaAstIn
+      method <- paramOut.method
       call <- method._callViaCallIn
       arg <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
       if arg.argumentIndex == paramOut.order
     } yield arg
 
-  def asInput: Traversal[MethodParameterIn] =
-    traversal.in(EdgeTypes.PARAMETER_LINK).cast[MethodParameterIn]
-
-  /**
-    * Traverse to parameter type
-    * */
-  def typ: Traversal[Type] =
-    traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
+  def method: Traversal[Method] =
+    traversal.in(EdgeTypes.AST).cast[Method]
 
 }
