@@ -1,6 +1,5 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
-import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
@@ -31,8 +30,5 @@ class MethodParameterOutTraversal(val traversal: Traversal[MethodParameterOut]) 
       arg <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
       if arg.argumentIndex == paramOut.order
     } yield arg
-
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.AST).cast[Method]
 
 }

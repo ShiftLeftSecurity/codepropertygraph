@@ -506,7 +506,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
     method
-      .addOutEdge(edge = ast, inNode = methodParameterOut)
+      .addOutEdge(edge = ast, inNode = methodParameterOut, cardinalityIn = Cardinality.One, stepNameIn = "method")
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
