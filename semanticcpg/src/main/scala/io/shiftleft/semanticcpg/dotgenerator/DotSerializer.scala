@@ -84,7 +84,9 @@ object DotSerializer {
     if (str == null) {
       ""
     } else {
-      str.replace("\"", "\\\"")
+      // Here, \\\\ means a literal \ and \" means a literal ".
+      // We need this to get valid dot files for literal \" sequences.
+      str.replace("\"", "\\\\"")
     }
   }
 
