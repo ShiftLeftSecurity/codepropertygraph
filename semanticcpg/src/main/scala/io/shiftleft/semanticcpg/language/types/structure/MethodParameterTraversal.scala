@@ -32,18 +32,12 @@ class MethodParameterTraversal(val traversal: Traversal[MethodParameterIn]) exte
     traversal.filter(_.order <= num)
 
   /**
-    * Traverse to method associated with this formal parameter
-    * */
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.AST).cast[Method]
-
-  /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
   def argument(implicit callResolver: ICallResolver): Traversal[Expression] =
     for {
       paramIn <- traversal
-      call <- callResolver.getMethodCallsites(paramIn._methodViaAstIn)
+      call <- callResolver.getMethodCallsites(paramIn.method)
       arg <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
       if arg.argumentIndex == paramIn.order
     } yield arg

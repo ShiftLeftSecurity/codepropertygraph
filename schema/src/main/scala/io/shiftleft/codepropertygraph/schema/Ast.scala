@@ -413,7 +413,9 @@ object Ast extends SchemaBase {
                   inNode = methodParameterIn,
                   cardinalityIn = Cardinality.One,
                   stepNameOut = "parameter",
-                  stepNameOutDoc = "Parameters of the method")
+                  stepNameOutDoc = "Parameters of the method",
+        stepNameIn = "method",
+        stepNameInDoc = "Traverse to method associated with this formal parameter")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(
         edge = ast,
