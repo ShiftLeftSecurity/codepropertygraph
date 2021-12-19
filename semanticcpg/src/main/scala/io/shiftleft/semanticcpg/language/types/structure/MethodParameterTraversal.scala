@@ -43,12 +43,6 @@ class MethodParameterTraversal(val traversal: Traversal[MethodParameterIn]) exte
     } yield arg
 
   /**
-    * Places (identifier) where this parameter is being referenced
-    * */
-  def referencingIdentifiers: Traversal[Identifier] =
-    traversal.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
-
-  /**
     * Traverse to parameter type
     * */
   def typ: Traversal[Type] =

@@ -593,7 +593,7 @@ object Ast extends SchemaBase {
         stepNameIn = "referencingIdentifiers",
         stepNameInDoc = "Places (identifier) where this local is being referenced"
       )
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne, stepNameIn = "referencingIdentifiers", stepNameInDoc = "Places (identifier) where this parameter is being referenced")
 
     namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
