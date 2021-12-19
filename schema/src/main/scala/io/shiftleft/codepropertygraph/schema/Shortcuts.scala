@@ -81,7 +81,9 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = jumpTarget)
       .addOutEdge(edge = contains, inNode = unknown)
 
-    methodParameterIn.addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
+    methodParameterIn.addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One,
+      stepNameOut = "typ",
+      stepNameOutDoc = "Traverse to parameter type")
     methodParameterOut.addOutEdge(edge = evalType,
                                   inNode = tpe,
                                   stepNameOut = "typ",

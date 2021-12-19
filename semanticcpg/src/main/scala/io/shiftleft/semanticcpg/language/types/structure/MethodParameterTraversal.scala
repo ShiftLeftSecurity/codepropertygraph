@@ -42,10 +42,4 @@ class MethodParameterTraversal(val traversal: Traversal[MethodParameterIn]) exte
       if arg.argumentIndex == paramIn.order
     } yield arg
 
-  /**
-    * Traverse to parameter type
-    * */
-  def typ: Traversal[Type] =
-    traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
-
 }
