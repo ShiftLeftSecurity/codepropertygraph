@@ -478,7 +478,6 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = controlStructure)
 
     unknown.addOutEdge(edge = ast, inNode = member)
-
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     namespaceBlock

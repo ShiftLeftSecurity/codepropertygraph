@@ -104,14 +104,9 @@ object CallGraph extends SchemaBase {
       ).protoId(3),
     )
 
-    methodParameterIn
-      .addProperties(evaluationStrategy)
-
-    methodReturn
-      .addProperties(evaluationStrategy)
-
-    methodParameterOut
-      .addProperties(evaluationStrategy)
+    methodParameterIn.addProperties(evaluationStrategy)
+    methodReturn.addProperties(evaluationStrategy)
+    methodParameterOut.addProperties(evaluationStrategy)
 
     val dispatchType = builder
       .addProperty(
