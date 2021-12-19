@@ -409,13 +409,15 @@ object Ast extends SchemaBase {
         stepNameOut = "methodReturn",
         stepNameOutDoc = "Formal return parameters"
       )
-      .addOutEdge(edge = ast,
-                  inNode = methodParameterIn,
-                  cardinalityIn = Cardinality.One,
-                  stepNameOut = "parameter",
-                  stepNameOutDoc = "Parameters of the method",
+      .addOutEdge(
+        edge = ast,
+        inNode = methodParameterIn,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "parameter",
+        stepNameOutDoc = "Parameters of the method",
         stepNameIn = "method",
-        stepNameInDoc = "Traverse to method associated with this formal parameter")
+        stepNameInDoc = "Traverse to method associated with this formal parameter"
+      )
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(
         edge = ast,
@@ -593,7 +595,13 @@ object Ast extends SchemaBase {
         stepNameIn = "referencingIdentifiers",
         stepNameInDoc = "Places (identifier) where this local is being referenced"
       )
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne, stepNameIn = "referencingIdentifiers", stepNameInDoc = "Places (identifier) where this parameter is being referenced")
+      .addOutEdge(
+        edge = ref,
+        inNode = methodParameterIn,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        stepNameIn = "referencingIdentifiers",
+        stepNameInDoc = "Places (identifier) where this parameter is being referenced"
+      )
 
     namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
