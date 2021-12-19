@@ -39,7 +39,7 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
   }
 
   def cfgNode: Traversal[CfgNode] =
-    method._containsOut.asScala.collect { case cfgNode: CfgNode => cfgNode }
+    method._containsOut.collectAll[CfgNode]
 
   /**
     * List of CFG nodes in reverse post order

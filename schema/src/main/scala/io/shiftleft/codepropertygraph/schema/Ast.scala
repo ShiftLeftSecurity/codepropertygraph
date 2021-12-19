@@ -386,8 +386,7 @@ object Ast extends SchemaBase {
       )
       .protoId(56)
 
-    file
-      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
+    file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     member.addOutEdge(edge = ast, inNode = modifier)
     tpe.addOutEdge(edge = ast, inNode = typeArgument)
@@ -478,8 +477,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    unknown
-      .addOutEdge(edge = ast, inNode = member)
+    unknown.addOutEdge(edge = ast, inNode = member)
 
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
