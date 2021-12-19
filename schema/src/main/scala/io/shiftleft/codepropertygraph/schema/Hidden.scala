@@ -90,11 +90,9 @@ object Hidden extends SchemaBase {
     // node relations
     local.addOutEdge(edge = capturedBy, inNode = closureBinding)
 
-    methodRef
-      .addOutEdge(edge = capture, inNode = closureBinding)
+    methodRef.addOutEdge(edge = capture, inNode = closureBinding)
 
-    typeRef
-      .addOutEdge(edge = capture, inNode = closureBinding)
+    typeRef.addOutEdge(edge = capture, inNode = closureBinding)
 
     closureBinding
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = EdgeType.Cardinality.One)

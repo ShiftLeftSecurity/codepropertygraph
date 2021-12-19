@@ -102,8 +102,6 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[NamespaceBlock]): NamespaceBlockTraversal =
     new NamespaceBlockTraversal(f(a))
   implicit def toFile[A](a: A)(implicit f: A => Traversal[File]): FileTraversal = new FileTraversal(f(a))
-  implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[MethodRef]): MethodRefTraversal =
-    new MethodRefTraversal(f(a))
 
   // Call graph extension
   implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[Method]): MethodTraversal =

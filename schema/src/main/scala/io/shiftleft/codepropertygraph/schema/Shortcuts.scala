@@ -89,7 +89,7 @@ object Shortcuts extends SchemaBase {
     methodReturn.addOutEdge(edge = evalType, inNode = tpe)
 
     methodRef
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
+      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One, stepNameOut = "referencedMethod", stepNameOutDoc = "Traverse to referenced method.")
       .addOutEdge(edge = evalType, inNode = tpe)
 
     typeRef.addOutEdge(edge = evalType, inNode = tpe)
