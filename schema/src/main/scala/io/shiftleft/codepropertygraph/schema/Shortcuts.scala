@@ -59,7 +59,7 @@ object Shortcuts extends SchemaBase {
       )
       .protoId(12)
 
-    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut, stepNameIn = "asInput")
+    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut, stepNameIn = "asInput", stepNameOut = "asOutput", stepNameOutDoc = "Traverse to corresponding formal output parameter")
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)

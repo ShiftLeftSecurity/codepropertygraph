@@ -43,12 +43,6 @@ class MethodParameterTraversal(val traversal: Traversal[MethodParameterIn]) exte
     } yield arg
 
   /**
-    * Traverse to corresponding formal output parameter
-    * */
-  def asOutput: Traversal[MethodParameterOut] =
-    traversal.out(EdgeTypes.PARAMETER_LINK).cast[MethodParameterOut]
-
-  /**
     * Places (identifier) where this parameter is being referenced
     * */
   def referencingIdentifiers: Traversal[Identifier] =
