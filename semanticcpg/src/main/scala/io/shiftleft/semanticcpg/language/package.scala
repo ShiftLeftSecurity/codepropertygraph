@@ -87,6 +87,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
     new ControlStructureTraversal(f(a))
   implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[Identifier]): IdentifierTraversal =
     new IdentifierTraversal(f(a))
+  implicit def toMember(traversal: IterableOnce[Member]): MemberTraversal = new MemberTraversal(traversal)
   implicit def toLocal(traversal: IterableOnce[Local]): LocalTraversal = new LocalTraversal(traversal)
   implicit def toMethod(traversal: IterableOnce[Method]): OriginalMethod = new OriginalMethod(traversal)
   implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[MethodParameterIn]): MethodParameterTraversal =

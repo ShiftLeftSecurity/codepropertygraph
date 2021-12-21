@@ -116,8 +116,7 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = ref,
                   inNode = member,
                   stepNameOut = "referencedMember",
-                  stepNameOutDoc = "Traverse to referenced members",
-                  stepNameIn = "refsCall")
+                  stepNameOutDoc = "Traverse to referenced members")
       .addOutEdge(edge = evalType, inNode = tpe)
 
     local.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "The type of the local.")
