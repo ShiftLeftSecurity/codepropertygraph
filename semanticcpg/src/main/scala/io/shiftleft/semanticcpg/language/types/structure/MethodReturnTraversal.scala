@@ -40,7 +40,4 @@ class MethodReturnTraversal(val traversal: Traversal[MethodReturn]) extends AnyV
   @Doc(info = "traverse to return type")
   def typ: Traversal[Type] =
     traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
-
-  def toReturn: Traversal[Return] =
-    traversal.flatMap(_.toReturn)
 }

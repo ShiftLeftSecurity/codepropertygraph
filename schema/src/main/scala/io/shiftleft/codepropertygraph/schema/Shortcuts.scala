@@ -59,7 +59,13 @@ object Shortcuts extends SchemaBase {
       )
       .protoId(12)
 
-    methodParameterIn.addOutEdge(edge = parameterLink, inNode = methodParameterOut, stepNameIn = "asInput")
+    methodParameterIn.addOutEdge(
+      edge = parameterLink,
+      inNode = methodParameterOut,
+      stepNameIn = "asInput",
+      stepNameOut = "asOutput",
+      stepNameOutDoc = "Traverse to corresponding formal output parameter"
+    )
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
@@ -81,7 +87,11 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = jumpTarget)
       .addOutEdge(edge = contains, inNode = unknown)
 
-    methodParameterIn.addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
+    methodParameterIn.addOutEdge(edge = evalType,
+                                 inNode = tpe,
+                                 cardinalityOut = Cardinality.One,
+                                 stepNameOut = "typ",
+                                 stepNameOutDoc = "Traverse to parameter type")
     methodParameterOut.addOutEdge(edge = evalType,
                                   inNode = tpe,
                                   stepNameOut = "typ",
@@ -89,7 +99,11 @@ object Shortcuts extends SchemaBase {
     methodReturn.addOutEdge(edge = evalType, inNode = tpe)
 
     methodRef
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
+      .addOutEdge(edge = ref,
+                  inNode = method,
+                  cardinalityOut = Cardinality.One,
+                  stepNameOut = "referencedMethod",
+                  stepNameOutDoc = "Traverse to referenced method.")
       .addOutEdge(edge = evalType, inNode = tpe)
 
     typeRef.addOutEdge(edge = evalType, inNode = tpe)
@@ -99,7 +113,10 @@ object Shortcuts extends SchemaBase {
     literal.addOutEdge(edge = evalType, inNode = tpe)
 
     callNode
-      .addOutEdge(edge = ref, inNode = member)
+      .addOutEdge(edge = ref,
+                  inNode = member,
+                  stepNameOut = "referencedMember",
+                  stepNameOutDoc = "Traverse to referenced members")
       .addOutEdge(edge = evalType, inNode = tpe)
 
     local.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "The type of the local.")

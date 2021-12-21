@@ -29,7 +29,7 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
     val methodDecorator = new MethodDecoratorPass(new Cpg(graph))
     methodDecorator.createAndApply()
 
-    val parameterOut = parameterIn._methodParameterOutViaParameterLinkOut.next()
+    val parameterOut = parameterIn.asOutput.next()
     parameterOut.code shouldBe "p1"
     parameterOut.order shouldBe 1
     parameterOut.name shouldBe "p1"

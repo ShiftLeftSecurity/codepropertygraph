@@ -88,7 +88,8 @@ object Cfg extends SchemaBase {
     ret.addOutEdge(edge = cfg,
                    inNode = methodReturn,
                    cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.ZeroOrOne)
+                   cardinalityIn = Cardinality.ZeroOrOne,
+                   stepNameIn = "toReturn")
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)

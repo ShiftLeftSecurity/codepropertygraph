@@ -13,8 +13,6 @@ import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
-import scala.jdk.CollectionConverters._
-
 class MethodMethods(val method: Method) extends AnyVal with NodeExtension with HasLocation {
 
   def local: Traversal[Local] =
@@ -39,7 +37,7 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
   }
 
   def cfgNode: Traversal[CfgNode] =
-    method._containsOut.asScala.collect { case cfgNode: CfgNode => cfgNode }
+    method._containsOut.collectAll[CfgNode]
 
   /**
     * List of CFG nodes in reverse post order

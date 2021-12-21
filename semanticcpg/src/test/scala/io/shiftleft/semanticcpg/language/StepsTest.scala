@@ -246,7 +246,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     def methodParameterIn = cpg.parameter.name("param1")
     methodParameterIn.typ.name.head shouldBe "paramtype"
-    methodParameterIn.head.typ.name.head shouldBe "paramtype"
+    methodParameterIn.head.typ.name shouldBe "paramtype"
 
     def methodParameterOut =
       cpg.graph

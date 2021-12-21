@@ -50,10 +50,4 @@ class CallTraversal(val traversal: Traversal[Call]) extends AnyVal {
       .hasLabel(NodeTypes.METHOD_RETURN)
       .cast[MethodReturn]
 
-  /**
-    * Traverse to referenced members
-    * */
-  def referencedMember: Traversal[Member] =
-    traversal.out(EdgeTypes.REF).cast[Member]
-
 }

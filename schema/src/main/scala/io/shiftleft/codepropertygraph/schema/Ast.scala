@@ -386,8 +386,7 @@ object Ast extends SchemaBase {
       )
       .protoId(56)
 
-    file
-      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
+    file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     member.addOutEdge(edge = ast, inNode = modifier)
     tpe.addOutEdge(edge = ast, inNode = typeArgument)
@@ -410,11 +409,15 @@ object Ast extends SchemaBase {
         stepNameOut = "methodReturn",
         stepNameOutDoc = "Formal return parameters"
       )
-      .addOutEdge(edge = ast,
-                  inNode = methodParameterIn,
-                  cardinalityIn = Cardinality.One,
-                  stepNameOut = "parameter",
-                  stepNameOutDoc = "Parameters of the method")
+      .addOutEdge(
+        edge = ast,
+        inNode = methodParameterIn,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "parameter",
+        stepNameOutDoc = "Parameters of the method",
+        stepNameIn = "method",
+        stepNameInDoc = "Traverse to method associated with this formal parameter"
+      )
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
       .addOutEdge(
         edge = ast,
@@ -478,9 +481,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    unknown
-      .addOutEdge(edge = ast, inNode = member)
-
+    unknown.addOutEdge(edge = ast, inNode = member)
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     namespaceBlock
@@ -594,7 +595,13 @@ object Ast extends SchemaBase {
         stepNameIn = "referencingIdentifiers",
         stepNameInDoc = "Places (identifier) where this local is being referenced"
       )
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = ref,
+        inNode = methodParameterIn,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        stepNameIn = "referencingIdentifiers",
+        stepNameInDoc = "Places (identifier) where this parameter is being referenced"
+      )
 
     namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
