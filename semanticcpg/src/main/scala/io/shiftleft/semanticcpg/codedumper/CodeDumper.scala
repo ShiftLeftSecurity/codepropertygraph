@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.codedumper
 
-import better.files.File
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.x2cpg.IOUtils
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.nio.file.Paths
 import scala.util.Try
 
 object CodeDumper {
@@ -64,7 +65,7 @@ object CodeDumper {
     * an arrow (as a source code comment) is included right before that line.
     * */
   def code(filename: String, startLine: Integer, endLine: Integer, lineToHighlight: Option[Integer] = None): String = {
-    val lines = Try(File(filename).lines.toList).getOrElse {
+    val lines = Try(IOUtils.readLinesInFile(Paths.get(filename))).getOrElse {
       logger.warn("error reading from: " + filename);
       List()
     }
