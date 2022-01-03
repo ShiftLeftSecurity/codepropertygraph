@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.codedumper
 
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation, Local}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.x2cpg.IOUtils
 import org.slf4j.{Logger, LoggerFactory}
@@ -37,6 +37,7 @@ object CodeDumper {
     val method = node match {
       case n: Method     => Some(n)
       case n: Expression => Some(n.method)
+      case n: Local      => Some(n.method)
       case _             => None
     }
 
