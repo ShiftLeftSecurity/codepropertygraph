@@ -1,7 +1,6 @@
 package io.shiftleft.x2cpg
 
 import java.io.Reader
-import java.math.BigInteger
 import java.nio.charset.{CharsetDecoder, CodingErrorAction}
 import java.nio.file.Path
 import scala.io.{BufferedSource, Codec, Source}
@@ -24,8 +23,6 @@ object IOUtils {
       .onMalformedInput(CodingErrorAction.REPLACE)
       .onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-  private val validUnicodeRegex = """([a-zA-Z0-9]){4}""".r
-
   private val boms = Set(
     '\uefbb', // UTF-8
     '\ufeff', // UTF-16 (BE)
@@ -41,25 +38,21 @@ object IOUtils {
     }
   }
 
-  private def removeUnpairedSurrogates(input: String): String = {
-    var result = input
-    """(\\u)""".r.findAllMatchIn(input).foreach { pos =>
-      val matchedString = input.substring(pos.start + 2, pos.start + 6)
-      if (validUnicodeRegex.matches(matchedString)) {
-        val c = new BigInteger(matchedString, 16).intValue().asInstanceOf[Char]
-        if (Character.isLowSurrogate(c) || Character.isHighSurrogate(c)) {
-          // removing them including leading '\' (needs escapes for backslash itself + for the regex construction)
-          result = result.replaceAll("(\\\\)*\\\\u" + matchedString, "")
-        }
-      }
-    }
-    result
-  }
+  /**
+    * Java strings are stored as sequences of 16-bit chars, but what they represent is sequences of unicode characters.
+    * In unicode terminology, they are stored as code units, but model code points. Thus, it's somewhat meaningless
+    * to talk about removing surrogates, which don't exist in the character / code point representation
+    * (unless you have rogue single surrogates, in which case you have other problems).
+    * Rather, what you want to do is to remove any characters which will require surrogates when encoded.
+    * That means any character which lies beyond the basic multilingual plane. You can do that with a simple regular expression.
+    */
+  private def replaceUnpairedSurrogates(input: String): String =
+    input.replaceAll("[^\u0000-\uffff]", "???")
 
   private def contentFromBufferedSource(bufferedSource: BufferedSource): Seq[String] = {
     val reader = bufferedSource.bufferedReader()
     skipBOMIfPresent(reader)
-    reader.lines().iterator().asScala.map(removeUnpairedSurrogates).toSeq
+    reader.lines().iterator().asScala.map(replaceUnpairedSurrogates).toSeq
   }
 
   private def bufferedSourceFromFile(path: Path): BufferedSource = {
