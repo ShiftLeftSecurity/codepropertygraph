@@ -6,7 +6,7 @@ val overflowdbVersion = "1.84"
 inThisBuild(
   List(
     organization := "io.shiftleft",
-    scalaVersion := "3.1.0",
+    scalaVersion := "2.13.7",
     crossScalaVersions := Seq("2.13.7", "3.1.0"),
     resolvers ++= Seq(
       Resolver.mavenLocal,
