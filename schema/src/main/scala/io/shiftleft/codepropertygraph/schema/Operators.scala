@@ -90,6 +90,7 @@ object Operators extends SchemaBase {
                value = "<operators>.assignmentXor",
                valueType = ValueTypes.STRING,
                comment = ""),
+      Constant(name = "arrayInitializer", value = "<operators>.arrayInitializer", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "assignment", value = "<operator>.assignment", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "minus", value = "<operator>.minus", valueType = ValueTypes.STRING, comment = "E.g. `a = -b`"),
       Constant(name = "plus", value = "<operator>.plus", valueType = ValueTypes.STRING, comment = "E.g. `a = +b`"),
