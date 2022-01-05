@@ -10,8 +10,6 @@ class TargetTraversal(val traversal: Traversal[Expression]) extends AnyVal {
     *   `x = buf[idxs[i]];``
     * then it will return two array accesses.
     */
-  def arrayAccess: Traversal[opnodes.ArrayAccess] = traversal.flatMap(_.arrayAccess)
+  def arrayAccess: Traversal[OpNodes.ArrayAccess] = traversal.flatMap(_.arrayAccess)
 
-  @deprecated("isArrayAccess is deprecated in favor if arrayAccess, due to counterintuitive naming")
-  def isArrayAccess: Traversal[opnodes.ArrayAccess] = arrayAccess
 }

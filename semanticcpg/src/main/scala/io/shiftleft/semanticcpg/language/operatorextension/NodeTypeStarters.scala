@@ -9,19 +9,19 @@ import overflowdb.traversal.help.{Doc, TraversalSource}
 class NodeTypeStarters(cpg: Cpg) {
 
   @Doc(info = "All assignments, including shorthand assignments that perform arithmetic (e.g., '+=')")
-  def assignment: Traversal[opnodes.Assignment] =
+  def assignment: Traversal[OpNodes.Assignment] =
     callsWithNameIn(allAssignmentTypes)
-      .map(new opnodes.Assignment(_))
+      .map(new OpNodes.Assignment(_))
 
   @Doc(info = "All arithmetic operations, including shorthand assignments that perform arithmetic (e.g., '+=')")
-  def arithmetic: Traversal[opnodes.Arithmetic] =
+  def arithmetic: Traversal[OpNodes.Arithmetic] =
     callsWithNameIn(allArithmeticTypes)
-      .map(new opnodes.Arithmetic(_))
+      .map(new OpNodes.Arithmetic(_))
 
   @Doc(info = "All array accesses")
-  def arrayAccess: Traversal[opnodes.ArrayAccess] =
+  def arrayAccess: Traversal[OpNodes.ArrayAccess] =
     callsWithNameIn(allArrayAccessTypes)
-      .map(new opnodes.ArrayAccess(_))
+      .map(new OpNodes.ArrayAccess(_))
 
   private def callsWithNameIn(set: Set[String]) =
     cpg.call.filter(x => set.contains(x.name))
