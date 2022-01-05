@@ -11,6 +11,7 @@ object NodeTypeStarters {
   val assignmentAndArithmetic: Set[String] = Set(
     Operators.assignmentDivision,
     Operators.assignmentExponentiation,
+    Operators.assignmentPlus,
     Operators.assignmentMinus,
     Operators.assignmentModulo,
     Operators.assignmentMultiplication,
@@ -24,7 +25,6 @@ object NodeTypeStarters {
     Operators.assignment,
     Operators.assignmentOr,
     Operators.assignmentAnd,
-    Operators.assignmentPlus,
     Operators.assignmentXor,
     Operators.assignmentArithmeticShiftRight,
     Operators.assignmentLogicalShiftRight,
