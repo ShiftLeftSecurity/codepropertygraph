@@ -134,11 +134,11 @@ package object testing {
         }
       }
 
-    def withCallInMethod(methodName: String, callName: String): MockCpg =
+    def withCallInMethod(methodName: String, callName: String, code: Option[String] = None): MockCpg =
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
         val blockNode = methodNode.block.head
-        val callNode = NewCall().name(callName).code(callName)
+        val callNode = NewCall().name(callName).code(code.getOrElse(callName))
         graph.addNode(callNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)
@@ -168,7 +168,6 @@ package object testing {
         graph.addNode(typeDecl)
         graph.addNode(literalNode)
         graph.addEdge(callNode, literalNode, EdgeTypes.AST)
-
         graph.addEdge(methodNode, literalNode, EdgeTypes.CONTAINS)
       }
     }

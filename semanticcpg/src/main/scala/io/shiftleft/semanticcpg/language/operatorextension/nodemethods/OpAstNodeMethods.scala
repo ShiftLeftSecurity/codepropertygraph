@@ -7,14 +7,20 @@ import overflowdb.traversal._
 
 class OpAstNodeMethods[A <: AstNode](val node: A) extends AnyVal {
   def inAssignment: Traversal[opnodes.Assignment] =
-    node.start.inAstMinusLeaf.isCall.name(ExtStarters.assignmentPattern).map(new opnodes.Assignment(_))
+    node.start.inAstMinusLeaf.isCall
+      .filter { x =>
+        ExtStarters.allAssignmentTypes.contains(x.name)
+      }
+      .map(new opnodes.Assignment(_))
 
   def assignments: Traversal[opnodes.Assignment] =
-    rawTravForPattern(ExtStarters.assignmentPattern).map(new opnodes.Assignment(_))
+    rawTravForPattern(ExtStarters.allAssignmentTypes).map(new opnodes.Assignment(_))
 
   def arithmetics: Traversal[opnodes.Arithmetic] =
-    rawTravForPattern(ExtStarters.arithmeticPattern).map(new opnodes.Arithmetic(_))
+    rawTravForPattern(ExtStarters.allArithmeticTypes).map(new opnodes.Arithmetic(_))
 
-  private def rawTravForPattern(pattern: String): Traversal[Call] =
-    node.ast.isCall.name(pattern)
+  private def rawTravForPattern(strings: Set[String]): Traversal[Call] =
+    node.ast.isCall.filter { x =>
+      strings.contains(x.name)
+    }
 }
