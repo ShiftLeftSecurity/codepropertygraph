@@ -159,8 +159,16 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
 
   /** Traverse to namespace */
   @Doc(info = "Namespace this method is declared in")
-  def namespace: Traversal[Namespace] =
-    definingTypeDecl.namespace
+  def namespace: Traversal[Namespace] = {
+    traversal.choose(_.astParentType) {
+      case NamespaceBlock.Label =>
+        // some language frontends don't have a TYPE_DECL for a METHOD
+        _.astParent.collectAll[NamespaceBlock].namespace
+      case _ =>
+        // other language frontends always embed their method in a TYPE_DECL
+        _.definingTypeDecl.namespace
+    }
+  }
 
   def numberOfLines: Traversal[Int] = traversal.map(_.numberOfLines)
 
