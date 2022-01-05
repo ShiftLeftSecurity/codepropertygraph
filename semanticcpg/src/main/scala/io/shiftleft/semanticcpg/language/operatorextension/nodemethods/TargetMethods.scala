@@ -1,19 +1,19 @@
 package io.shiftleft.semanticcpg.language.operatorextension.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{Call, Expression}
+import io.shiftleft.codepropertygraph.generated.nodes.Expression
+import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.operatorextension.{OpNodes, allArrayAccessTypes}
 import overflowdb.traversal._
 
 class TargetMethods(val expr: Expression) extends AnyVal {
 
   /**
-    * Top-level array accesses, e.g., foo[bar], but not x->foo[bar].
+    * Array access at highest level, e.g., in a(b(c)), the entire expression
+    * is returned, but not b(c) alone.
     * */
-  def arrayAccess: Traversal[OpNodes.ArrayAccess] = {
-    expr match {
-      case c: Call if allArrayAccessTypes.contains(c.name) => Traversal(c)
-      case _                                               => Traversal()
-    }
-  }.map(new OpNodes.ArrayAccess(_))
+  def arrayAccess: Traversal[OpNodes.ArrayAccess] =
+    expr.ast.isCall
+      .collectFirst { case x if allArrayAccessTypes.contains(x.name) => x }
+      .map(new OpNodes.ArrayAccess(_))
 
 }
