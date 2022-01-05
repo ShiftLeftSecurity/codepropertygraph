@@ -85,7 +85,10 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       y.name shouldBe "x"
     }
 
-    "only traverse to outer most array access for a target" in {
+  }
+
+  "Target" should {
+    "only traverse to outer most array access for a target.arrayAccess" in {
       val cpg = MockCpg()
         .withMethod(methodName)
         .withCallInMethod(methodName, Operators.assignment)

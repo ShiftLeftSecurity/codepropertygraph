@@ -7,7 +7,10 @@ import overflowdb.traversal.help.Doc
 
 class TargetTraversal(val traversal: Traversal[Expression]) extends AnyVal {
 
-  @Doc(info = "(Top-level) array accesses used as assignment targets")
+  @Doc(info = "(Outer-most) array accesses used as assignment targets")
   def arrayAccess: Traversal[OpNodes.ArrayAccess] = traversal.flatMap(_.arrayAccess)
+
+  @Doc(info = "Returns 'pointer' in assignments of the form *(pointer) = x")
+  def pointer: Traversal[Expression] = traversal.flatMap(_.pointer)
 
 }
