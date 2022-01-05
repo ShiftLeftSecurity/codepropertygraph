@@ -7,12 +7,12 @@ import overflowdb.traversal._
 
 trait Implicits {
   implicit def toNodeTypeStartersOperatorExtension(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
-  implicit def toArrayAccessExt(arrayAccess: opnodes.ArrayAccess): ArrayAccessMethods =
+  implicit def toArrayAccessExt(arrayAccess: OpNodes.ArrayAccess): ArrayAccessMethods =
     new ArrayAccessMethods(arrayAccess)
-  implicit def toArrayAccessTrav(steps: Traversal[opnodes.ArrayAccess]): ArrayAccessTraversal =
+  implicit def toArrayAccessTrav(steps: Traversal[OpNodes.ArrayAccess]): ArrayAccessTraversal =
     new ArrayAccessTraversal(steps)
-  implicit def toAssignmentExt(assignment: opnodes.Assignment): AssignmentMethods = new AssignmentMethods(assignment)
-  implicit def toAssignmentTrav(steps: Traversal[opnodes.Assignment]): AssignmentTraversal =
+  implicit def toAssignmentExt(assignment: OpNodes.Assignment): AssignmentMethods = new AssignmentMethods(assignment)
+  implicit def toAssignmentTrav(steps: Traversal[OpNodes.Assignment]): AssignmentTraversal =
     new AssignmentTraversal(steps)
   implicit def toTargetExt(call: Expression): TargetMethods = new TargetMethods(call)
   implicit def toTargetTrav(steps: Traversal[Expression]): TargetTraversal = new TargetTraversal(steps)

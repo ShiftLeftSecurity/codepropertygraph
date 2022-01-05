@@ -2,19 +2,21 @@ package io.shiftleft.semanticcpg.language.operatorextension.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.operatorextension.{NodeTypeStarters => ExtStarters, _}
+import io.shiftleft.semanticcpg.language.operatorextension.{OpNodes, allArithmeticTypes, allAssignmentTypes}
 import overflowdb.traversal._
 
 class OpAstNodeMethods[A <: AstNode](val node: A) extends AnyVal {
-  def inAssignment: Traversal[opnodes.Assignment] =
-    node.start.inAstMinusLeaf.isCall.name(ExtStarters.assignmentPattern).map(new opnodes.Assignment(_))
+  def inAssignment: Traversal[OpNodes.Assignment] =
+    node.start.inAstMinusLeaf.isCall
+      .filter(x => allAssignmentTypes.contains(x.name))
+      .map(new OpNodes.Assignment(_))
 
-  def assignments: Traversal[opnodes.Assignment] =
-    rawTravForPattern(ExtStarters.assignmentPattern).map(new opnodes.Assignment(_))
+  def assignments: Traversal[OpNodes.Assignment] =
+    rawTravForPattern(allAssignmentTypes).map(new OpNodes.Assignment(_))
 
-  def arithmetics: Traversal[opnodes.Arithmetic] =
-    rawTravForPattern(ExtStarters.arithmeticPattern).map(new opnodes.Arithmetic(_))
+  def arithmetics: Traversal[OpNodes.Arithmetic] =
+    rawTravForPattern(allArithmeticTypes).map(new OpNodes.Arithmetic(_))
 
-  private def rawTravForPattern(pattern: String): Traversal[Call] =
-    node.ast.isCall.name(pattern)
+  private def rawTravForPattern(strings: Set[String]): Traversal[Call] =
+    node.ast.isCall.filter(x => strings.contains(x.name))
 }
