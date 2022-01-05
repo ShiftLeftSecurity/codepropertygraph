@@ -172,15 +172,16 @@ package object testing {
       }
     }
 
-    def withIdentifierArgument(callName: String, name: String): MockCpg =
+    def withIdentifierArgument(callName: String, name: String, index: Int = 1): MockCpg =
       withCustom { (graph, cpg) =>
         val callNode = cpg.call.name(callName).head
         val methodNode = callNode.method.head
-        val identifierNode = NewIdentifier().name(name)
+        val identifierNode = NewIdentifier().name(name).argumentIndex(index)
         val typeDecl = NewTypeDecl().name("abc")
         graph.addNode(identifierNode)
         graph.addNode(typeDecl)
         graph.addEdge(callNode, identifierNode, EdgeTypes.AST)
+        graph.addEdge(callNode, identifierNode, EdgeTypes.ARGUMENT)
         graph.addEdge(methodNode, identifierNode, EdgeTypes.CONTAINS)
         graph.addEdge(identifierNode, typeDecl, EdgeTypes.REF)
       }

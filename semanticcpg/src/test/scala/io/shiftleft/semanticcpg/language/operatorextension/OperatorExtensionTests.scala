@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
-import io.shiftleft.codepropertygraph.generated.nodes.{Identifier, NewIdentifier}
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, Operators}
+import io.shiftleft.codepropertygraph.generated.Operators
+import io.shiftleft.codepropertygraph.generated.nodes.Identifier
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -41,39 +41,60 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       x.name shouldBe Operators.indexAccess
       x.code shouldBe "x[i]"
     }
+
+    def mockCpgWithCallAndCode(name: String, code: String) =
+      MockCpg()
+        .withMethod(methodName)
+        .withCallInMethod(methodName, name, Some(code))
+        .cpg
+
   }
 
   "Assignment" should {
     "allow traversing to target/source for assignment with two arguments" in {
       val cpg = MockCpg()
         .withMethod(methodName)
-        .withCallInMethod(methodName, Operators.assignment, Some("x = y"))
-        .withCustom { (graph, cpg) =>
-          val List(call) = cpg.call(Operators.assignment).l
-          val arg1 = NewIdentifier().name("x").argumentIndex(1)
-          val arg2 = NewIdentifier().name("y").argumentIndex(2)
-          graph.addNode(arg1)
-          graph.addNode(arg2)
-          graph.addEdge(call, arg1, EdgeTypes.ARGUMENT)
-          graph.addEdge(call, arg2, EdgeTypes.ARGUMENT)
-        }
+        .withCallInMethod(methodName, Operators.assignment)
+        .withIdentifierArgument(Operators.assignment, "x", 1)
+        .withIdentifierArgument(Operators.assignment, "y", 2)
         .cpg
 
       val List(target: Identifier) = cpg.assignment.target.l
       target.name shouldBe "x"
       val List(source: Identifier) = cpg.assignment.source.l
       source.name shouldBe "y"
-
       val List((x: Identifier, y: Identifier)) = cpg.assignment.map(x => (x.target, x.source)).l
       x.name shouldBe "x"
       y.name shouldBe "y"
     }
-  }
 
-  private def mockCpgWithCallAndCode(name: String, code: String) =
-    MockCpg()
-      .withMethod(methodName)
-      .withCallInMethod(methodName, name, Some(code))
-      .cpg
+    "allow traversing to target/source from assignment with one argument (e.g., 'i++')" in {
+      val cpg = MockCpg()
+        .withMethod(methodName)
+        .withCallInMethod(methodName, Operators.postIncrement)
+        .withIdentifierArgument(Operators.postIncrement, "x", 1)
+        .cpg
+
+      val List(target: Identifier) = cpg.assignment.target.l
+      target.name shouldBe "x"
+      val List(source: Identifier) = cpg.assignment.source.l
+      source.name shouldBe "x"
+      val List((x: Identifier, y: Identifier)) = cpg.assignment.map(x => (x.target, x.source)).l
+      x.name shouldBe "x"
+      y.name shouldBe "x"
+    }
+
+    "allow traversing to determine targets that are array accesses" in {
+      val cpg = MockCpg()
+        .withMethod(methodName)
+        .withCallInMethod(methodName, Operators.assignment)
+        .withIdentifierArgument(Operators.assignment, "x", 1)
+        .withIdentifierArgument(Operators.assignment, "y", 2)
+        .cpg
+
+      cpg.assignment.target.arrayAccess
+    }
+
+  }
 
 }
