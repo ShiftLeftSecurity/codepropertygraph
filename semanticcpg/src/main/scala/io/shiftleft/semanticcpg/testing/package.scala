@@ -173,18 +173,21 @@ package object testing {
     }
 
     def withIdentifierArgument(callName: String, name: String, index: Int = 1): MockCpg =
-      withCustom { (graph, cpg) =>
-        val callNode = cpg.call.name(callName).head
-        val methodNode = callNode.method.head
-        val identifierNode = NewIdentifier().name(name).argumentIndex(index)
-        val typeDecl = NewTypeDecl().name("abc")
-        graph.addNode(identifierNode)
-        graph.addNode(typeDecl)
-        graph.addEdge(callNode, identifierNode, EdgeTypes.AST)
-        graph.addEdge(callNode, identifierNode, EdgeTypes.ARGUMENT)
-        graph.addEdge(methodNode, identifierNode, EdgeTypes.CONTAINS)
-        graph.addEdge(identifierNode, typeDecl, EdgeTypes.REF)
-      }
+      withArgument(callName, NewIdentifier().name(name).argumentIndex(index))
+
+    def withCallArgument(callName: String, callArgName: String, code: String = "", index: Int = 1): MockCpg =
+      withArgument(callName, NewCall().name(callArgName).code(code).argumentIndex(index))
+
+    def withArgument(callName: String, newNode: NewNode): MockCpg = withCustom { (graph, cpg) =>
+      val callNode = cpg.call.name(callName).head
+      val methodNode = callNode.method.head
+      val typeDecl = NewTypeDecl().name("abc")
+      graph.addEdge(callNode, newNode, EdgeTypes.AST)
+      graph.addEdge(callNode, newNode, EdgeTypes.ARGUMENT)
+      graph.addEdge(methodNode, newNode, EdgeTypes.CONTAINS)
+      graph.addEdge(newNode, typeDecl, EdgeTypes.REF)
+      graph.addNode(newNode)
+    }
 
     def withCustom(f: (DiffGraph.Builder, Cpg) => Unit): MockCpg = {
       val diffGraph = new DiffGraph.Builder

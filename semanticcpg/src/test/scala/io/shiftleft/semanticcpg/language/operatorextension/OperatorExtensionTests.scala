@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.operatorextension
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.Identifier
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.operatorextension.OpNodes.ArrayAccess
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -88,13 +89,13 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       val cpg = MockCpg()
         .withMethod(methodName)
         .withCallInMethod(methodName, Operators.assignment)
-        .withIdentifierArgument(Operators.assignment, "x", 1)
+        .withCallArgument(Operators.assignment, Operators.indexAccess, "x[1]", 1)
         .withIdentifierArgument(Operators.assignment, "y", 2)
         .cpg
-
-      cpg.assignment.target.arrayAccess
+      val List(x: ArrayAccess) = cpg.assignment.target.arrayAccess.l
+      x.name shouldBe Operators.indexAccess
+      x.code shouldBe "x[1]"
     }
-
   }
 
 }
