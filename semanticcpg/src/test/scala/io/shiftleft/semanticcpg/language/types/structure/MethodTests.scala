@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
-import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Expression, Literal, Method, TypeDecl}
+import io.shiftleft.codepropertygraph.generated.nodes.{CfgNode, Expression, Literal, Method, NamespaceBlock, TypeDecl}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
@@ -44,9 +44,28 @@ class MethodTests extends AnyWordSpec with Matchers {
       queryResult.head.code shouldBe "literal"
     }
 
-    "expand to namespace" in {
-      val queryResult: Set[String] = cpg.method.namespace.name.l.distinct.toSet
-      queryResult shouldBe Set("namespace")
+    "expand to namespace" when {
+      "method is within a typeDecl (as for most frontends)" in {
+        val queryResult: Set[String] = cpg.method.namespace.name.l.distinct.toSet
+        queryResult shouldBe Set("namespace")
+      }
+
+      "method is directly within a namespace" in {
+        val cpg = MockCpg()
+          .withNamespace("namespace")
+          .withMethod("foo")
+          .withCustom {
+            case (graph, cpg) =>
+              val namespaceBlock = cpg.namespaceBlock("namespace").head
+              val method = cpg.method("foo").head
+              graph.addNodeProperty(method, Method.PropertyNames.AstParentType, NamespaceBlock.Label)
+              graph.addEdge(namespaceBlock, method, EdgeTypes.AST)
+          }
+          .cpg
+
+        val queryResult: Set[String] = cpg.method.namespace.name.l.distinct.toSet
+        queryResult shouldBe Set("namespace")
+      }
     }
 
     "filter by name" in {
