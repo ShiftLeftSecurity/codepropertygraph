@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language.operatorextension.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.Expression
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.semanticcpg.language.operatorextension.opnodes
+import io.shiftleft.semanticcpg.language.operatorextension.{allArrayAccessTypes, opnodes}
 import overflowdb.traversal._
 
 class TargetMethods(val expr: Expression) extends AnyVal {
@@ -14,10 +13,7 @@ class TargetMethods(val expr: Expression) extends AnyVal {
     */
   def arrayAccess: Traversal[opnodes.ArrayAccess] =
     expr.ast.isCall
-      .nameExact(Operators.computedMemberAccess,
-                 Operators.indirectComputedMemberAccess,
-                 Operators.indexAccess,
-                 Operators.indirectIndexAccess)
+      .filter(x => allArrayAccessTypes.contains(x.name))
       .map(new opnodes.ArrayAccess(_))
 
   @deprecated("isArrayAccess is deprecated in favor if arrayAccess, due to counterintuitive naming")
