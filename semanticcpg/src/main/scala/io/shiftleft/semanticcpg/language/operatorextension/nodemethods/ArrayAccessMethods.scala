@@ -9,6 +9,16 @@ class ArrayAccessMethods(val arrayAccess: OpNodes.ArrayAccess) extends AnyVal {
   def array: Expression =
     arrayAccess.argument(1)
 
+  def offset: Expression = arrayAccess.argument(2)
+
   def subscripts: Traversal[Identifier] =
-    arrayAccess.argument(2).ast.isIdentifier
+    offset.ast.isIdentifier
+
+  def usesConstantOffset: Boolean = {
+    (offset.ast.isIdentifier.size > 0) || {
+      val literalIndices = offset.ast.isLiteral.l
+      literalIndices.size == 1
+    }
+  }
+
 }
