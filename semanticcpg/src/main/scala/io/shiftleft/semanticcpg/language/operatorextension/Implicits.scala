@@ -1,11 +1,9 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, Expression}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression, Method}
 import io.shiftleft.semanticcpg.language.operatorextension.nodemethods._
 import overflowdb.traversal._
-import io.shiftleft.semanticcpg.language._
 
 trait Implicits {
   implicit def toNodeTypeStartersOperatorExtension(cpg: Cpg): NodeTypeStarters = new NodeTypeStarters(cpg)
@@ -20,15 +18,5 @@ trait Implicits {
   implicit def toTargetTrav(steps: Traversal[Expression]): TargetTraversal = new TargetTraversal(steps)
   implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
   implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNode[A] = new OpAstNode(steps)
-
-//  implicit class MethodExtension(methodTrav: Traversal[nodes.Method]) {
-//
-//    def fieldAccess: Traversal[OpNodes.FieldAccess] =
-//      callsWithNameIn(allFieldAccessTypes)
-//        .map(new OpNodes.FieldAccess(_))
-//
-//    private def callsWithNameIn(set: Set[String]) : Traversal[Call] =
-//      methodTrav.call.filter(x => set.contains(x.name))
-//  }
-
+  implicit def toOpMethodNodeTrav(steps: Traversal[Method]): OpMethodNode = new OpMethodNode(steps)
 }

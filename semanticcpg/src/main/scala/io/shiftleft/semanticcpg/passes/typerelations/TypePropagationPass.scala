@@ -33,8 +33,6 @@ class TypePropagationPass(cpg: Cpg) extends ConcurrentWriterCpgPass[Method](cpg)
     *       and if so, add it to the queue.
     **/
   override def runOnPart(builder: DiffGraph.Builder, part: Method): Unit = {
-    // TODO for the operator extension, we want steps from METHOD nodes
-    // to all of the supported operators
     val fieldAccesses = cpg.method.fieldAccess.l
     println(fieldAccesses)
   }
