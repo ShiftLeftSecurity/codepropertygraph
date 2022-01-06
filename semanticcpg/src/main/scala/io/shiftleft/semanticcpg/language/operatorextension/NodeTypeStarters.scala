@@ -23,6 +23,11 @@ class NodeTypeStarters(cpg: Cpg) {
     callsWithNameIn(allArrayAccessTypes)
       .map(new OpNodes.ArrayAccess(_))
 
+  @Doc(info = "Field accesses, both direct and indirect")
+  def fieldAccess: Traversal[OpNodes.FieldAccess] =
+    callsWithNameIn(allFieldAccessTypes)
+      .map(new OpNodes.FieldAccess(_))
+
   private def callsWithNameIn(set: Set[String]) =
     cpg.call.filter(x => set.contains(x.name))
 

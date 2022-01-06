@@ -55,4 +55,13 @@ package object operatorextension {
     Operators.indirectIndexAccess
   )
 
+  /**
+    * All operators representing direct or indirect accesses
+    * to fields of data structures
+    * */
+  val allFieldAccessTypes: Set[String] = Set(
+    Operators.fieldAccess,
+    Operators.indirectFieldAccess,
+  )
+
 }
