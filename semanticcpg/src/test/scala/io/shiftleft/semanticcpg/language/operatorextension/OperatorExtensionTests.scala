@@ -1,5 +1,6 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.Identifier
 import io.shiftleft.semanticcpg.language._
@@ -11,6 +12,12 @@ import org.scalatest.wordspec.AnyWordSpec
 class OperatorExtensionTests extends AnyWordSpec with Matchers {
 
   private val methodName = "method"
+
+  def mockCpgWithCallAndCode(name: String, code: String): Cpg =
+    MockCpg()
+      .withMethod(methodName)
+      .withCallInMethod(methodName, name, Some(code))
+      .cpg
 
   "NodeTypeStarters" should {
     "allow retrieving assignments" in {
@@ -36,26 +43,50 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       x.code shouldBe "x += 10"
     }
 
-    "allow retrieving array accesses" in {
+    "allow traversing to array accesses" in {
       val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "x[i]")
       val List(x: OpNodes.ArrayAccess) = cpg.arrayAccess.l
       x.name shouldBe Operators.indexAccess
       x.code shouldBe "x[i]"
     }
 
-    "allow retrieving field accesses" in {
+    "allow traversing to field accesses" in {
       val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "x.y")
       val List(x: OpNodes.FieldAccess) = cpg.fieldAccess.l
       x.name shouldBe Operators.fieldAccess
       x.code shouldBe "x.y"
     }
 
-    def mockCpgWithCallAndCode(name: String, code: String) =
-      MockCpg()
-        .withMethod(methodName)
-        .withCallInMethod(methodName, name, Some(code))
-        .cpg
+  }
 
+  "Method" should {
+    "allow traversing to assignments" in {
+      val cpg = mockCpgWithCallAndCode(Operators.assignment, "x = 10")
+      val List(x: OpNodes.Assignment) = cpg.method.assignment.l
+      x.name shouldBe Operators.assignment
+      x.code shouldBe "x = 10"
+    }
+
+    "allow traversing to arithmetic expressions" in {
+      val cpg = mockCpgWithCallAndCode(Operators.addition, "10 + 20")
+      val List(x: OpNodes.Arithmetic) = cpg.method.arithmetic.l
+      x.name shouldBe Operators.addition
+      x.code shouldBe "10 + 20"
+    }
+
+    "allow traversing to array accesses" in {
+      val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "x[i]")
+      val List(x: OpNodes.ArrayAccess) = cpg.arrayAccess.l
+      x.name shouldBe Operators.indexAccess
+      x.code shouldBe "x[i]"
+    }
+
+    "allow traversing to field accesses" in {
+      val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "x.y")
+      val List(x: OpNodes.FieldAccess) = cpg.fieldAccess.l
+      x.name shouldBe Operators.fieldAccess
+      x.code shouldBe "x.y"
+    }
   }
 
   "Assignment" should {
