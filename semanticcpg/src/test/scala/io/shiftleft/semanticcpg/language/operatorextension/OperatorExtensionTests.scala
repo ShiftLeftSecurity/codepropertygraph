@@ -1,8 +1,10 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
+import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.Operators
 import io.shiftleft.codepropertygraph.generated.nodes.Identifier
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.semanticcpg.language.operatorextension.OpNodes.ArrayAccess
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -10,6 +12,12 @@ import org.scalatest.wordspec.AnyWordSpec
 class OperatorExtensionTests extends AnyWordSpec with Matchers {
 
   private val methodName = "method"
+
+  def mockCpgWithCallAndCode(name: String, code: String): Cpg =
+    MockCpg()
+      .withMethod(methodName)
+      .withCallInMethod(methodName, name, Some(code))
+      .cpg
 
   "NodeTypeStarters" should {
     "allow retrieving assignments" in {
@@ -35,19 +43,50 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       x.code shouldBe "x += 10"
     }
 
-    "allow retrieving array accesses" in {
+    "allow traversing to array accesses" in {
       val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "x[i]")
       val List(x: OpNodes.ArrayAccess) = cpg.arrayAccess.l
       x.name shouldBe Operators.indexAccess
       x.code shouldBe "x[i]"
     }
 
-    def mockCpgWithCallAndCode(name: String, code: String) =
-      MockCpg()
-        .withMethod(methodName)
-        .withCallInMethod(methodName, name, Some(code))
-        .cpg
+    "allow traversing to field accesses" in {
+      val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "x.y")
+      val List(x: OpNodes.FieldAccess) = cpg.fieldAccess.l
+      x.name shouldBe Operators.fieldAccess
+      x.code shouldBe "x.y"
+    }
 
+  }
+
+  "Method" should {
+    "allow traversing to assignments" in {
+      val cpg = mockCpgWithCallAndCode(Operators.assignment, "x = 10")
+      val List(x: OpNodes.Assignment) = cpg.method.assignment.l
+      x.name shouldBe Operators.assignment
+      x.code shouldBe "x = 10"
+    }
+
+    "allow traversing to arithmetic expressions" in {
+      val cpg = mockCpgWithCallAndCode(Operators.addition, "10 + 20")
+      val List(x: OpNodes.Arithmetic) = cpg.method.arithmetic.l
+      x.name shouldBe Operators.addition
+      x.code shouldBe "10 + 20"
+    }
+
+    "allow traversing to array accesses" in {
+      val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "x[i]")
+      val List(x: OpNodes.ArrayAccess) = cpg.arrayAccess.l
+      x.name shouldBe Operators.indexAccess
+      x.code shouldBe "x[i]"
+    }
+
+    "allow traversing to field accesses" in {
+      val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "x.y")
+      val List(x: OpNodes.FieldAccess) = cpg.fieldAccess.l
+      x.name shouldBe Operators.fieldAccess
+      x.code shouldBe "x.y"
+    }
   }
 
   "Assignment" should {
@@ -84,17 +123,23 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       y.name shouldBe "x"
     }
 
-    "allow traversing to determine targets that are array accesses" in {
+  }
+
+  "Target" should {
+    "only traverse to outer most array access for a target.arrayAccess" in {
       val cpg = MockCpg()
         .withMethod(methodName)
         .withCallInMethod(methodName, Operators.assignment)
-        .withIdentifierArgument(Operators.assignment, "x", 1)
+        .withCallArgument(Operators.assignment, Operators.indexAccess, "x[y[1]]", 1)
+        .withIdentifierArgument(Operators.indexAccess, "x", 1)
+        .withCallArgument(Operators.indexAccess, Operators.indexAccess, "y[1]", 2)
         .withIdentifierArgument(Operators.assignment, "y", 2)
         .cpg
 
-      cpg.assignment.target.arrayAccess
+      val List(x: ArrayAccess) = cpg.assignment.target.arrayAccess.l
+      x.name shouldBe Operators.indexAccess
+      x.code shouldBe "x[y[1]]"
     }
-
   }
 
 }

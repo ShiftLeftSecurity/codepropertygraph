@@ -4,6 +4,9 @@ import io.shiftleft.codepropertygraph.generated.Operators
 
 package object operatorextension {
 
+  /**
+    * All operators that perform both assignments and arithmetic.
+    * */
   val assignmentAndArithmetic: Set[String] = Set(
     Operators.assignmentDivision,
     Operators.assignmentExponentiation,
@@ -17,6 +20,9 @@ package object operatorextension {
     Operators.postIncrement,
   )
 
+  /**
+    * All operators that carry out assignments.
+    * */
   val allAssignmentTypes: Set[String] = Set(
     Operators.assignment,
     Operators.assignmentOr,
@@ -27,6 +33,9 @@ package object operatorextension {
     Operators.assignmentShiftLeft,
   ) ++ assignmentAndArithmetic
 
+  /**
+    * All operators representing arithmetic.
+    * */
   val allArithmeticTypes: Set[String] = Set(
     Operators.addition,
     Operators.subtraction,
@@ -36,11 +45,23 @@ package object operatorextension {
     Operators.modulo
   ) ++ assignmentAndArithmetic
 
+  /**
+    * All operators representing array accesses.
+    * */
   val allArrayAccessTypes: Set[String] = Set(
     Operators.computedMemberAccess,
     Operators.indirectComputedMemberAccess,
     Operators.indexAccess,
     Operators.indirectIndexAccess
+  )
+
+  /**
+    * All operators representing direct or indirect accesses
+    * to fields of data structures
+    * */
+  val allFieldAccessTypes: Set[String] = Set(
+    Operators.fieldAccess,
+    Operators.indirectFieldAccess,
   )
 
 }

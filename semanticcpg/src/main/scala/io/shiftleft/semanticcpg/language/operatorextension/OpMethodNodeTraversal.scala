@@ -1,12 +1,11 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
-import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
-import overflowdb.traversal.help.{Doc, TraversalSource}
+import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method}
+import io.shiftleft.semanticcpg.language.toMethodForCallGraph
+import overflowdb.traversal.Traversal
+import overflowdb.traversal.help.Doc
 
-@TraversalSource
-class NodeTypeStarters(cpg: Cpg) {
+class OpMethodNodeTraversal(methodTrav: Traversal[Method]) {
 
   @Doc(info = "All assignments, including shorthand assignments that perform arithmetic (e.g., '+=')")
   def assignment: Traversal[OpNodes.Assignment] =
@@ -28,7 +27,7 @@ class NodeTypeStarters(cpg: Cpg) {
     callsWithNameIn(allFieldAccessTypes)
       .map(new OpNodes.FieldAccess(_))
 
-  private def callsWithNameIn(set: Set[String]) =
-    cpg.call.filter(x => set.contains(x.name))
+  private def callsWithNameIn(set: Set[String]): Traversal[Call] =
+    methodTrav.call.filter(x => set.contains(x.name))
 
 }
