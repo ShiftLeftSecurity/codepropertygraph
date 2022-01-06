@@ -6,15 +6,16 @@ import io.shiftleft.semanticcpg.language.operatorextension.{OpNodes, allArithmet
 import overflowdb.traversal._
 
 class OpAstNodeMethods[A <: AstNode](val node: A) extends AnyVal {
+
   def inAssignment: Traversal[OpNodes.Assignment] =
     node.start.inAstMinusLeaf.isCall
       .filter(x => allAssignmentTypes.contains(x.name))
       .map(new OpNodes.Assignment(_))
 
-  def assignments: Traversal[OpNodes.Assignment] =
+  def assignment: Traversal[OpNodes.Assignment] =
     rawTravForPattern(allAssignmentTypes).map(new OpNodes.Assignment(_))
 
-  def arithmetics: Traversal[OpNodes.Arithmetic] =
+  def arithmetic: Traversal[OpNodes.Arithmetic] =
     rawTravForPattern(allArithmeticTypes).map(new OpNodes.Arithmetic(_))
 
   private def rawTravForPattern(strings: Set[String]): Traversal[Call] =

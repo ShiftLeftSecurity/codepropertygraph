@@ -26,7 +26,7 @@ trait Implicits {
   implicit def toTargetTrav(steps: Traversal[Expression]): TargetTraversal = new TargetTraversal(steps)
 
   implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
-  implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNode[A] = new OpAstNode(steps)
+  implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNodeTraversal[A] = new OpAstNodeTraversal(steps)
 
-  implicit def toOpMethodNodeTrav(steps: Traversal[Method]): OpMethodNode = new OpMethodNode(steps)
+  implicit def toOpMethodNodeTrav(steps: Traversal[Method]): OpMethodNodeTraversal = new OpMethodNodeTraversal(steps)
 }
