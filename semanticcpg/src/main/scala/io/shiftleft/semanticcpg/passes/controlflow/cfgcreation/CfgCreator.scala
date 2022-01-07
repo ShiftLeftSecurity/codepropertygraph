@@ -5,7 +5,7 @@ import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, Dispatch
 import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.controlflow.cfgcreation.Cfg.CfgEdgeType
-import overflowdb.traversal._
+import overflowdb.traversal.Traversal
 
 /**
   * Translation of abstract syntax trees into control flow graphs

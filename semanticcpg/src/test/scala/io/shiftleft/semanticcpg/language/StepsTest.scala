@@ -8,7 +8,7 @@ import org.json4s._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
+import overflowdb.traversal.{Traversal, jIteratortoTraversal, toElementTraversal, toNodeTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -57,7 +57,7 @@ class StepsTest extends AnyWordSpec with Matchers {
         val results: List[Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
-        results.toSetMutable shouldBe methods.toSetMutable
+        results.toSet shouldBe methods.toSet
       }
     }
   }
@@ -281,13 +281,13 @@ class StepsTest extends AnyWordSpec with Matchers {
     methodRef.referencedMethod
     methodRef.headOption.map(_.referencedMethod)
 
-    def expression: Traversal[Expression] = cpg.identifier.name("anidentifier")
+    def expression: Traversal[Expression] = cpg.identifier.name("anidentifier").cast[Expression]
     expression.expressionUp.isCall.size shouldBe 1
     expression.head.expressionUp.isCall.size shouldBe 1
 
 //    def cfg: Traversal[CfgNode] = cpg.method.name("add")
 
-    def ast: Traversal[AstNode] = cpg.method.name("foo")
+    def ast: Traversal[AstNode] = cpg.method.name("foo").cast[AstNode]
     ast.astParent.property(Properties.NAME).head shouldBe "AClass"
     ast.head.astParent.property(Properties.NAME) shouldBe "AClass"
 

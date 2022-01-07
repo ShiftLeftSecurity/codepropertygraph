@@ -3,8 +3,8 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, ControlStructure, Expression}
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Properties}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
+import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
 object ControlStructureTraversal {
   val secondChildIndex = 2

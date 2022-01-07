@@ -4,7 +4,7 @@ import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
-import overflowdb.traversal._
+import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
 
@@ -131,7 +131,7 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
           }
       }
     }
-    controllingNodes
+    Traversal.from(controllingNodes)
   }
 
   def method: Method = node match {

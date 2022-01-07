@@ -4,14 +4,14 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
-import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
+import overflowdb.traversal.{Traversal, help, toElementTraversal, toNodeTraversal}
 
 /**
   * A method, function, or procedure
   * */
 @help.Traversal(elementType = classOf[Method])
-class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
+class MethodTraversal(val iterableOnce: IterableOnce[Method]) extends AnyVal {
 
   /**
     * All control structures of this method
@@ -172,4 +172,5 @@ class MethodTraversal(val traversal: IterableOnce[Method]) extends AnyVal {
 
   def numberOfLines: Traversal[Int] = traversal.map(_.numberOfLines)
 
+  private def traversal = Traversal.from(iterableOnce)
 }

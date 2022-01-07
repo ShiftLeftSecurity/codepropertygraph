@@ -3,10 +3,9 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
-import io.shiftleft.semanticcpg.language._
 import overflowdb._
-import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
+import overflowdb.traversal.{Traversal, jIteratortoTraversal, toElementTraversal}
 
 @TraversalSource
 class NodeTypeStarters(cpg: Cpg) {
@@ -214,8 +213,7 @@ class NodeTypeStarters(cpg: Cpg) {
     cpg.graph.nodes(NodeTypes.METHOD_REF).cast[MethodRef]
 
   /**
-    * Shorthand for `cpg.methodRef
-    * .filter(_.referencedMethod.name(name))`
+    * Shorthand for `cpg.methodRef.filter(_.referencedMethod.name(name))`
     * */
   def methodRef(name: String): Traversal[MethodRef] =
     methodRef.where(_.referencedMethod.name(name))
