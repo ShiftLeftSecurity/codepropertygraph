@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, ControlStructure, Expression}
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, EdgeTypes, Properties}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal.{toNodeTraversal, toElementTraversal, Traversal}
 import overflowdb.traversal.help.Doc
 
 object ControlStructureTraversal {

@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
-import overflowdb.traversal.{Traversal, help}
+import overflowdb.traversal.{help, toNodeTraversal, toElementTraversal, Traversal}
 import overflowdb.traversal.help.Doc
 
 /**
