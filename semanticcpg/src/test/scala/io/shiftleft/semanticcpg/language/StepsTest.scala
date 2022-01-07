@@ -8,7 +8,7 @@ import org.json4s._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal.{jIteratortoTraversal, toElementTraversal, toNodeTraversal, Traversal}
+import overflowdb.traversal.{Traversal, jIteratortoTraversal, toElementTraversal, toNodeTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 

@@ -4,8 +4,8 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import overflowdb._
-import overflowdb.traversal.{jIteratortoTraversal, toElementTraversal, Traversal}
 import overflowdb.traversal.help.{Doc, TraversalSource}
+import overflowdb.traversal.{Traversal, jIteratortoTraversal, toElementTraversal}
 
 @TraversalSource
 class NodeTypeStarters(cpg: Cpg) {

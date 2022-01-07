@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
 import io.shiftleft.semanticcpg.language._
 import overflowdb._
-import overflowdb.traversal.{toNodeTraversal, toElementTraversal, Traversal}
+import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
 /**
   * Type declaration - possibly a template that requires instantiation

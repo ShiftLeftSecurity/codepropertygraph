@@ -5,6 +5,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
 import overflowdb.traversal.Traversal
+
 import scala.jdk.CollectionConverters._
 
 class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {

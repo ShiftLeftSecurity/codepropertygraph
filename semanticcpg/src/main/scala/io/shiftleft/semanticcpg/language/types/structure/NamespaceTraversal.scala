@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.{toNodeTraversal, toElementTraversal, Traversal}
+import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
 /**
   * A namespace, e.g., Java package or C# namespace
