@@ -8,7 +8,7 @@ import org.json4s._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.traversal._
+import overflowdb.traversal.{Traversal, jIteratortoTraversal}
 
 class StepsTest extends AnyWordSpec with Matchers {
 
@@ -57,7 +57,7 @@ class StepsTest extends AnyWordSpec with Matchers {
         val results: List[Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
-        results.toSetMutable shouldBe methods.toSetMutable
+        results.toSet shouldBe methods.toSet
       }
     }
   }

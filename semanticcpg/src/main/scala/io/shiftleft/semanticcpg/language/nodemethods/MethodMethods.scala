@@ -1,17 +1,9 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
-import io.shiftleft.codepropertygraph.generated.nodes.{
-  Block,
-  CfgNode,
-  ControlStructure,
-  Local,
-  Method,
-  NewLocation,
-  TypeDecl
-}
+import io.shiftleft.codepropertygraph.generated.nodes.{Block, CfgNode, ControlStructure, Local, Method, NewLocation, TypeDecl}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal._
+import overflowdb.traversal.{Traversal, jIteratortoTraversal}
 
 class MethodMethods(val method: Method) extends AnyVal with NodeExtension with HasLocation {
 

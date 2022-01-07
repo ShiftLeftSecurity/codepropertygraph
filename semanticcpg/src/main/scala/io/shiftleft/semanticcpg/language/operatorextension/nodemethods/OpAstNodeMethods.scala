@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.operatorextension.nodemethods
 import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.operatorextension.{OpNodes, allArithmeticTypes, allAssignmentTypes}
-import overflowdb.traversal._
+import overflowdb.traversal.{NodeOps, Traversal}
 
 class OpAstNodeMethods[A <: AstNode](val node: A) extends AnyVal {
 
