@@ -76,14 +76,14 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
 
     "allow traversing to array accesses" in {
       val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "x[i]")
-      val List(x: OpNodes.ArrayAccess) = cpg.arrayAccess.l
+      val List(x: OpNodes.ArrayAccess) = cpg.method.arrayAccess.l
       x.name shouldBe Operators.indexAccess
       x.code shouldBe "x[i]"
     }
 
     "allow traversing to field accesses" in {
       val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "x.y")
-      val List(x: OpNodes.FieldAccess) = cpg.fieldAccess.l
+      val List(x: OpNodes.FieldAccess) = cpg.method.fieldAccess.l
       x.name shouldBe Operators.fieldAccess
       x.code shouldBe "x.y"
     }
