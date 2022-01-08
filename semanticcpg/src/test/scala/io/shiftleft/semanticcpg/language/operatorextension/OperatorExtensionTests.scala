@@ -125,11 +125,9 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
 
   }
 
-  "Target" should {
+  "Assignment Target" should {
     "only traverse to outer most array access for a target.arrayAccess" in {
-      val cpg = MockCpg()
-        .withMethod(methodName)
-        .withCallInMethod(methodName, Operators.assignment)
+      val cpg = MockAssignmentCpg()
         .withCallArgument(Operators.assignment, Operators.indexAccess, "x[y[1]]", 1)
         .withIdentifierArgument(Operators.indexAccess, "x", 1)
         .withCallArgument(Operators.indexAccess, Operators.indexAccess, "y[1]", 2)
@@ -140,6 +138,20 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       x.name shouldBe Operators.indexAccess
       x.code shouldBe "x[y[1]]"
     }
+
+    "allow traversing to pointer" in {
+      val cpg = MockAssignmentCpg()
+        .withCallArgument(Operators.assignment, Operators.indirection, "*(ptr)")
+        .withIdentifierArgument(Operators.indirection, "ptr")
+        .cpg
+      val List(x: Identifier) = cpg.assignment.target.pointer.l
+      x.name shouldBe "ptr"
+    }
+
+    def MockAssignmentCpg(): MockCpg =
+      MockCpg()
+        .withMethod(methodName)
+        .withCallInMethod(methodName, Operators.assignment)
   }
 
 }
