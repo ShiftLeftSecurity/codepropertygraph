@@ -26,7 +26,7 @@ class CallTraversal(val traversal: Traversal[Call]) extends AnyVal {
     The receiver of a call if the call has a receiver associated.
     */
   def receiver: Traversal[Expression] =
-    traversal.out(EdgeTypes.RECEIVER).cast[Expression]
+    traversal.flatMap(_.receiver)
 
   /**
     Arguments of the call

@@ -82,7 +82,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toType[A](a: A)(implicit f: A => Traversal[Type]): TypeTraversal = new TypeTraversal(f(a))
   implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): TypeDeclTraversal =
     new TypeDeclTraversal(f(a))
-  implicit def toCall[A](a: A)(implicit f: A => Traversal[Call]): OriginalCall = new OriginalCall(f(a))
+  implicit def toCall(traversal: IterableOnce[Call]): OriginalCall = new OriginalCall(traversal)
   implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[ControlStructure]): ControlStructureTraversal =
     new ControlStructureTraversal(f(a))
   implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[Identifier]): IdentifierTraversal =
