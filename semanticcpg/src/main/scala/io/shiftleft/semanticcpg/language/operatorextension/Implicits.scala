@@ -1,7 +1,7 @@
 package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression, Method}
+import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Expression}
 import io.shiftleft.semanticcpg.language.operatorextension.nodemethods._
 import overflowdb.traversal._
 
@@ -28,5 +28,4 @@ trait Implicits {
   implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
   implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNodeTraversal[A] = new OpAstNodeTraversal(steps)
 
-  implicit def toOpMethodNodeTrav(steps: Traversal[Method]): OpMethodNodeTraversal = new OpMethodNodeTraversal(steps)
 }

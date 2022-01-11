@@ -16,7 +16,7 @@ class ArrayAccessMethods(val arrayAccess: OpNodes.ArrayAccess) extends AnyVal {
     offset.ast.isIdentifier
 
   def usesConstantOffset: Boolean = {
-    (offset.ast.isIdentifier.size > 0) || {
+    offset.ast.isIdentifier.nonEmpty || {
       val literalIndices = offset.ast.isLiteral.l
       literalIndices.size == 1
     }

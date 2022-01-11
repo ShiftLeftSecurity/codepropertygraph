@@ -5,6 +5,7 @@ import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.operatorextension.{
   OpNodes,
   allArithmeticTypes,
+  allArrayAccessTypes,
   allAssignmentTypes,
   allFieldAccessTypes
 }
@@ -17,14 +18,14 @@ class OpAstNodeMethods[A <: AstNode](val node: A) extends AnyVal {
       .filter(x => allAssignmentTypes.contains(x.name))
       .map(new OpNodes.Assignment(_))
 
-  // TODO I believe these are actually incorrectly named: these methods
-  // perform safe down casts, so, they should be called `is$Type`
-
   def assignment: Traversal[OpNodes.Assignment] =
     rawTravForPattern(allAssignmentTypes).map(new OpNodes.Assignment(_))
 
   def arithmetic: Traversal[OpNodes.Arithmetic] =
     rawTravForPattern(allArithmeticTypes).map(new OpNodes.Arithmetic(_))
+
+  def arrayAccess: Traversal[OpNodes.ArrayAccess] =
+    rawTravForPattern(allArrayAccessTypes).map(new OpNodes.ArrayAccess(_))
 
   def fieldAccess: Traversal[OpNodes.FieldAccess] =
     rawTravForPattern(allFieldAccessTypes).map(new OpNodes.FieldAccess(_))
