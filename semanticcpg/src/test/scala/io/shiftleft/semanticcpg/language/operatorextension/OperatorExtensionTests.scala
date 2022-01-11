@@ -17,6 +17,7 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
     MockCpg()
       .withMethod(methodName)
       .withCallInMethod(methodName, name, Some(code))
+      .withIdentifierArgument(name, "x", 1)
       .cpg
 
   "NodeTypeStarters" should {
@@ -87,6 +88,35 @@ class OperatorExtensionTests extends AnyWordSpec with Matchers {
       x.name shouldBe Operators.fieldAccess
       x.code shouldBe "x.y"
     }
+
+    "allow traversing to enclosing assignment" in {
+      val cpg = mockCpgWithCallAndCode(Operators.assignment, "x = 10")
+      val List(x: OpNodes.Assignment) = cpg.identifier("x").inAssignment.l
+      x.name shouldBe Operators.assignment
+      x.code shouldBe "x = 10"
+    }
+
+    "allow traversing to enclosing arithmetic expressions" in {
+      val cpg = mockCpgWithCallAndCode(Operators.addition, "x + 10")
+      val List(x: OpNodes.Arithmetic) = cpg.identifier("x").inArithmetic.l
+      x.name shouldBe Operators.addition
+      x.code shouldBe "x + 10"
+    }
+
+    "allow traversing to enclosing array access" in {
+      val cpg = mockCpgWithCallAndCode(Operators.indexAccess, "y[x]")
+      val List(x: OpNodes.ArrayAccess) = cpg.identifier("x").inArrayAccess.l
+      x.name shouldBe Operators.indexAccess
+      x.code shouldBe "y[x]"
+    }
+
+    "allow traversing to enclosing field access" in {
+      val cpg = mockCpgWithCallAndCode(Operators.fieldAccess, "y->x")
+      val List(x: OpNodes.FieldAccess) = cpg.identifier("x").inFieldAccess.l
+      x.name shouldBe Operators.fieldAccess
+      x.code shouldBe "y->x"
+    }
+
   }
 
   "Assignment" should {

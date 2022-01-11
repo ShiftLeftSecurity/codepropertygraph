@@ -30,6 +30,6 @@ class OpAstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyV
   def inArrayAccess: Traversal[OpNodes.ArrayAccess] = traversal.flatMap(_.inArrayAccess)
 
   @Doc(info = "Any field access that this node is a part of (traverse up)")
-  def inFieldAccess: Traversal[OpNodes.FieldAccess] = traversal.flatMap(_.fieldAccess)
+  def inFieldAccess: Traversal[OpNodes.FieldAccess] = traversal.flatMap(_.inFieldAccess)
 
 }
