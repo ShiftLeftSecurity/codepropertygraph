@@ -6,6 +6,9 @@ import io.shiftleft.semanticcpg.language.{HasLocation, LocationCreator, _}
 import overflowdb.traversal._
 
 class CallMethods(val node: Call) extends AnyVal with NodeExtension with HasLocation {
+  def receiver: Traversal[Expression] =
+    node.receiverOut
+
   def arguments(index: Int): Traversal[Expression] =
     node._argumentOut
       .collect {
