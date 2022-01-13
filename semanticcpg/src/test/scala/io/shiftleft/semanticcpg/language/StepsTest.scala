@@ -167,14 +167,15 @@ class StepsTest extends AnyWordSpec with Matchers {
   ".help step" should {
 
     "show domain overview" in {
-      val cpg = Cpg.emptyCpg
-      cpg.help should include(".comment")
-      cpg.help should include("All comments in source-based CPGs")
-      cpg.help should include(".arithmetic")
-      cpg.help should include("All arithmetic operations")
+      val domainStartersHelp = Cpg.emptyCpg.help
+      domainStartersHelp should include(".comment")
+      domainStartersHelp should include("All comments in source-based CPGs")
+      domainStartersHelp should include(".arithmetic")
+      domainStartersHelp should include("All arithmetic operations")
     }
 
     "provide node-specific overview" in {
+      // TODO drop start
       val methodSteps = new Steps[Method](null)
       methodSteps.help should include("Available steps for Method")
       methodSteps.help should include(".namespace")
@@ -182,13 +183,20 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       methodSteps.helpVerbose should include("traversal name")
       methodSteps.helpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
+      // TODO drop end
 
-      val methodStepsHelp = Cpg.emptyCpg.method.help
-      methodStepsHelp should include("Available steps for Method")
-      methodStepsHelp should include(".namespace")
-
-      val assignmentStepsHelp = Cpg.emptyCpg.assignment.help
-      assignmentStepsHelp should include("Left-hand sides of assignments")
+      // TODO use this in future instead
+//      val methodStepsHelp = Cpg.emptyCpg.method.help
+//      methodStepsHelp should include("Available steps for Method")
+//      methodStepsHelp should include(".namespace")
+//      methodStepsHelp should include(".depth") //from AstNode
+//
+//      val methodStepsHelpVerbose = Cpg.emptyCpg.method.helpVerbose
+//      methodStepsHelpVerbose should include("traversal name")
+//      methodStepsHelpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
+//
+//      val assignmentStepsHelp = Cpg.emptyCpg.assignment.help
+//      assignmentStepsHelp should include("Left-hand sides of assignments")
     }
 
     "provides generic help" when {
