@@ -182,6 +182,13 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       methodSteps.helpVerbose should include("traversal name")
       methodSteps.helpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
+
+      val methodStepsHelp = Cpg.emptyCpg.method.help
+      methodStepsHelp should include("Available steps for Method")
+      methodStepsHelp should include(".namespace")
+
+      val assignmentStepsHelp = Cpg.emptyCpg.assignment.help
+      assignmentStepsHelp should include("Left-hand sides of assignments")
     }
 
     "provides generic help" when {

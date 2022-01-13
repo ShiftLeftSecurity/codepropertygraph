@@ -1,6 +1,6 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "2.19+1-fdda119b"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "2.19+2-d9dad062"
 
 Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
 Compile / generateDomainClasses / fieldName := "instance"
