@@ -51,6 +51,28 @@ class CpgPassTests extends AnyWordSpec with Matchers {
       pass.createAndApply()
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
     }
+
+    "fail for schema violations" in {
+      val cpg = Cpg.emptyCpg
+      val pass = new CpgPass(cpg, "pass1") {
+        override def run(): Iterator[DiffGraph] = {
+          val file1 = NewFile().name("foo")
+          val file2 = NewFile().name("bar")
+          Iterator(
+            DiffGraph.newBuilder
+              .addNode(file1)
+              .addNode(file2)
+              .addEdge(file1, file2, "illegal_edge_label")
+              .build()
+          )
+        }
+      }
+
+      // the above DiffGraph is not schema conform, applying it must throw an exception
+      intercept[Exception] {
+        pass.createAndApply()
+      }
+    }
   }
 
 }
