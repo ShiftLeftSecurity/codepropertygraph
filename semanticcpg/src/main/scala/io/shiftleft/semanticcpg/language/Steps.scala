@@ -4,13 +4,11 @@ import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.{CustomSerializer, Extraction}
 import overflowdb.traversal._
-import overflowdb.traversal.help.DocFinder._
-import overflowdb.traversal.help.{Doc, TraversalHelp}
+import overflowdb.traversal.help.Doc
 
 import java.util.{List => JList}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
-import scala.reflect.ClassTag
 
 /** Base class for our DSL
   * These are the base steps available in all steps of the query language.
@@ -49,18 +47,6 @@ class Steps[A](val traversal: Traversal[A]) extends AnyVal {
     to the Scala list obtained via `toList`)
     */
   def jl: JList[A] = b.asJava
-
-  /**
-    * Print help/documentation based on the current elementType `A`.
-    * Relies on all step extensions being annotated with @TraversalExt / @Doc
-    * Note that this works independently of tab completion and implicit conversions in scope - it will simply list
-    * all documented steps in the classpath
-    * */
-  def help(implicit elementType: ClassTag[A]): String =
-    Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = false)
-
-  def helpVerbose(implicit elementType: ClassTag[A]): String =
-    Steps.help.forElementSpecificSteps(elementType.runtimeClass, verbose = true)
 
   /**
     * Execute this traversal and pretty print the results.
@@ -111,15 +97,4 @@ object Steps {
             Extraction.decompose(elementMap)
         }
     ))
-
-  val help = new TraversalHelp("io.shiftleft") {
-    // TODO remove once we migrated to overflowdb-traversal
-    override lazy val genericStepDocs: Iterable[StepDoc] =
-      findStepDocs(classOf[Steps[_]])
-
-    // TODO remove once we migrated to overflowdb-traversal
-    override lazy val genericNodeStepDocs: Iterable[StepDoc] =
-      findStepDocs(classOf[NodeSteps[_]])
-
-  }
 }

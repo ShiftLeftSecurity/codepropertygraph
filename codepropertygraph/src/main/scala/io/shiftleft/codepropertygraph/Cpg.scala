@@ -1,11 +1,14 @@
 package io.shiftleft.codepropertygraph
 
 import overflowdb.Graph
+import overflowdb.traversal.help.DocSearchPackages
 
 /** TODO this is now being generated as well - for now we'll just forward calls to `generated.Cpg`
   * next step is to remove this class and move remove the `generated` part from the generated package
   */
 object Cpg {
+  implicit val docSearchPackages: DocSearchPackages =
+    DocSearchPackages("io.shiftleft", "io.joern")
 
   /**
     * Syntactic sugar for `new Cpg(graph)`.
