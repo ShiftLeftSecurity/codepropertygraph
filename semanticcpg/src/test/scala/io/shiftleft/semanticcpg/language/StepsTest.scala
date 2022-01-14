@@ -1,8 +1,9 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.Cpg.docSearchPackages
 import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
+import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s._
 import org.json4s.native.JsonMethods.parse
@@ -165,7 +166,6 @@ class StepsTest extends AnyWordSpec with Matchers {
   }
 
   ".help step" should {
-
     "show domain overview" in {
       val domainStartersHelp = Cpg.emptyCpg.help
       domainStartersHelp should include(".comment")
@@ -175,28 +175,17 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "provide node-specific overview" in {
-      // TODO drop start
-      val methodSteps = new Steps[Method](null)
-      methodSteps.help should include("Available steps for Method")
-      methodSteps.help should include(".namespace")
-      methodSteps.help should include(".depth") //from AstNode
+      val methodStepsHelp = Cpg.emptyCpg.method.help
+      methodStepsHelp should include("Available steps for Method")
+      methodStepsHelp should include(".namespace")
+      methodStepsHelp should include(".depth") //from AstNode
 
-      methodSteps.helpVerbose should include("traversal name")
-      methodSteps.helpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
-      // TODO drop end
+      val methodStepsHelpVerbose = Cpg.emptyCpg.method.helpVerbose
+      methodStepsHelpVerbose should include("traversal name")
+      methodStepsHelpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
 
-      // TODO use this in future instead
-//      val methodStepsHelp = Cpg.emptyCpg.method.help
-//      methodStepsHelp should include("Available steps for Method")
-//      methodStepsHelp should include(".namespace")
-//      methodStepsHelp should include(".depth") //from AstNode
-//
-//      val methodStepsHelpVerbose = Cpg.emptyCpg.method.helpVerbose
-//      methodStepsHelpVerbose should include("traversal name")
-//      methodStepsHelpVerbose should include("io.shiftleft.semanticcpg.language.types.structure.Method")
-//
-//      val assignmentStepsHelp = Cpg.emptyCpg.assignment.help
-//      assignmentStepsHelp should include("Left-hand sides of assignments")
+      val assignmentStepsHelp = Cpg.emptyCpg.assignment.help
+      assignmentStepsHelp should include("Left-hand sides of assignments") // from AssignmentTraversal
     }
 
     "provides generic help" when {
