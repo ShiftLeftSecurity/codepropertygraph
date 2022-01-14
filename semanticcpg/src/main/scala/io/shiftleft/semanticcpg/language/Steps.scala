@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
-import java.util.{List => JList}
 import org.json4s.native.Serialization.{write, writePretty}
 import org.json4s.{CustomSerializer, Extraction}
 import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
+
+import java.util.{List => JList}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 

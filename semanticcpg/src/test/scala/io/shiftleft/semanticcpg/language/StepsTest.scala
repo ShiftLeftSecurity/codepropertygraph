@@ -2,8 +2,8 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.Cpg.docSearchPackages
-import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.codepropertygraph.generated.nodes._
+import io.shiftleft.codepropertygraph.generated.{NodeTypes, Properties}
 import io.shiftleft.semanticcpg.testing.MockCpg
 import org.json4s._
 import org.json4s.native.JsonMethods.parse
