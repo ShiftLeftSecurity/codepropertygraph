@@ -4,8 +4,12 @@ import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Binding extends SchemaBase {
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema, methodSchema: Method.Schema) =
-    new Schema(builder, base, typeSchema, methodSchema)
+  def apply(builder: SchemaBuilder,
+            base: Base.Schema,
+            typeSchema: Type.Schema,
+            methodSchema: Method.Schema,
+            callGraphSchema: CallGraph.Schema) =
+    new Schema(builder, base, typeSchema, methodSchema, callGraphSchema)
 
   override def index: Int = 19
 
@@ -18,10 +22,15 @@ object Binding extends SchemaBase {
       |connected to the method it resolves to via an outgoing `REF` edge.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder, base: Base.Schema, typeDeclSchema: Type.Schema, methodSchema: Method.Schema) {
+  class Schema(builder: SchemaBuilder,
+               base: Base.Schema,
+               typeDeclSchema: Type.Schema,
+               methodSchema: Method.Schema,
+               callGraphSchema: CallGraph.Schema) {
     import base._
     import typeDeclSchema._
     import methodSchema._
+    import callGraphSchema._
 
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
@@ -30,12 +39,13 @@ object Binding extends SchemaBase {
         name = "BINDING",
         comment = """`BINDING` nodes represent name-signature pairs that can be resolved at a
             |type declaration (`TYPE_DECL`). They are connected to `TYPE_DECL` nodes via
-            |incoming `BINDS` edges and to the methods they resolve to via outgoing
-            |`REF` edges.
+            |incoming `BINDS` edges. The bound method is either associated with an outgoing
+            |`REF` edge to a `METHOD` or with the `METHOD_FULL_NAME` property. The `REF` edge
+            |if present has priority.
             |""".stripMargin
       )
       .protoId(146)
-      .addProperties(name, signature)
+      .addProperties(name, signature, methodFullName)
 
     val binds = builder
       .addEdgeType(
