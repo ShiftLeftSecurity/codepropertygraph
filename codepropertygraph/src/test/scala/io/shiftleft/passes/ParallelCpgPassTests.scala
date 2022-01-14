@@ -61,6 +61,33 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 30)
     }
 
+    "fail for schema violations" in {
+      val cpg = Cpg.emptyCpg
+      val pass = new ParallelCpgPass[String](cpg, "pass1") {
+        override def partIterator = Iterator("part1")
+
+        override def runOnPart(part: String): Iterator[DiffGraph] = {
+          part match {
+            case "part1" =>
+              val file1 = NewFile().name("foo")
+              val file2 = NewFile().name("bar")
+              Iterator(
+                DiffGraph.newBuilder
+                  .addNode(file1)
+                  .addNode(file2)
+                  .addEdge(file1, file2, "illegal_edge_label")
+                  .build()
+              )
+          }
+        }
+      }
+
+      // the above DiffGraph is not schema conform, applying it must throw an exception
+      intercept[Exception] {
+        pass.createAndApply()
+      }
+    }
+
   }
 
 }
