@@ -7,7 +7,8 @@ import overflowdb.traversal.help.DocSearchPackages
   * next step is to remove this class and move remove the `generated` part from the generated package
   */
 object Cpg {
-  implicit val docSearchPackages: DocSearchPackages = DocSearchPackages("io.shiftleft")
+  implicit val docSearchPackages: DocSearchPackages =
+    DocSearchPackages("io.shiftleft", "io.joern")
 
   /**
     * Syntactic sugar for `new Cpg(graph)`.
