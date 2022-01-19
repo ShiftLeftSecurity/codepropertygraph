@@ -38,7 +38,7 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
     val writer = new Writer(serializedCpg, prefix, inverse, MDC.getCopyOfContextMap())
     val writerThread = new Thread(writer)
     writerThread.setName("Writer")
-    var exceptionCaught: Option[Throwable] = None
+    @volatile var exceptionCaught: Option[Throwable] = None
     writerThread.setUncaughtExceptionHandler { (_: Thread, t: Throwable) =>
       exceptionCaught = Option(t)
     }
