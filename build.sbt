@@ -54,7 +54,7 @@ ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild
 ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild/baseDirectory).value}"
 
 ThisBuild / libraryDependencies ++= Seq(
-  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.0" % Test
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.1" % Test
 )
 
 // Scalafix / imports check setup
