@@ -85,10 +85,14 @@ object Cfg extends SchemaBase {
     typeRef.addOutEdge(edge = cfg, inNode = cfgNode)
     unknown.addOutEdge(edge = cfg, inNode = cfgNode)
 
+    /** Each METHOD has exactly one METHOD_RETURN (the formal return value), but
+      * each METHOD_RETURN can have multiple RETURN nodes. This way, we can represent
+      * a method with multiple return statements.
+      */
     ret.addOutEdge(edge = cfg,
                    inNode = methodReturn,
                    cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.ZeroOrOne,
+                   cardinalityIn = Cardinality.List,
                    stepNameIn = "toReturn")
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
