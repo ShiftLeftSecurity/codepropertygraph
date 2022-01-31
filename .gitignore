@@ -20,6 +20,7 @@ project/.bloop
 /foo.c
 /woo.c
 /.bsp
+/logs
 
 foo.c
 woo.c
@@ -34,10 +35,6 @@ cpg.bin
 
 # Created by https://www.gitignore.io/api/c++,cmake,linux
 # Edit at https://www.gitignore.io/?templates=c++,cmake,linux
-
-## FuzzyPP ##
-bin/
-lib/
 
 ### C++ ###
 # Prerequisites

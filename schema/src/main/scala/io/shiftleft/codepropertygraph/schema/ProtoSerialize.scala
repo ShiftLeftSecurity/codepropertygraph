@@ -18,7 +18,7 @@ object ProtoSerialize extends SchemaBase {
   class Schema(builder: SchemaBuilder, ast: Ast.Schema) {
 
     import ast._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val containedRef = builder
       .addProperty(

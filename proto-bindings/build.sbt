@@ -47,3 +47,22 @@ installProtoc := {
   }
   protocBinary
 }
+
+/** workaround for an IntelliJ [bug](https://youtrack.jetbrains.com/issue/SCL-19517),
+  * where it only recognizes generated sources if there is at least one Scala class in the same package
+  * 
+  * TODO remove after a fix for https://youtrack.jetbrains.com/issue/SCL-19517 is available
+  */
+Compile / sourceGenerators += Def.task {
+  val protoPackage = "io.shiftleft.proto.cpg"
+
+  val scalaFile = (Compile/sourceManaged).value / "_ONLY_FOR_INTELLIJ.scala"
+  
+  IO.write(scalaFile,
+    s"""package $protoPackage
+      |
+      |private class _ONLY_FOR_INTELLIJ
+      |""".stripMargin)
+
+  Seq(scalaFile)
+}.taskValue

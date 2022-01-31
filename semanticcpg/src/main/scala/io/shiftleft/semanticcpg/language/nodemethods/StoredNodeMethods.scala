@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.codepropertygraph.generated.nodes.{StoredNode, Tag}
 import io.shiftleft.semanticcpg.NodeExtension
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 

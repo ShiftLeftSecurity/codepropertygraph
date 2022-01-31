@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{Traversal, help}
+import overflowdb.traversal.{Traversal, help, iterableToTraversal, toElementTraversal, toNodeTraversal}
 
 @help.Traversal(elementType = classOf[AstNode])
 class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal {
@@ -12,7 +12,7 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
   /**
     * Nodes of the AST rooted in this node, including the node itself.
     * */
-  @Doc("All nodes of the abstract syntax tree")
+  @Doc(info = "All nodes of the abstract syntax tree")
   def ast: Traversal[AstNode] =
     traversal.repeat(_.out(EdgeTypes.AST))(_.emit).cast[AstNode]
 
@@ -27,7 +27,7 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
   def containsCallTo(regex: String): Traversal[A] =
     traversal.filter(_.ast.isCall.name(regex).size > 0)
 
-  @Doc("Depth of the abstract syntax tree")
+  @Doc(info = "Depth of the abstract syntax tree")
   def depth: Traversal[Int] =
     traversal.map(_.depth)
 
@@ -106,13 +106,13 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
     * Traverse only to those AST nodes that are blocks
     * */
   def isBlock: Traversal[Block] =
-    traversal.hasLabel(NodeTypes.BLOCK).cast[Block]
+    traversal.collectAll[Block]
 
   /**
     * Traverse only to those AST nodes that are control structures
     * */
   def isControlStructure: Traversal[ControlStructure] =
-    traversal.hasLabel(NodeTypes.CONTROL_STRUCTURE).cast[ControlStructure]
+    traversal.collectAll[ControlStructure]
 
   /**
     * Traverse only to AST nodes that are expressions
@@ -124,7 +124,7 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
     * Traverse only to AST nodes that are calls
     * */
   def isCall: Traversal[Call] =
-    traversal.hasLabel(NodeTypes.CALL).cast[Call]
+    traversal.collectAll[Call]
 
   /**
   Cast to call if applicable and filter on call code `calleeRegex`
@@ -136,82 +136,82 @@ class AstNodeTraversal[A <: AstNode](val traversal: Traversal[A]) extends AnyVal
     * Traverse only to AST nodes that are literals
     * */
   def isLiteral: Traversal[Literal] =
-    traversal.hasLabel(NodeTypes.LITERAL).cast[Literal]
+    traversal.collectAll[Literal]
 
   def isLocal: Traversal[Local] =
-    traversal.hasLabel(NodeTypes.LOCAL).cast[Local]
+    traversal.collectAll[Local]
 
   /**
     * Traverse only to AST nodes that are identifier
     * */
   def isIdentifier: Traversal[Identifier] =
-    traversal.hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
+    traversal.collectAll[Identifier]
 
   /**
     * Traverse only to FILE AST nodes
     * */
   def isFile: Traversal[File] =
-    traversal.hasLabel(NodeTypes.FILE).cast[File]
+    traversal.collectAll[File]
 
   /**
     * Traverse only to AST nodes that are field identifier
     * */
   def isFieldIdentifier: Traversal[FieldIdentifier] =
-    traversal.hasLabel(NodeTypes.FIELD_IDENTIFIER).cast[FieldIdentifier]
+    traversal.collectAll[FieldIdentifier]
 
   /**
     * Traverse only to AST nodes that are return nodes
     * */
   def isReturn: Traversal[Return] =
-    traversal.hasLabel(NodeTypes.RETURN).cast[Return]
+    traversal.collectAll[Return]
 
   /**
     * Traverse only to AST nodes that are MEMBER
     */
   def isMember: Traversal[Member] =
-    traversal.hasLabel(NodeTypes.MEMBER).cast[Member]
+    traversal.collectAll[Member]
 
   /**
     * Traverse only to AST nodes that are method reference
     */
   def isMethodRef: Traversal[MethodRef] =
-    traversal.hasLabel(NodeTypes.METHOD_REF).cast[MethodRef]
+    traversal.collectAll[MethodRef]
 
   /**
     * Traverse only to AST nodes that are type reference
     */
   def isTypeRef: Traversal[MethodRef] =
-    traversal.hasLabel(NodeTypes.TYPE_REF).cast[MethodRef]
+    traversal.collectAll[MethodRef]
 
   /**
     * Traverse only to AST nodes that are METHOD
     */
   def isMethod: Traversal[Method] =
-    traversal.hasLabel(NodeTypes.METHOD).cast[Method]
+    traversal.collectAll[Method]
 
   /**
     * Traverse only to AST nodes that are MODIFIER
     */
   def isModifier: Traversal[Modifier] =
-    traversal.hasLabel(NodeTypes.MODIFIER).cast[Modifier]
+    traversal.collectAll[Modifier]
 
   /**
     * Traverse only to AST nodes that are NAMESPACE_BLOCK
     */
   def isNamespaceBlock: Traversal[NamespaceBlock] =
-    traversal.hasLabel(NodeTypes.NAMESPACE_BLOCK).cast[NamespaceBlock]
+    traversal.collectAll[NamespaceBlock]
 
   /**
     * Traverse only to AST nodes that are METHOD_PARAMETER_IN
     */
   def isParameter: Traversal[MethodParameterIn] =
-    traversal.hasLabel(NodeTypes.METHOD_PARAMETER_IN).cast[MethodParameterIn]
+    traversal.collectAll[MethodParameterIn]
 
   /**
     * Traverse only to AST nodes that are TYPE_DECL
     */
   def isTypeDecl: Traversal[TypeDecl] =
-    traversal.hasLabel(NodeTypes.TYPE_DECL).cast[TypeDecl]
+    traversal.collectAll[TypeDecl]
 
   def walkAstUntilReaching(labels: List[String]): Traversal[StoredNode] =
     traversal

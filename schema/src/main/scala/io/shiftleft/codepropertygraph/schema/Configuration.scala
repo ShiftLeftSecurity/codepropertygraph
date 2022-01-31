@@ -21,7 +21,7 @@ object Configuration extends SchemaBase {
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
 
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val configFile: NodeType = builder
       .addNodeType(

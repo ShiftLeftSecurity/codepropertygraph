@@ -9,6 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.traversal._
 
+import java.nio.file.Files
 import scala.jdk.CollectionConverters._
 
 class ParallelCpgPassTests extends AnyWordSpec with Matchers {
@@ -35,7 +36,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
   "ParallelCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.nodes.map(_.property(Properties.NAME)).toSet shouldBe Set("foo", "bar")
+      cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
     }
 
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
@@ -46,7 +47,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()
         file.exists shouldBe true
-        file.size should not be 0
+        Files.size(file.path) should not be 0
       }
     }
 
@@ -58,6 +59,37 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
     "take into account KeyPools for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
       pass.createAndApply()
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 30)
+    }
+
+    "fail for schema violations" in {
+      val cpg = Cpg.emptyCpg
+      val pass = new ParallelCpgPass[String](cpg, "pass2") {
+        def partIterator = Iterator("a", "b")
+        def runOnPart(part: String): Iterator[DiffGraph] =
+          part match {
+            case "a" =>
+              // this is fine
+              val diffGraph = DiffGraph.newBuilder
+              diffGraph.addNode(NewFile().name(part))
+              Iterator(diffGraph.build())
+            case "b" =>
+              // schema violation
+              val file1 = NewFile().name("foo")
+              val file2 = NewFile().name("bar")
+              Iterator(
+                DiffGraph.newBuilder
+                  .addNode(file1)
+                  .addNode(file2)
+                  .addEdge(file1, file2, "illegal_edge_label")
+                  .build()
+              )
+          }
+      }
+
+      // the above DiffGraph (part "b") is not schema conform, applying it must throw an exception
+      intercept[Exception] {
+        pass.createAndApply()
+      }
     }
 
   }

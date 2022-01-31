@@ -29,11 +29,6 @@ object LocationCreator {
     }
   }
 
-  def foo: NewLocation = {
-    val a: NewLocationBuilder = ???
-    a
-  }
-
   def apply(
       node: AbstractNode,
       symbol: String,
@@ -43,8 +38,7 @@ object LocationCreator {
   ): NewLocation = {
 
     if (method == null) {
-      val a = NewLocation().node(Some(node))
-      a
+      NewLocation().node(node)
     } else {
       val typeOption = methodToTypeDecl(method)
       val typeName = typeOption.map(_.fullName).getOrElse("")
@@ -52,7 +46,7 @@ object LocationCreator {
 
       val namespaceOption = for {
         tpe <- typeOption
-        namespaceBlock <- tpe._namespaceBlockViaAstIn
+        namespaceBlock <- tpe.namespaceBlock
         namespace <- namespaceBlock._namespaceViaRefOut.nextOption()
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
@@ -67,7 +61,7 @@ object LocationCreator {
         .classShortName(typeShortName)
         .nodeLabel(label)
         .filename(if (method.filename.isEmpty) "N/A" else method.filename)
-        .node(Some(node))
+        .node(node)
     }
   }
 

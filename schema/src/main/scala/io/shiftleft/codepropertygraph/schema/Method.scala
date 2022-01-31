@@ -22,7 +22,7 @@ object Method extends SchemaBase {
     import base._
     import typeDeclSchema._
     import fs._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val signature = builder
       .addProperty(
@@ -121,9 +121,7 @@ object Method extends SchemaBase {
       .protoId(3)
       .addProperties(typeFullName)
 
-    method
-      .addOutEdge(edge = sourceFile, inNode = file)
-
+    method.addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "method")
   }
 
 }

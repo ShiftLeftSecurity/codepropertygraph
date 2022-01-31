@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   * A local variable
@@ -19,23 +19,4 @@ class LocalTraversal(val traversal: Traversal[Local]) extends AnyVal {
     //definingBlock.method
   }
 
-  /**
-    * The block in which local is declared.
-    */
-  def definingBlock: Traversal[Block] =
-    traversal.in(EdgeTypes.AST).cast[Block]
-
-  /**
-    * Places (identifier) where this local is being referenced
-    * */
-  def referencingIdentifiers: Traversal[Identifier] =
-    traversal.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
-
-  /**
-    * The type of the local.
-    *
-    * Unfortunately, `type` is a keyword, so we use `typ` here.
-    * */
-  def typ: Traversal[Type] =
-    traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
 }

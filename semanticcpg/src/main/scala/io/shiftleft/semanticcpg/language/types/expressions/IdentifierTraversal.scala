@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Declaration, Identifier}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   An identifier, e.g., an instance of a local variable, or a temporary variable

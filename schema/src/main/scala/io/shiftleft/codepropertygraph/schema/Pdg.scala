@@ -20,7 +20,7 @@ object Pdg extends SchemaBase {
     new Schema(builder, methodSchema, ast)
 
   class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
 
@@ -199,11 +199,13 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = methodParameterIn)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     ret
       .addOutEdge(edge = reachingDef, inNode = methodReturn)
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     methodRef
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -211,6 +213,15 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
+
+    typeRef
+      .addOutEdge(edge = reachingDef, inNode = callNode)
+      .addOutEdge(edge = reachingDef, inNode = ret)
+      .addOutEdge(edge = reachingDef, inNode = identifier)
+      .addOutEdge(edge = reachingDef, inNode = literal)
+      .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     methodParameterIn
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -218,6 +229,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     literal
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -225,6 +237,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     callNode
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -232,6 +245,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     identifier
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -239,6 +253,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     block
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -247,6 +262,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     controlStructure
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -254,6 +270,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
     unknown
       .addOutEdge(edge = reachingDef, inNode = callNode)
@@ -261,6 +278,7 @@ object Pdg extends SchemaBase {
       .addOutEdge(edge = reachingDef, inNode = identifier)
       .addOutEdge(edge = reachingDef, inNode = literal)
       .addOutEdge(edge = reachingDef, inNode = methodRef)
+      .addOutEdge(edge = reachingDef, inNode = typeRef)
 
   }
 

@@ -43,7 +43,7 @@ object Ast extends SchemaBase {
                methodSchema: Method.Schema,
                typeSchema: Type.Schema,
                fs: FileSystem.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
     import namespaces._
@@ -219,6 +219,8 @@ object Ast extends SchemaBase {
                comment = "The constructor modifier").protoId(7),
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
         .protoId(8),
+      Constant(name = "INTERNAL", value = "INTERNAL", valueType = ValueTypes.STRING, comment = "The internal modifier")
+        .protoId(9),
     )
 
     val modifier: NodeType = builder
@@ -243,6 +245,19 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .protoId(340)
+      .addProperties(name, parserTypeName)
+      .extendz(astNode)
+
+    val jumpLabel: NodeType = builder
+      .addNodeType(
+        name = "JUMP_LABEL",
+        comment = """A jump label specifies the label and thus the JUMP_TARGET of control structures
+                    |BREAK and CONTINUE. The `NAME` field holds the name of the label while the
+                    |`PARSER_TYPE_NAME` field holds the name of language construct that this jump
+                    |label is created from, e.g., "Label".
+                    |""".stripMargin
+      )
+      .protoId(341)
       .addProperties(name, parserTypeName)
       .extendz(astNode)
 
@@ -282,7 +297,7 @@ object Ast extends SchemaBase {
         valueType = ValueType.String,
         comment = """The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure
             |a `CONTROL_STRUCTURE` node represents. The available types are the following:
-            | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, and SWITCH.
+            | BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, THROW and SWITCH.
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
@@ -290,12 +305,20 @@ object Ast extends SchemaBase {
 
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
-      Constant(name = "BREAK", value = "BREAK", valueType = ValueTypes.STRING, comment = "Represents a break statement")
-        .protoId(1),
-      Constant(name = "CONTINUE",
-               value = "CONTINUE",
-               valueType = ValueTypes.STRING,
-               comment = "Represents a continue statement").protoId(2),
+      Constant(
+        name = "BREAK",
+        value = "BREAK",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a break statement. Labeled breaks are expected to have a JUMP_LABEL
+            |node AST child with ORDER 1""".stripMargin
+      ).protoId(1),
+      Constant(
+        name = "CONTINUE",
+        value = "CONTINUE",
+        valueType = ValueTypes.STRING,
+        comment = """Represents a continue statement. Labeled continues are expected to have a JUMP_LABEL
+                           |node AST child with ORDER 1""".stripMargin
+      ).protoId(2),
       Constant(name = "WHILE", value = "WHILE", valueType = ValueTypes.STRING, comment = "Represents a while statement")
         .protoId(3),
       Constant(name = "DO", value = "DO", valueType = ValueTypes.STRING, comment = "Represents a do statement")
@@ -314,6 +337,8 @@ object Ast extends SchemaBase {
                comment = "Represents a switch statement").protoId(9),
       Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
         .protoId(10),
+      Constant(name = "THROW", value = "THROW", valueType = ValueTypes.STRING, comment = "Represents a throw statement")
+        .protoId(11)
     )
 
     val controlStructure: NodeType = builder
@@ -361,22 +386,47 @@ object Ast extends SchemaBase {
       )
       .protoId(56)
 
-    file
-      .addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
+    file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     member.addOutEdge(edge = ast, inNode = modifier)
     tpe.addOutEdge(edge = ast, inNode = typeArgument)
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast, inNode = member, cardinalityIn = Cardinality.One)
+      .addOutEdge(edge = ast,
+                  inNode = member,
+                  cardinalityIn = Cardinality.One,
+                  stepNameIn = "typeDecl",
+                  stepNameInDoc = "The type declaration this member is defined in")
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     method
-      .addOutEdge(edge = ast, inNode = methodReturn, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = methodParameterIn, cardinalityIn = Cardinality.One)
+      .addOutEdge(
+        edge = ast,
+        inNode = methodReturn,
+        cardinalityOut = Cardinality.One,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "methodReturn",
+        stepNameOutDoc = "Formal return parameters"
+      )
+      .addOutEdge(
+        edge = ast,
+        inNode = methodParameterIn,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "parameter",
+        stepNameOutDoc = "Parameters of the method",
+        stepNameIn = "method",
+        stepNameInDoc = "Traverse to method associated with this formal parameter"
+      )
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = block, cardinalityOut = Cardinality.One, cardinalityIn = Cardinality.One)
+      .addOutEdge(
+        edge = ast,
+        inNode = block,
+        cardinalityOut = Cardinality.One,
+        cardinalityIn = Cardinality.One,
+        stepNameOut = "block",
+        stepNameOutDoc = "Root of the abstract syntax tree"
+      )
       .addOutEdge(edge = ast, inNode = typeParameter, cardinalityIn = Cardinality.One)
 
     ret
@@ -397,7 +447,10 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeRef)
       .addOutEdge(edge = ast, inNode = ret)
       .addOutEdge(edge = ast, inNode = block, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast, inNode = local)
+      .addOutEdge(edge = ast,
+                  inNode = local,
+                  stepNameIn = "definingBlock",
+                  stepNameInDoc = "The block in which local is declared.")
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)
@@ -414,6 +467,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = controlStructure)
       .addOutEdge(edge = ast, inNode = methodRef, cardinalityIn = Cardinality.One)
       .addOutEdge(edge = ast, inNode = typeRef)
+      .addOutEdge(edge = ast, inNode = jumpLabel)
 
     unknown
       .addOutEdge(edge = ast, inNode = literal)
@@ -427,13 +481,11 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    unknown
-      .addOutEdge(edge = ast, inNode = member)
-
+    unknown.addOutEdge(edge = ast, inNode = member)
     methodParameterIn.addOutEdge(edge = ast, inNode = unknown)
 
     namespaceBlock
-      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne, stepNameIn = "namespaceBlock")
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
     namespace.extendz(astNode)
@@ -455,7 +507,7 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
     method
-      .addOutEdge(edge = ast, inNode = methodParameterOut)
+      .addOutEdge(edge = ast, inNode = methodParameterOut, cardinalityIn = Cardinality.One, stepNameIn = "method")
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
 
@@ -521,29 +573,37 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = block)
       .addOutEdge(edge = ast, inNode = controlStructure)
 
-    ret
-      .addOutEdge(edge = ast, inNode = callNode)
+    ret.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
+    unknown.addOutEdge(edge = ast, inNode = callNode)
+    controlStructure.addOutEdge(edge = condition, inNode = callNode)
 
     block
       .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
-
-    unknown
-      .addOutEdge(edge = ast, inNode = callNode)
-
-    controlStructure
-      .addOutEdge(edge = condition, inNode = callNode)
+      .addOutEdge(edge = ast,
+                  inNode = local,
+                  stepNameOut = "local",
+                  stepNameOutDoc = "Traverse to locals of this block.")
 
     // To refactor
 
     identifier
-      .addOutEdge(edge = ref, inNode = local, cardinalityOut = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = ref,
+        inNode = local,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        stepNameIn = "referencingIdentifiers",
+        stepNameInDoc = "Places (identifier) where this local is being referenced"
+      )
+      .addOutEdge(
+        edge = ref,
+        inNode = methodParameterIn,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        stepNameIn = "referencingIdentifiers",
+        stepNameInDoc = "Places (identifier) where this parameter is being referenced"
+      )
 
-    namespaceBlock
-      .addOutEdge(edge = ref, inNode = namespace)
+    namespaceBlock.addOutEdge(edge = ref, inNode = namespace)
 
   }
 

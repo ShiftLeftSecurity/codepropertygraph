@@ -3,6 +3,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
+import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
@@ -19,6 +20,38 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
       case expr: Expression                           => expr.code
       case call: CallRepr if !call.isInstanceOf[Call] => call.code
     }
+
+  /**
+    * Successors in the CFG
+    * */
+  def cfgNext: Traversal[CfgNode] = {
+    Traversal.fromSingle(node).cfgNext
+  }
+
+  /**
+    * Maps each node in the traversal to a traversal returning
+    * its n successors.
+    **/
+  def cfgNext(n: Int): Traversal[CfgNode] = n match {
+    case 0 => Traversal()
+    case _ => cfgNext.flatMap(x => List(x) ++ x.cfgNext(n - 1))
+  }
+
+  /**
+    * Maps each node in the traversal to a traversal returning
+    * its n predecessors.
+    **/
+  def cfgPrev(n: Int): Traversal[CfgNode] = n match {
+    case 0 => Traversal()
+    case _ => cfgPrev.flatMap(x => List(x) ++ x.cfgPrev(n - 1))
+  }
+
+  /**
+    * Predecessors in the CFG
+    * */
+  def cfgPrev: Traversal[CfgNode] = {
+    Traversal.fromSingle(node).cfgPrev
+  }
 
   /**
     * Recursively determine all nodes on which this
@@ -98,7 +131,7 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
           }
       }
     }
-    controllingNodes
+    Traversal.from(controllingNodes)
   }
 
   def method: Method = node match {
@@ -107,6 +140,18 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
       walkUpAst(node)
     case _: CallRepr if !node.isInstanceOf[Call] => walkUpAst(node)
     case _: Expression | _: JumpTarget           => walkUpContains(node)
+  }
+
+  /**
+    * Obtain hexadecimal string representation of lineNumber field.
+    *
+    * Binary frontends store addresses in the lineNumber field as
+    * integers. For interoperability with other binary analysis
+    * tooling, it is convenient to allow retrieving these as
+    * hex strings.
+    * */
+  def address: Option[String] = {
+    node.lineNumber.map(_.toLong.toHexString)
   }
 
   private def walkUpAst(node: CfgNode): Method =

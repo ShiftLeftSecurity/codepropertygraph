@@ -3,16 +3,27 @@ package io.shiftleft.codepropertygraph.cpgloading
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
+import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Config
 
 import java.io.InputStream
 import java.nio.file.{Files, Path}
-import java.util.{Collection => JCollection, List => JList}
-import scala.collection.mutable.ArrayBuffer
+import java.util.{List => JList}
+import scala.collection.mutable.ArrayDeque
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
+
+// This class is used to temporarily store edges we have red from proto before we store them
+// in the CPG. As usual proto is very memory inefficiet when it comes to memory and saving a
+// few bytes adds up since we keep all graph edge in this intermediate representation before
+// we start adding the edges to the CPG.
+case class TmpEdge(dst: Long, src: Long, typ: Int, properties: List[Edge.Property]) {
+  def this(edge: Edge) = {
+    this(edge.getDst, edge.getSrc, edge.getTypeValue, List.from(edge.getPropertyList.asScala))
+  }
+}
 
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -21,14 +32,20 @@ object ProtoCpgLoader {
     measureAndReport {
       val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
-        val edgeLists: ArrayBuffer[JCollection[Edge]] = ArrayBuffer.empty
+        val edges = ArrayDeque.empty[TmpEdge]
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
           val cpgStruct = getNextProtoCpgFromStream(inputStream)
           builder.addNodes(cpgStruct.getNodeList)
-          edgeLists += cpgStruct.getEdgeList
+          cpgStruct.getEdgeList.asScala.foreach { edge =>
+            edges.append(new TmpEdge(edge))
+          }
         }
-        edgeLists.foreach(edgeCollection => builder.addEdges(edgeCollection))
+        // We remove the edges while iterating so that the GC can already collect them.
+        while (edges.nonEmpty) {
+          val edge = edges.removeHead()
+          builder.addEdge(edge.dst, edge.src, EdgeType.forNumber(edge.typ), edge.properties)
+        }
       } match {
         case Failure(exception) => throw exception
         case Success(_)         => builder.build()
@@ -38,7 +55,11 @@ object ProtoCpgLoader {
   def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: Config): Cpg = {
     val builder = new ProtoToCpg(overflowDbConfig)
     cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
-    cpgs.foreach(cpg => builder.addEdges(cpg.getEdgeList))
+    cpgs.foreach { cpg =>
+      cpg.getEdgeList.asScala.foreach { edge =>
+        builder.addEdge(edge.getDst, edge.getSrc, edge.getType, edge.getPropertyList.asScala)
+      }
+    }
     builder.build()
   }
 

@@ -3,39 +3,30 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 
 object Comment extends SchemaBase {
+  def index = 12
+  override def providedByFrontend = true
 
-  def index: Int = 12
-  override def providedByFrontend: Boolean = true
+  override def description = ""
 
-  override def description: String =
-    """
-      |""".stripMargin
+  def apply(builder: SchemaBuilder, ast: Ast.Schema, fs: FileSystem.Schema) =
+    new Schema(builder, ast, fs)
 
-  def apply(builder: SchemaBuilder, base: Base.Schema, ast: Ast.Schema, fs: FileSystem.Schema) =
-    new Schema(builder, base, ast, fs)
-
-  class Schema(builder: SchemaBuilder, base: Base.Schema, astSchema: Ast.Schema, fs: FileSystem.Schema) {
+  class Schema(builder: SchemaBuilder, astSchema: Ast.Schema, fs: FileSystem.Schema) {
     import astSchema._
     import fs._
-    import base._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
-// node types
     val comment: NodeType = builder
       .addNodeType(
         name = "COMMENT",
         comment = "A source code comment"
       )
       .protoId(511)
-      .addProperties(lineNumber, code, filename)
+      .addProperties(filename)
+      .extendz(astNode)
 
-// node relations
-    comment
-      .addOutEdge(edge = sourceFile, inNode = comment)
-
-    file
-      .addOutEdge(edge = ast, inNode = comment)
-
+    comment.addOutEdge(edge = sourceFile, inNode = comment, stepNameOut = "file")
+    file.addOutEdge(edge = ast, inNode = comment, stepNameOut = "comment")
   }
 
 }

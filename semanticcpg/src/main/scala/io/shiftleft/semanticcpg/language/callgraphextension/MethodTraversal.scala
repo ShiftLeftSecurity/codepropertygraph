@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.help.Doc
-import overflowdb.traversal.{PathAwareTraversal, Traversal}
+import overflowdb.traversal.{PathAwareTraversal, Traversal, toNodeTraversal}
 
 class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
 
@@ -71,7 +71,7 @@ class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
   /**
     * Outgoing call sites
     * */
-  @Doc("Call sites (outgoing calls)")
+  @Doc(info = "Call sites (outgoing calls)")
   def call: Traversal[Call] =
     traversal.out(EdgeTypes.CONTAINS).collectAll[Call]
 

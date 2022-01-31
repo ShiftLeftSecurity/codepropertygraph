@@ -24,7 +24,7 @@ object MetaData extends SchemaBase {
 
   class Schema(builder: SchemaBuilder, base: Base.Schema) {
     import base._
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val overlays = builder
       .addProperty(
@@ -83,7 +83,15 @@ object MetaData extends SchemaBase {
                value = "GHIDRA",
                valueType = ValueTypes.STRING,
                comment = "generic reverse engineering framework").protoId(10),
-      Constant(name = "KOTLIN", value = "KOTLIN", valueType = ValueTypes.STRING, comment = "").protoId(11)
+      Constant(name = "KOTLIN", value = "KOTLIN", valueType = ValueTypes.STRING, comment = "").protoId(11),
+      Constant(name = "NEWC",
+               value = "NEWC",
+               valueType = ValueTypes.STRING,
+               comment = "Eclipse CDT based parser for C/C++").protoId(12),
+      Constant(name = "JAVASRC",
+               value = "JAVASRC",
+               valueType = ValueTypes.STRING,
+               comment = "Source-based front-end for Java").protoId(13)
     )
 
   }

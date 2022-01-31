@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{
   AbstractNode,
   AstNode,
-  Block,
   Call,
   CfgNode,
   ControlStructure,
@@ -28,6 +27,10 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   TypeDecl
 }
 import io.shiftleft.codepropertygraph.generated.traversal.NodeTraversalImplicits
+import io.shiftleft.semanticcpg.language.bindingextension.{
+  MethodTraversal => BindingMethodTraversal,
+  TypeDeclTraversal => BindingTypeDeclTraversal
+}
 import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
@@ -39,7 +42,7 @@ import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
 import io.shiftleft.semanticcpg.language.types.expressions.{CallTraversal => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{MethodTraversal => OriginalMethod, _}
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   Language for traversing the code property graph
@@ -79,14 +82,14 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toType[A](a: A)(implicit f: A => Traversal[Type]): TypeTraversal = new TypeTraversal(f(a))
   implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): TypeDeclTraversal =
     new TypeDeclTraversal(f(a))
-  implicit def toCall[A](a: A)(implicit f: A => Traversal[Call]): OriginalCall = new OriginalCall(f(a))
+  implicit def toCall(traversal: IterableOnce[Call]): OriginalCall = new OriginalCall(traversal)
   implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[ControlStructure]): ControlStructureTraversal =
     new ControlStructureTraversal(f(a))
   implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[Identifier]): IdentifierTraversal =
     new IdentifierTraversal(f(a))
-  implicit def toMember[A](a: A)(implicit f: A => Traversal[Member]): MemberTraversal = new MemberTraversal(f(a))
-  implicit def toLocal[A](a: A)(implicit f: A => Traversal[Local]): LocalTraversal = new LocalTraversal(f(a))
-  implicit def toMethod[A](a: A)(implicit f: A => Traversal[Method]): OriginalMethod = new OriginalMethod(f(a))
+  implicit def toMember(traversal: IterableOnce[Member]): MemberTraversal = new MemberTraversal(traversal)
+  implicit def toLocal(traversal: IterableOnce[Local]): LocalTraversal = new LocalTraversal(traversal)
+  implicit def toMethod(traversal: IterableOnce[Method]): OriginalMethod = new OriginalMethod(traversal)
   implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[MethodParameterIn]): MethodParameterTraversal =
     new MethodParameterTraversal(f(a))
   implicit def toMethodParameterOut[A](a: A)(
@@ -99,15 +102,18 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[NamespaceBlock]): NamespaceBlockTraversal =
     new NamespaceBlockTraversal(f(a))
   implicit def toFile[A](a: A)(implicit f: A => Traversal[File]): FileTraversal = new FileTraversal(f(a))
-  implicit def toBlock[A](a: A)(implicit f: A => Traversal[Block]): BlockTraversal = new BlockTraversal(f(a))
-  implicit def toMethodRef[A](a: A)(implicit f: A => Traversal[MethodRef]): MethodRefTraversal =
-    new MethodRefTraversal(f(a))
 
   // Call graph extension
   implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[Method]): MethodTraversal =
     new MethodTraversal(f(a))
   implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[Call]): CallTraversal = new CallTraversal(f(a))
   // / Call graph extension
+
+  // Binding extensions
+  implicit def toMethodForBindingExt[A](a: A)(implicit f: A => Traversal[Method]): BindingMethodTraversal =
+    new BindingMethodTraversal(f(a))
+  implicit def toTypeDeclForBindingExt[A](a: A)(implicit f: A => Traversal[TypeDecl]): BindingTypeDeclTraversal =
+    new BindingTypeDeclTraversal(f(a))
 
   implicit def toAstNodeDot[A, NodeType <: AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
     new AstNodeDot(f(a))

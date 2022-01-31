@@ -4,6 +4,8 @@ import better.files.File
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.nio.file.Files
+
 class X2CpgTests extends AnyWordSpec with Matchers {
 
   "initCpg" should {
@@ -21,19 +23,19 @@ class X2CpgTests extends AnyWordSpec with Matchers {
       file.exists shouldBe false
       val cpg = X2Cpg.newEmptyCpg(Some(file.path.toString))
       file.exists shouldBe true
-      file.size should not be 0
+      Files.size(file.path) should not be 0
       cpg.close()
     }
 
     "overwrite existing file to create empty CPG" in {
       File.usingTemporaryFile("x2cpg") { file =>
         file.exists shouldBe true
-        file.size shouldBe 0
+        Files.size(file.path) shouldBe 0
         val cpg = X2Cpg.newEmptyCpg(Some(file.path.toString))
         cpg.graph.V.hasNext shouldBe false
         cpg.graph.E.hasNext shouldBe false
         file.exists shouldBe true
-        file.size should not be 0
+        Files.size(file.path) should not be 0
         cpg.close()
       }
     }

@@ -22,7 +22,7 @@ object Cfg extends SchemaBase {
     new Schema(builder, methodSchema, ast)
 
   class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, ast: Ast.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import ast._
 
@@ -63,7 +63,10 @@ object Cfg extends SchemaBase {
                   inNode = methodReturn,
                   cardinalityOut = Cardinality.ZeroOrOne,
                   cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg, inNode = cfgNode)
+      .addOutEdge(edge = cfg,
+                  inNode = cfgNode,
+                  stepNameOut = "cfgFirst",
+                  stepNameOutDoc = "First control flow graph node")
 
     fieldIdentifier
       .addOutEdge(edge = cfg, inNode = cfgNode)
@@ -82,10 +85,15 @@ object Cfg extends SchemaBase {
     typeRef.addOutEdge(edge = cfg, inNode = cfgNode)
     unknown.addOutEdge(edge = cfg, inNode = cfgNode)
 
+    /** Each METHOD has exactly one METHOD_RETURN (the formal return value), but
+      * each METHOD_RETURN can have multiple RETURN nodes. This way, we can represent
+      * a method with multiple return statements.
+      */
     ret.addOutEdge(edge = cfg,
                    inNode = methodReturn,
                    cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.ZeroOrOne)
+                   cardinalityIn = Cardinality.List,
+                   stepNameIn = "toReturn")
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)

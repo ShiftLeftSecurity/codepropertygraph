@@ -7,6 +7,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.nio.file.Files
 import scala.jdk.CollectionConverters._
 
 class CpgPassTests extends AnyWordSpec with Matchers {
@@ -42,13 +43,35 @@ class CpgPassTests extends AnyWordSpec with Matchers {
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()
         file.exists shouldBe true
-        file.size should not be 0
+        Files.size(file.path) should not be 0
       }
     }
 
     "take into account KeyPool for createAndApply" in Fixture(Some(new IntervalKeyPool(100, 120))) { (cpg, pass) =>
       pass.createAndApply()
       cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
+    }
+
+    "fail for schema violations" in {
+      val cpg = Cpg.emptyCpg
+      val pass = new CpgPass(cpg, "pass1") {
+        override def run(): Iterator[DiffGraph] = {
+          val file1 = NewFile().name("foo")
+          val file2 = NewFile().name("bar")
+          Iterator(
+            DiffGraph.newBuilder
+              .addNode(file1)
+              .addNode(file2)
+              .addEdge(file1, file2, "illegal_edge_label")
+              .build()
+          )
+        }
+      }
+
+      // the above DiffGraph is not schema conform, applying it must throw an exception
+      intercept[Exception] {
+        pass.createAndApply()
+      }
     }
   }
 

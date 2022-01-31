@@ -4,6 +4,9 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="[%-5p] %m%n" />
         </Console>
+        <File name="FileAppender" fileName="${sys:user.dir}/logs/cpg.log">
+            <PatternLayout pattern="[%-5p] %m%n" />
+        </File>
     </Appenders>
     <Loggers>
         <Logger name="org.reflections8.Reflections" level="error"/>
@@ -12,8 +15,9 @@
         <Logger name="io.shiftleft.codepropertygraph.cpgloading" level="error"/>
         <Logger name="io.shiftleft.console.scripting" level="error"/>
 
-        <Root level="info">
-            <AppenderRef ref="Console" />
+        <Root level="all">
+            <AppenderRef ref="FileAppender" level="trace" />
+            <AppenderRef ref="Console" level="error" />
         </Root>
     </Loggers>
 </Configuration>

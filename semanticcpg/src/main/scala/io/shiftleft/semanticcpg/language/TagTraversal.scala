@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.language
 
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import overflowdb.traversal.{Traversal, iterableToTraversal}
+import overflowdb.traversal._
 
 class TagTraversal(val traversal: Traversal[Tag]) extends AnyVal {
 

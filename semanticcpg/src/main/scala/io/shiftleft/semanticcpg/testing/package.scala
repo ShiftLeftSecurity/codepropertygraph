@@ -16,14 +16,14 @@ package object testing {
 
   }
 
-  case class MockCpg(cpg: Cpg = Cpg.empty) {
+  case class MockCpg(cpg: Cpg = Cpg.emptyCpg) {
 
-    def withMetaData(language: String = Languages.C): MockCpg = withMetaData(language, List())
+    def withMetaData(language: String = Languages.C): MockCpg = withMetaData(language, Nil)
 
     def withMetaData(language: String, overlays: List[String]): MockCpg = {
       withCustom { (diffGraph, _) =>
         diffGraph.addNode(
-          NewMetaData().language(language).overlays(overlays.toIndexedSeq)
+          NewMetaData().language(language).overlays(overlays)
         )
       }
     }
@@ -134,11 +134,11 @@ package object testing {
         }
       }
 
-    def withCallInMethod(methodName: String, callName: String): MockCpg =
+    def withCallInMethod(methodName: String, callName: String, code: Option[String] = None): MockCpg =
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
         val blockNode = methodNode.block.head
-        val callNode = NewCall().name(callName).code(callName)
+        val callNode = NewCall().name(callName).code(code.getOrElse(callName))
         graph.addNode(callNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)
@@ -168,23 +168,26 @@ package object testing {
         graph.addNode(typeDecl)
         graph.addNode(literalNode)
         graph.addEdge(callNode, literalNode, EdgeTypes.AST)
-
         graph.addEdge(methodNode, literalNode, EdgeTypes.CONTAINS)
       }
     }
 
-    def withIdentifierArgument(callName: String, name: String): MockCpg =
-      withCustom { (graph, cpg) =>
-        val callNode = cpg.call.name(callName).head
-        val methodNode = callNode.method.head
-        val identifierNode = NewIdentifier().name(name)
-        val typeDecl = NewTypeDecl().name("abc")
-        graph.addNode(identifierNode)
-        graph.addNode(typeDecl)
-        graph.addEdge(callNode, identifierNode, EdgeTypes.AST)
-        graph.addEdge(methodNode, identifierNode, EdgeTypes.CONTAINS)
-        graph.addEdge(identifierNode, typeDecl, EdgeTypes.REF)
-      }
+    def withIdentifierArgument(callName: String, name: String, index: Int = 1): MockCpg =
+      withArgument(callName, NewIdentifier().name(name).argumentIndex(index))
+
+    def withCallArgument(callName: String, callArgName: String, code: String = "", index: Int = 1): MockCpg =
+      withArgument(callName, NewCall().name(callArgName).code(code).argumentIndex(index))
+
+    def withArgument(callName: String, newNode: NewNode): MockCpg = withCustom { (graph, cpg) =>
+      val callNode = cpg.call.name(callName).head
+      val methodNode = callNode.method.head
+      val typeDecl = NewTypeDecl().name("abc")
+      graph.addEdge(callNode, newNode, EdgeTypes.AST)
+      graph.addEdge(callNode, newNode, EdgeTypes.ARGUMENT)
+      graph.addEdge(methodNode, newNode, EdgeTypes.CONTAINS)
+      graph.addEdge(newNode, typeDecl, EdgeTypes.REF)
+      graph.addNode(newNode)
+    }
 
     def withCustom(f: (DiffGraph.Builder, Cpg) => Unit): MockCpg = {
       val diffGraph = new DiffGraph.Builder

@@ -22,56 +22,8 @@ jobs:
         distribution: 'adopt'
         java-version: 11
     - name: Compile and run tests
-      run: sbt compile test
+      run: sbt +test
     - name: Check formatting
-      run: sbt scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
+      run: sbt ++2.13.7 scalafmtCheck test:scalafmtCheck "scalafixAll --check OrganizeImports"
     - run: echo "Previous step failed because code is not formatted. Run 'sbt format'"
       if: ${{ failure() }}
-
-  test-fuzzypp-linux:
-    runs-on: ubuntu-18.04
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Clone submodules
-        run: git submodule update --init --recursive
-      - name: Install g++-8
-        run: sudo apt-get install gcc-8 g++-8
-      - name: Run cmake on fuzzypp
-        run: cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 ./fuzzypp
-      - name: Run cmake build
-        run: cmake --build . -- -j4
-      - name: Run fuzzyppcli-tests
-        run: "./fuzzypp/bin/fuzzyppcli-tests"
-      - name: Zip artifact
-        run: zip -j ./fuzzyppcli.zip ./fuzzypp/bin/fuzzyppcli
-      - name: Upload zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: unix-zip
-          path: ./fuzzyppcli.zip
-
-  test-fuzzypp-windows:
-    runs-on: windows-2019
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Clone submodules
-        run: git submodule update --init --recursive
-      - name: Run cmake on fuzzypp
-        run: cmake -G "Visual Studio 16 2019" -A "x64" ./fuzzypp
-      - name: Run cmake build
-        run: cmake --build . --config Release
-      - name: Run fuzzyppcli-tests
-        run: "./fuzzypp/bin/Release/fuzzyppcli-tests.exe"
-      - name: Zip artifact
-        run: 7z a -r -tzip ./fuzzyppcli-win.zip ./fuzzypp/bin/Release/fuzzyppcli.exe
-      - name: Upload zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: windows-zip
-          path: ./fuzzyppcli-win.zip

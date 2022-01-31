@@ -2,23 +2,36 @@ package io.shiftleft.semanticcpg.language.operatorextension
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
 
-object NodeTypeStarters {
-  val assignmentPattern = "<operator>.(assignment.*)|(.*(increment|decrement))"
-  val arithmeticPattern = "<operator>.(addition|subtraction|division|multiplication|exponentiation|modulo)"
-}
-
+/**
+  * Steps that allow traversing from `cpg` to operators.
+  * */
 @TraversalSource
 class NodeTypeStarters(cpg: Cpg) {
-  import NodeTypeStarters._
 
-  @Doc("All assignments")
-  def assignment: Traversal[opnodes.Assignment] =
-    cpg.call.name(assignmentPattern).map(new opnodes.Assignment(_))
+  @Doc(info = "All assignments, including shorthand assignments that perform arithmetic (e.g., '+=')")
+  def assignment: Traversal[OpNodes.Assignment] =
+    callsWithNameIn(allAssignmentTypes)
+      .map(new OpNodes.Assignment(_))
 
-  @Doc("All arithmetic operations")
-  def arithmetic: Traversal[opnodes.Arithmetic] =
-    cpg.call.name(arithmeticPattern).map(new opnodes.Arithmetic(_))
+  @Doc(info = "All arithmetic operations, including shorthand assignments that perform arithmetic (e.g., '+=')")
+  def arithmetic: Traversal[OpNodes.Arithmetic] =
+    callsWithNameIn(allArithmeticTypes)
+      .map(new OpNodes.Arithmetic(_))
+
+  @Doc(info = "All array accesses")
+  def arrayAccess: Traversal[OpNodes.ArrayAccess] =
+    callsWithNameIn(allArrayAccessTypes)
+      .map(new OpNodes.ArrayAccess(_))
+
+  @Doc(info = "Field accesses, both direct and indirect")
+  def fieldAccess: Traversal[OpNodes.FieldAccess] =
+    callsWithNameIn(allFieldAccessTypes)
+      .map(new OpNodes.FieldAccess(_))
+
+  private def callsWithNameIn(set: Set[String]) =
+    cpg.call.filter(x => set.contains(x.name))
+
 }

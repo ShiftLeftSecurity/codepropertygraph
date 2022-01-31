@@ -47,6 +47,13 @@ Additional build-time dependencies are automatically downloaded as
 part of the build process. To build and install into your local Maven
 cache, issue the command `sbt clean test publishM2`.
 
+This repo cross-compiles to Scala 2.13.x and 3.x. The default version is
+Scala 3.x which means all sbt commands will compile using Scala 3.x.
+If you want to run an sbt command for both versions you need to prefix
+it with a "+" like `sbt +test`. If you use an open sbt shell you can
+switch the default compiler version for the duration of the shell session with `++` e.g., 
+`++2.13.7` and `++3.1.0`.
+
 # Code style
 
 Code style is automatically verified by external tools:
@@ -143,4 +150,3 @@ Schema written to: /tmp/schema.json
 - The ShiftLeft Tinkergraph: https://github.com/ShiftLeftSecurity/tinkergraph-gremlin
 
 - ShiftLeft OverflowDB: https://github.com/ShiftLeftSecurity/overflowdb
-

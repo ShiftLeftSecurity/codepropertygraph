@@ -1,11 +1,12 @@
 package io.shiftleft.semanticcpg.codedumper
 
-import better.files.File
 import io.shiftleft.codepropertygraph.generated.Languages
-import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Method, NewLocation}
+import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Local, Method, NewLocation}
 import io.shiftleft.semanticcpg.language._
+import io.shiftleft.x2cpg.IOUtils
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.nio.file.Paths
 import scala.util.Try
 
 object CodeDumper {
@@ -25,15 +26,18 @@ object CodeDumper {
       return ""
     }
 
+    val supportedLanguages = Set(Languages.C, Languages.NEWC, Languages.GHIDRA, Languages.JAVASRC)
+
     val node = location.node.get
-    if (language.isEmpty || !Set(Languages.C).contains(language.get)) {
+    if (language.isEmpty || !supportedLanguages.contains(language.get)) {
       logger.info("dump not supported for this language or language not set in CPG")
       return ""
     }
 
-    val method = node match {
+    val method: Option[Method] = node match {
       case n: Method     => Some(n)
       case n: Expression => Some(n.method)
+      case n: Local      => n.method.headOption
       case _             => None
     }
 
@@ -41,7 +45,11 @@ object CodeDumper {
     method
       .collect {
         case m: Method if m.lineNumber.isDefined && m.lineNumberEnd.isDefined =>
-          val rawCode = code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
+          val rawCode = if (language.contains(Languages.GHIDRA)) {
+            m.code
+          } else {
+            code(filename, m.lineNumber.get, m.lineNumberEnd.get, lineToHighlight)
+          }
           if (highlight) {
             SourceHighlighter.highlight(Source(rawCode, language.get))
           } else {
@@ -58,7 +66,7 @@ object CodeDumper {
     * an arrow (as a source code comment) is included right before that line.
     * */
   def code(filename: String, startLine: Integer, endLine: Integer, lineToHighlight: Option[Integer] = None): String = {
-    val lines = Try(File(filename).lines.toList).getOrElse {
+    val lines = Try(IOUtils.readLinesInFile(Paths.get(filename))).getOrElse {
       logger.warn("error reading from: " + filename);
       List()
     }

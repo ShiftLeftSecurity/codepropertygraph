@@ -101,10 +101,10 @@ object AccessPathHandling {
         VariablePointerShift
       }
       case Some(literal: Literal) =>
-        literal.code.toIntOption.map(PointerShift).getOrElse(VariablePointerShift)
+        literal.code.toIntOption.map(PointerShift.apply).getOrElse(VariablePointerShift)
       case Some(fieldIdentifier: FieldIdentifier) =>
         fieldIdentifier.canonicalName.toIntOption
-          .map(PointerShift)
+          .map(PointerShift.apply)
           .getOrElse(VariablePointerShift)
       case _ => VariablePointerShift
     }

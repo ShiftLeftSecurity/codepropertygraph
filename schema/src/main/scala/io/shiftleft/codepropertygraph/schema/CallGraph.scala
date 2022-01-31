@@ -19,7 +19,7 @@ object CallGraph extends SchemaBase {
     new Schema(builder, methodSchema, astSchema: Ast.Schema)
 
   class Schema(builder: SchemaBuilder, methodSchema: Method.Schema, astSchema: Ast.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import astSchema._
 
@@ -62,8 +62,7 @@ object CallGraph extends SchemaBase {
       .mandatory(PropertyDefaults.String)
       .protoId(54)
 
-    expression
-      .addProperties(argumentIndex, argumentName)
+    expression.addProperties(argumentIndex, argumentName)
 
     val evaluationStrategy = builder
       .addProperty(
@@ -105,14 +104,9 @@ object CallGraph extends SchemaBase {
       ).protoId(3),
     )
 
-    methodParameterIn
-      .addProperties(evaluationStrategy)
-
-    methodReturn
-      .addProperties(evaluationStrategy)
-
-    methodParameterOut
-      .addProperties(evaluationStrategy)
+    methodParameterIn.addProperties(evaluationStrategy)
+    methodReturn.addProperties(evaluationStrategy)
+    methodParameterOut.addProperties(evaluationStrategy)
 
     val dispatchType = builder
       .addProperty(
@@ -175,6 +169,12 @@ object CallGraph extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "For dynamically dispatched calls the target is determined during runtime"
       ).protoId(2),
+      Constant(
+        name = "INLINED",
+        value = "INLINED",
+        valueType = ValueTypes.STRING,
+        comment = "For macro expansions, code is inlined."
+      ).protoId(3),
     )
 
     callNode

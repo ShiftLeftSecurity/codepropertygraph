@@ -61,7 +61,7 @@ private class CpgOverlayApplier(graph: Graph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Node] = mutable.HashMap.empty
 
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
-  implicit val interner = StringInterner.noop
+  implicit val interner: StringInterner = StringInterner.noop
 
   /**
     * Applies diff to existing (loaded) Graph
@@ -88,7 +88,7 @@ private class CpgOverlayApplier(graph: Graph) {
       val properties = node.getPropertyList.asScala.toSeq
         .map(prop => (prop.getName.name, prop.getValue))
         .map(ProtoToCpg.toProperty)
-      val newNode = graph + (node.getType.name, properties: _*)
+      val newNode = graph.+(node.getType.name, properties: _*)
       inverseBuilder.onNewNode(newNode.asInstanceOf[StoredNode])
       overlayNodeIdToSrcGraphNode.put(node.getKey, newNode)
     }
@@ -102,7 +102,7 @@ private class CpgOverlayApplier(graph: Graph) {
       val properties = edge.getPropertyList.asScala.toSeq
         .map(prop => (prop.getName.name, prop.getValue))
         .map(ProtoToCpg.toProperty)
-      val newEdge = srcNode --- (edge.getType.name, properties: _*) --> dstNode
+      val newEdge = srcNode.---(edge.getType.name, properties: _*) --> dstNode
       inverseBuilder.onNewEdge(newEdge)
     }
   }

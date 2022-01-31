@@ -34,7 +34,7 @@ object Shortcuts extends SchemaBase {
     import typeSchema._
     import fs._
 
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
     val evalType = builder
       .addEdgeType(
@@ -59,8 +59,13 @@ object Shortcuts extends SchemaBase {
       )
       .protoId(12)
 
-    methodParameterIn
-      .addOutEdge(edge = parameterLink, inNode = methodParameterOut)
+    methodParameterIn.addOutEdge(
+      edge = parameterLink,
+      inNode = methodParameterOut,
+      stepNameIn = "asInput",
+      stepNameOut = "asOutput",
+      stepNameOutDoc = "Traverse to corresponding formal output parameter"
+    )
 
     file
       .addOutEdge(edge = contains, inNode = typeDecl)
@@ -70,7 +75,10 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = callNode)
       .addOutEdge(edge = contains, inNode = identifier)
       .addOutEdge(edge = contains, inNode = fieldIdentifier)
-      .addOutEdge(edge = contains, inNode = literal)
+      .addOutEdge(edge = contains,
+                  inNode = literal,
+                  stepNameOut = "literal",
+                  stepNameOutDoc = "Literals used in the method")
       .addOutEdge(edge = contains, inNode = ret)
       .addOutEdge(edge = contains, inNode = methodRef)
       .addOutEdge(edge = contains, inNode = typeRef)
@@ -79,53 +87,43 @@ object Shortcuts extends SchemaBase {
       .addOutEdge(edge = contains, inNode = jumpTarget)
       .addOutEdge(edge = contains, inNode = unknown)
 
-    methodParameterIn
-      .addOutEdge(edge = evalType, inNode = tpe, cardinalityOut = Cardinality.One)
-
-    methodParameterOut
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    methodReturn
-      .addOutEdge(edge = evalType, inNode = tpe)
+    methodParameterIn.addOutEdge(edge = evalType,
+                                 inNode = tpe,
+                                 cardinalityOut = Cardinality.One,
+                                 stepNameOut = "typ",
+                                 stepNameOutDoc = "Traverse to parameter type")
+    methodParameterOut.addOutEdge(edge = evalType,
+                                  inNode = tpe,
+                                  stepNameOut = "typ",
+                                  stepNameOutDoc = "Traverse to parameter type")
+    methodReturn.addOutEdge(edge = evalType, inNode = tpe)
 
     methodRef
-      .addOutEdge(edge = ref, inNode = method, cardinalityOut = Cardinality.One)
+      .addOutEdge(edge = ref,
+                  inNode = method,
+                  cardinalityOut = Cardinality.One,
+                  stepNameOut = "referencedMethod",
+                  stepNameOutDoc = "Traverse to referenced method.")
       .addOutEdge(edge = evalType, inNode = tpe)
 
-    typeRef
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    tpe
-      .addOutEdge(edge = ref, inNode = typeDecl)
-
-    typeDecl
-      .addOutEdge(edge = contains, inNode = method)
-
-    member
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    literal
-      .addOutEdge(edge = evalType, inNode = tpe)
+    typeRef.addOutEdge(edge = evalType, inNode = tpe)
+    tpe.addOutEdge(edge = ref, inNode = typeDecl)
+    typeDecl.addOutEdge(edge = contains, inNode = method)
+    member.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "Traverse to member type")
+    literal.addOutEdge(edge = evalType, inNode = tpe)
 
     callNode
-      .addOutEdge(edge = ref, inNode = member)
+      .addOutEdge(edge = ref,
+                  inNode = member,
+                  stepNameOut = "referencedMember",
+                  stepNameOutDoc = "Traverse to referenced members")
       .addOutEdge(edge = evalType, inNode = tpe)
 
-    local
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    identifier
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    block
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    controlStructure
-      .addOutEdge(edge = evalType, inNode = tpe)
-
-    unknown
-      .addOutEdge(edge = evalType, inNode = tpe)
-
+    local.addOutEdge(edge = evalType, inNode = tpe, stepNameOut = "typ", stepNameOutDoc = "The type of the local.")
+    identifier.addOutEdge(edge = evalType, inNode = tpe)
+    block.addOutEdge(edge = evalType, inNode = tpe)
+    controlStructure.addOutEdge(edge = evalType, inNode = tpe)
+    unknown.addOutEdge(edge = evalType, inNode = tpe)
   }
 
 }

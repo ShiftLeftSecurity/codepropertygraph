@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.types.expressions
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 /**
   A call site
@@ -26,7 +26,7 @@ class CallTraversal(val traversal: Traversal[Call]) extends AnyVal {
     The receiver of a call if the call has a receiver associated.
     */
   def receiver: Traversal[Expression] =
-    traversal.out(EdgeTypes.RECEIVER).cast[Expression]
+    traversal.flatMap(_.receiver)
 
   /**
     Arguments of the call
@@ -49,11 +49,5 @@ class CallTraversal(val traversal: Traversal[Call]) extends AnyVal {
       .out(EdgeTypes.AST)
       .hasLabel(NodeTypes.METHOD_RETURN)
       .cast[MethodReturn]
-
-  /**
-    * Traverse to referenced members
-    * */
-  def referencedMember: Traversal[Member] =
-    traversal.out(EdgeTypes.REF).cast[Member]
 
 }

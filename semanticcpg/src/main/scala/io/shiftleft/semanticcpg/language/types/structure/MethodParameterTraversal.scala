@@ -1,9 +1,8 @@
 package io.shiftleft.semanticcpg.language.types.structure
 
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
-import overflowdb.traversal.{Traversal, help}
+import overflowdb.traversal._
 
 import scala.jdk.CollectionConverters._
 
@@ -32,38 +31,14 @@ class MethodParameterTraversal(val traversal: Traversal[MethodParameterIn]) exte
     traversal.filter(_.order <= num)
 
   /**
-    * Traverse to method associated with this formal parameter
-    * */
-  def method: Traversal[Method] =
-    traversal.in(EdgeTypes.AST).cast[Method]
-
-  /**
     * Traverse to arguments (actual parameters) associated with this formal parameter
     * */
   def argument(implicit callResolver: ICallResolver): Traversal[Expression] =
     for {
       paramIn <- traversal
-      call <- callResolver.getMethodCallsites(paramIn._methodViaAstIn)
+      call <- callResolver.getMethodCallsites(paramIn.method)
       arg <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
       if arg.argumentIndex == paramIn.order
     } yield arg
-
-  /**
-    * Traverse to corresponding formal output parameter
-    * */
-  def asOutput: Traversal[MethodParameterOut] =
-    traversal.out(EdgeTypes.PARAMETER_LINK).cast[MethodParameterOut]
-
-  /**
-    * Places (identifier) where this parameter is being referenced
-    * */
-  def referencingIdentifiers: Traversal[Identifier] =
-    traversal.in(EdgeTypes.REF).hasLabel(NodeTypes.IDENTIFIER).cast[Identifier]
-
-  /**
-    * Traverse to parameter type
-    * */
-  def typ: Traversal[Type] =
-    traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]
 
 }

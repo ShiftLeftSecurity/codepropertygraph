@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, NewTagNodePair, StoredNode}
 import io.shiftleft.passes.DiffGraph
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 class NewTagNodePairTraversal(traversal: Traversal[NewTagNodePair]) extends HasStoreMethod {
 

@@ -17,7 +17,7 @@ object Namespace extends SchemaBase {
     new Schema(builder, base, fs)
 
   class Schema(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import base._
     import fs._
 
@@ -59,8 +59,7 @@ object Namespace extends SchemaBase {
       .protoId(40)
       .addProperties(name)
 
-    namespaceBlock
-      .addOutEdge(edge = sourceFile, inNode = file)
+    namespaceBlock.addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "namespaceBlock")
 
   }
 

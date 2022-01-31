@@ -15,7 +15,7 @@ object Operators extends SchemaBase {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
-    implicit private val schemaInfo = SchemaInfo.forClass(getClass)
+    implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
 // constants
     val operators = builder.addConstants(
@@ -88,6 +88,10 @@ object Operators extends SchemaBase {
       Constant(name = "assignmentOr", value = "<operators>.assignmentOr", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "assignmentXor",
                value = "<operators>.assignmentXor",
+               valueType = ValueTypes.STRING,
+               comment = ""),
+      Constant(name = "arrayInitializer",
+               value = "<operator>.arrayInitializer",
                valueType = ValueTypes.STRING,
                comment = ""),
       Constant(name = "assignment", value = "<operator>.assignment", valueType = ValueTypes.STRING, comment = ""),
@@ -254,6 +258,31 @@ object Operators extends SchemaBase {
         value = "<operator>.notIn",
         valueType = ValueTypes.STRING,
         comment = "Checks the non-existence of a variable in a range or collection, e.g. `print(5 not in [1, 2, 3, 4])`"
+      ),
+      Constant(name = "is",
+               value = "<operator>.is",
+               valueType = ValueTypes.STRING,
+               comment = "Checks whether a variable is of a given type"),
+      Constant(name = "isNot",
+               value = "<operator>.isNot",
+               valueType = ValueTypes.STRING,
+               comment = "Checks whether a variable is not of a given type"),
+      Constant(name = "notNullAssert",
+               value = "<operator>.notNullAssert",
+               valueType = ValueTypes.STRING,
+               comment = "Converts any value to a not-null type"),
+      Constant(
+        name = "lengthOf",
+        value = "<operator>.lengthOf",
+        valueType = ValueTypes.STRING,
+        comment =
+          "Returns the length of the given collection e.g. (new int[]{ 1, 2, 3 }).length in Java or len([1, 2, 3]) in Python"
+      ),
+      Constant(
+        name = "safeNavigation",
+        value = "<operator>.safeNavigation",
+        valueType = ValueTypes.STRING,
+        comment = "Returns null if the first operator is null, otherwise performs a dereferencing operation"
       ),
     )
 

@@ -1,25 +1,9 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "1.95+3-91beb17b"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "2.21"
 
-val generateDomainClasses = taskKey[Seq[File]]("generate overflowdb domain classes for our schema")
-generateDomainClasses := Def.taskDyn {
-  val outputRoot = target.value / "odb-codegen"
-  val currentSchemaMd5 = FileUtils.md5(sourceDirectory.value, file("schema/build.sbt"))
-
-  if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
-    Def.task {
-      FileUtils.listFilesRecursively(outputRoot)
-    }
-  } else {
-    Def.task {
-      FileUtils.deleteRecursively(outputRoot)
-      (Compile/runMain).toTask(s" io.shiftleft.codepropertygraph.schema.Codegen schema/target/odb-codegen").value
-      lastSchemaMd5(currentSchemaMd5)
-      FileUtils.listFilesRecursively(outputRoot)
-    }
-  }
-}.value
+Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
+Compile / generateDomainClasses / fieldName := "instance"
 
 val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {
