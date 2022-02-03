@@ -12,20 +12,17 @@ import overflowdb.traversal._
 import java.nio.file.Files
 import scala.jdk.CollectionConverters._
 
-class ParallelCpgPassTests extends AnyWordSpec with Matchers {
+class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
       val cpg = Cpg.emptyCpg
-      class MyPass(cpg: Cpg) extends ParallelCpgPass[String](cpg, "MyPass", keyPools) {
-        override def partIterator: Iterator[String] = {
-          Iterator("foo", "bar")
-        }
+      val pool = keyPools.flatMap(_.headOption)
+      class MyPass(cpg: Cpg) extends ConcurrentWriterCpgPass[String](cpg, "MyPass", pool) {
+        override def generateParts(): Array[String] = Array("foo", "bar")
 
-        override def runOnPart(part: String): Iterator[DiffGraph] = {
-          val diffGraph = DiffGraph.newBuilder
+        override def runOnPart(diffGraph: DiffGraphBuilder, part: String): Unit = {
           diffGraph.addNode(NewFile().name(part))
-          Iterator(diffGraph.build())
         }
       }
       val pass = new MyPass(cpg)
@@ -33,7 +30,7 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
     }
   }
 
-  "ParallelCpgPass" should {
+  "ConcurrentWriterCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
       cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
@@ -56,33 +53,29 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
       new IntervalKeyPool(30, 40)
     )
 
-    "take into account KeyPools for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
+    "use only the first KeyPool for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 30)
+      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(10, 11)
     }
 
     "fail for schema violations" in {
       val cpg = Cpg.emptyCpg
-      val pass = new ParallelCpgPass[String](cpg, "pass2") {
-        def partIterator = Iterator("a", "b")
-        def runOnPart(part: String): Iterator[DiffGraph] =
+      val pass = new ConcurrentWriterCpgPass[String](cpg, "pass2") {
+        override def generateParts() = Array("a", "b")
+        override def runOnPart(diffGraph: DiffGraphBuilder, part: String): Unit =
           part match {
             case "a" =>
               // this is fine
-              val diffGraph = DiffGraph.newBuilder
               diffGraph.addNode(NewFile().name(part))
-              Iterator(diffGraph.build())
             case "b" =>
               // schema violation
               val file1 = NewFile().name("foo")
               val file2 = NewFile().name("bar")
-              Iterator(
-                DiffGraph.newBuilder
-                  .addNode(file1)
-                  .addNode(file2)
-                  .addEdge(file1, file2, "illegal_edge_label")
-                  .build()
-              )
+              diffGraph
+                .addNode(file1)
+                .addNode(file2)
+                .addEdge(file1, file2, "illegal_edge_label")
+
           }
       }
 
@@ -92,24 +85,24 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
       }
     }
 
-    "add NewNodes that are referenced in different parts multiple times" in {
+    "add NewNodes that are referenced in different parts only once" in {
       val cpg = Cpg.emptyCpg
-      val pass = new ParallelCpgPass[String](cpg, "pass2") {
+      val pass = new ConcurrentWriterCpgPass[String](cpg, "pass2") {
         val call1 = NewCall().name("call1")
         val call2 = NewCall().name("call2")
         val call3 = NewCall().name("call3")
 
-        def partIterator = Iterator("a", "b")
-        def runOnPart(part: String): Iterator[DiffGraph] =
+        override def generateParts() = Array("a", "b")
+        override def runOnPart(diffGraph: DiffGraphBuilder, part: String): Unit =
           part match {
             case "a" =>
-              Iterator(DiffGraph.newBuilder.addEdge(call1, call2, "AST").build)
+              diffGraph.addEdge(call1, call2, "AST")
             case "b" =>
-              Iterator(DiffGraph.newBuilder.addEdge(call2, call3, "AST").build)
+              diffGraph.addEdge(call2, call3, "AST")
           }
       }
       pass.createAndApply()
-      cpg.graph.nodeCount() shouldBe 4
+      cpg.graph.nodeCount() shouldBe 3
     }
   }
 

@@ -98,8 +98,9 @@ object MethodRefLinker {
           }
       } else {
         srcNode.out(edgeType).property(Properties.FULL_NAME).nextOption() match {
-          case Some(dstFullName) => srcNode.setProperty(dstFullNameKey, dstFullName)
-          case None              => logger.info(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
+          case Some(dstFullName) =>
+            dstGraph.addNodeProperty(srcNode.asInstanceOf[StoredNode], dstFullNameKey, dstFullName)
+          case None => logger.info(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
         if (!loggedDeprecationWarning) {
           logger.info(
@@ -130,7 +131,7 @@ object MethodRefLinker {
         }
       } else {
         val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
-        srcNode.setProperty(dstFullNameKey, dstFullNames)
+        dstGraph.addNodeProperty(srcNode, dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
           logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +

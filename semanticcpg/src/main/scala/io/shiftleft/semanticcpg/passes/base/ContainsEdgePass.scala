@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.base
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph}
+import io.shiftleft.passes.ConcurrentWriterCpgPass
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -18,7 +18,7 @@ class ContainsEdgePass(cpg: Cpg) extends ConcurrentWriterCpgPass[AstNode](cpg) {
   override def generateParts(): Array[AstNode] =
     cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode]).toArray
 
-  override def runOnPart(dstGraph: DiffGraph.Builder, source: AstNode): Unit = {
+  override def runOnPart(dstGraph: DiffGraphBuilder, source: AstNode): Unit = {
     //AST is assumed to be a tree. If it contains cycles, then this will give a nice endless loop with OOM
     val queue = mutable.ArrayDeque[StoredNode](source)
     while (queue.nonEmpty) {

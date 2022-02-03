@@ -9,10 +9,11 @@ object NodeOrdering {
     * return a map that associates each node with an index such that nodes are numbered
     * in post order.
     * */
-  def postOrderNumbering[NodeType](cfgEntry: NodeType, expand: NodeType => Iterator[NodeType]): Map[NodeType, Int] = {
+  def postOrderNumbering[NodeType](cfgEntry: NodeType,
+                                   expand: NodeType => Iterator[NodeType]): mutable.LinkedHashMap[NodeType, Int] = {
     var stack = (cfgEntry, expand(cfgEntry)) :: Nil
     val visited = mutable.Set.empty[NodeType]
-    val numbering = mutable.Map.empty[NodeType, Int]
+    val numbering = mutable.LinkedHashMap.empty[NodeType, Int]
     var nextNumber = 0
 
     while (stack.nonEmpty) {
@@ -26,11 +27,11 @@ object NodeOrdering {
         }
       } else {
         stack = stack.tail
-        numbering += (node -> nextNumber)
+        numbering.put(node, nextNumber)
         nextNumber += 1
       }
     }
-    numbering.toMap
+    numbering
   }
 
   /**

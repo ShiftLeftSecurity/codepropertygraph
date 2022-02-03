@@ -7,14 +7,7 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
   * Using the method `next`, the pool provides the
   * next id in a thread-safe manner.
   * */
-trait KeyPool {
-
-  /**
-    * Returns the next id from the key pool
-    * */
-  def next: Long
-
-}
+trait KeyPool extends overflowdb.BatchedUpdate.KeyPool {}
 
 /**
   A key pool that returns the integers of the interval

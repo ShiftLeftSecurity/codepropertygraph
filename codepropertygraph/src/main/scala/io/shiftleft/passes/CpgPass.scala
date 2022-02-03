@@ -103,11 +103,12 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
 
-  def run(builder: DiffGraph.Builder): Unit
+  def run(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit
 
   final override def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
 
-  final override def runOnPart(builder: DiffGraph.Builder, part: AnyRef): Unit = run(builder)
+  final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
+    run(builder)
 }
 
 /* ForkJoinParallelCpgPass is a possible replacement for CpgPass and ParallelCpgPass.
@@ -134,6 +135,7 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * */
 abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
+  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
   //generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
   //setup large data structures, acquire external resources
@@ -141,7 +143,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
   //release large data structures and external resources
   def finish(): Unit = {}
   //main function: add desired changes to builder
-  def runOnPart(builder: DiffGraph.Builder, part: T): Unit
+  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
@@ -153,14 +155,15 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     var nParts = 0
     var nanosBuilt = -1L
     var nDiff = -1
+    var nDiffT = -1
     try {
       init()
       val parts = generateParts()
       nParts = parts.size
       val diffGraph = nParts match {
-        case 0 => DiffGraph.EmptyChangeSet
+        case 0 => (new DiffGraphBuilder).build()
         case 1 =>
-          val builder = DiffGraph.newBuilder
+          val builder = new DiffGraphBuilder
           runOnPart(builder, parts(0).asInstanceOf[T])
           builder.build()
         case _ =>
@@ -168,28 +171,40 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
             .stream(parts)
             .parallel()
             .collect(
-              new Supplier[DiffGraph.Builder] {
-                override def get(): DiffGraph.Builder = DiffGraph.newBuilder
+              new Supplier[DiffGraphBuilder] {
+                override def get(): DiffGraphBuilder =
+                  new DiffGraphBuilder
               },
-              new BiConsumer[DiffGraph.Builder, AnyRef] {
-                override def accept(builder: DiffGraph.Builder, part: AnyRef): Unit =
+              new BiConsumer[DiffGraphBuilder, AnyRef] {
+                override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
                   runOnPart(builder, part.asInstanceOf[T])
               },
-              new BiConsumer[DiffGraph.Builder, DiffGraph.Builder] {
-                override def accept(leftBuilder: DiffGraph.Builder, rightBuilder: DiffGraph.Builder): Unit =
-                  leftBuilder.moveFrom(rightBuilder)
+              new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
+                override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
+                  leftBuilder.absorb(rightBuilder)
               }
             )
             .build()
       }
       nanosBuilt = System.nanoTime()
-      nDiff = diffGraph.size
+      nDiff = diffGraph.size()
       val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
       val withInverse = doSerialize && inverse
+      val listener =
+        if (withInverse) new BatchUpdateInverseListener else if (doSerialize) new BatchUpdateForwardListener else null
 
-      val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
-      if (doSerialize) {
-        store(serialize(appliedDiffGraph, withInverse), generateOutFileName(prefix, outName, 0), serializedCpg)
+      nDiffT = overflowdb.BatchedUpdate
+        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), listener)
+        .transitiveModifications()
+
+      if (withInverse) {
+        store(listener.asInstanceOf[BatchUpdateInverseListener].getSerialization(),
+              generateOutFileName(prefix, outName, 0),
+              serializedCpg)
+      } else if (doSerialize) {
+        store(listener.asInstanceOf[BatchUpdateForwardListener].builder.build(),
+              generateOutFileName(prefix, outName, 0),
+              serializedCpg)
       }
     } catch {
       case exc: Exception =>
@@ -203,8 +218,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         // in the reported timings, and we must have our final log message if finish() throws
         val nanosStop = System.nanoTime()
         val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
+        val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
+          if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
+        } else ""
         baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d changes commited from ${nParts}%d parts.")
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes commited from ${nParts}%d parts.${serializationString}%s")
       }
     }
   }

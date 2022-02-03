@@ -168,6 +168,9 @@ object ConcurrentWriterCpgPass {
 }
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends CpgPassBase {
+  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
+
+  @volatile var nDiffT = -1
 
   //generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
@@ -183,7 +186,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     *
     * E.g. adding a CFG edge to node X races with reading an AST edge of node X.
     * */
-  def runOnPart(builder: DiffGraph.Builder, part: T): Unit
+  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
@@ -195,12 +198,12 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val nanosStart = System.nanoTime()
     var nParts = 0
     var nDiff = 0
-
+    nDiffT = -1
     init()
     val parts = generateParts()
     nParts = parts.size
     val partIter = parts.iterator
-    val completionQueue = mutable.ArrayDeque[Future[DiffGraph]]()
+    val completionQueue = mutable.ArrayDeque[Future[overflowdb.BatchedUpdate.DiffGraph]]()
     val writer = new Writer(serializedCpg, prefix, inverse, MDC.getCopyOfContextMap())
     val writerThread = new Thread(writer)
     writerThread.setName("Writer")
@@ -216,13 +219,16 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         // as opposed to ParallelCpgPass, there is no race between diffgraph-generators to enqueue into the writer -- everything
         // is nice and ordered. Downside is that a very slow part may gum up the works (i.e. the completionQueue fills up and threads go idle)
         var done = false
-        while (!done) {
+        while (!done && writer.raisedException == null) {
+          if (writer.raisedException != null)
+            throw writer.raisedException //will be wrapped with good stacktrace in the finally block
+
           if (completionQueue.size < producerQueueCapacity && partIter.hasNext) {
             val next = partIter.next()
             //todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             //if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
-              val builder = DiffGraph.newBuilder
+              val builder = new DiffGraphBuilder
               runOnPart(builder, next.asInstanceOf[T])
               builder.build()
             })
@@ -237,16 +243,25 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         }
       } finally {
         try {
-          writer.queue.put(None)
+          //if the writer died on us, then the queue might be full and we could deadlock
+          if (writer.raisedException == null) writer.queue.put(None)
           writerThread.join()
+          //we need to reraise exceptions
+          if (writer.raisedException != null)
+            throw new RuntimeException("Failure in diffgraph application", writer.raisedException)
+
         } finally { finish() }
       }
     } finally {
       // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
       // in the reported timings, and we must have our final log message if finish() throws
+
       val nanosStop = System.nanoTime()
+      val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
+        if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
+      } else ""
       baseLogger.info(
-        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d changes commited from ${nParts}%d parts.")
+        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes commited from ${nParts}%d parts.${serializationString}%s")
     }
   }
 
@@ -256,10 +271,14 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
                        mdc: java.util.Map[String, String])
       extends Runnable {
 
-    val queue = new LinkedBlockingQueue[Option[DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
+    val queue =
+      new LinkedBlockingQueue[Option[overflowdb.BatchedUpdate.DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
+
+    @volatile var raisedException: Exception = null
 
     override def run(): Unit = {
       try {
+        nDiffT = 0
         MDC.setContextMap(mdc)
         var terminate = false
         var index: Int = 0
@@ -271,10 +290,22 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, withInverse, keyPool)
-              if (doSerialize) {
-                store(serialize(appliedDiffGraph, withInverse),
-                      generateOutFileName(prefix, outName, index),
+              val listener =
+                if (withInverse) new BatchUpdateInverseListener
+                else if (doSerialize) new BatchUpdateForwardListener
+                else null
+
+              nDiffT += overflowdb.BatchedUpdate
+                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), listener)
+                .transitiveModifications()
+
+              if (withInverse) {
+                store(listener.asInstanceOf[BatchUpdateInverseListener].getSerialization(),
+                      generateOutFileName(prefix, outName, 0),
+                      serializedCpg)
+              } else if (doSerialize) {
+                store(listener.asInstanceOf[BatchUpdateForwardListener].builder.build(),
+                      generateOutFileName(prefix, outName, 0),
                       serializedCpg)
               }
               index += 1
@@ -282,6 +313,10 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         }
       } catch {
         case exception: InterruptedException => baseLogger.warn("Interrupted WriterThread", exception)
+        case exc: Exception =>
+          raisedException = exc
+          queue.clear()
+          throw exc
       }
     }
   }

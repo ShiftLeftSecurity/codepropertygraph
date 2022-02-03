@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.102"
+val overflowdbVersion = "1.110+13-a9ede5cc"
 
 inThisBuild(
   List(
@@ -78,7 +78,8 @@ addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
-  "-Xfatal-warnings",
+ // "-Xfatal-warnings",
+ "-Wconf:cat=deprecation:w,any:e",
   "-language:implicitConversions",
 ) ++ (
   CrossVersion.partialVersion(scalaVersion.value) match {
