@@ -28,18 +28,18 @@ class CfgGenerator {
       }
     }
 
-    val edges = verticesToDisplay.map { v =>
+    val edges = verticesToDisplay.flatMap { v =>
       edgesToDisplay(v)
-    }
+    }.distinct
 
-    val allIdsReferencedByEdges = edges.flatten.flatMap { edge =>
+    val allIdsReferencedByEdges = edges.flatMap { edge =>
       Set(edge.src.id, edge.dst.id)
     }
 
     Graph(
       verticesToDisplay
         .filter(node => allIdsReferencedByEdges.contains(node.id)),
-      edges.flatten
+      edges
     )
   }
 
