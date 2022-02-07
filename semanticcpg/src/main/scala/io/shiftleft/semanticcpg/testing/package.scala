@@ -144,6 +144,15 @@ package object testing {
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)
       }
 
+    def withMethodCall(calledMethod: String, callingMethod: String, code: Option[String] = None): MockCpg =
+      withCustom { (graph, cpg) =>
+        val callingMethodNode = cpg.method.name(callingMethod).head
+        val calledMethodNode = cpg.method.name(calledMethod).head
+        val callNode = NewCall().name(calledMethod).code(code.getOrElse(calledMethod))
+        graph.addEdge(callNode, calledMethodNode, EdgeTypes.CALL)
+        graph.addEdge(callingMethodNode, callNode, EdgeTypes.CONTAINS)
+      }
+
     def withLocalInMethod(methodName: String, localName: String): MockCpg =
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
