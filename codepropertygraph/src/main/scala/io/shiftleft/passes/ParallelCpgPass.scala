@@ -274,7 +274,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     val queue =
       new LinkedBlockingQueue[Option[overflowdb.BatchedUpdate.DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
 
-    @volatile var raisedException: Exception = null
+    @volatile private var raisedException: Exception = null
 
     override def run(): Unit = {
       try {
