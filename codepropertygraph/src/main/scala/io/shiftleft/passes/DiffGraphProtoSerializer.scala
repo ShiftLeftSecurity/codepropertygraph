@@ -23,7 +23,7 @@ import io.shiftleft.proto.cpg.Cpg.{
 }
 import overflowdb._
 import overflowdb.traversal.toNodeTraversalViaAdditionalImplicit
-
+import overflowdb.traversal.jIteratortoTraversal
 import java.lang.{Long => JLong}
 import java.security.MessageDigest
 import scala.collection.mutable
@@ -52,7 +52,10 @@ object DiffGraphProtoSerializer {
           val inNodeId = proto.getInNodeKey
           val edgeLabel = proto.getEdgeType.toString
 
-          val edge = graph.V(outNodeId).outE(edgeLabel).filter(_.inNode.id == inNodeId).l match {
+          val edge = toNodeTraversalViaAdditionalImplicit(graph.V(outNodeId))
+            .outE(edgeLabel)
+            .filter(_.inNode.id == inNodeId)
+            .l match {
             case edge :: Nil => edge
             case Nil         => throw new AssertionError(s"unable to find edge that is supposed to be removed: $proto")
             case candidates => // found multiple edges - try to disambiguate via propertiesHash

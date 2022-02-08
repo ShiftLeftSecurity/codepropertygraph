@@ -103,9 +103,9 @@ class ParallelCpgPassTests extends AnyWordSpec with Matchers {
         def runOnPart(part: String): Iterator[DiffGraph] =
           part match {
             case "a" =>
-              Iterator(DiffGraph.newBuilder.addEdge(call1, call2, "AST").build)
+              Iterator(DiffGraph.newBuilder.addEdge(call1, call2, "AST").build())
             case "b" =>
-              Iterator(DiffGraph.newBuilder.addEdge(call2, call3, "AST").build)
+              Iterator(DiffGraph.newBuilder.addEdge(call2, call3, "AST").build())
           }
       }
       pass.createAndApply()

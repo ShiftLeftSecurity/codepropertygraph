@@ -43,7 +43,7 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
   }
 
   "apply cpg pass, serialize the inverse DiffGraph, and apply the inverse to undo" in {
-    withNewBaseCpg { cpg: Cpg =>
+    withNewBaseCpg { (cpg: Cpg) =>
       cpg.graph.nodeCount shouldBe 1
       val initialNode = cpg.graph.V.has(Properties.CODE, InitialNodeCode).head.asInstanceOf[StoredNode]
 
