@@ -35,7 +35,29 @@ object Ast {
       diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.ARGUMENT)
     }
   }
-
+  def storeInDiffGraph(ast: Ast, diffGraph: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit = {
+    ast.nodes.foreach { node =>
+      diffGraph.addNode(node)
+    }
+    ast.edges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.AST)
+    }
+    ast.conditionEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.CONDITION)
+    }
+    ast.receiverEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.RECEIVER)
+    }
+    ast.refEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.REF)
+    }
+    ast.bindsEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.BINDS)
+    }
+    ast.argEdges.foreach { edge =>
+      diffGraph.addEdge(edge.src, edge.dst, EdgeTypes.ARGUMENT)
+    }
+  }
 }
 
 case class Ast(nodes: List[NewNode],

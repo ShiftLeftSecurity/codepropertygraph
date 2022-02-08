@@ -1,6 +1,9 @@
 package io.shiftleft.semanticcpg.testing
 
 import io.shiftleft.codepropertygraph.generated.nodes.StoredNode
+import overflowdb.{Edge, Node, Property, PropertyKey}
+
+import java.util
 
 /** mixin trait for test nodes */
 trait DummyNodeImpl extends StoredNode {
@@ -15,11 +18,15 @@ trait DummyNodeImpl extends StoredNode {
   def propertiesMap(): java.util.Map[String, Object] = ???
   def propertyOption(x$1: String): java.util.Optional[Object] = ???
   def propertyOption[A](x$1: overflowdb.PropertyKey[A]): java.util.Optional[A] = ???
-  //def remove(): Unit = ???
-  //def removeProperty(x$1: String): Unit = ???
-  //def setProperty(x$1: overflowdb.Property[_]): Unit = ???
-  //def setProperty[A](x$1: overflowdb.PropertyKey[A], x$2: A): Unit = ???
-  //def setProperty(x$1: String, x$2: Object): Unit = ???
+  override def addEdgeImpl(label: String, inNode: Node, keyValues: Any*): Edge = ???
+  override def addEdgeImpl(label: String, inNode: Node, keyValues: util.Map[String, AnyRef]): Edge = ???
+  override def addEdgeSilentImpl(label: String, inNode: Node, keyValues: Any*): Unit = ???
+  override def addEdgeSilentImpl(label: String, inNode: Node, keyValues: util.Map[String, AnyRef]): Unit = ???
+  override def setPropertyImpl(key: String, value: Any): Unit = ???
+  override def setPropertyImpl[A](key: PropertyKey[A], value: A): Unit = ???
+  override def setPropertyImpl(property: Property[_]): Unit = ???
+  override def removePropertyImpl(key: String): Unit = ???
+  override def removeImpl(): Unit = ???
 
   // Members declared in scala.Equals
   def canEqual(that: Any): Boolean = ???
@@ -29,6 +36,7 @@ trait DummyNodeImpl extends StoredNode {
   // def addEdge(x$1: String, x$2: overflowdb.Node, x$3: Object*): overflowdb.Edge = ???
   // def addEdgeSilent(x$1: String, x$2: overflowdb.Node, x$3: java.util.Map[String, Object]): Unit = ???
   // def addEdgeSilent(x$1: String, x$2: overflowdb.Node, x$3: Object*): Unit = ???
+
   def both(x$1: String*): java.util.Iterator[overflowdb.Node] = ???
   def both(): java.util.Iterator[overflowdb.Node] = ???
   def bothE(x$1: String*): java.util.Iterator[overflowdb.Edge] = ???
