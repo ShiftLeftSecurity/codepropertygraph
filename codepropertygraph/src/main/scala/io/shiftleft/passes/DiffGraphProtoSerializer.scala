@@ -11,6 +11,7 @@ import io.shiftleft.proto.cpg.Cpg.{
   ContainedRefs,
   CpgOverlay,
   CpgStruct,
+  DiffGraph => DiffGraphProto,
   DoubleList,
   EdgePropertyName,
   FloatList,
@@ -18,12 +19,11 @@ import io.shiftleft.proto.cpg.Cpg.{
   LongList,
   NodePropertyName,
   PropertyValue,
-  StringList,
-  DiffGraph => DiffGraphProto
+  StringList
 }
 import overflowdb._
-import overflowdb.traversal.toNodeTraversalViaAdditionalImplicit
-import overflowdb.traversal.jIteratortoTraversal
+import overflowdb.traversal.{jIteratortoTraversal, toNodeTraversalViaAdditionalImplicit}
+
 import java.lang.{Long => JLong}
 import java.security.MessageDigest
 import scala.collection.mutable
