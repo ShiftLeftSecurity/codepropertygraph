@@ -74,7 +74,6 @@ object X2Cpg {
       .getOrElse {
         Config.withDefaults()
       }
-
     Cpg.withConfig(odbConfig)
   }
 

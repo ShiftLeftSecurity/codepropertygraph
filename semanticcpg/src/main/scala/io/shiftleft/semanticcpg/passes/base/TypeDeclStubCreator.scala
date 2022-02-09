@@ -45,7 +45,7 @@ class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
       .name(name)
       .fullName(fullName)
       .isExternal(true)
-      .inheritsFromTypeFullName(Nil)
+      .inheritsFromTypeFullName(IndexedSeq.empty)
       .astParentType(NodeTypes.NAMESPACE_BLOCK)
       .astParentFullName(NamespaceTraversal.globalNamespaceName)
       .filename(FileTraversal.UNKNOWN)

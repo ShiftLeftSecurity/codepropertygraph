@@ -3,24 +3,23 @@ package io.shiftleft.semanticcpg.passes.controlflow.cfgdominator
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.EdgeTypes
 import io.shiftleft.codepropertygraph.generated.nodes.{Method, StoredNode}
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.ForkJoinParallelCpgPass
 import io.shiftleft.semanticcpg.language._
+
+import scala.collection.mutable
 
 /**
   * This pass has no prerequisites.
   */
-class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class CfgDominatorPass(cpg: Cpg) extends ForkJoinParallelCpgPass[Method](cpg) {
+  override def generateParts(): Array[Method] = cpg.method.toArray
 
-  override def partIterator: Iterator[Method] = cpg.method.iterator
-
-  override def runOnPart(method: Method): Iterator[DiffGraph] = {
+  override def runOnPart(dstGraph: DiffGraphBuilder, method: Method): Unit = {
     val cfgAdapter = new CpgCfgAdapter()
     val dominatorCalculator = new CfgDominator(cfgAdapter)
 
     val reverseCfgAdapter = new ReverseCpgCfgAdapter()
     val postDominatorCalculator = new CfgDominator(reverseCfgAdapter)
-
-    val dstGraph = DiffGraph.newBuilder
 
     val cfgNodeToImmediateDominator = dominatorCalculator.calculate(method)
     addDomTreeEdges(dstGraph, cfgNodeToImmediateDominator)
@@ -28,26 +27,22 @@ class CfgDominatorPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
     val cfgNodeToPostImmediateDominator = postDominatorCalculator.calculate(method.methodReturn)
     addPostDomTreeEdges(dstGraph, cfgNodeToPostImmediateDominator)
 
-    Iterator(dstGraph.build())
   }
 
-  private def addDomTreeEdges(dstGraph: DiffGraph.Builder,
-                              cfgNodeToImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
-    // TODO do not iterate over potential hash map to ensure same iteration order for
-    // edge creation.
+  private def addDomTreeEdges(dstGraph: DiffGraphBuilder,
+                              cfgNodeToImmediateDominator: mutable.LinkedHashMap[StoredNode, StoredNode]): Unit = {
     cfgNodeToImmediateDominator.foreach {
       case (node, immediateDominator) =>
-        dstGraph.addEdgeInOriginal(immediateDominator, node, EdgeTypes.DOMINATE)
+        dstGraph.addEdge(immediateDominator, node, EdgeTypes.DOMINATE)
     }
   }
 
-  private def addPostDomTreeEdges(dstGraph: DiffGraph.Builder,
-                                  cfgNodeToPostImmediateDominator: Map[StoredNode, StoredNode]): Unit = {
-    // TODO do not iterate over potential hash map to ensure same iteration order for
-    // edge creation.
+  private def addPostDomTreeEdges(
+      dstGraph: DiffGraphBuilder,
+      cfgNodeToPostImmediateDominator: mutable.LinkedHashMap[StoredNode, StoredNode]): Unit = {
     cfgNodeToPostImmediateDominator.foreach {
       case (node, immediatePostDominator) =>
-        dstGraph.addEdgeInOriginal(immediatePostDominator, node, EdgeTypes.POST_DOMINATE)
+        dstGraph.addEdge(immediatePostDominator, node, EdgeTypes.POST_DOMINATE)
     }
   }
 }

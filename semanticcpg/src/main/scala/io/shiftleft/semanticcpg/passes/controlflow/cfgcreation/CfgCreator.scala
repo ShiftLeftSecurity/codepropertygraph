@@ -2,9 +2,9 @@ package io.shiftleft.semanticcpg.passes.controlflow.cfgcreation
 
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{ControlStructureTypes, DispatchTypes, EdgeTypes, Operators}
-import io.shiftleft.passes.DiffGraph
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.controlflow.cfgcreation.Cfg.CfgEdgeType
+import overflowdb.BatchedUpdate.DiffGraphBuilder
 import overflowdb.traversal.Traversal
 
 /**
@@ -46,7 +46,7 @@ import overflowdb.traversal.Traversal
   * outgoing edges for which the destination node is yet to be determined as
   * the "fringe" of the control flow graph.
   */
-class CfgCreator(entryNode: Method, diffGraph: DiffGraph.Builder) {
+class CfgCreator(entryNode: Method, diffGraph: DiffGraphBuilder) {
 
   import Cfg._
   import CfgCreator._

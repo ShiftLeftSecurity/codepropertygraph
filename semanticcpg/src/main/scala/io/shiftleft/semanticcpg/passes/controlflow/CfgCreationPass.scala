@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.controlflow
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.Method
-import io.shiftleft.passes.{ConcurrentWriterCpgPass, DiffGraph}
+import io.shiftleft.passes.ConcurrentWriterCpgPass
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.controlflow.cfgcreation.CfgCreator
 
@@ -21,10 +21,10 @@ class CfgCreationPass(cpg: Cpg) extends ConcurrentWriterCpgPass[Method](cpg) {
 
   override def generateParts(): Array[Method] = cpg.method.toArray
 
-  override def runOnPart(diffGraph: DiffGraph.Builder, method: Method): Unit = {
-    val localDiff = DiffGraph.newBuilder
+  override def runOnPart(diffGraph: DiffGraphBuilder, method: Method): Unit = {
+    val localDiff = new DiffGraphBuilder
     new CfgCreator(method, localDiff).run()
-    diffGraph.moveFrom(localDiff)
+    diffGraph.absorb(localDiff)
   }
 
 }

@@ -2,6 +2,8 @@ package io.shiftleft.semanticcpg.passes.controlflow.cfgdominator
 
 import io.shiftleft.semanticcpg.language.NodeOrdering
 
+import scala.collection.mutable
+
 class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
   /**
@@ -12,7 +14,7 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     * The algorithm is from: "A Simple, Fast Dominance Algorithm" from
     * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
     */
-  def calculate(cfgEntry: NodeType): Map[NodeType, NodeType] = {
+  def calculate(cfgEntry: NodeType): mutable.LinkedHashMap[NodeType, NodeType] = {
     val UNDEFINED = -1
     def expand(x: NodeType) = { adapter.successors(x).iterator }
     def expandBack(x: NodeType) = { adapter.predecessors(x).iterator }
