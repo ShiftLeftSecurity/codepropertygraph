@@ -13,16 +13,24 @@ import overflowdb.traversal.Traversal
   * recursive problem in which sub trees of the syntax tree are translated and their corresponding control flow graphs
   * are connected according to the control flow semantics of the root node. For example, consider the abstract syntax
   * tree for an if-statement:
-  *
-  * ( if ) / \ (x < 10) (x += 1) / \ / \ x 10 x 1
-  *
+  * {{{
+  *               (  if )
+  *              /       \
+  *          (x < 10)  (x += 1)
+  *            / \       / \
+  *           x  10     x   1
+  * }}}
   * This tree can be translated into a control flow graph, by translating the sub tree rooted in `x < 10` and that of `x
   * += 1` and connecting their control flow graphs according to the semantics of `if`:
+  * {{{
+  *            [x < 10]----
+  *               |t     f|
+  *            [x +=1 ]   |
+  *               |
+  * }}}
   *
-  * [x < 10]----
-  * \|t f| [x +=1 ] |
-  * \| The semantics of if dictate that the first sub tree to the left is a condition, which is connected to the CFG of
-  * the second sub tree - the body of the if statement - via a control flow edge with the `true` label (indicated in the
+  * The semantics of if dictate that the first sub tree to the left is a condition, which is connected to the CFG of the
+  * second sub tree - the body of the if statement - via a control flow edge with the `true` label (indicated in the
   * illustration by `t`), and to the CFG of any follow-up code via a `false` edge (indicated by `f`).
   *
   * A problem that becomes immediately apparent in the illustration is that the result of translating a sub tree may
