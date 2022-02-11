@@ -5,12 +5,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import overflowdb.Config
 
-/**
-  * Specification of the CPGLoader. The loader allows CPGs to be loaded
-  * from the CPG protobuf file format (based on Google protocol buffers).
-  * An optional `CpgLoaderConfig` can be passed to the loader to influence
-  * the loading process.
-  * */
+/** Specification of the CPGLoader. The loader allows CPGs to be loaded from the CPG protobuf file format (based on
+  * Google protocol buffers). An optional `CpgLoaderConfig` can be passed to the loader to influence the loading
+  * process.
+  */
 class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   var zipFile: better.files.File = _
@@ -25,9 +23,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   "CpgLoader" should {
 
-    /**
-      * CpgLoader receives the filename of the CPG that
-      * is to be loaded.
+    /** CpgLoader receives the filename of the CPG that is to be loaded.
       */
     "allow loading of CPG from bin.zip file" in {
       zipFile.exists shouldBe true
@@ -39,29 +35,25 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       an[Exception] should be thrownBy CpgLoader.load("invalid/path/cpg.bin.zip")
     }
 
-    /**
-      * By default, the CPG returned by the CpgLoader will NOT be backed by overflowdb
-      * - limiting usage to graphs that fit into RAM. Overflowdb can be enabled
-      * by passing a CpgLoaderConfig as follows.
-      * */
+    /** By default, the CPG returned by the CpgLoader will NOT be backed by overflowdb
+      *   - limiting usage to graphs that fit into RAM. Overflowdb can be enabled by passing a CpgLoaderConfig as
+      *     follows.
+      */
     "allow disabling the overflowdb backend" in {
       val config = new CpgLoaderConfig(overflowDbConfig = new Config())
-      val cpg = CpgLoader.load(zipFile.pathAsString, config)
+      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
       cpg.graph.nodes.hasNext shouldBe true
     }
 
-    /**
-      * By default, indexes will be created for the CPG in order to increase
-      * performance of traversals. The downside is that graph modifications
-      * become more expensive as indexes need to be updated on each modification.
-      * If a large number of updates is to be performed on the CPG after loading it,
-      * it may make sense to defer creation of indexes such that is is performed
-      * after modifications have been made.
-      * */
+    /** By default, indexes will be created for the CPG in order to increase performance of traversals. The downside is
+      * that graph modifications become more expensive as indexes need to be updated on each modification. If a large
+      * number of updates is to be performed on the CPG after loading it, it may make sense to defer creation of indexes
+      * such that is is performed after modifications have been made.
+      */
     "allow late creation of indexes" in {
       // Do not create indexes on load
       val config = new CpgLoaderConfig(createIndexes = false)
-      val cpg = CpgLoader.load(zipFile.pathAsString, config)
+      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
 
       // ... execute lots of operations on the graph
       cpg.graph.addNode("METHOD")

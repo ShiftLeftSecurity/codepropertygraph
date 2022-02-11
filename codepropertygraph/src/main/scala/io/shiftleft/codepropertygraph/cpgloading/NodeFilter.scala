@@ -6,8 +6,7 @@ import io.shiftleft.proto.cpg.Cpg.NodePropertyName
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-/**
-  * Removes duplicate nodes to avoid uniqueness restriction for parallel frontends.
+/** Removes duplicate nodes to avoid uniqueness restriction for parallel frontends.
   */
 class NodeFilter {
   private val typeFullNames = mutable.Set[String]()

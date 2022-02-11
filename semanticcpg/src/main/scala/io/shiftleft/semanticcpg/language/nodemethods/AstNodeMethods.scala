@@ -8,10 +8,8 @@ import overflowdb.traversal.Traversal
 
 class AstNodeMethods(val node: AstNode) extends AnyVal with NodeExtension {
 
-  /**
-    * Indicate whether the AST node represents a control structure,
-    * e.g., `if`, `for`, `while`.
-    * */
+  /** Indicate whether the AST node represents a control structure, e.g., `if`, `for`, `while`.
+    */
   def isControlStructure: Boolean = node.isInstanceOf[ControlStructure]
 
   def isIdentifier: Boolean = node.isInstanceOf[Identifier]
@@ -48,13 +46,12 @@ class AstNodeMethods(val node: AstNode) extends AnyVal with NodeExtension {
 
   def depth: Int = depth(_ => true)
 
-  /**
-    * The depth of the AST rooted in this node. Upon walking
-    * the tree to its leaves, the depth is only increased for
+  /** The depth of the AST rooted in this node. Upon walking the tree to its leaves, the depth is only increased for
     * nodes where `p(node)` is true.
-    * */
+    */
   def depth(p: AstNode => Boolean): Int = {
-    val additionalDepth = if (p(node)) { 1 } else { 0 }
+    val additionalDepth = if (p(node)) { 1 }
+    else { 0 }
 
     val childDepths = node.astChildren.map(_.depth(p)).l
     additionalDepth + (if (childDepths.isEmpty) {
@@ -67,9 +64,8 @@ class AstNodeMethods(val node: AstNode) extends AnyVal with NodeExtension {
   def astParent: AstNode =
     node._astIn.onlyChecked.asInstanceOf[AstNode]
 
-  /**
-    * Nodes of the AST rooted in this node, including the node itself.
-    * */
+  /** Nodes of the AST rooted in this node, including the node itself.
+    */
   def ast: Traversal[AstNode] =
     Traversal.fromSingle(node).ast
 

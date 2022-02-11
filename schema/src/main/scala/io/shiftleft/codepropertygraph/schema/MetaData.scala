@@ -7,7 +7,7 @@ import overflowdb.storage.ValueTypes
 
 object MetaData extends SchemaBase {
 
-  def index: Int = 2
+  def index: Int                           = 2
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -79,19 +79,25 @@ object MetaData extends SchemaBase {
       Constant(name = "PHP", value = "PHP", valueType = ValueTypes.STRING, comment = "").protoId(8),
       Constant(name = "FUZZY_TEST_LANG", value = "FUZZY_TEST_LANG", valueType = ValueTypes.STRING, comment = "")
         .protoId(9),
-      Constant(name = "GHIDRA",
-               value = "GHIDRA",
-               valueType = ValueTypes.STRING,
-               comment = "generic reverse engineering framework").protoId(10),
+      Constant(
+        name = "GHIDRA",
+        value = "GHIDRA",
+        valueType = ValueTypes.STRING,
+        comment = "generic reverse engineering framework"
+      ).protoId(10),
       Constant(name = "KOTLIN", value = "KOTLIN", valueType = ValueTypes.STRING, comment = "").protoId(11),
-      Constant(name = "NEWC",
-               value = "NEWC",
-               valueType = ValueTypes.STRING,
-               comment = "Eclipse CDT based parser for C/C++").protoId(12),
-      Constant(name = "JAVASRC",
-               value = "JAVASRC",
-               valueType = ValueTypes.STRING,
-               comment = "Source-based front-end for Java").protoId(13)
+      Constant(
+        name = "NEWC",
+        value = "NEWC",
+        valueType = ValueTypes.STRING,
+        comment = "Eclipse CDT based parser for C/C++"
+      ).protoId(12),
+      Constant(
+        name = "JAVASRC",
+        value = "JAVASRC",
+        valueType = ValueTypes.STRING,
+        comment = "Source-based front-end for Java"
+      ).protoId(13)
     )
 
   }

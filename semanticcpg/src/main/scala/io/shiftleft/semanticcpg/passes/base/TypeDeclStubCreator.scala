@@ -7,11 +7,8 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.{FileTraversal, NamespaceTraversal}
 
-/**
-  * This pass has no other pass as prerequisite.
-  * For each `TYPE` node that does not have a corresponding `TYPE_DECL`
-  * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is
-  * considered external.
+/** This pass has no other pass as prerequisite. For each `TYPE` node that does not have a corresponding `TYPE_DECL`
+  * node, this pass creates a `TYPE_DECL` node. The `TYPE_DECL` is considered external.
   */
 class TypeDeclStubCreator(cpg: Cpg) extends CpgPass(cpg) {
 

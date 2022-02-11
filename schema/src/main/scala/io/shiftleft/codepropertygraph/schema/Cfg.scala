@@ -52,28 +52,31 @@ object Cfg extends SchemaBase {
     jumpTarget.extendz(cfgNode)
 
     val cfg = builder
-      .addEdgeType(
-        name = "CFG",
-        comment = "This edge indicates control flow from the source to the destination node."
-      )
+      .addEdgeType(name = "CFG", comment = "This edge indicates control flow from the source to the destination node.")
       .protoId(19)
 
     method
-      .addOutEdge(edge = cfg,
-                  inNode = methodReturn,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = cfg,
-                  inNode = cfgNode,
-                  stepNameOut = "cfgFirst",
-                  stepNameOutDoc = "First control flow graph node")
+      .addOutEdge(
+        edge = cfg,
+        inNode = methodReturn,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = cfg,
+        inNode = cfgNode,
+        stepNameOut = "cfgFirst",
+        stepNameOutDoc = "First control flow graph node"
+      )
 
     fieldIdentifier
       .addOutEdge(edge = cfg, inNode = cfgNode)
-      .addOutEdge(edge = cfg,
-                  inNode = callNode,
-                  cardinalityOut = Cardinality.One,
-                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = cfg,
+        inNode = callNode,
+        cardinalityOut = Cardinality.One,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
 
     block.addOutEdge(edge = cfg, inNode = cfgNode)
     callNode.addOutEdge(edge = cfg, inNode = cfgNode)
@@ -85,15 +88,16 @@ object Cfg extends SchemaBase {
     typeRef.addOutEdge(edge = cfg, inNode = cfgNode)
     unknown.addOutEdge(edge = cfg, inNode = cfgNode)
 
-    /** Each METHOD has exactly one METHOD_RETURN (the formal return value), but
-      * each METHOD_RETURN can have multiple RETURN nodes. This way, we can represent
-      * a method with multiple return statements.
+    /** Each METHOD has exactly one METHOD_RETURN (the formal return value), but each METHOD_RETURN can have multiple
+      * RETURN nodes. This way, we can represent a method with multiple return statements.
       */
-    ret.addOutEdge(edge = cfg,
-                   inNode = methodReturn,
-                   cardinalityOut = Cardinality.One,
-                   cardinalityIn = Cardinality.List,
-                   stepNameIn = "toReturn")
+    ret.addOutEdge(
+      edge = cfg,
+      inNode = methodReturn,
+      cardinalityOut = Cardinality.One,
+      cardinalityIn = Cardinality.List,
+      stepNameIn = "toReturn"
+    )
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)

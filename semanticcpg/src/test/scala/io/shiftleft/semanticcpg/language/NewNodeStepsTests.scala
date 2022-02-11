@@ -14,7 +14,7 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
   "stores NewNodes" in {
     implicit val diffGraphBuilder = DiffGraph.newBuilder
-    val newNode = newTestNode()
+    val newNode                   = newTestNode()
     new NewNodeSteps(newNode.start).store()
     val diffGraph = diffGraphBuilder.build()
     diffGraph.nodes.toList shouldBe List(newNode)
@@ -29,13 +29,13 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
     "embedding a StoredNode and a NewNode" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
-      val cpg = Cpg.emptyCpg
-      val existingContainedNode = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[StoredNode]
+      val cpg                       = Cpg.emptyCpg
+      val existingContainedNode     = cpg.graph.addNode(42L, "MODIFIER").asInstanceOf[StoredNode]
       existingContainedNode.setProperty(PropertyNames.MODIFIER_TYPE, ModifierTypes.NATIVE)
       cpg.graph.V().asScala.toSet shouldBe Set(existingContainedNode)
 
       val newContainedNode = newTestNode()
-      val newNode = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
+      val newNode          = newTestNode(containedNodes = List(existingContainedNode, newContainedNode))
       new NewNodeSteps(newNode.start).store()
       val diffGraph = diffGraphBuilder.build()
       diffGraph.nodes.toSet shouldBe Set(newNode)
@@ -47,10 +47,10 @@ class NewNodeStepsTest extends AnyWordSpec with Matchers {
 
     "embedding a NewNode recursively" in {
       implicit val diffGraphBuilder = DiffGraph.newBuilder
-      val cpg = Cpg.emptyCpg
-      val newContainedNodeL1 = newTestNode()
-      val newContainedNodeL0 = newTestNode(containedNodes = List(newContainedNodeL1))
-      val newNode = newTestNode(containedNodes = List(newContainedNodeL0))
+      val cpg                       = Cpg.emptyCpg
+      val newContainedNodeL1        = newTestNode()
+      val newContainedNodeL0        = newTestNode(containedNodes = List(newContainedNodeL1))
+      val newNode                   = newTestNode(containedNodes = List(newContainedNodeL0))
       new NewNodeSteps(newNode.start).store()
       val diffGraph = diffGraphBuilder.build()
 

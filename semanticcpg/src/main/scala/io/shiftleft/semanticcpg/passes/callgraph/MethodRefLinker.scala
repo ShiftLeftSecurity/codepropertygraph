@@ -12,9 +12,8 @@ import overflowdb.traversal._
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-/**
-  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
-  * language frontends which do not provide method stubs and type decl stubs.
+/** This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for language frontends which do not provide
+  * method stubs and type decl stubs.
   */
 class MethodRefLinker(cpg: Cpg) extends CpgPass(cpg) {
   import MethodRefLinker.linkToSingle
@@ -59,20 +58,19 @@ object MethodRefLinker {
   def nodesWithFullName(cpg: Cpg, x: String): mutable.Seq[NodeRef[_ <: NodeDb]] =
     cpg.graph.indexManager.lookup(PropertyNames.FULL_NAME, x).asScala
 
-  /**
-    * For all nodes `n` with a label in `srcLabels`, determine
-    * the value of `n.\$dstFullNameKey`, use that to lookup the
-    * destination node in `dstNodeMap`, and create an edge of type
-    * `edgeType` between `n` and the destination node.
-    * */
-  def linkToSingle(cpg: Cpg,
-                   srcLabels: List[String],
-                   dstNodeLabel: String,
-                   edgeType: String,
-                   dstNodeMap: String => Option[StoredNode],
-                   dstFullNameKey: String,
-                   dstGraph: DiffGraph.Builder,
-                   dstNotExistsHandler: Option[(StoredNode, String) => Unit]): Unit = {
+  /** For all nodes `n` with a label in `srcLabels`, determine the value of `n.\$dstFullNameKey`, use that to lookup the
+    * destination node in `dstNodeMap`, and create an edge of type `edgeType` between `n` and the destination node.
+    */
+  def linkToSingle(
+    cpg: Cpg,
+    srcLabels: List[String],
+    dstNodeLabel: String,
+    edgeType: String,
+    dstNodeMap: String => Option[StoredNode],
+    dstFullNameKey: String,
+    dstGraph: DiffGraph.Builder,
+    dstNotExistsHandler: Option[(StoredNode, String) => Unit]
+  ): Unit = {
     var loggedDeprecationWarning = false
     Traversal(cpg.graph.nodes(srcLabels: _*)).foreach { srcNode =>
       // If the source node does not have any outgoing edges of this type
@@ -105,28 +103,31 @@ object MethodRefLinker {
         if (!loggedDeprecationWarning) {
           logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
-              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+              s" a source node of type $srcLabels and a $dstNodeLabel node."
+          )
           loggedDeprecationWarning = true
         }
       }
     }
   }
 
-  def linkToMultiple[SRC_NODE_TYPE <: StoredNode](cpg: Cpg,
-                                                  srcLabels: List[String],
-                                                  dstNodeLabel: String,
-                                                  edgeType: String,
-                                                  dstNodeMap: String => Option[StoredNode],
-                                                  getDstFullNames: SRC_NODE_TYPE => Iterable[String],
-                                                  dstFullNameKey: String,
-                                                  dstGraph: DiffGraph.Builder): Unit = {
+  def linkToMultiple[SRC_NODE_TYPE <: StoredNode](
+    cpg: Cpg,
+    srcLabels: List[String],
+    dstNodeLabel: String,
+    edgeType: String,
+    dstNodeMap: String => Option[StoredNode],
+    getDstFullNames: SRC_NODE_TYPE => Iterable[String],
+    dstFullNameKey: String,
+    dstGraph: DiffGraph.Builder
+  ): Unit = {
     var loggedDeprecationWarning = false
     Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {
         getDstFullNames(srcNode).foreach { dstFullName =>
           dstNodeMap(dstFullName) match {
             case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
-            case None          => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
+            case None => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
         }
       } else {
@@ -135,7 +136,8 @@ object MethodRefLinker {
         if (!loggedDeprecationWarning) {
           logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +
-              s" a source node of type $srcLabels and a $dstNodeLabel node.")
+              s" a source node of type $srcLabels and a $dstNodeLabel node."
+          )
           loggedDeprecationWarning = true
         }
       }
@@ -143,26 +145,32 @@ object MethodRefLinker {
   }
 
   @inline
-  def logFailedDstLookup(edgeType: String,
-                         srcNodeType: String,
-                         srcNodeId: String,
-                         dstNodeType: String,
-                         dstFullName: String): Unit = {
+  def logFailedDstLookup(
+    edgeType: String,
+    srcNodeType: String,
+    srcNodeId: String,
+    dstNodeType: String,
+    dstFullName: String
+  ): Unit = {
     logger.info(
       "Could not create edge. Destination lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcNodeId=$srcNodeId, " +
-        s"dstNodeType=$dstNodeType, dstFullName=$dstFullName")
+        s"dstNodeType=$dstNodeType, dstFullName=$dstFullName"
+    )
   }
 
   @inline
-  def logFailedSrcLookup(edgeType: String,
-                         srcNodeType: String,
-                         srcFullName: String,
-                         dstNodeType: String,
-                         dstNodeId: String): Unit = {
+  def logFailedSrcLookup(
+    edgeType: String,
+    srcNodeType: String,
+    srcFullName: String,
+    dstNodeType: String,
+    dstNodeId: String
+  ): Unit = {
     logger.info(
       "Could not create edge. Source lookup failed. " +
         s"edgeType=$edgeType, srcNodeType=$srcNodeType, srcFullName=$srcFullName, " +
-        s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId")
+        s"dstNodeType=$dstNodeType, dstNodeId=$dstNodeId"
+    )
   }
 }

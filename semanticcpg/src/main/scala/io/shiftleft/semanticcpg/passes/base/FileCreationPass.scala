@@ -10,16 +10,15 @@ import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker
 
 import scala.collection.mutable
 
-/**
-  * For all nodes with FILENAME fields, create corresponding FILE nodes
-  * and connect node with FILE node via outgoing SOURCE_FILE edges.
+/** For all nodes with FILENAME fields, create corresponding FILE nodes and connect node with FILE node via outgoing
+  * SOURCE_FILE edges.
   */
 class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
 
     val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
-    val newFileNameToNode = mutable.Map.empty[String, NewFile]
+    val newFileNameToNode      = mutable.Map.empty[String, NewFile]
 
     cpg.file.foreach { node =>
       originalFileNameToNode += node.name -> node
@@ -27,12 +26,15 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
 
     def createFileIfDoesNotExist(srcNode: StoredNode, destFullName: String): Unit = {
       if (destFullName != srcNode.propertyDefaultValue(PropertyNames.FILENAME)) {
-        val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN } else { destFullName }
-        val newFile = newFileNameToNode.getOrElseUpdate(dstFullName, {
-          val file = NewFile().name(dstFullName).order(0)
-          dstGraph.addNode(file)
-          file
-        })
+        val dstFullName = if (destFullName == "") { FileTraversal.UNKNOWN }
+        else { destFullName }
+        val newFile = newFileNameToNode.getOrElseUpdate(
+          dstFullName, {
+            val file = NewFile().name(dstFullName).order(0)
+            dstGraph.addNode(file)
+            file
+          }
+        )
         dstGraph.addEdgeFromOriginal(srcNode, newFile, EdgeTypes.SOURCE_FILE)
       }
     }
@@ -42,12 +44,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
 
     MethodRefLinker.linkToSingle(
       cpg,
-      srcLabels = List(
-        NodeTypes.NAMESPACE_BLOCK,
-        NodeTypes.TYPE_DECL,
-        NodeTypes.METHOD,
-        NodeTypes.COMMENT
-      ),
+      srcLabels = List(NodeTypes.NAMESPACE_BLOCK, NodeTypes.TYPE_DECL, NodeTypes.METHOD, NodeTypes.COMMENT),
       dstNodeLabel = NodeTypes.FILE,
       edgeType = EdgeTypes.SOURCE_FILE,
       dstNodeMap = { x =>

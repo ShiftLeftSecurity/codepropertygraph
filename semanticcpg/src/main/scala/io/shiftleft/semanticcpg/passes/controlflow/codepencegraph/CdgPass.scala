@@ -19,8 +19,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.jdk.CollectionConverters._
 
-/**
-  * This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
+/** This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
   */
 class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
   import CdgPass.logger
@@ -33,32 +32,31 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
-    val cfgNodes = method._containsOut.asScala.toList
+    val cfgNodes         = method._containsOut.asScala.toList
     val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
 
-    postDomFrontiers.foreach {
-      case (node, postDomFrontierNodes) =>
-        postDomFrontierNodes.foreach { postDomFrontierNode =>
-          postDomFrontierNode match {
-            case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown | _: ControlStructure |
-                _: JumpTarget => {
-              dstGraph.addEdgeInOriginal(postDomFrontierNode, node, EdgeTypes.CDG)
-            }
-            case _ =>
-              val nodeLabel = postDomFrontierNode.label
-              val containsIn = postDomFrontierNode._containsIn
-              if (containsIn == null || !containsIn.hasNext) {
-                logger.warn(
-                  s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG.")
-              } else {
-                val method = containsIn.next
-                logger.warn(
-                  s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
-                    s" Method: ${method match { case m: Method => m.fullName; case other => other.label }}" +
-                    s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode._cfgOut.asScala.size}")
-              }
+    postDomFrontiers.foreach { case (node, postDomFrontierNodes) =>
+      postDomFrontierNodes.foreach { postDomFrontierNode =>
+        postDomFrontierNode match {
+          case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown | _: ControlStructure |
+              _: JumpTarget => {
+            dstGraph.addEdgeInOriginal(postDomFrontierNode, node, EdgeTypes.CDG)
           }
+          case _ =>
+            val nodeLabel  = postDomFrontierNode.label
+            val containsIn = postDomFrontierNode._containsIn
+            if (containsIn == null || !containsIn.hasNext) {
+              logger.warn(s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG.")
+            } else {
+              val method = containsIn.next
+              logger.warn(
+                s"Found CDG edge starting at $nodeLabel node. This is most likely caused by an invalid CFG." +
+                  s" Method: ${method match { case m: Method => m.fullName; case other => other.label }}" +
+                  s" number of outgoing CFG edges from $nodeLabel node: ${postDomFrontierNode._cfgOut.asScala.size}"
+              )
+            }
         }
+      }
     }
     Iterator(dstGraph.build())
   }

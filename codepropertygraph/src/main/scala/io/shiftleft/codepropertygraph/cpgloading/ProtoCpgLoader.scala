@@ -35,7 +35,7 @@ object ProtoCpgLoader {
         val edges = ArrayDeque.empty[TmpEdge]
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
-          val cpgStruct = getNextProtoCpgFromStream(inputStream)
+          val cpgStruct   = getNextProtoCpgFromStream(inputStream)
           builder.addNodes(cpgStruct.getNodeList)
           cpgStruct.getEdgeList.asScala.foreach { edge =>
             edges.append(new TmpEdge(edge))
@@ -96,7 +96,7 @@ object ProtoCpgLoader {
     CpgStruct.parseFrom(inputStream)
 
   private def measureAndReport[A](f: => A): A = {
-    val start = System.currentTimeMillis()
+    val start  = System.currentTimeMillis()
     val result = f
     logger.info("CPG construction finished in " + (System.currentTimeMillis() - start) + "ms.")
     result

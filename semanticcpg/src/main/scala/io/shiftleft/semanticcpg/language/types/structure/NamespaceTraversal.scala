@@ -5,14 +5,12 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
-/**
-  * A namespace, e.g., Java package or C# namespace
-  * */
+/** A namespace, e.g., Java package or C# namespace
+  */
 class NamespaceTraversal(val traversal: Traversal[Namespace]) extends AnyVal {
 
-  /**
-    * The type declarations defined in this namespace
-    * */
+  /** The type declarations defined in this namespace
+    */
   def typeDecl: Traversal[TypeDecl] =
     traversal
       .in(EdgeTypes.REF)
@@ -20,9 +18,8 @@ class NamespaceTraversal(val traversal: Traversal[Namespace]) extends AnyVal {
       .hasLabel(NodeTypes.TYPE_DECL)
       .cast[TypeDecl]
 
-  /**
-    * Methods defined in this namespace
-    * */
+  /** Methods defined in this namespace
+    */
   def method: Traversal[Method] =
     traversal
       .in(EdgeTypes.REF)
@@ -30,17 +27,13 @@ class NamespaceTraversal(val traversal: Traversal[Namespace]) extends AnyVal {
       .hasLabel(NodeTypes.METHOD)
       .cast[Method]
 
-  /**
-    * External namespaces - any namespaces
-    * which contain one or more external type.
-    * */
+  /** External namespaces - any namespaces which contain one or more external type.
+    */
   def external: Traversal[Namespace] =
     traversal.where(_.typeDecl.external)
 
-  /**
-    * Internal namespaces - any namespaces
-    * which contain one or more internal type
-    * */
+  /** Internal namespaces - any namespaces which contain one or more internal type
+    */
   def internal: Traversal[Namespace] =
     traversal.where(_.typeDecl.internal)
 

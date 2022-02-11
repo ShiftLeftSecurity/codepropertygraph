@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 class CfgDominatorPassTests extends AnyWordSpec with Matchers {
   "Have correct DOMINATE/POST_DOMINATE edges after CfgDominatorPass run." in {
     val graph = OverflowDbTestInstance.create
-    val cpg = new Cpg(graph)
+    val cpg   = new Cpg(graph)
 
     val v0 = graph + NodeTypes.METHOD
     val v1 = graph + NodeTypes.UNKNOWN

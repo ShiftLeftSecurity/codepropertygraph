@@ -4,10 +4,8 @@ import better.files._
 
 object SourceFiles {
 
-  /**
-    * For a given array of input paths, determine all
-    * source files by inspecting filename extensions.
-    * */
+  /** For a given array of input paths, determine all source files by inspecting filename extensions.
+    */
   def determine(inputPaths: Set[String], sourceFileExtensions: Set[String]): List[String] = {
     def hasSourceFileExtension(file: File): Boolean =
       file.extension.exists(sourceFileExtensions.contains)

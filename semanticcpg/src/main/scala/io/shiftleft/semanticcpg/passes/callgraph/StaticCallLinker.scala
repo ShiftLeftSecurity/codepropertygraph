@@ -14,9 +14,8 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   import StaticCallLinker._
   private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
 
-  /**
-    * Main method of enhancement - to be implemented by child class
-    **/
+  /** Main method of enhancement - to be implemented by child class
+    */
   override def run(): Iterator[DiffGraph] = {
     val dstGraph = DiffGraph.newBuilder
     cpg.method.foreach { method =>
@@ -52,7 +51,8 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     } else {
       logger.info(
         s"Unable to link static CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
-          s"SIGNATURE ${call.signature}, CODE ${call.code}")
+          s"SIGNATURE ${call.signature}, CODE ${call.code}"
+      )
     }
   }
 

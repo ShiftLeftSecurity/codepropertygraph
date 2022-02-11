@@ -26,17 +26,14 @@ class MethodReturnTraversal(val traversal: Traversal[MethodReturn]) extends AnyV
       }
       .cast[Call]
 
-  /**
-    *  Traverse to last expressions in CFG.
-    *  Can be multiple.
+  /** Traverse to last expressions in CFG. Can be multiple.
     */
   @Doc(info = "traverse to last expressions in CFG (can be multiple)")
   def cfgLast: Traversal[CfgNode] =
     traversal.in(EdgeTypes.CFG).cast[Expression]
 
-  /**
-    * Traverse to return type
-    * */
+  /** Traverse to return type
+    */
   @Doc(info = "traverse to return type")
   def typ: Traversal[Type] =
     traversal.out(EdgeTypes.EVAL_TYPE).cast[Type]

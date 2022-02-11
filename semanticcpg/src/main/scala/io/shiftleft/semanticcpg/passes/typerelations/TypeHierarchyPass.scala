@@ -6,9 +6,8 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyN
 import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{linkToMultiple, typeFullNameToNode}
 
-/**
-  * Create INHERITS_FROM edges from `TYPE_DECL` nodes to `TYPE` nodes.
-  * */
+/** Create INHERITS_FROM edges from `TYPE_DECL` nodes to `TYPE` nodes.
+  */
 class TypeHierarchyPass(cpg: Cpg) extends CpgPass(cpg) {
 
   override def run(): Iterator[DiffGraph] = {

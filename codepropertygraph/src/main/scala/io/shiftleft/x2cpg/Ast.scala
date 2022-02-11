@@ -8,7 +8,7 @@ case class AstEdge(src: NewNode, dst: NewNode)
 
 object Ast {
   def apply(node: NewNode): Ast = Ast(List(node))
-  def apply(): Ast = new Ast(List())
+  def apply(): Ast              = new Ast(List())
 
   /** Copy nodes/edges of given `AST` into the given `diffGraph`.
     */
@@ -60,20 +60,21 @@ object Ast {
   }
 }
 
-case class Ast(nodes: List[NewNode],
-               edges: List[AstEdge] = List(),
-               conditionEdges: List[AstEdge] = List(),
-               refEdges: List[AstEdge] = List(),
-               bindsEdges: List[AstEdge] = List(),
-               receiverEdges: List[AstEdge] = List(),
-               argEdges: List[AstEdge] = List()) {
+case class Ast(
+  nodes: List[NewNode],
+  edges: List[AstEdge] = List(),
+  conditionEdges: List[AstEdge] = List(),
+  refEdges: List[AstEdge] = List(),
+  bindsEdges: List[AstEdge] = List(),
+  receiverEdges: List[AstEdge] = List(),
+  argEdges: List[AstEdge] = List()
+) {
 
   def root: Option[NewNode] = nodes.headOption
 
   def rightMostLeaf: Option[NewNode] = nodes.lastOption
 
-  /** AST that results when adding `other` as a child to this AST.
-    * `other` is connected to this AST's root node.
+  /** AST that results when adding `other` as a child to this AST. `other` is connected to this AST's root node.
     */
   def withChild(other: Ast): Ast = {
     Ast(
@@ -81,7 +82,8 @@ case class Ast(nodes: List[NewNode],
       edges = edges ++ other.edges ++ root.toList.flatMap(r =>
         other.root.toList.map { rc =>
           AstEdge(r, rc)
-      }),
+        }
+      ),
       conditionEdges = conditionEdges ++ other.conditionEdges,
       argEdges = argEdges ++ other.argEdges,
       receiverEdges = receiverEdges ++ other.receiverEdges,
@@ -102,8 +104,8 @@ case class Ast(nodes: List[NewNode],
     )
   }
 
-  /** AST that results when adding all ASTs in `asts` as children,
-    * that is, connecting them to the root node of this AST.
+  /** AST that results when adding all ASTs in `asts` as children, that is, connecting them to the root node of this
+    * AST.
     */
   def withChildren(asts: Seq[Ast]): Ast = {
     if (asts.isEmpty) {
@@ -157,11 +159,9 @@ case class Ast(nodes: List[NewNode],
     this.copy(receiverEdges = receiverEdges ++ dsts.map(AstEdge(src, _)))
   }
 
-  /**
-    * Returns a deep copy of the sub tree rooted in `node`. If `order`
-    * is set, then the `order` and `argumentIndex` fields of the
-    * new root node are set to `order`.
-    * */
+  /** Returns a deep copy of the sub tree rooted in `node`. If `order` is set, then the `order` and `argumentIndex`
+    * fields of the new root node are set to `order`.
+    */
   def subTreeCopy(node: AstNodeNew, order: Int = -1): Ast = {
     val newNode = node.copy
     if (order != -1) {
@@ -183,18 +183,20 @@ case class Ast(nodes: List[NewNode],
       oldToNew.get(x).getOrElse(x)
     }
 
-    val newArgEdges = argEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newArgEdges       = argEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
     val newConditionEdges = conditionEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
-    val newRefEdges = refEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
-    val newBindsEdges = bindsEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
-    val newReceiverEdges = receiverEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newRefEdges       = refEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newBindsEdges     = bindsEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
+    val newReceiverEdges  = receiverEdges.filter(_.src == node).map(x => AstEdge(newNode, newIfExists(x.dst)))
 
     Ast(newNode)
-      .copy(argEdges = newArgEdges,
-            conditionEdges = newConditionEdges,
-            refEdges = newRefEdges,
-            bindsEdges = newBindsEdges,
-            receiverEdges = newReceiverEdges)
+      .copy(
+        argEdges = newArgEdges,
+        conditionEdges = newConditionEdges,
+        refEdges = newRefEdges,
+        bindsEdges = newBindsEdges,
+        receiverEdges = newReceiverEdges
+      )
       .withChildren(newChildren)
   }
 

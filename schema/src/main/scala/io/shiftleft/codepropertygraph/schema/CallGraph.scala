@@ -101,7 +101,7 @@ object CallGraph extends SchemaBase {
         value = "BY_VALUE",
         valueType = ValueTypes.STRING,
         comment = "A parameter or return of a function passed by value which means a flat copy is used"
-      ).protoId(3),
+      ).protoId(3)
     )
 
     methodParameterIn.addProperties(evaluationStrategy)
@@ -174,7 +174,7 @@ object CallGraph extends SchemaBase {
         value = "INLINED",
         valueType = ValueTypes.STRING,
         comment = "For macro expansions, code is inlined."
-      ).protoId(3),
+      ).protoId(3)
     )
 
     callNode
@@ -193,27 +193,37 @@ object CallGraph extends SchemaBase {
     methodRef.addProperty(methodFullName)
 
     callNode
-      .addOutEdge(edge = receiver,
-                  inNode = callNode,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = receiver,
-                  inNode = identifier,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = receiver,
-                  inNode = literal,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = receiver,
-                  inNode = methodRef,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = receiver,
+        inNode = callNode,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = receiver,
+        inNode = identifier,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = receiver,
+        inNode = literal,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = receiver,
+        inNode = methodRef,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
       .addOutEdge(edge = receiver, inNode = typeRef)
-      .addOutEdge(edge = receiver,
-                  inNode = block,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = receiver,
+        inNode = block,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
       .addOutEdge(edge = receiver, inNode = controlStructure)
       .addOutEdge(edge = receiver, inNode = unknown)
       .addOutEdge(edge = argument, inNode = callNode, cardinalityIn = Cardinality.ZeroOrOne)
@@ -228,31 +238,43 @@ object CallGraph extends SchemaBase {
       .addOutEdge(edge = argument, inNode = unknown)
 
     ret
-      .addOutEdge(edge = argument,
-                  inNode = callNode,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = argument,
-                  inNode = identifier,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = argument,
-                  inNode = literal,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = argument,
-                  inNode = methodRef,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = argument,
+        inNode = callNode,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = argument,
+        inNode = identifier,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = argument,
+        inNode = literal,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = argument,
+        inNode = methodRef,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
       .addOutEdge(edge = argument, inNode = typeRef)
-      .addOutEdge(edge = argument,
-                  inNode = ret,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
-      .addOutEdge(edge = argument,
-                  inNode = block,
-                  cardinalityOut = Cardinality.ZeroOrOne,
-                  cardinalityIn = Cardinality.ZeroOrOne)
+      .addOutEdge(
+        edge = argument,
+        inNode = ret,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
+      .addOutEdge(
+        edge = argument,
+        inNode = block,
+        cardinalityOut = Cardinality.ZeroOrOne,
+        cardinalityIn = Cardinality.ZeroOrOne
+      )
       .addOutEdge(edge = argument, inNode = jumpTarget)
       .addOutEdge(edge = argument, inNode = controlStructure)
       .addOutEdge(edge = argument, inNode = unknown)

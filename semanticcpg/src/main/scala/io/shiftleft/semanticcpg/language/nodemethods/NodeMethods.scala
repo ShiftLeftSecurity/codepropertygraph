@@ -19,17 +19,15 @@ class NodeMethods(val node: AbstractNode) extends AnyVal with NodeExtension {
     node match {
       case storedNode: StoredNode =>
         storedNode._taggedByOut.asScala
-          .map {
-            case tagNode: HasName with HasValue =>
-              (tagNode.name, Option(tagNode.value))
+          .map { case tagNode: HasName with HasValue =>
+            (tagNode.name, Option(tagNode.value))
           }
           .distinct
-          .collect {
-            case (name, Some(value)) =>
-              NewTag()
-                .name(name)
-                .value(value)
-                .asInstanceOf[TagBase]
+          .collect { case (name, Some(value)) =>
+            NewTag()
+              .name(name)
+              .value(value)
+              .asInstanceOf[TagBase]
           }
       case _ =>
         Traversal.empty

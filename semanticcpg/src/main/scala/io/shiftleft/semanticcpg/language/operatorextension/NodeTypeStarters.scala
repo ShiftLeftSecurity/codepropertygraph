@@ -5,9 +5,8 @@ import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 import overflowdb.traversal.help.{Doc, TraversalSource}
 
-/**
-  * Steps that allow traversing from `cpg` to operators.
-  * */
+/** Steps that allow traversing from `cpg` to operators.
+  */
 @TraversalSource
 class NodeTypeStarters(cpg: Cpg) {
 

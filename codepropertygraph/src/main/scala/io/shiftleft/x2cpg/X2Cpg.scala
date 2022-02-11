@@ -19,25 +19,23 @@ object X2Cpg {
 
   private val logger = LoggerFactory.getLogger(X2Cpg.getClass)
 
-  /**
-    * Parse commands line arguments in `args` using an X2Cpg command line parser,
-    * extended with the frontend specific options in `frontendSpecific` with the
-    * initial configuration set to `initialConf`.
+  /** Parse commands line arguments in `args` using an X2Cpg command line parser, extended with the frontend specific
+    * options in `frontendSpecific` with the initial configuration set to `initialConf`.
     *
-    * On success, the configuration is returned wrapped into an Option.
-    * On failure, error messages are printed and `None` is returned.
-    **/
-  def parseCommandLine[R <: X2CpgConfig[R]](args: Array[String],
-                                            frontendSpecific: OParser[_, R],
-                                            initialConf: R): Option[R] = {
+    * On success, the configuration is returned wrapped into an Option. On failure, error messages are printed and
+    * `None` is returned.
+    */
+  def parseCommandLine[R <: X2CpgConfig[R]](
+    args: Array[String],
+    frontendSpecific: OParser[_, R],
+    initialConf: R
+  ): Option[R] = {
     val parser = commandLineParser(frontendSpecific)
     OParser.parse(parser, args, initialConf)
   }
 
-  /**
-    * Create a command line parser that can be extended
-    * to add options specific for the frontend.
-    * */
+  /** Create a command line parser that can be extended to add options specific for the frontend.
+    */
   private def commandLineParser[R <: X2CpgConfig[R]](frontendSpecific: OParser[_, R]): OParser[_, R] = {
     val builder = OParser.builder[R]
     import builder._
@@ -57,10 +55,8 @@ object X2Cpg {
     )
   }
 
-  /**
-    * Create an empty CPG, backed by the file at `optionalOutputPath` or
-    * in-memory if `optionalOutputPath` is empty.
-    * */
+  /** Create an empty CPG, backed by the file at `optionalOutputPath` or in-memory if `optionalOutputPath` is empty.
+    */
   def newEmptyCpg(optionalOutputPath: Option[String] = None): Cpg = {
     val odbConfig = optionalOutputPath
       .map { outputPath =>

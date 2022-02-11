@@ -8,7 +8,7 @@ import io.shiftleft.semanticcpg.passes.base._
 object Base {
   val overlayName: String = "base"
   val description: String = "base layer (linked frontend CPG)"
-  def defaultOpts = new LayerCreatorOptions()
+  def defaultOpts         = new LayerCreatorOptions()
 
   def passes(cpg: Cpg): Iterator[CpgPassBase] = Iterator(
     new FileCreationPass(cpg),
@@ -30,9 +30,8 @@ class Base extends LayerCreator {
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
     cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
-    Base.passes(cpg).zipWithIndex.foreach {
-      case (pass, index) =>
-        runPass(pass, context, storeUndoInfo, index)
+    Base.passes(cpg).zipWithIndex.foreach { case (pass, index) =>
+      runPass(pass, context, storeUndoInfo, index)
     }
   }
 

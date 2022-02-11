@@ -10,14 +10,13 @@ import scala.util.Try
 
 case class NameAndSignature(name: String, signature: String, fullName: String)
 
-/**
-  * This pass has no other pass as prerequisite.
+/** This pass has no other pass as prerequisite.
   */
 class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int)](cpg) {
 
   // Since the method fullNames for fuzzyc are not unique, we do not have
   // a 1to1 relation and may overwrite some values. This is ok for now.
-  private var methodFullNameToNode = Map[String, MethodBase]()
+  private var methodFullNameToNode   = Map[String, MethodBase]()
   private var methodToParameterCount = Map[NameAndSignature, Int]()
 
   override def init(): Unit = {
@@ -34,9 +33,9 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
   override def partIterator: Iterator[(NameAndSignature, Int)] = methodToParameterCount.iterator
 
   override def runOnPart(part: (NameAndSignature, Int)): Iterator[DiffGraph] = {
-    val name = part._1.name
-    val signature = part._1.signature
-    val fullName = part._1.fullName
+    val name           = part._1.name
+    val signature      = part._1.signature
+    val fullName       = part._1.fullName
     val parameterCount = part._2
 
     implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
@@ -51,8 +50,8 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
   private def addLineNumberInfo(methodNode: NewMethod, fullName: String): NewMethod = {
     val s = fullName.split(":")
     if (s.size == 5 && Try { s(1).toInt }.isSuccess && Try { s(2).toInt }.isSuccess) {
-      val filename = s(0)
-      val lineNumber = s(1).toInt
+      val filename      = s(0)
+      val lineNumber    = s(1).toInt
       val lineNumberEnd = s(2).toInt
       methodNode
         .filename(filename)
@@ -63,11 +62,13 @@ class MethodStubCreator(cpg: Cpg) extends ParallelCpgPass[(NameAndSignature, Int
     }
   }
 
-  private def createMethodStub(name: String,
-                               fullName: String,
-                               signature: String,
-                               parameterCount: Int,
-                               dstGraph: DiffGraph.Builder): MethodBase = {
+  private def createMethodStub(
+    name: String,
+    fullName: String,
+    signature: String,
+    parameterCount: Int,
+    dstGraph: DiffGraph.Builder
+  ): MethodBase = {
     val methodNode = addLineNumberInfo(
       NewMethod()
         .name(name)

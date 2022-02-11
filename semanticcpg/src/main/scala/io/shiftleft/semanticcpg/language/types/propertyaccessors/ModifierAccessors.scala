@@ -42,9 +42,8 @@ class ModifierAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
   def hasModifier(modifier: String): Traversal[A] =
     traversal.where(_.out.hasLabel(NodeTypes.MODIFIER).has(Properties.MODIFIER_TYPE -> modifier))
 
-  /**
-    * Traverse to modifiers, e.g., "static", "public".
-    * */
+  /** Traverse to modifiers, e.g., "static", "public".
+    */
   def modifier: Traversal[Modifier] =
     traversal.out.hasLabel(NodeTypes.MODIFIER).cast[Modifier]
 }

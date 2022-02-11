@@ -9,11 +9,9 @@ import scala.annotation.tailrec
 
 class ExpressionMethods(val node: AstNode) extends AnyVal with NodeExtension {
 
-  /**
-    * Traverse to it's parent expression (e.g. call or return) by following the incoming AST
-    * It's continuing it's walk until it hits an expression that's not a generic
-    * "member access operation", e.g., "<operator>.memberAccess".
-    * */
+  /** Traverse to it's parent expression (e.g. call or return) by following the incoming AST It's continuing it's walk
+    * until it hits an expression that's not a generic "member access operation", e.g., "<operator>.memberAccess".
+    */
   def parentExpression: Option[Expression] = _parentExpression(node)
 
   @tailrec

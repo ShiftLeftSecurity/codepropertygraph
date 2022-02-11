@@ -13,23 +13,27 @@ object Hidden extends SchemaBase {
       |in the future and not make part of the standard.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            methodSchema: Method.Schema,
-            typeDecl: Type.Schema,
-            ast: Ast.Schema,
-            cfg: Cfg.Schema,
-            fs: FileSystem.Schema,
-            callGraph: CallGraph.Schema) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
+  def apply(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    methodSchema: Method.Schema,
+    typeDecl: Type.Schema,
+    ast: Ast.Schema,
+    cfg: Cfg.Schema,
+    fs: FileSystem.Schema,
+    callGraph: CallGraph.Schema
+  ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               methodSchema: Method.Schema,
-               typeDeclSchema: Type.Schema,
-               astSchema: Ast.Schema,
-               cfg: Cfg.Schema,
-               fsSchema: FileSystem.Schema,
-               callGraph: CallGraph.Schema) {
+  class Schema(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    methodSchema: Method.Schema,
+    typeDeclSchema: Type.Schema,
+    astSchema: Ast.Schema,
+    cfg: Cfg.Schema,
+    fsSchema: FileSystem.Schema,
+    callGraph: CallGraph.Schema
+  ) {
 
     import base._
     import methodSchema._
@@ -63,10 +67,7 @@ object Hidden extends SchemaBase {
 
     // edge types
     val capture = builder
-      .addEdgeType(
-        name = "CAPTURE",
-        comment = "Represents the capturing of a variable into a closure"
-      )
+      .addEdgeType(name = "CAPTURE", comment = "Represents the capturing of a variable into a closure")
       .protoId(40)
 
     // node types
@@ -120,10 +121,7 @@ object Hidden extends SchemaBase {
 
     // node types
     val dependency: NodeType = builder
-      .addNodeType(
-        name = "DEPENDENCY",
-        comment = "This node represents a dependency"
-      )
+      .addNodeType(name = "DEPENDENCY", comment = "This node represents a dependency")
       .protoId(35)
       .addProperties(version, name, dependencyGroupId, usedIn)
 

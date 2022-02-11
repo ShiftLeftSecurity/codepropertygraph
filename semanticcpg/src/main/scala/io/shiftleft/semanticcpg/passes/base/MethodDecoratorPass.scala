@@ -6,19 +6,15 @@ import io.shiftleft.passes.{CpgPass, DiffGraph}
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
-/**
-  * Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and
-  * connects those with a PARAMETER_LINK edge.
+/** Adds a METHOD_PARAMETER_OUT for each METHOD_PARAMETER_IN to the graph and connects those with a PARAMETER_LINK edge.
   * It also creates an AST edge from METHOD to the new METHOD_PARAMETER_OUT nodes.
   *
-  * This pass has MethodStubCreator as prerequisite for language frontends which do
-  * not provide method stubs.
-  *
+  * This pass has MethodStubCreator as prerequisite for language frontends which do not provide method stubs.
   */
 class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
   import MethodDecoratorPass.logger
 
-  private[this] var loggedDeprecatedWarning = false
+  private[this] var loggedDeprecatedWarning   = false
   private[this] var loggedMissingTypeFullName = false
 
   override def run(): Iterator[DiffGraph] = {

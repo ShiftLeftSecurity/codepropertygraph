@@ -34,7 +34,8 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .has(Properties.FULL_NAME, value))
+        .has(Properties.FULL_NAME, value)
+    )
 
   def evalTypeExact(values: String*): Traversal[A] =
     if (values.isEmpty) Traversal.empty
@@ -42,14 +43,16 @@ class EvalTypeAccessors[A <: Node](val traversal: Traversal[A]) extends AnyVal {
       traversal.where(
         _.out(EdgeTypes.EVAL_TYPE)
           .out(EdgeTypes.REF)
-          .has(Properties.FULL_NAME.where(P.within(values.to(Set)))))
+          .has(Properties.FULL_NAME.where(P.within(values.to(Set))))
+      )
     }
 
   def evalTypeNot(value: String): Traversal[A] =
     traversal.where(
       _.out(EdgeTypes.EVAL_TYPE)
         .out(EdgeTypes.REF)
-        .hasNot(Properties.FULL_NAME.where(_.matches(value))))
+        .hasNot(Properties.FULL_NAME.where(_.matches(value)))
+    )
 
   def evalTypeNot(regexes: String*): Traversal[A] =
     if (regexes.isEmpty) Traversal.empty

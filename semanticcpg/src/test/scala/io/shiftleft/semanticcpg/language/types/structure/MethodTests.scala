@@ -17,13 +17,12 @@ class MethodTests extends AnyWordSpec with Matchers {
     .withCallInMethod("foo", "call")
     .withCallInMethod("foo", "call2")
     .withLiteralArgument("call", "literal")
-    .withCustom {
-      case (graph, cpg) =>
-        val method = cpg.method("foo").head
-        val call = cpg.call.name("call").head
-        val methodReturn = cpg.method("foo").methodReturn.head
-        graph.addEdge(method, call, EdgeTypes.CFG)
-        graph.addEdge(call, methodReturn, EdgeTypes.CFG)
+    .withCustom { case (graph, cpg) =>
+      val method       = cpg.method("foo").head
+      val call         = cpg.call.name("call").head
+      val methodReturn = cpg.method("foo").methodReturn.head
+      graph.addEdge(method, call, EdgeTypes.CFG)
+      graph.addEdge(call, methodReturn, EdgeTypes.CFG)
     }
     .cpg
 
@@ -54,12 +53,11 @@ class MethodTests extends AnyWordSpec with Matchers {
         val cpg = MockCpg()
           .withNamespace("namespace")
           .withMethod("foo")
-          .withCustom {
-            case (graph, cpg) =>
-              val namespaceBlock = cpg.namespaceBlock("namespace").head
-              val method = cpg.method("foo").head
-              graph.addNodeProperty(method, Method.PropertyNames.AstParentType, NamespaceBlock.Label)
-              graph.addEdge(namespaceBlock, method, EdgeTypes.AST)
+          .withCustom { case (graph, cpg) =>
+            val namespaceBlock = cpg.namespaceBlock("namespace").head
+            val method         = cpg.method("foo").head
+            graph.addNodeProperty(method, Method.PropertyNames.AstParentType, NamespaceBlock.Label)
+            graph.addEdge(namespaceBlock, method, EdgeTypes.AST)
           }
           .cpg
 
@@ -115,9 +113,7 @@ class MethodTests extends AnyWordSpec with Matchers {
     "filter for external/internal methods" in {
       val externals = cpg.method.external.fullName.l
       externals.size should be > 0
-      externals should contain allElementsOf Seq(
-        "bar"
-      )
+      externals should contain allElementsOf Seq("bar")
 
       val internals = cpg.method.internal.fullName.l
       internals.size should be > 0

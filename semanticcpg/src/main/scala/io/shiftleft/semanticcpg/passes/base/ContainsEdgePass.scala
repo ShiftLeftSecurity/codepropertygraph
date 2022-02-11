@@ -8,9 +8,8 @@ import io.shiftleft.passes.ConcurrentWriterCpgPass
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-/**
-  * This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for
-  * language frontends which do not provide method stubs and type decl stubs.
+/** This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for language frontends which do not provide
+  * method stubs and type decl stubs.
   */
 class ContainsEdgePass(cpg: Cpg) extends ConcurrentWriterCpgPass[AstNode](cpg) {
   import ContainsEdgePass._
@@ -19,7 +18,7 @@ class ContainsEdgePass(cpg: Cpg) extends ConcurrentWriterCpgPass[AstNode](cpg) {
     cpg.graph.nodes(sourceTypes: _*).asScala.map(_.asInstanceOf[AstNode]).toArray
 
   override def runOnPart(dstGraph: DiffGraphBuilder, source: AstNode): Unit = {
-    //AST is assumed to be a tree. If it contains cycles, then this will give a nice endless loop with OOM
+    // AST is assumed to be a tree. If it contains cycles, then this will give a nice endless loop with OOM
     val queue = mutable.ArrayDeque[StoredNode](source)
     while (queue.nonEmpty) {
       val parent = queue.removeHead()
@@ -45,10 +44,6 @@ object ContainsEdgePass {
     case _ => false
   }
 
-  private val sourceTypes = List(
-    NodeTypes.METHOD,
-    NodeTypes.TYPE_DECL,
-    NodeTypes.FILE
-  )
+  private val sourceTypes = List(NodeTypes.METHOD, NodeTypes.TYPE_DECL, NodeTypes.FILE)
 
 }

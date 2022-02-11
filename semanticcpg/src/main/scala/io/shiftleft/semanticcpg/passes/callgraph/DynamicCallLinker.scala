@@ -18,9 +18,8 @@ import scala.jdk.CollectionConverters._
   * This pass intentionally ignores the vtable mechanism based on BINDING nodes but does check for an existing call edge
   * before adding one. It assumes non-circular inheritance, on pain of endless recursion / stack overflow.
   *
-  * Based on the algorithm by Jang, Dongseok & Tatlock, Zachary & Lerner, Sorin. (2014).
-  * SAFEDISPATCH: Securing C++ Virtual Calls from Memory Corruption Attacks.
-  * 10.14722/ndss.2014.23287.
+  * Based on the algorithm by Jang, Dongseok & Tatlock, Zachary & Lerner, Sorin. (2014). SAFEDISPATCH: Securing C++
+  * Virtual Calls from Memory Corruption Attacks. 10.14722/ndss.2014.23287.
   */
 class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
@@ -59,10 +58,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     cpg.typeDecl
       .flatMap { c =>
         c._methodViaAstOut.map { n =>
-          (
-            n.fullName,
-            allSubclasses(c.fullName).flatMap(sc => staticLookup(sc, n))
-          )
+          (n.fullName, allSubclasses(c.fullName).flatMap(sc => staticLookup(sc, n)))
         }.toMap
       }
       .foreach { case (methodName, candidates) => validM.put(methodName, candidates) }
@@ -91,9 +87,8 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           cpg.typ
             .nameExact(typDeclFullName)
             .flatMap(_.in(EdgeTypes.INHERITS_FROM).asScala)
-            .collect {
-              case x: TypeDecl =>
-                x.fullName
+            .collect { case x: TypeDecl =>
+              x.fullName
             }
             .to(mutable.LinkedHashSet)
         // The second check makes sure that set is changing which wouldn't be the case in circular hierarchies
@@ -142,7 +137,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   /** In the case where the method isn't an internal method and cannot be resolved by crawling TYPE_DECL nodes it can be
-    *  resolved from the map of external methods.
+    * resolved from the map of external methods.
     */
   private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
     methodStubMap.get(call.methodFullName) match {

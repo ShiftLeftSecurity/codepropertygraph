@@ -7,22 +7,19 @@ import overflowdb._
 import overflowdb.traversal.help.Doc
 import overflowdb.traversal.{Traversal, help, toElementTraversal, toNodeTraversal}
 
-/**
-  * A method, function, or procedure
-  * */
+/** A method, function, or procedure
+  */
 @help.Traversal(elementType = classOf[Method])
 class MethodTraversal(val iterableOnce: IterableOnce[Method]) extends AnyVal {
 
-  /**
-    * All control structures of this method
-    * */
+  /** All control structures of this method
+    */
   @Doc(info = "Control structures (source frontends only)")
   def controlStructure: Traversal[ControlStructure] =
     traversal.ast.isControlStructure
 
-  /**
-    * Shorthand to traverse to control structures where condition matches `regex`
-    * */
+  /** Shorthand to traverse to control structures where condition matches `regex`
+    */
   def controlStructure(regex: String): Traversal[ControlStructure] =
     traversal.ast.isControlStructure.code(regex)
 
@@ -70,64 +67,53 @@ class MethodTraversal(val iterableOnce: IterableOnce[Method]) extends AnyVal {
   def throws: Traversal[ControlStructure] =
     controlStructure.isThrow
 
-  /**
-    * The type declaration associated with this method, e.g., the class it is defined in.
-    * */
+  /** The type declaration associated with this method, e.g., the class it is defined in.
+    */
   @Doc(info = "Type this method is defined in")
   def definingTypeDecl: Traversal[TypeDecl] =
     traversal
       .repeat(_.in(EdgeTypes.AST))(_.until(_.hasLabel(NodeTypes.TYPE_DECL)))
       .cast[TypeDecl]
 
-  /**
-    * The method in which this method is defined
-    * */
+  /** The method in which this method is defined
+    */
   @Doc(info = "Method this method is defined in")
   def definingMethod: Traversal[Method] =
     traversal
       .repeat(_.in(EdgeTypes.AST))(_.until(_.hasLabel(NodeTypes.METHOD)))
       .cast[Method]
 
-  /**
-    * Traverse only to methods that are stubs, e.g., their code is not available
-    * or the method body is empty.
-    * */
+  /** Traverse only to methods that are stubs, e.g., their code is not available or the method body is empty.
+    */
   def isStub: Traversal[Method] =
     traversal.where(_.not(_.out(EdgeTypes.CFG).not(_.hasLabel(NodeTypes.METHOD_RETURN))))
 
-  /**
-    * Traverse only to methods that are not stubs.
-    * */
+  /** Traverse only to methods that are not stubs.
+    */
   def isNotStub: Traversal[Method] =
     traversal.where(_.out(EdgeTypes.CFG).not(_.hasLabel(NodeTypes.METHOD_RETURN)))
 
-  /**
-    * Traverse only to methods that accept variadic arguments.
+  /** Traverse only to methods that accept variadic arguments.
     */
   def isVariadic: Traversal[Method] = {
     traversal.filter(_.isVariadic)
   }
 
-  /**
-    * Traverse to external methods, that is, methods not present
-    * but only referenced in the CPG.
-    * */
+  /** Traverse to external methods, that is, methods not present but only referenced in the CPG.
+    */
   @Doc(info = "External methods (called, but no body available)")
   def external: Traversal[Method] = {
     traversal.has(Properties.IS_EXTERNAL -> true)
   }
 
-  /**
-    * Traverse to internal methods, that is, methods for which
-    * code is included in this CPG.
-    * */
+  /** Traverse to internal methods, that is, methods for which code is included in this CPG.
+    */
   @Doc(info = "Internal methods, i.e., a body is available")
   def internal: Traversal[Method] =
     traversal.has(Properties.IS_EXTERNAL -> false)
 
-  /**
-    * Traverse to the methods local variables
-    * */
+  /** Traverse to the methods local variables
+    */
   @Doc(info = "Local variables declared in the method")
   def local: Traversal[Local] =
     traversal.block.ast.isLocal
@@ -145,8 +131,7 @@ class MethodTraversal(val iterableOnce: IterableOnce[Method]) extends AnyVal {
   def cfgNode: Traversal[CfgNode] =
     traversal.flatMap(_.cfgNode)
 
-  /**
-    *  Traverse to last expression in CFG.
+  /** Traverse to last expression in CFG.
     */
   @Doc(info = "Last control flow graph node")
   def cfgLast: Traversal[CfgNode] =

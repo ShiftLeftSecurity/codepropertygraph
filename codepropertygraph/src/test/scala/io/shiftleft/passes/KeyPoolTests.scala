@@ -15,7 +15,7 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
 
     "allow splitting into multiple pools" in {
       val keyPool = new IntervalKeyPool(1, 1000)
-      val pools = keyPool.split(11).toList
+      val pools   = keyPool.split(11).toList
       assertThrows[IllegalStateException] { keyPool.next }
       pools.size shouldBe 11
       // Pools should all have the same size
@@ -46,7 +46,7 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
 
   "SequenceKeyPool" should {
     "return elements of sequence one by one and then raise" in {
-      val seq = List[Long](1, 2, 3)
+      val seq     = List[Long](1, 2, 3)
       val keyPool = new SequenceKeyPool(seq)
       List.range(0, 3).map(_ => keyPool.next) shouldBe seq
       assertThrows[RuntimeException] { keyPool.next }
@@ -57,7 +57,7 @@ class KeyPoolTests extends AnyWordSpec with Matchers {
   "KeyPoolCreator" should {
     "split into n pools and honor minimum value" in {
       val minValue = 10
-      val pools = KeyPoolCreator.obtain(3, minValue)
+      val pools    = KeyPoolCreator.obtain(3, minValue)
       pools.size shouldBe 3
       pools match {
         case List(pool1, pool2, pool3) =>

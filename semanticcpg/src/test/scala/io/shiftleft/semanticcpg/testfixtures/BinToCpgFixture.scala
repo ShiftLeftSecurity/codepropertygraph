@@ -11,8 +11,8 @@ import java.io.File
 
 class BinToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
-  var cpg: Cpg = Cpg.emptyCpg
-  val binDirectory = ProjectRoot.relativise("src/test/resources/testbinaries/")
+  var cpg: Cpg               = Cpg.emptyCpg
+  val binDirectory           = ProjectRoot.relativise("src/test/resources/testbinaries/")
   def passes(cpg: Cpg): Unit = createEnhancements(cpg)
 
   def createEnhancements(cpg: Cpg): Unit = {

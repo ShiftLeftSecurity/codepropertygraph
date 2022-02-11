@@ -27,7 +27,7 @@ object AccessPathHandling {
     }
   }
 
-  private val logger = LoggerFactory.getLogger(getClass)
+  private val logger                = LoggerFactory.getLogger(getClass)
   private var hasWarnedDeprecations = false
 
   def memberAccessToPath(memberAccess: Call, tail: List[AccessElement]) = {
@@ -52,8 +52,8 @@ object AccessPathHandling {
         }
         memberAccess
           .argumentOption(2)
-          .collect {
-            case lit: Literal => ConstantAccess(lit.code)
+          .collect { case lit: Literal =>
+            ConstantAccess(lit.code)
           }
           .getOrElse(VariableAccess) :: tail
       case Operators.indirection =>
@@ -82,7 +82,8 @@ object AccessPathHandling {
         logger.warn(
           s"Invalid AST: Found member access without second argument." +
             s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${memberAccess.method.fullName}")
+            s" In method ${memberAccess.method.fullName}"
+        )
         VariableAccess
       }
       case Some(literal: Literal) => ConstantAccess(literal.code)
@@ -97,7 +98,8 @@ object AccessPathHandling {
         logger.warn(
           s"Invalid AST: Found member access without second argument." +
             s" Member access CODE: ${memberAccess.code}" +
-            s" In method ${memberAccess.method.fullName}")
+            s" In method ${memberAccess.method.fullName}"
+        )
         VariablePointerShift
       }
       case Some(literal: Literal) =>

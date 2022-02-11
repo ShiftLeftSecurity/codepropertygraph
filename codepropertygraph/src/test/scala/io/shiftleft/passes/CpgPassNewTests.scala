@@ -37,7 +37,7 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
       File.usingTemporaryFile("pass", ".zip") { file =>
         file.delete()
-        val filename = file.path.toString
+        val filename      = file.path.toString
         val serializedCpg = new SerializedCpg(filename)
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()

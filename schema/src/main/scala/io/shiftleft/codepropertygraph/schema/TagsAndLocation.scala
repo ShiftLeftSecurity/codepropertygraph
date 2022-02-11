@@ -16,22 +16,26 @@ object TagsAndLocation extends SchemaBase {
       |rather than end-results that are to be reported to the user.
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            typeSchema: Type.Schema,
-            methodSchema: Method.Schema,
-            ast: Ast.Schema,
-            fs: FileSystem.Schema,
-            callGraph: CallGraph.Schema) =
+  def apply(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    typeSchema: Type.Schema,
+    methodSchema: Method.Schema,
+    ast: Ast.Schema,
+    fs: FileSystem.Schema,
+    callGraph: CallGraph.Schema
+  ) =
     new Schema(builder, base, typeSchema, methodSchema, ast, fs, callGraph)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               typeSchema: Type.Schema,
-               methodSchema: Method.Schema,
-               ast: Ast.Schema,
-               fs: FileSystem.Schema,
-               callGraph: CallGraph.Schema) {
+  class Schema(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    typeSchema: Type.Schema,
+    methodSchema: Method.Schema,
+    ast: Ast.Schema,
+    fs: FileSystem.Schema,
+    callGraph: CallGraph.Schema
+  ) {
     import base._
     import typeSchema._
     import methodSchema._
@@ -42,97 +46,63 @@ object TagsAndLocation extends SchemaBase {
 
 // node properties
     val symbol = builder
-      .addProperty(
-        name = "SYMBOL",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "SYMBOL", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(100)
 
     val methodShortName = builder
-      .addProperty(
-        name = "METHOD_SHORT_NAME",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "METHOD_SHORT_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(102)
 
     val packageName = builder
-      .addProperty(
-        name = "PACKAGE_NAME",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "PACKAGE_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(103)
 
     val className = builder
-      .addProperty(
-        name = "CLASS_NAME",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "CLASS_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(104)
 
     val classShortName = builder
-      .addProperty(
-        name = "CLASS_SHORT_NAME",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "CLASS_SHORT_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(132)
 
     val nodeLabel = builder
-      .addProperty(
-        name = "NODE_LABEL",
-        valueType = ValueType.String,
-        comment = ""
-      )
+      .addProperty(name = "NODE_LABEL", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
       .protoId(105)
 
     val taggedBy = builder
-      .addEdgeType(
-        name = "TAGGED_BY",
-        comment = "Edges from nodes to the tags they are tagged by."
-      )
+      .addEdgeType(name = "TAGGED_BY", comment = "Edges from nodes to the tags they are tagged by.")
       .protoId(11)
 
     // node types
 
     val tag: NodeType = builder
-      .addNodeType(
-        name = "TAG",
-        comment = "This node represents a tag."
-      )
+      .addNodeType(name = "TAG", comment = "This node represents a tag.")
       .protoId(24)
       .addProperties(name, value)
 
     val location: NodeType = builder
-      .addNodeType(
-        name = "LOCATION",
-        comment = "A location node summarizes a source code location."
-      )
+      .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")
       .protoId(25)
-      .addProperties(symbol,
-                     methodFullName,
-                     methodShortName,
-                     packageName,
-                     lineNumber,
-                     className,
-                     classShortName,
-                     nodeLabel,
-                     filename)
+      .addProperties(
+        symbol,
+        methodFullName,
+        methodShortName,
+        packageName,
+        lineNumber,
+        className,
+        classShortName,
+        nodeLabel,
+        filename
+      )
 
     val tagNodePair: NodeType = builder
-      .addNodeType(
-        name = "TAG_NODE_PAIR",
-        comment = "This node contains an arbitrary node and an associated tag node."
-      )
+      .addNodeType(name = "TAG_NODE_PAIR", comment = "This node contains an arbitrary node and an associated tag node.")
       .protoId(208)
       .addProperties()
 

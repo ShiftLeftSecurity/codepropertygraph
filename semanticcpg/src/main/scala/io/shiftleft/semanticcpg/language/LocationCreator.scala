@@ -30,24 +30,24 @@ object LocationCreator {
   }
 
   def apply(
-      node: AbstractNode,
-      symbol: String,
-      label: String,
-      lineNumber: Option[Integer],
-      method: Method
+    node: AbstractNode,
+    symbol: String,
+    label: String,
+    lineNumber: Option[Integer],
+    method: Method
   ): NewLocation = {
 
     if (method == null) {
       NewLocation().node(node)
     } else {
-      val typeOption = methodToTypeDecl(method)
-      val typeName = typeOption.map(_.fullName).getOrElse("")
+      val typeOption    = methodToTypeDecl(method)
+      val typeName      = typeOption.map(_.fullName).getOrElse("")
       val typeShortName = typeOption.map(_.name).getOrElse("")
 
       val namespaceOption = for {
-        tpe <- typeOption
+        tpe            <- typeOption
         namespaceBlock <- tpe.namespaceBlock
-        namespace <- namespaceBlock._namespaceViaRefOut.nextOption()
+        namespace      <- namespaceBlock._namespaceViaRefOut.nextOption()
       } yield namespace.name
       val namespaceName = namespaceOption.getOrElse("")
 

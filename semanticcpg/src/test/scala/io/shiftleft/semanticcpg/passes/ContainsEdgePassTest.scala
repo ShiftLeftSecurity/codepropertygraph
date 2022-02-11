@@ -45,12 +45,12 @@ object ContainsEdgePassTest {
   private class Fixture {
     private val graph = OverflowDbTestInstance.create
 
-    val fileVertex = graph + NodeTypes.FILE
-    val typeDeclVertex = graph + NodeTypes.TYPE_DECL
-    val typeMethodVertex = graph + NodeTypes.METHOD
-    val methodVertex = graph + NodeTypes.METHOD
-    val innerMethodVertex = graph + NodeTypes.METHOD
-    val expressionVertex = graph + NodeTypes.CALL
+    val fileVertex            = graph + NodeTypes.FILE
+    val typeDeclVertex        = graph + NodeTypes.TYPE_DECL
+    val typeMethodVertex      = graph + NodeTypes.METHOD
+    val methodVertex          = graph + NodeTypes.METHOD
+    val innerMethodVertex     = graph + NodeTypes.METHOD
+    val expressionVertex      = graph + NodeTypes.CALL
     val innerExpressionVertex = graph + NodeTypes.CALL
 
     fileVertex --- EdgeTypes.AST --> typeDeclVertex

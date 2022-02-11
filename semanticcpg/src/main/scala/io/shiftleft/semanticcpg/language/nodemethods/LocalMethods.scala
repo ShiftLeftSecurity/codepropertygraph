@@ -7,18 +7,11 @@ import overflowdb.traversal.Traversal
 
 class LocalMethods(val local: Local) extends AnyVal with NodeExtension with HasLocation {
   override def location: NewLocation = {
-    LocationCreator(
-      local,
-      local.name,
-      local.label,
-      local.lineNumber,
-      local.method.head
-    )
+    LocationCreator(local, local.name, local.label, local.lineNumber, local.method.head)
   }
 
-  /**
-    * The method hosting this local variable
-    * */
+  /** The method hosting this local variable
+    */
   def method: Traversal[Method] =
     toTraversal(local).method
 }
