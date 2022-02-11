@@ -15,9 +15,7 @@ trait ICallResolver {
 
   def getUnresolvedMethodFullNamesInternal(callsite: CallRepr): Iterable[String]
 
-  /**
-    * Get methods called at the given callsite.
-    * This internally calls triggerCallsiteResolution.
+  /** Get methods called at the given callsite. This internally calls triggerCallsiteResolution.
     */
   def getCalledMethods(callsite: CallRepr): Iterable[Method] = {
     triggerCallsiteResolution(callsite)
@@ -28,15 +26,12 @@ trait ICallResolver {
     combined
   }
 
-  /**
-    * Same as getCalledMethods but with traversal return type.
+  /** Same as getCalledMethods but with traversal return type.
     */
   def getCalledMethodsAsTraversal(callsite: CallRepr): Traversal[Method] =
     getCalledMethods(callsite).to(Traversal)
 
-  /**
-    * Get callsites of the given method.
-    * This internally calls triggerMethodResolution.
+  /** Get callsites of the given method. This internally calls triggerMethodResolution.
     */
   def getMethodCallsites(method: Method): Iterable[CallRepr] = {
     triggerMethodCallsiteResolution(method)
@@ -51,31 +46,26 @@ trait ICallResolver {
     combined.toBuffer
   }
 
-  /**
-    * Same as getMethodCallsites but with traversal return type.
+  /** Same as getMethodCallsites but with traversal return type.
     */
   def getMethodCallsitesAsTraversal(method: Method): Traversal[CallRepr] =
     getMethodCallsites(method).to(Traversal)
 
-  /**
-    * Starts data flow tracking to find all method which could be called at the given callsite.
-    * The result is stored in the resolver internal cache.
+  /** Starts data flow tracking to find all method which could be called at the given callsite. The result is stored in
+    * the resolver internal cache.
     */
   def triggerCallsiteResolution(callsite: CallRepr): Unit
 
-  /**
-    * Starts data flow tracking to find all callsites which could call the given method.
-    * The result is stored in the resolver internal cache.
+  /** Starts data flow tracking to find all callsites which could call the given method. The result is stored in the
+    * resolver internal cache.
     */
   def triggerMethodCallsiteResolution(method: Method): Unit
 
-  /**
-    * Retrieve results of triggerCallsiteResolution.
+  /** Retrieve results of triggerCallsiteResolution.
     */
   def getResolvedCalledMethods(callsite: CallRepr): Iterable[Method]
 
-  /**
-    * Retrieve results of triggerMethodResolution.
+  /** Retrieve results of triggerMethodResolution.
     */
   def getResolvedMethodCallsites(method: Method): Iterable[CallRepr]
 }

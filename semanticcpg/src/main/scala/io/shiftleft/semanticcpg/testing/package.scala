@@ -22,24 +22,20 @@ package object testing {
 
     def withMetaData(language: String, overlays: List[String]): MockCpg = {
       withCustom { (diffGraph, _) =>
-        diffGraph.addNode(
-          NewMetaData().language(language).overlays(overlays)
-        )
+        diffGraph.addNode(NewMetaData().language(language).overlays(overlays))
       }
     }
 
     def withFile(filename: String): MockCpg =
       withCustom { (graph, _) =>
-        graph.addNode(
-          NewFile().name(filename)
-        )
+        graph.addNode(NewFile().name(filename))
       }
 
     def withNamespace(name: String, inFile: Option[String] = None): MockCpg =
       withCustom { (graph, _) =>
         {
           val namespaceBlock = NewNamespaceBlock().name(name)
-          val namespace = NewNamespace().name(name)
+          val namespace      = NewNamespace().name(name)
           graph.addNode(namespaceBlock)
           graph.addNode(namespace)
           graph.addEdge(namespaceBlock, namespace, EdgeTypes.REF)
@@ -50,10 +46,12 @@ package object testing {
         }
       }
 
-    def withTypeDecl(name: String,
-                     isExternal: Boolean = false,
-                     inNamespace: Option[String] = None,
-                     inFile: Option[String] = None): MockCpg =
+    def withTypeDecl(
+      name: String,
+      isExternal: Boolean = false,
+      inNamespace: Option[String] = None,
+      inFile: Option[String] = None
+    ): MockCpg =
       withCustom { (graph, _) =>
         {
           val typeNode = NewType().name(name)
@@ -62,7 +60,7 @@ package object testing {
             .fullName(name)
             .isExternal(isExternal)
 
-          val member = NewMember().name("amember")
+          val member   = NewMember().name("amember")
           val modifier = NewModifier().modifierType(ModifierTypes.STATIC)
 
           graph.addNode(typeDeclNode)
@@ -84,18 +82,20 @@ package object testing {
         }
       }
 
-    def withMethod(name: String,
-                   external: Boolean = false,
-                   inTypeDecl: Option[String] = None,
-                   fileName: String = ""): MockCpg =
+    def withMethod(
+      name: String,
+      external: Boolean = false,
+      inTypeDecl: Option[String] = None,
+      fileName: String = ""
+    ): MockCpg =
       withCustom { (graph, _) =>
-        val retParam = NewMethodReturn().typeFullName("int")
-        val param = NewMethodParameterIn().order(1).name("param1")
+        val retParam  = NewMethodReturn().typeFullName("int")
+        val param     = NewMethodParameterIn().order(1).name("param1")
         val paramType = NewType().name("paramtype")
-        val paramOut = NewMethodParameterOut().name("param1").order(1)
+        val paramOut  = NewMethodParameterOut().name("param1").order(1)
         val method =
           NewMethod().isExternal(external).name(name).fullName(name).signature("asignature").filename(fileName)
-        val block = NewBlock().typeFullName("int")
+        val block    = NewBlock().typeFullName("int")
         val modifier = NewModifier().modifierType("modifiertype")
 
         graph.addNode(method)
@@ -119,26 +119,26 @@ package object testing {
         }
       }
 
-    def withTagsOnMethod(methodName: String,
-                         methodTags: List[(String, String)] = List(),
-                         paramTags: List[(String, String)] = List()): MockCpg =
+    def withTagsOnMethod(
+      methodName: String,
+      methodTags: List[(String, String)] = List(),
+      paramTags: List[(String, String)] = List()
+    ): MockCpg =
       withCustom { (graph, cpg) =>
         implicit val diffGraph: DiffGraph.Builder = graph
-        methodTags.foreach {
-          case (k, v) =>
-            cpg.method.name(methodName).newTagNodePair(k, v).store()
+        methodTags.foreach { case (k, v) =>
+          cpg.method.name(methodName).newTagNodePair(k, v).store()
         }
-        paramTags.foreach {
-          case (k, v) =>
-            cpg.method.name(methodName).parameter.newTagNodePair(k, v).store()
+        paramTags.foreach { case (k, v) =>
+          cpg.method.name(methodName).parameter.newTagNodePair(k, v).store()
         }
       }
 
     def withCallInMethod(methodName: String, callName: String, code: Option[String] = None): MockCpg =
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
-        val blockNode = methodNode.block.head
-        val callNode = NewCall().name(callName).code(code.getOrElse(callName))
+        val blockNode  = methodNode.block.head
+        val callNode   = NewCall().name(callName).code(code.getOrElse(callName))
         graph.addNode(callNode)
         graph.addEdge(blockNode, callNode, EdgeTypes.AST)
         graph.addEdge(methodNode, callNode, EdgeTypes.CONTAINS)
@@ -147,8 +147,8 @@ package object testing {
     def withMethodCall(calledMethod: String, callingMethod: String, code: Option[String] = None): MockCpg =
       withCustom { (graph, cpg) =>
         val callingMethodNode = cpg.method.name(callingMethod).head
-        val calledMethodNode = cpg.method.name(calledMethod).head
-        val callNode = NewCall().name(calledMethod).code(code.getOrElse(calledMethod))
+        val calledMethodNode  = cpg.method.name(calledMethod).head
+        val callNode          = NewCall().name(calledMethod).code(code.getOrElse(calledMethod))
         graph.addEdge(callNode, calledMethodNode, EdgeTypes.CALL)
         graph.addEdge(callingMethodNode, callNode, EdgeTypes.CONTAINS)
       }
@@ -156,9 +156,9 @@ package object testing {
     def withLocalInMethod(methodName: String, localName: String): MockCpg =
       withCustom { (graph, cpg) =>
         val methodNode = cpg.method.name(methodName).head
-        val blockNode = methodNode.block.head
-        val typeNode = NewType().name("alocaltype")
-        val localNode = NewLocal().name(localName).typeFullName("alocaltype")
+        val blockNode  = methodNode.block.head
+        val typeNode   = NewType().name("alocaltype")
+        val localNode  = NewLocal().name(localName).typeFullName("alocaltype")
         graph.addNode(localNode)
         graph.addNode(typeNode)
         graph.addEdge(blockNode, localNode, EdgeTypes.AST)
@@ -167,8 +167,8 @@ package object testing {
 
     def withLiteralArgument(callName: String, literalCode: String): MockCpg = {
       withCustom { (graph, cpg) =>
-        val callNode = cpg.call.name(callName).head
-        val methodNode = callNode.method.head
+        val callNode    = cpg.call.name(callName).head
+        val methodNode  = callNode.method.head
         val literalNode = NewLiteral().code(literalCode)
         val typeDecl = NewTypeDecl()
           .name("ATypeDecl")
@@ -188,9 +188,9 @@ package object testing {
       withArgument(callName, NewCall().name(callArgName).code(code).argumentIndex(index))
 
     def withArgument(callName: String, newNode: NewNode): MockCpg = withCustom { (graph, cpg) =>
-      val callNode = cpg.call.name(callName).head
+      val callNode   = cpg.call.name(callName).head
       val methodNode = callNode.method.head
-      val typeDecl = NewTypeDecl().name("abc")
+      val typeDecl   = NewTypeDecl().name("abc")
       graph.addEdge(callNode, newNode, EdgeTypes.AST)
       graph.addEdge(callNode, newNode, EdgeTypes.ARGUMENT)
       graph.addEdge(methodNode, newNode, EdgeTypes.CONTAINS)

@@ -22,78 +22,110 @@ object Operators extends SchemaBase {
       category = "Operators",
       Constant(name = "addition", value = "<operator>.addition", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "subtraction", value = "<operator>.subtraction", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "multiplication",
-               value = "<operator>.multiplication",
-               valueType = ValueTypes.STRING,
-               comment = ""),
+      Constant(
+        name = "multiplication",
+        value = "<operator>.multiplication",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
       Constant(name = "division", value = "<operator>.division", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "exponentiation",
-               value = "<operator>.exponentiation",
-               valueType = ValueTypes.STRING,
-               comment = ""),
+      Constant(
+        name = "exponentiation",
+        value = "<operator>.exponentiation",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
       Constant(name = "modulo", value = "<operator>.modulo", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "shiftLeft", value = "<operator>.shiftLeft", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "logicalShiftRight",
-               value = "<operator>.logicalShiftRight",
-               valueType = ValueTypes.STRING,
-               comment = "Shift right padding with zeros"),
-      Constant(name = "arithmeticShiftRight",
-               value = "<operator>.arithmeticShiftRight",
-               valueType = ValueTypes.STRING,
-               comment = "Shift right preserving the sign"),
+      Constant(
+        name = "logicalShiftRight",
+        value = "<operator>.logicalShiftRight",
+        valueType = ValueTypes.STRING,
+        comment = "Shift right padding with zeros"
+      ),
+      Constant(
+        name = "arithmeticShiftRight",
+        value = "<operator>.arithmeticShiftRight",
+        valueType = ValueTypes.STRING,
+        comment = "Shift right preserving the sign"
+      ),
       Constant(name = "not", value = "<operator>.not", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "and", value = "<operator>.and", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "or", value = "<operator>.or", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "xor", value = "<operator>.xor", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "assignmentPlus",
-               value = "<operator>.assignmentPlus",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentMinus",
-               value = "<operator>.assignmentMinus",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentMultiplication",
-               value = "<operator>.assignmentMultiplication",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentDivision",
-               value = "<operator>.assignmentDivision",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentExponentiation",
-               value = "<operators>.assignmentExponentiation",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentModulo",
-               value = "<operators>.assignmentModulo",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentShiftLeft",
-               value = "<operators>.assignmentShiftLeft",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentLogicalShiftRight",
-               value = "<operators>.assignmentLogicalShiftRight",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentArithmeticShiftRight",
-               value = "<operators>.assignmentArithmeticShiftRight",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "assignmentAnd",
-               value = "<operators>.assignmentAnd",
-               valueType = ValueTypes.STRING,
-               comment = ""),
+      Constant(
+        name = "assignmentPlus",
+        value = "<operator>.assignmentPlus",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentMinus",
+        value = "<operator>.assignmentMinus",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentMultiplication",
+        value = "<operator>.assignmentMultiplication",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentDivision",
+        value = "<operator>.assignmentDivision",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentExponentiation",
+        value = "<operators>.assignmentExponentiation",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentModulo",
+        value = "<operators>.assignmentModulo",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentShiftLeft",
+        value = "<operators>.assignmentShiftLeft",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentLogicalShiftRight",
+        value = "<operators>.assignmentLogicalShiftRight",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentArithmeticShiftRight",
+        value = "<operators>.assignmentArithmeticShiftRight",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "assignmentAnd",
+        value = "<operators>.assignmentAnd",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
       Constant(name = "assignmentOr", value = "<operators>.assignmentOr", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "assignmentXor",
-               value = "<operators>.assignmentXor",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "arrayInitializer",
-               value = "<operator>.arrayInitializer",
-               valueType = ValueTypes.STRING,
-               comment = ""),
+      Constant(
+        name = "assignmentXor",
+        value = "<operators>.assignmentXor",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "arrayInitializer",
+        value = "<operator>.arrayInitializer",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
       Constant(name = "assignment", value = "<operator>.assignment", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "minus", value = "<operator>.minus", valueType = ValueTypes.STRING, comment = "E.g. `a = -b`"),
       Constant(name = "plus", value = "<operator>.plus", valueType = ValueTypes.STRING, comment = "E.g. `a = +b`"),
@@ -108,19 +140,25 @@ object Operators extends SchemaBase {
       Constant(name = "notEquals", value = "<operator>.notEquals", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "greaterThan", value = "<operator>.greaterThan", valueType = ValueTypes.STRING, comment = ""),
       Constant(name = "lessThan", value = "<operator>.lessThan", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "greaterEqualsThan",
-               value = "<operator>.greaterEqualsThan",
-               valueType = ValueTypes.STRING,
-               comment = ""),
-      Constant(name = "lessEqualsThan",
-               value = "<operator>.lessEqualsThan",
-               valueType = ValueTypes.STRING,
-               comment = ""),
+      Constant(
+        name = "greaterEqualsThan",
+        value = "<operator>.greaterEqualsThan",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
+      Constant(
+        name = "lessEqualsThan",
+        value = "<operator>.lessEqualsThan",
+        valueType = ValueTypes.STRING,
+        comment = ""
+      ),
       Constant(name = "instanceOf", value = "<operator>.instanceOf", valueType = ValueTypes.STRING, comment = ""),
-      Constant(name = "memberAccess",
-               value = "<operator>.memberAccess",
-               valueType = ValueTypes.STRING,
-               comment = "Deprecated. Formerly in C: `a.b` but not! in Java"),
+      Constant(
+        name = "memberAccess",
+        value = "<operator>.memberAccess",
+        valueType = ValueTypes.STRING,
+        comment = "Deprecated. Formerly in C: `a.b` but not! in Java"
+      ),
       Constant(
         name = "indirectMemberAccess",
         value = "<operator>.indirectMemberAccess",
@@ -165,10 +203,12 @@ object Operators extends SchemaBase {
         comment =
           "E.g. `x = f() ?: g()`. A binary operator that returns its first operand if that operand evaluates to a true value, and otherwise evaluates and returns its second operand."
       ),
-      Constant(name = "cast",
-               value = "<operator>.cast",
-               valueType = ValueTypes.STRING,
-               comment = "Type casts of any sort"),
+      Constant(
+        name = "cast",
+        value = "<operator>.cast",
+        valueType = ValueTypes.STRING,
+        comment = "Type casts of any sort"
+      ),
       Constant(
         name = "compare",
         value = "<operator>.compare",
@@ -183,10 +223,12 @@ object Operators extends SchemaBase {
         comment =
           "Returns the address of a given object. Pairs of addressOf and indirection operators cancel each other. Handling of this operator is special-cased in the back-end"
       ),
-      Constant(name = "sizeOf",
-               value = "<operator>.sizeOf",
-               valueType = ValueTypes.STRING,
-               comment = "Returns the size of a given object"),
+      Constant(
+        name = "sizeOf",
+        value = "<operator>.sizeOf",
+        valueType = ValueTypes.STRING,
+        comment = "Returns the size of a given object"
+      ),
       Constant(
         name = "fieldAccess",
         value = "<operator>.fieldAccess",
@@ -259,18 +301,24 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "Checks the non-existence of a variable in a range or collection, e.g. `print(5 not in [1, 2, 3, 4])`"
       ),
-      Constant(name = "is",
-               value = "<operator>.is",
-               valueType = ValueTypes.STRING,
-               comment = "Checks whether a variable is of a given type"),
-      Constant(name = "isNot",
-               value = "<operator>.isNot",
-               valueType = ValueTypes.STRING,
-               comment = "Checks whether a variable is not of a given type"),
-      Constant(name = "notNullAssert",
-               value = "<operator>.notNullAssert",
-               valueType = ValueTypes.STRING,
-               comment = "Converts any value to a not-null type"),
+      Constant(
+        name = "is",
+        value = "<operator>.is",
+        valueType = ValueTypes.STRING,
+        comment = "Checks whether a variable is of a given type"
+      ),
+      Constant(
+        name = "isNot",
+        value = "<operator>.isNot",
+        valueType = ValueTypes.STRING,
+        comment = "Checks whether a variable is not of a given type"
+      ),
+      Constant(
+        name = "notNullAssert",
+        value = "<operator>.notNullAssert",
+        valueType = ValueTypes.STRING,
+        comment = "Converts any value to a not-null type"
+      ),
       Constant(
         name = "lengthOf",
         value = "<operator>.lengthOf",
@@ -283,7 +331,7 @@ object Operators extends SchemaBase {
         value = "<operator>.safeNavigation",
         valueType = ValueTypes.STRING,
         comment = "Returns null if the first operator is null, otherwise performs a dereferencing operation"
-      ),
+      )
     )
 
   }

@@ -49,13 +49,13 @@ class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
     v4 --- "CFG" --> v5
     v5 --- "CFG" --> v6
 
-    val cfgAdapter = new TestCfgAdapter
+    val cfgAdapter             = new TestCfgAdapter
     val cfgDominatorCalculator = new CfgDominator(cfgAdapter)
-    val immediateDominators = cfgDominatorCalculator.calculate(v0)
+    val immediateDominators    = cfgDominatorCalculator.calculate(v0)
 
-    val domTreeAdapter = new TestDomTreeAdapter(immediateDominators)
+    val domTreeAdapter       = new TestDomTreeAdapter(immediateDominators)
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
-    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
+    val dominanceFrontier    = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
     dominanceFrontier.get(v0) shouldBe None
     dominanceFrontier.get(v1) shouldBe None
@@ -76,13 +76,13 @@ class CfgDominatorFrontierTests extends AnyWordSpec with Matchers {
     v0 --- "CFG" --> v2
     v1 --- "CFG" --> v2
 
-    val cfgAdapter = new TestCfgAdapter
+    val cfgAdapter             = new TestCfgAdapter
     val cfgDominatorCalculator = new CfgDominator(cfgAdapter)
-    val immediateDominators = cfgDominatorCalculator.calculate(v0)
+    val immediateDominators    = cfgDominatorCalculator.calculate(v0)
 
-    val domTreeAdapter = new TestDomTreeAdapter(immediateDominators)
+    val domTreeAdapter       = new TestDomTreeAdapter(immediateDominators)
     val cfgDominatorFrontier = new CfgDominatorFrontier(cfgAdapter, domTreeAdapter)
-    val dominanceFrontier = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
+    val dominanceFrontier    = cfgDominatorFrontier.calculate(graph.nodes.asScala.toList)
 
     dominanceFrontier.get(v0) shouldBe None
     dominanceFrontier.apply(v1) shouldBe Set(v2)

@@ -9,7 +9,7 @@ class NewTagNodePairTraversal(traversal: Traversal[NewTagNodePair]) extends HasS
 
   override def store()(implicit diffGraph: DiffGraph.Builder): Unit = {
     traversal.foreach { tagNodePair =>
-      val tag = tagNodePair.tag
+      val tag      = tagNodePair.tag
       val tagValue = tagNodePair.node
       diffGraph.addNode(tag.asInstanceOf[NewNode])
       tagValue match {

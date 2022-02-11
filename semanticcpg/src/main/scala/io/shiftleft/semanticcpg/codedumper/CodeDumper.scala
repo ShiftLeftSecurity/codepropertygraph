@@ -15,9 +15,8 @@ object CodeDumper {
 
   val arrow: CharSequence = "/* <=== */ "
 
-  /**
-    * Dump string representation of code at given `location`.
-    * */
+  /** Dump string representation of code at given `location`.
+    */
   def dump(location: NewLocation, language: Option[String], highlight: Boolean): String = {
     val filename = location.filename
 
@@ -60,11 +59,10 @@ object CodeDumper {
       .getOrElse("")
   }
 
-  /**
-    * For a given `filename`, `startLine`, and `endLine`, return the corresponding code
-    * by reading it from the file. If `lineToHighlight` is defined, then a line containing
-    * an arrow (as a source code comment) is included right before that line.
-    * */
+  /** For a given `filename`, `startLine`, and `endLine`, return the corresponding code by reading it from the file. If
+    * `lineToHighlight` is defined, then a line containing an arrow (as a source code comment) is included right before
+    * that line.
+    */
   def code(filename: String, startLine: Integer, endLine: Integer, lineToHighlight: Option[Integer] = None): String = {
     val lines = Try(IOUtils.readLinesInFile(Paths.get(filename))).getOrElse {
       logger.warn("error reading from: " + filename);
@@ -73,13 +71,12 @@ object CodeDumper {
     lines
       .slice(startLine - 1, endLine)
       .zipWithIndex
-      .map {
-        case (line, lineNo) =>
-          if (lineToHighlight.isDefined && lineNo == lineToHighlight.get - startLine) {
-            line + " " + arrow
-          } else {
-            line
-          }
+      .map { case (line, lineNo) =>
+        if (lineToHighlight.isDefined && lineNo == lineToHighlight.get - startLine) {
+          line + " " + arrow
+        } else {
+          line
+        }
       }
       .mkString("\n")
   }

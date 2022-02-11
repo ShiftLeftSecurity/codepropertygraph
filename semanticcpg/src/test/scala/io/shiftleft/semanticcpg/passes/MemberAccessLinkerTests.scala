@@ -10,7 +10,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class MemberAccessLinkerTests extends AnyWordSpec with Matchers {
 
   val cpg = MockCpg().withCustom { (graph, _) =>
-    val call = NewCall().name(Operators.indirectMemberAccess)
+    val call   = NewCall().name(Operators.indirectMemberAccess)
     val member = NewMember().name("aaa")
     graph.addNode(call)
     graph.addNode(member)

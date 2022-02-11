@@ -9,7 +9,7 @@ object Type extends SchemaBase {
   def apply(builder: SchemaBuilder, base: Base.Schema, fs: FileSystem.Schema) =
     new Schema(builder, base, fs)
 
-  def index: Int = 6
+  def index: Int                           = 6
   override def providedByFrontend: Boolean = true
 
   override def description: String =

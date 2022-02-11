@@ -8,7 +8,7 @@ import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
 object ControlStructureTraversal {
   val secondChildIndex = 2
-  val thirdChildIndex = 3
+  val thirdChildIndex  = 3
 }
 
 class ControlStructureTraversal(val traversal: Traversal[ControlStructure]) extends AnyVal {

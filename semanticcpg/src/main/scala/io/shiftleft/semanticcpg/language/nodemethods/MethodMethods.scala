@@ -18,9 +18,8 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
   def local: Traversal[Local] =
     method._blockViaContainsOut.flatMap(_._localViaAstOut)
 
-  /**
-    * All control structures of this method
-    * */
+  /** All control structures of this method
+    */
   def controlStructure: Traversal[ControlStructure] =
     method.ast.isControlStructure
 
@@ -39,33 +38,22 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
   def cfgNode: Traversal[CfgNode] =
     method._containsOut.collectAll[CfgNode]
 
-  /**
-    * List of CFG nodes in reverse post order
-    * */
+  /** List of CFG nodes in reverse post order
+    */
   def reversePostOrder: Traversal[CfgNode] = {
     def expand(x: CfgNode) = { x.cfgNext.iterator }
-    Traversal.from(
-      NodeOrdering.reverseNodeList(
-        NodeOrdering.postOrderNumbering(method, expand).toList
-      )
-    )
+    Traversal.from(NodeOrdering.reverseNodeList(NodeOrdering.postOrderNumbering(method, expand).toList))
   }
 
-  /**
-    * List of CFG nodes in post order
-    * */
+  /** List of CFG nodes in post order
+    */
   def postOrder: Traversal[CfgNode] = {
     def expand(x: CfgNode) = { x.cfgNext.iterator }
-    Traversal.from(
-      NodeOrdering.nodeList(
-        NodeOrdering.postOrderNumbering(method, expand).toList
-      )
-    )
+    Traversal.from(NodeOrdering.nodeList(NodeOrdering.postOrderNumbering(method, expand).toList))
   }
 
-  /**
-    * The type declaration associated with this method, e.g., the class it is defined in.
-    * */
+  /** The type declaration associated with this method, e.g., the class it is defined in.
+    */
   def definingTypeDecl: Traversal[TypeDecl] =
     Traversal.fromSingle(method).definingTypeDecl
 
@@ -74,12 +62,6 @@ class MethodMethods(val method: Method) extends AnyVal with NodeExtension with H
     method.block
 
   override def location: NewLocation = {
-    LocationCreator(
-      method,
-      method.name,
-      method.label,
-      method.lineNumber,
-      method
-    )
+    LocationCreator(method, method.name, method.label, method.lineNumber, method)
   }
 }

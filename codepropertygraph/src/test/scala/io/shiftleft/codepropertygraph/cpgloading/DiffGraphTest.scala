@@ -17,9 +17,9 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
     withTestOdb { graph =>
       // setup existing graph
       // add x and y nodes to graph
-      val x = graph + (MethodParameterIn.Label, MethodParameterIn.Properties.Code -> "x")
-      val y = graph + (Identifier.Label, Identifier.Properties.Code -> "old y code")
-      val x2y = x --- (ReachingDef.Label, ReachingDef.Properties.Variable -> "true") --> y
+      val x   = graph + (MethodParameterIn.Label, MethodParameterIn.Properties.Code -> "x")
+      val y   = graph + (Identifier.Label, Identifier.Properties.Code               -> "old y code")
+      val x2y = x --- (ReachingDef.Label, ReachingDef.Properties.Variable           -> "true") --> y
 
       // make diffgraph
       val diffBuilder = DiffGraph.newBuilder
@@ -44,18 +44,18 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       // apply diffgraph with undoable = true
       val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, graph, true, None)
       val inverseDiffGraph = appliedDiffGraph.inverseDiffGraph.get
-      val changes = inverseDiffGraph.iterator.toList
+      val changes          = inverseDiffGraph.iterator.toList
       import DiffGraph.Change._
       val List(
-        SetEdgeProperty(_, PropertyNames.VARIABLE, "true"), // restore old edge property value
+        SetEdgeProperty(_, PropertyNames.VARIABLE, "true"),   // restore old edge property value
         SetNodeProperty(_, PropertyNames.CODE, "old y code"), // restore old Y property value
-        RemoveNodeProperty(_, PropertyNames.ORDER), // remove newly added property
-        RemoveEdge(_), // remove x -> a
-        RemoveEdge(_), // remove b -> c
-        RemoveEdge(_), // remove a -> b
-        RemoveNode(_), // remove c
-        RemoveNode(_), // remove b
-        RemoveNode(_) // remove a
+        RemoveNodeProperty(_, PropertyNames.ORDER),           // remove newly added property
+        RemoveEdge(_),                                        // remove x -> a
+        RemoveEdge(_),                                        // remove b -> c
+        RemoveEdge(_),                                        // remove a -> b
+        RemoveNode(_),                                        // remove c
+        RemoveNode(_),                                        // remove b
+        RemoveNode(_)                                         // remove a
       ) = changes
     }
   }
@@ -66,7 +66,7 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
       diffBuilder.addNode(createNewNode("a"))
       diffBuilder.addNode(createNewNode("b"))
       diffBuilder.addNode(createNewNode("c"))
-      val threeNodes = diffBuilder.build()
+      val threeNodes   = diffBuilder.build()
       val appliedDiff1 = DiffGraph.Applier.applyDiff(threeNodes, graph, true, None)
       graph.nodeCount shouldBe 3
       DiffGraph.Applier.unapplyDiff(graph, appliedDiff1.inverseDiffGraph.get)
@@ -85,14 +85,14 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
 
   "should choose keys from provided KeyPool" in {
     withTestOdb { graph =>
-      val builder = DiffGraph.newBuilder
-      val firstNode: NewNode = createNewNode("a")
+      val builder             = DiffGraph.newBuilder
+      val firstNode: NewNode  = createNewNode("a")
       val secondNode: NewNode = createNewNode("b")
-      val thirdNode: NewNode = createNewNode("c")
+      val thirdNode: NewNode  = createNewNode("c")
       builder.addNode(firstNode)
       builder.addNode(secondNode)
       builder.addNode(thirdNode)
-      val keyPool = Some(new IntervalKeyPool(20, 30))
+      val keyPool      = Some(new IntervalKeyPool(20, 30))
       val appliedGraph = DiffGraph.Applier.applyDiff(builder.build(), graph, true, keyPool)
       appliedGraph.nodeToGraphId(firstNode) shouldBe 20
       appliedGraph.nodeToGraphId(secondNode) shouldBe 21
@@ -104,12 +104,12 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
 
     "testing simple scenario" in withTestOdb { graph =>
       val diffBuilder = DiffGraph.newBuilder
-      val newNodeA = createNewNode("a")
-      val newNodeB = createNewNode("b")
+      val newNodeA    = createNewNode("a")
+      val newNodeB    = createNewNode("b")
       diffBuilder.addNode(newNodeA)
       diffBuilder.addNode(newNodeB)
       diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
-      val diff = diffBuilder.build()
+      val diff        = diffBuilder.build()
       val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true, None)
       graph.nodeCount shouldBe 2
       graph.edgeCount shouldBe 1
@@ -119,15 +119,15 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
 
     "testing more complex scenario" in withTestOdb { graph =>
       val diffBuilder = DiffGraph.newBuilder
-      val newNodeA = createNewNode("a")
-      val newNodeB = createNewNode("b")
+      val newNodeA    = createNewNode("a")
+      val newNodeB    = createNewNode("b")
       diffBuilder.addNode(newNodeA)
       diffBuilder.addNode(newNodeB)
       diffBuilder.addEdge(newNodeA, newNodeB, EdgeTypes.AST)
       val newNodeC = createNewNode("c")
       diffBuilder.addNode(newNodeC)
       diffBuilder.addEdge(newNodeB, newNodeC, EdgeTypes.AST)
-      val diff = diffBuilder.build()
+      val diff        = diffBuilder.build()
       val appliedDiff = DiffGraph.Applier.applyDiff(diff, graph, true, None)
       graph.nodeCount shouldBe 3
       graph.edgeCount shouldBe 2
@@ -138,9 +138,9 @@ class DiffGraphTest extends AnyWordSpec with Matchers {
 
   "adding two new edges to the same NewNode should still result in only adding one NewNode" in withTestOdb { graph =>
     val diffBuilder = DiffGraph.newBuilder
-    val newNodeA = createNewNode("a")
-    val newNodeB = createNewNode("b")
-    val newNodeC = createNewNode("c")
+    val newNodeA    = createNewNode("a")
+    val newNodeB    = createNewNode("b")
+    val newNodeC    = createNewNode("c")
     diffBuilder.addNode(newNodeA)
     diffBuilder.addNode(newNodeB)
     diffBuilder.addNode(newNodeC)

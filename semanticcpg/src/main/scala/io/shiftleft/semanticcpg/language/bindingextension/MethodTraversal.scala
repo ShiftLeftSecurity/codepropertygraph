@@ -7,14 +7,12 @@ import overflowdb.traversal._
 
 class MethodTraversal(val traversal: Traversal[Method]) extends AnyVal {
 
-  /**
-    * Traverse to type decl which have this method bound to it.
+  /** Traverse to type decl which have this method bound to it.
     */
   def bindingTypeDecl: Traversal[TypeDecl] =
     referencingBinding.bindingTypeDecl
 
-  /**
-    * Traverse to bindings which reference to this method.
+  /** Traverse to bindings which reference to this method.
     */
   def referencingBinding: Traversal[Binding] =
     traversal.in(EdgeTypes.REF).where(_.hasLabel(NodeTypes.BINDING)).cast[Binding]

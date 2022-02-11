@@ -6,15 +6,13 @@ import overflowdb.traversal._
 
 class NamespaceBlockTraversal(val traversal: Traversal[NamespaceBlock]) extends AnyVal {
 
-  /**
-    * Namespaces for namespace blocks.
-    * */
+  /** Namespaces for namespace blocks.
+    */
   def namespace: Traversal[Namespace] =
     traversal.out(EdgeTypes.REF).cast[Namespace]
 
-  /**
-    * The type declarations defined in this namespace
-    * */
+  /** The type declarations defined in this namespace
+    */
   def typeDecl: Traversal[TypeDecl] =
     traversal
       .out(EdgeTypes.AST)

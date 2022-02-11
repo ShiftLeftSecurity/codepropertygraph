@@ -8,11 +8,10 @@ import overflowdb.Node
 import overflowdb.traversal._
 import overflowdb.traversal.help.Doc
 
-/**
-  * Steps for all node types
+/** Steps for all node types
   *
   * This is the base class for all steps defined on
-  * */
+  */
 @help.Traversal(elementType = classOf[StoredNode])
 class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) extends AnyVal {
 
@@ -101,13 +100,11 @@ class NodeSteps[NodeType <: StoredNode](val traversal: Traversal[NodeType]) exte
 
   @Doc(info = "Tag node with (`tagName`, `tagValue`)", longInfo = "", example = """.newTagNodePair("key","val")""")
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePairTraversal = {
-    new NewTagNodePairTraversal(
-      traversal.map { node =>
-        NewTagNodePair()
-          .tag(NewTag().name(tagName).value(tagValue))
-          .node(node)
-      }
-    )
+    new NewTagNodePairTraversal(traversal.map { node =>
+      NewTagNodePair()
+        .tag(NewTag().name(tagName).value(tagValue))
+        .node(node)
+    })
   }
 
   @Doc(info = "Tags attached to this node")

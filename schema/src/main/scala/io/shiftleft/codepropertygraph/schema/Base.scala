@@ -6,7 +6,7 @@ import overflowdb.schema._
 
 object Base extends SchemaBase {
 
-  def index: Int = Int.MaxValue
+  def index: Int                           = Int.MaxValue
   override def providedByFrontend: Boolean = true
   override def description: String =
     """
@@ -138,10 +138,7 @@ object Base extends SchemaBase {
     // node base types
 
     val declaration = builder
-      .addNodeBaseType(
-        name = "DECLARATION",
-        comment = "This is the base node class for all declarations."
-      )
+      .addNodeBaseType(name = "DECLARATION", comment = "This is the base node class for all declarations.")
       .addProperties(name)
 
     // Edge types

@@ -17,9 +17,9 @@ class CfgNodeTraversalTests extends AnyWordSpec with Matchers {
     .withCallInMethod("methodForCfgTest", "call3")
     .withCustom { (graph, cpg) =>
       val method = cpg.method("methodForCfgTest").head
-      val call1 = cpg.call.name("call1").head
-      val call2 = cpg.call.name("call2").head
-      val call3 = cpg.call.name("call3").head
+      val call1  = cpg.call.name("call1").head
+      val call2  = cpg.call.name("call2").head
+      val call3  = cpg.call.name("call3").head
       graph.addEdge(method, call1, EdgeTypes.CFG)
       graph.addEdge(call1, call2, EdgeTypes.CFG)
       graph.addEdge(call2, call3, EdgeTypes.CFG)

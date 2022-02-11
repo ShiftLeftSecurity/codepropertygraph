@@ -13,14 +13,13 @@ object Schema2Json extends App {
   implicit val formats: AnyRef with Formats =
     Serialization.formats(NoTypeHints)
 
-  val json = ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
+  val json =
+    ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
 
   val outFileName = "/tmp/schema.json"
   better.files
     .File(outFileName)
-    .write(
-      compact(render(json))
-    )
+    .write(compact(render(json)))
   println(s"Schema written to: $outFileName")
 
   private def schemaName(nodeType: AbstractNodeType): String =
@@ -47,12 +46,12 @@ object Schema2Json extends App {
       .flatMap(_.definedIn)
       .distinct
       .map { info =>
-        val name = info.getDeclaringClass.getSimpleName
+        val name        = info.getDeclaringClass.getSimpleName
         val description = info.getDeclaringClass.getDeclaredMethod("description").invoke(null).asInstanceOf[String]
         val providedByFrontend =
           info.getDeclaringClass.getDeclaredMethod("providedByFrontend").invoke(null).asInstanceOf[Boolean]
-        ("name" -> name) ~
-          ("description" -> description) ~
+        ("name"                 -> name) ~
+          ("description"        -> description) ~
           ("providedByFrontend" -> providedByFrontend)
       }
   }
@@ -62,7 +61,7 @@ object Schema2Json extends App {
       .filterNot(x => isSchemaHidden(x.schemaInfo))
       .sortBy(x => (schemaIndex(x), x.name))
       .flatMap { nodeType =>
-        val baseTypeNames = nodeType.extendz.map(_.name)
+        val baseTypeNames    = nodeType.extendz.map(_.name)
         val allPropertyNames = nodeType.properties.filterNot(x => isSchemaHidden(x.schemaInfo)).map(_.name)
         val cardinalities =
           nodeType.properties.filterNot(x => isSchemaHidden(x.schemaInfo)).map(p => name(p.cardinality))
@@ -87,16 +86,16 @@ object Schema2Json extends App {
           case _ => List()
         }
         val json = ("name" -> nodeType.name) ~
-          ("comment" -> nodeType.comment) ~
-          ("extends" -> baseTypeNames) ~
-          ("allProperties" -> allPropertyNames) ~
-          ("cardinalities" -> cardinalities) ~
+          ("comment"             -> nodeType.comment) ~
+          ("extends"             -> baseTypeNames) ~
+          ("allProperties"       -> allPropertyNames) ~
+          ("cardinalities"       -> cardinalities) ~
           ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
-          ("properties" -> nonInheritedProperties) ~
-          ("schema" -> schName) ~
-          ("schemaIndex" -> schemaIndex(nodeType)) ~
-          ("isAbstract" -> nodeType.isInstanceOf[NodeBaseType]) ~
-          ("containedNodes" -> containedNodes)
+          ("properties"          -> nonInheritedProperties) ~
+          ("schema"              -> schName) ~
+          ("schemaIndex"         -> schemaIndex(nodeType)) ~
+          ("isAbstract"          -> nodeType.isInstanceOf[NodeBaseType]) ~
+          ("containedNodes"      -> containedNodes)
         Some(json)
       }
   }
@@ -108,9 +107,9 @@ object Schema2Json extends App {
       .flatMap { edge =>
         val schName = schemaName(edge.schemaInfo)
         Some(
-          ("name" -> edge.name) ~
+          ("name"      -> edge.name) ~
             ("comment" -> edge.comment) ~
-            ("schema" -> schName)
+            ("schema"  -> schName)
         )
       }
   }
@@ -122,9 +121,9 @@ object Schema2Json extends App {
       .flatMap { prop =>
         val schName = schemaName(prop.schemaInfo)
         Some(
-          ("name" -> prop.name) ~
+          ("name"      -> prop.name) ~
             ("comment" -> prop.comment) ~
-            ("schema" -> schName)
+            ("schema"  -> schName)
         )
       }
   }

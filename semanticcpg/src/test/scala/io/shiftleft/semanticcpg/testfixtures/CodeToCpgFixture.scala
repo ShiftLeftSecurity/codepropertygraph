@@ -11,8 +11,8 @@ import java.nio.file.Files
 
 class CodeToCpgFixture(val frontend: LanguageFrontend) extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
-  val code = ""
-  var cpg: Cpg = _
+  val code                   = ""
+  var cpg: Cpg               = _
   def passes(cpg: Cpg): Unit = createEnhancements(cpg)
 
   override def beforeAll(): Unit = {

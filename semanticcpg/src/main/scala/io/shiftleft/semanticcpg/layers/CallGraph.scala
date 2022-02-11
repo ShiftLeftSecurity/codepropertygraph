@@ -7,14 +7,10 @@ import io.shiftleft.semanticcpg.passes.callgraph.{DynamicCallLinker, MethodRefLi
 object CallGraph {
   val overlayName: String = "callgraph"
   val description: String = "Call graph layer"
-  def defaultOpts = new LayerCreatorOptions()
+  def defaultOpts         = new LayerCreatorOptions()
 
   def passes(cpg: Cpg): Iterator[CpgPassBase] = {
-    Iterator(
-      new MethodRefLinker(cpg),
-      new StaticCallLinker(cpg),
-      new DynamicCallLinker(cpg),
-    )
+    Iterator(new MethodRefLinker(cpg), new StaticCallLinker(cpg), new DynamicCallLinker(cpg))
   }
 
 }
@@ -22,13 +18,12 @@ object CallGraph {
 class CallGraph extends LayerCreator {
   override val overlayName: String = CallGraph.overlayName
   override val description: String = CallGraph.description
-  override val dependsOn = List(TypeRelations.overlayName)
+  override val dependsOn           = List(TypeRelations.overlayName)
 
   override def create(context: LayerCreatorContext, storeUndoInfo: Boolean): Unit = {
     val cpg = context.cpg
-    CallGraph.passes(cpg).zipWithIndex.foreach {
-      case (pass, index) =>
-        runPass(pass, context, storeUndoInfo, index)
+    CallGraph.passes(cpg).zipWithIndex.foreach { case (pass, index) =>
+      runPass(pass, context, storeUndoInfo, index)
     }
   }
 

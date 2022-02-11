@@ -17,10 +17,9 @@ object AccessPath {
   def isExtensionExcluded(exclusions: Seq[Elements], extension: Elements): Boolean =
     exclusions.exists(e => extension.elements.startsWith(e.elements))
 
-  /**
-    * This class contains operations on `Elements` that are only used in
-    * the `AccessPath` class and are not part of the public API of `Elements`
-    * */
+  /** This class contains operations on `Elements` that are only used in the `AccessPath` class and are not part of the
+    * public API of `Elements`
+    */
   private implicit class ElementsDecorations(el: Elements) {
 
     def noOvertaint(start: Int = 0, untilExclusive: Int = el.elements.length): Boolean = {
@@ -35,19 +34,16 @@ object AccessPath {
       true
     }
 
-    /**
-      * In all sane situations, invertibleTailLength is 0 or 1:
-      *   - we don't expect <i> &, because you cannot take the address of pointer+i
-      *   (can only take address of rvalue)
-      *   - we don't expect & <i>: The & should have collapsed against a preceding *.
-      * An example where this occurs is (&(ptr->field))[1], which becomes ptr: * field & <2> *
-      * This reads the _next_ field: It doesn't alias with ptr->field at all,
-      * but reads the next bytes in the struct, after field.
+    /** In all sane situations, invertibleTailLength is 0 or 1:
+      *   - we don't expect <i> &, because you cannot take the address of pointer+i (can only take address of rvalue)
+      *   - we don't expect & <i>: The & should have collapsed against a preceding *. An example where this occurs is
+      *     (&(ptr->field))[1], which becomes ptr: * field & <2> * This reads the _next_ field: It doesn't alias with
+      *     ptr->field at all, but reads the next bytes in the struct, after field.
       *
       * Such code is very un-idiomatic.
       */
     def invertibleTailLength: Int = {
-      var i = 0
+      var i         = 0
       val nElements = el.elements.length - 1
       while (nElements - i > -1) {
         el.elements(nElements - i) match {
@@ -78,14 +74,14 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
   }
 
   // for handling of invertible elements, cf AccessPathAlgebra.md
-  //FIXME: may need to process invertible tail of `other` better
+  // FIXME: may need to process invertible tail of `other` better
 
   def ++(other: Elements): Option[AccessPath] = {
     if (isExtensionExcluded(other)) None
     else Some(AccessPath(this.elements ++ other, this.truncateExclusions(other).exclusions))
   }
 
-  //FIXME: may need to process invertible tail of `other` better
+  // FIXME: may need to process invertible tail of `other` better
   def ++(other: AccessPath): Option[AccessPath] = {
     (this ++ other.elements).map { appended =>
       other.exclusions.foldLeft(appended) { case (ap, ex) => ap.addExclusion(ex) }
@@ -94,8 +90,11 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
 
   def matchFull(other: AccessPath): FullMatchResult = {
     val res = this.matchFull(other.elements)
-    if (res.extensionDiff.isEmpty && res.stepIntoPath.isDefined && other.isExtensionExcluded(
-          res.stepIntoPath.get.elements)) {
+    if (
+      res.extensionDiff.isEmpty && res.stepIntoPath.isDefined && other.isExtensionExcluded(
+        res.stepIntoPath.get.elements
+      )
+    ) {
       FullMatchResult(Some(this), None, Elements.empty)
     } else res
   }
@@ -110,24 +109,28 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       case MatchResult.VARIABLE_PREFIX_MATCH | MatchResult.VARIABLE_EXACT_MATCH =>
         FullMatchResult(Some(this), Some(AccessPath(matchDiff, this.exclusions)), Elements.empty)
       case MatchResult.EXTENDED_MATCH =>
-        FullMatchResult(Some(this.addExclusion(matchDiff)),
-                        Some(AccessPath(Elements.empty, exclusions).truncateExclusions(matchDiff)),
-                        matchDiff)
+        FullMatchResult(
+          Some(this.addExclusion(matchDiff)),
+          Some(AccessPath(Elements.empty, exclusions).truncateExclusions(matchDiff)),
+          matchDiff
+        )
       case MatchResult.VARIABLE_EXTENDED_MATCH =>
-        FullMatchResult(Some(this),
-                        Some(AccessPath(Elements.empty, exclusions).truncateExclusions(matchDiff)),
-                        matchDiff)
+        FullMatchResult(
+          Some(this),
+          Some(AccessPath(Elements.empty, exclusions).truncateExclusions(matchDiff)),
+          matchDiff
+        )
     }
   }
 
   def matchAndDiff(other: Elements): (MatchResult.MatchResult, Elements) = {
-    val thisTail = elements.invertibleTailLength
+    val thisTail  = elements.invertibleTailLength
     val otherTail = other.invertibleTailLength
-    val thisHead = elements.elements.length - thisTail
+    val thisHead  = elements.elements.length - thisTail
     val otherHead = other.elements.length - otherTail
 
-    val cmpUntil = scala.math.min(thisHead, otherHead)
-    var idx = 0
+    val cmpUntil    = scala.math.min(thisHead, otherHead)
+    var idx         = 0
     var overTainted = false
     while (idx < cmpUntil) {
       (elements.elements(idx), other.elements(idx)) match {
@@ -143,14 +146,10 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
     }
     var done = false
 
-    /**
-      *  We now try to greedily match more elements. We know that one of the two paths will
-      *  only contain invertible elements. The issue is the following:
-      *   prefix <1> & x
-      *   prefix <?> &
-      *  With greedy matching, we end up with a diff: x.
-      *  If we just did the invert-append algorithm, we would end up with a less precise
-      *   diff: * <?> <1> &  x == * <?> & x.
+    /** We now try to greedily match more elements. We know that one of the two paths will only contain invertible
+      * elements. The issue is the following: prefix <1> & x prefix <?> & With greedy matching, we end up with a diff:
+      * x. If we just did the invert-append algorithm, we would end up with a less precise diff: * <?> <1> & x == * <?>
+      * & x.
       */
     val minlen = scala.math.min(elements.elements.length, other.elements.length)
     while (!done && idx < minlen) {
@@ -171,9 +170,8 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       // prefix or exact
       val diff = Elements.inverted(other.elements.drop(idx)) ++ Elements.unnormalized(elements.elements.drop(idx))
 
-      /**
-        * we don't need to overtaint if thisTail has variable PointerShift: They can still
-        * get excluded e.g. suppose we track "a" "b" <?> and encounter "a" <4>.
+      /** we don't need to overtaint if thisTail has variable PointerShift: They can still get excluded e.g. suppose we
+        * track "a" "b" <?> and encounter "a" <4>.
         */
       overTainted |= !other.noOvertaint(otherHead)
       if (!overTainted & thisHead == otherHead) (MatchResult.EXACT_MATCH, diff)
@@ -182,13 +180,11 @@ case class AccessPath(elements: Elements, exclusions: Seq[Elements]) {
       else if (overTainted && thisHead != otherHead) (MatchResult.VARIABLE_PREFIX_MATCH, diff)
       else throw new RuntimeException()
     } else {
-      //extended
+      // extended
       val diff = Elements.inverted(elements.elements.drop(idx)) ++ Elements.unnormalized(other.elements.drop(idx))
 
-      /**
-        * we need to overtaint if any either otherTail or thisTail has variable PointerShift:
-        * e.g. suppose we track "a" <4> and encounter "a" "b" <?> "c", or suppose that we track "a"
-        * <?> and encounter "a" "b"
+      /** we need to overtaint if any either otherTail or thisTail has variable PointerShift: e.g. suppose we track "a"
+        * <4> and encounter "a" "b" <?> "c", or suppose that we track "a" <?> and encounter "a" "b"
         */
       overTainted |= !elements.noOvertaint(thisHead) | !other.noOvertaint(otherHead)
 
@@ -229,70 +225,61 @@ sealed trait MatchResult
 object MatchResult extends Enumeration {
   type MatchResult = Value
   val NO_MATCH, EXACT_MATCH, VARIABLE_EXACT_MATCH, PREFIX_MATCH, VARIABLE_PREFIX_MATCH, EXTENDED_MATCH,
-  VARIABLE_EXTENDED_MATCH = Value
+    VARIABLE_EXTENDED_MATCH = Value
 }
 
-/**
-  * Result of `matchFull` comparison
+/** Result of `matchFull` comparison
   *
-  * @param stepOverPath              the unaffected part of the access path. Some(this) for
-  *                                  no match, None for perfect match; may have additional
-  *                                  exclusions to this.
-  * @param stepIntoPath              The affected part of the access path, mapped to be relative to
-  *                                  this stepIntoPath.isDefined if and only if there is a match in
-  *                                  paths, i.e. if the call can affect the tracked variable at all.
-  *                                  Outside of overtainting, if stepIntoPath.isDefined &&
-  *                                  stepIntoPath.elements.nonEmpty then: path.elements ==
-  *                                  other.elements ++ path.matchFull(other).stepIntoPath.get.elements
-  *                                  extensionDiff.isEmpty
+  * @param stepOverPath
+  *   the unaffected part of the access path. Some(this) for no match, None for perfect match; may have additional
+  *   exclusions to this.
+  * @param stepIntoPath
+  *   The affected part of the access path, mapped to be relative to this stepIntoPath.isDefined if and only if there is
+  *   a match in paths, i.e. if the call can affect the tracked variable at all. Outside of overtainting, if
+  *   stepIntoPath.isDefined && stepIntoPath.elements.nonEmpty then: path.elements == other.elements ++
+  *   path.matchFull(other).stepIntoPath.get.elements extensionDiff.isEmpty
   *
-  * @param extensionDiff            extensionDiff is non empty if and only if a proper subset is
-  *                                 affected. Outside of over tainting, if extensionDiff is non empty then:
-  *                                 path.elements ++ path.matchFull(other).extensionDiff == other.elements
-  *                                 path.matchFull(other).stepIntoPath.get.elements.isEmpty
+  * @param extensionDiff
+  *   extensionDiff is non empty if and only if a proper subset is affected. Outside of over tainting, if extensionDiff
+  *   is non empty then: path.elements ++ path.matchFull(other).extensionDiff == other.elements
+  *   path.matchFull(other).stepIntoPath.get.elements.isEmpty
   *
   * Invariants:
   *   - Exclusions have no invertible tail
-  *   - Only paths without overTaint can have exclusions
-  *   TODO: Figure out sensible assertions to defend these invariants
+  *   - Only paths without overTaint can have exclusions TODO: Figure out sensible assertions to defend these invariants
   */
-case class FullMatchResult(stepOverPath: Option[AccessPath],
-                           stepIntoPath: Option[AccessPath],
-                           extensionDiff: Elements) {
+case class FullMatchResult(
+  stepOverPath: Option[AccessPath],
+  stepIntoPath: Option[AccessPath],
+  extensionDiff: Elements
+) {
   def hasMatch: Boolean = stepIntoPath.nonEmpty
 }
 
-/**
-  * For handling of invertible elements, cf AccessPathAlgebra.md.
-  * The general rule is that elements concatenate normally, except for:
+/** For handling of invertible elements, cf AccessPathAlgebra.md. The general rule is that elements concatenate
+  * normally, except for:
   *
-  *   Elements(&) ++ Elements(*) == Elements()
-  *   Elements(*) ++ Elements(&) == Elements()
-  *   Elements(<0>) == Elements()
-  *   Elements(<i>) ++ Elements(<j>) == Elements(<i+j>)
-  *   Elements(<?>) ++ Elements(<j>) == Elements(<?>)
-  *   Elements(<i>) ++ Elements(<?>) == Elements(<?>)
-  *   Elements(<?>) ++ Elements(<?>) == Elements(<?>)
+  * Elements(&) ++ Elements(*) == Elements() Elements(*) ++ Elements(&) == Elements() Elements(<0>) == Elements()
+  * Elements(<i>) ++ Elements(<j>) == Elements(<i+j>) Elements(<?>) ++ Elements(<j>) == Elements(<?>) Elements(<i>) ++
+  * Elements(<?>) == Elements(<?>) Elements(<?>) ++ Elements(<?>) == Elements(<?>)
   *
-  *   From this, once can see that <i>, * and & are invertible, <?> is idempotent and <0> is a
-  *   convoluted way of describing and empty sequence of tokens. Nevertheless, we mostly consider
-  *   * as noninvertible (because it is, in real computers!) and <?> as invertible
-  *   (because it is in real computers, we just don't know the offset)
+  * From this, once can see that <i>, * and & are invertible, <?> is idempotent and <0> is a convoluted way of
+  * describing and empty sequence of tokens. Nevertheless, we mostly consider * as noninvertible (because it is, in real
+  * computers!) and <?> as invertible (because it is in real computers, we just don't know the offset)
   *
-  *   Elements get a private constructor. Users should use the no-argument Elements.apply() factory
-  *   method to get an empty path, and the specific concat operators for building up pathes.
-  *   The Elements.normalized(iter) factory method serves to build this in bulk.
+  * Elements get a private constructor. Users should use the no-argument Elements.apply() factory method to get an empty
+  * path, and the specific concat operators for building up pathes. The Elements.normalized(iter) factory method serves
+  * to build this in bulk.
   *
-  *   The unnormalized factory method is more of an escape hatch.
+  * The unnormalized factory method is more of an escape hatch.
   *
-  *   The elements field should never be mutated outside of this file: We compare and hash Elements
-  *   by their contents, not by identity, and this breaks in case of mutation.
+  * The elements field should never be mutated outside of this file: We compare and hash Elements by their contents, not
+  * by identity, and this breaks in case of mutation.
   *
-  *   The reason for using a mutable Array instead of an immutable Vector is that this is the
-  *   lightest weight datastructure for the job.
+  * The reason for using a mutable Array instead of an immutable Vector is that this is the lightest weight
+  * datastructure for the job.
   *
-  *   The reason for making this non-private is simply that it is truly annoying to write wrappers
-  *   for all possible uses.
+  * The reason for making this non-private is simply that it is truly annoying to write wrappers for all possible uses.
   */
 // TODO: Figure out sensible assertions to defend invariant that the empty instance is
 // the only empty elements instance, i.e., assert that elems.isEmpty implies elems eq
@@ -333,12 +320,12 @@ object Elements {
 
   private def destructiveNormalized(elems: Array[AccessElement]): Elements = {
     var idxRight = 0
-    var idxLeft = -1
+    var idxLeft  = -1
     while (idxRight < elems.length) {
       val nextE = elems(idxRight)
       nextE match {
         case shift: PointerShift if shift.logicalOffset == 0 =>
-        //nothing to do
+        // nothing to do
         case _ =>
           if (idxLeft == -1) {
             idxLeft = 0
@@ -388,7 +375,7 @@ final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()
 
   override def compareTo(other: Elements): Int = {
     val until = scala.math.min(elements.length, other.elements.length)
-    var idx = 0
+    var idx   = 0
     while (idx < until) {
       elements(idx).compareTo(other.elements(idx)) match {
         case 0          =>
@@ -406,11 +393,11 @@ final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()
     if (elements.isEmpty) return otherElements
     if (otherElements.isEmpty) return this
 
-    var buf = None: Option[AccessElement]
+    var buf       = None: Option[AccessElement]
     val otherSize = otherElements.elements.length
-    var idx = 0
-    val until = scala.math.min(elements.length, otherSize)
-    var done = false
+    var idx       = 0
+    val until     = scala.math.min(elements.length, otherSize)
+    var done      = false
 
     while (idx < until & !done) {
       (elements(elements.length - idx - 1), otherElements.elements(idx)) match {
@@ -435,7 +422,7 @@ final class Elements(val elements: Array[AccessElement] = Array[AccessElement]()
           done = true
       }
     }
-    val sz = elements.length + otherSize - 2 * idx + (if (buf.isDefined) 1 else 0)
+    val sz  = elements.length + otherSize - 2 * idx + (if (buf.isDefined) 1 else 0)
     val res = Array.fill(sz) { null }: Array[AccessElement]
     elements.copyToArray(res, 0, elements.length - idx)
     if (buf.isDefined) {

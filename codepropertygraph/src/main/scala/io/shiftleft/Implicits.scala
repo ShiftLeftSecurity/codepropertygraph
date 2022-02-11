@@ -18,12 +18,10 @@ object Implicits {
     }
   }
 
-  /**
-    * A wrapper around a Java iterator that throws a proper NoSuchElementException.
+  /** A wrapper around a Java iterator that throws a proper NoSuchElementException.
     *
-    * Proper in this case means an exception with a stack trace.
-    * This is intended to be used as a replacement for next() on the iterators
-    * returned from TinkerPop since those are missing stack traces.
+    * Proper in this case means an exception with a stack trace. This is intended to be used as a replacement for next()
+    * on the iterators returned from TinkerPop since those are missing stack traces.
     */
   implicit class JavaIteratorDeco[T](val iterator: java.util.Iterator[T]) extends AnyVal {
     def nextChecked: T = {

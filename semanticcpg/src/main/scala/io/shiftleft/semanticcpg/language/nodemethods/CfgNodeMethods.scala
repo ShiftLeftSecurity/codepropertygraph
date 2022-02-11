@@ -10,9 +10,8 @@ import scala.jdk.CollectionConverters._
 
 class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
 
-  /**
-    * Textual representation of CFG node
-    * */
+  /** Textual representation of CFG node
+    */
   def repr: String =
     node match {
       case method: MethodBase                         => method.name
@@ -21,92 +20,74 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
       case call: CallRepr if !call.isInstanceOf[Call] => call.code
     }
 
-  /**
-    * Successors in the CFG
-    * */
+  /** Successors in the CFG
+    */
   def cfgNext: Traversal[CfgNode] = {
     Traversal.fromSingle(node).cfgNext
   }
 
-  /**
-    * Maps each node in the traversal to a traversal returning
-    * its n successors.
-    **/
+  /** Maps each node in the traversal to a traversal returning its n successors.
+    */
   def cfgNext(n: Int): Traversal[CfgNode] = n match {
     case 0 => Traversal()
     case _ => cfgNext.flatMap(x => List(x) ++ x.cfgNext(n - 1))
   }
 
-  /**
-    * Maps each node in the traversal to a traversal returning
-    * its n predecessors.
-    **/
+  /** Maps each node in the traversal to a traversal returning its n predecessors.
+    */
   def cfgPrev(n: Int): Traversal[CfgNode] = n match {
     case 0 => Traversal()
     case _ => cfgPrev.flatMap(x => List(x) ++ x.cfgPrev(n - 1))
   }
 
-  /**
-    * Predecessors in the CFG
-    * */
+  /** Predecessors in the CFG
+    */
   def cfgPrev: Traversal[CfgNode] = {
     Traversal.fromSingle(node).cfgPrev
   }
 
-  /**
-    * Recursively determine all nodes on which this
-    * CFG node is control-dependent.
-    * */
+  /** Recursively determine all nodes on which this CFG node is control-dependent.
+    */
   def controlledBy: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._cdgIn.asScala
     }
   }
 
-  /**
-    * Recursively determine all nodes which this
-    * CFG node controls
-    * */
+  /** Recursively determine all nodes which this CFG node controls
+    */
   def controls: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._cdgOut.asScala
     }
   }
 
-  /**
-    * Recursively determine all nodes by which
-    * this node is dominated
-    * */
+  /** Recursively determine all nodes by which this node is dominated
+    */
   def dominatedBy: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._dominateIn.asScala
     }
   }
 
-  /**
-    * Recursively determine all nodes which
-    * are dominated by this node
-    * */
+  /** Recursively determine all nodes which are dominated by this node
+    */
   def dominates: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._dominateOut.asScala
     }
   }
 
-  /**
-    * Recursively determine all nodes by which
-    * this node is post dominated
-    * */
+  /** Recursively determine all nodes by which this node is post dominated
+    */
   def postDominatedBy: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._postDominateIn.asScala
     }
   }
 
-  /**
-    * Recursively determine all nodes which
-    * are post dominated by this node
-    * */
+  /** Recursively determine all nodes which are post dominated by this node
+    */
   def postDominates: Traversal[CfgNode] = {
     expandExhaustively { v =>
       v._postDominateOut.asScala
@@ -115,20 +96,19 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
 
   private def expandExhaustively(expand: CfgNode => Iterator[StoredNode]): Traversal[CfgNode] = {
     var controllingNodes = List.empty[CfgNode]
-    var visited = Set.empty + node
-    var worklist = node :: Nil
+    var visited          = Set.empty + node
+    var worklist         = node :: Nil
 
     while (worklist.nonEmpty) {
       val vertex = worklist.head
       worklist = worklist.tail
 
-      expand(vertex).foreach {
-        case controllingNode: CfgNode =>
-          if (!visited.contains(controllingNode)) {
-            visited += controllingNode
-            controllingNodes = controllingNode :: controllingNodes
-            worklist = controllingNode :: worklist
-          }
+      expand(vertex).foreach { case controllingNode: CfgNode =>
+        if (!visited.contains(controllingNode)) {
+          visited += controllingNode
+          controllingNodes = controllingNode :: controllingNodes
+          worklist = controllingNode :: worklist
+        }
       }
     }
     Traversal.from(controllingNodes)
@@ -142,14 +122,11 @@ class CfgNodeMethods(val node: CfgNode) extends AnyVal with NodeExtension {
     case _: Expression | _: JumpTarget           => walkUpContains(node)
   }
 
-  /**
-    * Obtain hexadecimal string representation of lineNumber field.
+  /** Obtain hexadecimal string representation of lineNumber field.
     *
-    * Binary frontends store addresses in the lineNumber field as
-    * integers. For interoperability with other binary analysis
-    * tooling, it is convenient to allow retrieving these as
-    * hex strings.
-    * */
+    * Binary frontends store addresses in the lineNumber field as integers. For interoperability with other binary
+    * analysis tooling, it is convenient to allow retrieving these as hex strings.
+    */
   def address: Option[String] = {
     node.lineNumber.map(_.toLong.toHexString)
   }

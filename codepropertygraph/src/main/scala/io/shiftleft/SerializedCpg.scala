@@ -9,16 +9,13 @@ import java.util
 
 class SerializedCpg extends AutoCloseable {
 
-  /**
-    * We allow creating a dummy serialized CPG that does not do anything.
+  /** We allow creating a dummy serialized CPG that does not do anything.
     */
   private[this] var zipFileSystem: FileSystem = null
-  private[this] var counter = 0
+  private[this] var counter                   = 0
 
-  /**
-    * Create Serialized CPG from existing file. If the file does not exist,
-    * an empty Serialized CPG is created.
-    **/
+  /** Create Serialized CPG from existing file. If the file does not exist, an empty Serialized CPG is created.
+    */
   def this(filename: String) = {
     this()
     initZipFilesystem(filename)
@@ -33,14 +30,13 @@ class SerializedCpg extends AutoCloseable {
     // This ensures that the file is created if it does not exist
     env.put("create", "true")
     env.put("useTempFile", java.lang.Boolean.TRUE)
-    val fileUri = new File(filename).toURI
+    val fileUri   = new File(filename).toURI
     val outputUri = new URI("jar:" + fileUri.getScheme, null, fileUri.getPath, null)
     zipFileSystem = FileSystems.newFileSystem(outputUri, env)
   }
 
-  /**
-    * Add overlay graph named `name` to the zip file
-    **/
+  /** Add overlay graph named `name` to the zip file
+    */
   @throws[IOException]
   def addOverlay(overlay: GeneratedMessageV3, name: String): Unit = {
     if (!isEmpty) {
@@ -54,8 +50,8 @@ class SerializedCpg extends AutoCloseable {
 
   @throws[IOException]
   def addOverlay(overlays: Iterator[GeneratedMessageV3], name: String): Unit = {
-    overlays.zipWithIndex.foreach {
-      case (overlay, i) => addOverlay(overlay, name + "_" + i)
+    overlays.zipWithIndex.foreach { case (overlay, i) =>
+      addOverlay(overlay, name + "_" + i)
     }
   }
 

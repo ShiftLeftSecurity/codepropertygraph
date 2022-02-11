@@ -4,11 +4,13 @@ import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Binding extends SchemaBase {
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            typeSchema: Type.Schema,
-            methodSchema: Method.Schema,
-            callGraphSchema: CallGraph.Schema) =
+  def apply(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    typeSchema: Type.Schema,
+    methodSchema: Method.Schema,
+    callGraphSchema: CallGraph.Schema
+  ) =
     new Schema(builder, base, typeSchema, methodSchema, callGraphSchema)
 
   override def index: Int = 19
@@ -22,11 +24,13 @@ object Binding extends SchemaBase {
       |connected to the method it resolves to via an outgoing `REF` edge.
       |""".stripMargin
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               typeDeclSchema: Type.Schema,
-               methodSchema: Method.Schema,
-               callGraphSchema: CallGraph.Schema) {
+  class Schema(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    typeDeclSchema: Type.Schema,
+    methodSchema: Method.Schema,
+    callGraphSchema: CallGraph.Schema
+  ) {
     import base._
     import typeDeclSchema._
     import methodSchema._
@@ -58,15 +62,19 @@ object Binding extends SchemaBase {
       )
       .protoId(155)
 
-    typeDecl.addOutEdge(edge = binds,
-                        inNode = binding,
-                        cardinalityIn = EdgeType.Cardinality.One,
-                        stepNameIn = "bindingTypeDecl")
+    typeDecl.addOutEdge(
+      edge = binds,
+      inNode = binding,
+      cardinalityIn = EdgeType.Cardinality.One,
+      stepNameIn = "bindingTypeDecl"
+    )
 
-    binding.addOutEdge(edge = ref,
-                       inNode = method,
-                       cardinalityOut = EdgeType.Cardinality.One,
-                       stepNameOut = "boundMethod")
+    binding.addOutEdge(
+      edge = ref,
+      inNode = method,
+      cardinalityOut = EdgeType.Cardinality.One,
+      stepNameOut = "boundMethod"
+    )
 
   }
 

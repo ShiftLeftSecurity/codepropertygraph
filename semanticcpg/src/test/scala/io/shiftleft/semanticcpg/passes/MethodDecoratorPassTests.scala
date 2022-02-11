@@ -15,12 +15,12 @@ class MethodDecoratorPassTests extends AnyWordSpec with Matchers {
     val parameterIn = graph
       .+(
         NodeTypes.METHOD_PARAMETER_IN,
-        Properties.CODE -> "p1",
-        Properties.ORDER -> 1,
-        Properties.NAME -> "p1",
+        Properties.CODE                -> "p1",
+        Properties.ORDER               -> 1,
+        Properties.NAME                -> "p1",
         Properties.EVALUATION_STRATEGY -> EvaluationStrategies.BY_REFERENCE,
-        Properties.TYPE_FULL_NAME -> "some.Type",
-        Properties.LINE_NUMBER -> 10
+        Properties.TYPE_FULL_NAME      -> "some.Type",
+        Properties.LINE_NUMBER         -> 10
       )
       .asInstanceOf[MethodParameterIn]
 

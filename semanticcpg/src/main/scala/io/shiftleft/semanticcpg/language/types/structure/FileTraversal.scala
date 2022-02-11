@@ -4,9 +4,8 @@ import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import overflowdb.traversal._
 
-/**
-  * A compilation unit
-  * */
+/** A compilation unit
+  */
 class FileTraversal(val traversal: Traversal[File]) extends AnyVal {
 
   def namespace: Traversal[Namespace] =

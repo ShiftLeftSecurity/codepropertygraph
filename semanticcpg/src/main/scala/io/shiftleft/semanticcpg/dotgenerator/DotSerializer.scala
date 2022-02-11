@@ -13,14 +13,16 @@ object DotSerializer {
     }
 
   }
-  case class Edge(src: StoredNode,
-                  dst: StoredNode,
-                  srcVisible: Boolean = true,
-                  label: String = "",
-                  edgeType: String = "")
+  case class Edge(
+    src: StoredNode,
+    dst: StoredNode,
+    srcVisible: Boolean = true,
+    label: String = "",
+    edgeType: String = ""
+  )
 
   def dotGraph(root: AstNode, graph: Graph, withEdgeTypes: Boolean = false): String = {
-    val sb = namedGraphBegin(root)
+    val sb          = namedGraphBegin(root)
     val nodeStrings = graph.vertices.map(nodeToDot)
     val edgeStrings = graph.edges.map(e => edgeToDot(e, withEdgeTypes))
     sb.append((nodeStrings ++ edgeStrings).mkString("\n"))
@@ -37,18 +39,16 @@ object DotSerializer {
   }
 
   private def stringRepr(vertex: StoredNode): String = {
-    escape(
-      vertex match {
-        case call: Call               => (call.name, call.code).toString
-        case expr: Expression         => (expr.label, expr.code, toCfgNode(expr).code).toString
-        case method: Method           => (method.label, method.name).toString
-        case ret: MethodReturn        => (ret.label, ret.typeFullName).toString
-        case param: MethodParameterIn => ("PARAM", param.code).toString
-        case local: Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
-        case target: JumpTarget       => (target.label, target.name).toString
-        case _                        => ""
-      }
-    )
+    escape(vertex match {
+      case call: Call               => (call.name, call.code).toString
+      case expr: Expression         => (expr.label, expr.code, toCfgNode(expr).code).toString
+      case method: Method           => (method.label, method.name).toString
+      case ret: MethodReturn        => (ret.label, ret.typeFullName).toString
+      case param: MethodParameterIn => ("PARAM", param.code).toString
+      case local: Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
+      case target: JumpTarget       => (target.label, target.name).toString
+      case _                        => ""
+    })
   }
 
   private def toCfgNode(node: StoredNode): CfgNode = {

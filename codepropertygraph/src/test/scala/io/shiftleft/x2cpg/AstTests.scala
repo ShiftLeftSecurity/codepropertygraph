@@ -8,12 +8,12 @@ class AstTests extends AnyWordSpec with Matchers {
 
   "subTreeCopy" should {
 
-    val foo = NewCall().name("foo")
-    val bar = NewCall().name("bar").order(1)
-    val idName = NewIdentifier().name("idname").order(1)
-    val moo = NewCall().name("moo").order(1)
+    val foo        = NewCall().name("foo")
+    val bar        = NewCall().name("bar").order(1)
+    val idName     = NewIdentifier().name("idname").order(1)
+    val moo        = NewCall().name("moo").order(1)
     val callInCall = NewCall().name("callincall").order(1)
-    val leaf = NewIdentifier().name("leaf").order(1)
+    val leaf       = NewIdentifier().name("leaf").order(1)
 
     val testTree = Ast(foo)
       .withChildren(
@@ -21,7 +21,7 @@ class AstTests extends AnyWordSpec with Matchers {
           Ast(bar).withChild(Ast(idName)).withArgEdge(bar, idName),
           Ast(moo)
             .withChild(Ast(callInCall).withChild(Ast(leaf)).withArgEdge(callInCall, leaf))
-            .withArgEdge(moo, callInCall),
+            .withArgEdge(moo, callInCall)
         )
       )
       .withArgEdges(foo, List(bar, moo))

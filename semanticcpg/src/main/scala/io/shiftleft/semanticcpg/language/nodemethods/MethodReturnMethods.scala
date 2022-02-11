@@ -6,12 +6,6 @@ import io.shiftleft.semanticcpg.language.{HasLocation, LocationCreator, _}
 
 class MethodReturnMethods(val node: MethodReturn) extends AnyVal with NodeExtension with HasLocation {
   override def location: NewLocation = {
-    LocationCreator(
-      node,
-      "$ret",
-      node.label,
-      node.lineNumber,
-      node.method
-    )
+    LocationCreator(node, "$ret", node.label, node.lineNumber, node.method)
   }
 }

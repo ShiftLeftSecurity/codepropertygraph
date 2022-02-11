@@ -16,7 +16,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
-      val cpg = Cpg.emptyCpg
+      val cpg  = Cpg.emptyCpg
       val pool = keyPools.flatMap(_.headOption)
       class MyPass(cpg: Cpg) extends ConcurrentWriterCpgPass[String](cpg, "MyPass", pool) {
         override def generateParts(): Array[String] = Array("foo", "bar")
@@ -39,7 +39,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
       File.usingTemporaryFile("pass", ".zip") { file =>
         file.delete()
-        val filename = file.path.toString
+        val filename      = file.path.toString
         val serializedCpg = new SerializedCpg(filename)
         pass.createApplySerializeAndStore(serializedCpg, true)
         serializedCpg.close()
@@ -48,10 +48,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
       }
     }
 
-    val keyPools = Iterator(
-      new IntervalKeyPool(10, 20),
-      new IntervalKeyPool(30, 40)
-    )
+    val keyPools = Iterator(new IntervalKeyPool(10, 20), new IntervalKeyPool(30, 40))
 
     "use only the first KeyPool for createAndApply" in Fixture(Some(keyPools)) { (cpg, pass) =>
       pass.createAndApply()

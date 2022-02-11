@@ -25,9 +25,9 @@ class MethodParameterOutTraversal(val traversal: Traversal[MethodParameterOut]) 
   def argument: Traversal[Expression] =
     for {
       paramOut <- traversal
-      method <- paramOut.method
-      call <- method._callViaCallIn
-      arg <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
+      method   <- paramOut.method
+      call     <- method._callViaCallIn
+      arg      <- call._argumentOut.asScala.collect { case node: Expression with HasArgumentIndex => node }
       if arg.argumentIndex == paramOut.order
     } yield arg
 

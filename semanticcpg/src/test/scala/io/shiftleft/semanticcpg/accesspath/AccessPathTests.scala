@@ -32,11 +32,11 @@ class AccessPathTests extends AnyWordSpec {
             }
             case (IndirectionAccess, AddressOf) => {
 
-              /** We also collapse *&. This is WRONG (you cannot deref a pointer and then un-deref the result).
-                * However, it is sometimes valid as a syntactic construct, and the language should make sure that this
-                * only occurs in such settings.
-                * I.e. valid code should only produce such paths when their contraction is valid.
-                * We still treat * as un-invertible, though!
+              /** We also collapse *&. This is WRONG (you cannot deref a pointer and then un-deref the result). However,
+                * it is sometimes valid as a syntactic construct, and the language should make sure that this only
+                * occurs in such settings.
+                * I.e. valid code should only produce such paths when their contraction is valid. We still treat * as
+                * un-invertible, though!
                 */
               Elements.newIfNonEmpty(elements.dropRight(1))
             }
@@ -60,9 +60,9 @@ class AccessPathTests extends AnyWordSpec {
     Elements.normalized(elements)
   }
 
-  val V = VariableAccess
-  val I = IndirectionAccess
-  val A = AddressOf
+  val V  = VariableAccess
+  val I  = IndirectionAccess
+  val A  = AddressOf
   val VP = VariablePointerShift
 
   "Test matchAndDiff" in {
@@ -111,17 +111,17 @@ class AccessPathTests extends AnyWordSpec {
     E(A, 0, I) shouldBe E()
     E(2, -1, "a", I, 3, -5, 2, A) shouldBe E(1, "a")
     E(2) ++ E(-1) ++ E("a") ++ E(I) ++ E(3) ++ E(-5) ++ E(2) ++ E(A) shouldBe E(1, "a")
-    E(2) :+ PointerShift(-1) :+ ConstantAccess("a") :+ I :+ PointerShift(3) :+ PointerShift(-5) :+ PointerShift(2) :+ A shouldBe E(
-      1,
-      "a")
+    E(2) :+ PointerShift(-1) :+ ConstantAccess("a") :+ I :+ PointerShift(3) :+ PointerShift(-5) :+ PointerShift(
+      2
+    ) :+ A shouldBe E(1, "a")
 
     E("a", 3, A, 4, I, 4, I) ++ E(A, -4, A, -4, I, -3) shouldBe E("a")
     Elements.inverted(E("a", 3, A, 4, I, 4, I).elements.drop(1)) shouldBe E(A, -4, A, -4, I, -3)
     E(A, 1, VP, 2, I) shouldBe E(A, VP, I)
-    E(I, "a", A) ++ E(I) shouldBe E(I, "a") //GEP
+    E(I, "a", A) ++ E(I) shouldBe E(I, "a") // GEP
   }
   "Test matchAndDiff with inverses" in {
-    //exact:
+    // exact:
     AccessPath(E("a", 1, A, 2), Seq(E("c")))
       .matchAndDiff(E("a", 8, A, 16)) shouldBe (EXACT_MATCH, E(-16, I, -7, A, 2))
     AccessPath(E("a", 1, A, 2), Seq(E("c")))
@@ -144,7 +144,7 @@ class AccessPathTests extends AnyWordSpec {
 
     AccessPath(E("a", 1, "b", A, 2), Seq(E("c")))
       .matchAndDiff(E("a", 8, A, 16)) shouldBe (PREFIX_MATCH, E(-16, I, -7, "b", A, 2))
-    //revisit: could be exact
+    // revisit: could be exact
     AccessPath(E("a", VP, "b", A, 2), Seq(E("c")))
       .matchAndDiff(E("a", 8, A, 16)) shouldBe (VARIABLE_PREFIX_MATCH, E(-16, I, "b", A, 2))
     AccessPath(E("a", 1, "b", A, 2), Seq(E("c")))
@@ -153,35 +153,40 @@ class AccessPathTests extends AnyWordSpec {
     // example where we track effectively nothing
     AccessPath(E("a", 1, A, 2), Seq(E(-2, I)))
       .matchAndDiff(E("a", "b", 8, A, 16)) shouldBe (NO_MATCH, E())
-    //suboptimal:
+    // suboptimal:
     AccessPath(E("a", 1, A, 2), Seq(E(-2, I)))
       .matchAndDiff(E("a", VP, A, 16, I)) shouldBe (VARIABLE_EXTENDED_MATCH, E(14, I))
   }
 
   "Test matchFull" in {
-    //no match
+    // no match
     AccessPath(E("a", "b"), Seq(E("c")))
-      .matchFull(AccessPath(E("C"), Seq())) shouldBe FullMatchResult(stepOverPath =
-                                                                       Some(AccessPath(E("a", "b"), Seq(E("c")))),
-                                                                     stepIntoPath = None,
-                                                                     extensionDiff = E())
-    //prefix
+      .matchFull(AccessPath(E("C"), Seq())) shouldBe FullMatchResult(
+      stepOverPath = Some(AccessPath(E("a", "b"), Seq(E("c")))),
+      stepIntoPath = None,
+      extensionDiff = E()
+    )
+    // prefix
     AccessPath(E("a", "b"), E("c") :: Nil)
-      .matchFull(E("a")) shouldBe FullMatchResult(stepOverPath = None,
-                                                  stepIntoPath = Some(AccessPath(E("b"), E("c") :: Nil)),
-                                                  extensionDiff = E())
-    //extension
+      .matchFull(E("a")) shouldBe FullMatchResult(
+      stepOverPath = None,
+      stepIntoPath = Some(AccessPath(E("b"), E("c") :: Nil)),
+      extensionDiff = E()
+    )
+    // extension
     AccessPath(E("a", "b"), E("c", "d") :: Nil)
       .matchFull(AccessPath(E("a", "b", "c"), Nil)) shouldBe FullMatchResult(
       stepOverPath = Some(AccessPath(E("a", "b"), E("c") :: Nil)),
       stepIntoPath = Some(AccessPath(E(), E("d") :: Nil)),
-      extensionDiff = E("c"))
-    //rhs has exclusions
+      extensionDiff = E("c")
+    )
+    // rhs has exclusions
     AccessPath(E("a", "b"), E("c") :: Nil)
       .matchFull(AccessPath(E("a"), E("b") :: Nil)) shouldBe FullMatchResult(
       stepOverPath = Some(AccessPath(E("a", "b"), E("c") :: Nil)),
       stepIntoPath = None,
-      extensionDiff = E())
+      extensionDiff = E()
+    )
   }
 
 }

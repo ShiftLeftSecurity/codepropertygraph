@@ -6,20 +6,18 @@ import scala.collection.mutable
 
 class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
 
-  /**
-    * Calculates the immediate dominators of all CFG nodes reachable from cfgEntry.
-    * Since the cfgEntry does not have an immediate dominator, it has no entry in the
-    * return map.
+  /** Calculates the immediate dominators of all CFG nodes reachable from cfgEntry. Since the cfgEntry does not have an
+    * immediate dominator, it has no entry in the return map.
     *
-    * The algorithm is from: "A Simple, Fast Dominance Algorithm" from
-    * "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy".
+    * The algorithm is from: "A Simple, Fast Dominance Algorithm" from "Keith D. Cooper, Timothy J. Harvey, and Ken
+    * Kennedy".
     */
   def calculate(cfgEntry: NodeType): mutable.LinkedHashMap[NodeType, NodeType] = {
-    val UNDEFINED = -1
-    def expand(x: NodeType) = { adapter.successors(x).iterator }
+    val UNDEFINED               = -1
+    def expand(x: NodeType)     = { adapter.successors(x).iterator }
     def expandBack(x: NodeType) = { adapter.predecessors(x).iterator }
 
-    val postOrderNumbering = NodeOrdering.postOrderNumbering(cfgEntry, expand)
+    val postOrderNumbering      = NodeOrdering.postOrderNumbering(cfgEntry, expand)
     val nodesInReversePostOrder = NodeOrdering.reverseNodeList(postOrderNumbering.toList).filterNot(_ == cfgEntry)
     // Index of each node into dominators array.
     val indexOf = postOrderNumbering.withDefaultValue(UNDEFINED)
@@ -30,10 +28,9 @@ class CfgDominator[NodeType](adapter: CfgAdapter[NodeType]) {
     val dominators = Array.fill(indexOf.size)(UNDEFINED)
     dominators(indexOf(cfgEntry)) = indexOf(cfgEntry)
 
-    /**
-      * Retrieve index of immediate dominator for node with given index. If the
-      * index is `UNDEFINED`, UNDEFINED is returned.
-      * */
+    /** Retrieve index of immediate dominator for node with given index. If the index is `UNDEFINED`, UNDEFINED is
+      * returned.
+      */
     def safeDominators(index: Int): Int = {
       if (index != UNDEFINED) {
         dominators(index)

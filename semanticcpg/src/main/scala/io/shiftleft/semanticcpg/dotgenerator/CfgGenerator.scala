@@ -13,14 +13,14 @@ class CfgGenerator {
   val edgeType: String = EdgeTypes.CFG
 
   def generate(methodNode: Method): Graph = {
-    val vertices = methodNode.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
+    val vertices          = methodNode.cfgNode.l ++ List(methodNode, methodNode.methodReturn) ++ methodNode.parameter.l
     val verticesToDisplay = vertices.filter(cfgNodeShouldBeDisplayed)
 
     def edgesToDisplay(srcNode: StoredNode, visited: List[StoredNode] = List()): List[Edge] = {
       if (visited.contains(srcNode)) {
         List()
       } else {
-        val children = expand(srcNode).filter(x => vertices.contains(x.dst))
+        val children             = expand(srcNode).filter(x => vertices.contains(x.dst))
         val (visible, invisible) = children.partition(x => cfgNodeShouldBeDisplayed(x.dst))
         visible.toList ++ invisible.toList.flatMap { n =>
           edgesToDisplay(n.dst, visited ++ List(srcNode)).map(y => Edge(srcNode, y.dst, edgeType = edgeType))

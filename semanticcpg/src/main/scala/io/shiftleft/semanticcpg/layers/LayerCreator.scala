@@ -15,18 +15,17 @@ abstract class LayerCreator {
   val description: String
   val dependsOn: List[String] = List()
 
-  /**
-    * If the LayerCreator modifies the CPG, then we store its name
-    * in the CPGs metadata and disallow rerunning the creator,
-    * that is, applying the layer twice.
-    * */
+  /** If the LayerCreator modifies the CPG, then we store its name in the CPGs metadata and disallow rerunning the
+    * creator, that is, applying the layer twice.
+    */
   protected val modifiesCpg: Boolean = true
 
   def run(context: LayerCreatorContext, storeUndoInfo: Boolean = false): Unit = {
     val appliedOverlays = Overlays.appliedOverlays(context.cpg).toSet
     if (!dependsOn.toSet.subsetOf(appliedOverlays)) {
       logger.warn(
-        s"${this.getClass.getName} depends on $dependsOn but CPG only has $appliedOverlays - skipping creation")
+        s"${this.getClass.getName} depends on $dependsOn but CPG only has $appliedOverlays - skipping creation"
+      )
     } else if (appliedOverlays.contains(overlayName)) {
       logger.warn(s"The overlay $overlayName already exists - skipping creation")
     } else {
@@ -44,10 +43,12 @@ abstract class LayerCreator {
     }
   }
 
-  protected def runPass(pass: CpgPassBase,
-                        context: LayerCreatorContext,
-                        storeUndoInfo: Boolean,
-                        index: Int = 0): Unit = {
+  protected def runPass(
+    pass: CpgPassBase,
+    context: LayerCreatorContext,
+    storeUndoInfo: Boolean,
+    index: Int = 0
+  ): Unit = {
     val serializedCpg = initSerializedCpg(context.outputDir, pass.name, index)
     pass.createApplySerializeAndStore(serializedCpg, inverse = storeUndoInfo)
     serializedCpg.close()

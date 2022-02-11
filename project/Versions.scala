@@ -2,7 +2,7 @@
 object Versions {
   val overflowdb = parseVersion("overflowdbVersion")
   val scalatest  = "3.2.10"
-  val json4s = "4.0.3"
+  val json4s     = "4.0.3"
 
   private def parseVersion(key: String): String = {
     val versionRegexp = s""".*val $key[ ]+=[ ]?"(.*?)"""".r
@@ -14,7 +14,8 @@ object Versions {
       .toList
     assert(
       versions.size == 1,
-      s"""unable to extract $key from build.sbt, expected exactly one line like `val $key= "0.0.0-SNAPSHOT"`.""")
+      s"""unable to extract $key from build.sbt, expected exactly one line like `val $key= "0.0.0-SNAPSHOT"`."""
+    )
     versions.head
   }
 

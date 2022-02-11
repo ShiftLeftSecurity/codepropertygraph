@@ -16,8 +16,7 @@ private[cpgloading] object CpgOverlayLoader {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  /**
-    * Load overlays stored in the file with the name `filename`.
+  /** Load overlays stored in the file with the name `filename`.
     */
   def load(filename: String, baseCpg: Cpg): Unit = {
     val applier = new CpgOverlayApplier(baseCpg.graph)
@@ -26,10 +25,9 @@ private[cpgloading] object CpgOverlayLoader {
       .map { overlays =>
         overlays.foreach(applier.applyDiff)
       }
-      .recover {
-        case e: IOException =>
-          logger.error("Failed to load overlay from " + filename, e)
-          Nil
+      .recover { case e: IOException =>
+        logger.error("Failed to load overlay from " + filename, e)
+        Nil
       }
       .get
   }
@@ -42,20 +40,19 @@ private[cpgloading] object CpgOverlayLoader {
           DiffGraph.Applier.applyDiff(DiffGraph.fromProto(diffGraph, baseCpg), baseCpg)
         }
       }
-      .recover {
-        case e: IOException =>
-          logger.error("Failed to load overlay from " + filename, e)
-          Nil
+      .recover { case e: IOException =>
+        logger.error("Failed to load overlay from " + filename, e)
+        Nil
       }
       .get
   }
 
 }
 
-/**
-  * Component to merge CPG overlay into existing graph
+/** Component to merge CPG overlay into existing graph
   *
-  * @param graph the existing (loaded) graph to apply overlay to
+  * @param graph
+  *   the existing (loaded) graph to apply overlay to
   */
 private class CpgOverlayApplier(graph: Graph) {
   private val overlayNodeIdToSrcGraphNode: mutable.HashMap[Long, Node] = mutable.HashMap.empty
@@ -63,8 +60,7 @@ private class CpgOverlayApplier(graph: Graph) {
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit val interner: StringInterner = StringInterner.noop
 
-  /**
-    * Applies diff to existing (loaded) Graph
+  /** Applies diff to existing (loaded) Graph
     */
   def applyDiff(overlay: CpgOverlay): Unit = {
     val inverseBuilder: DiffGraph.InverseBuilder = DiffGraph.InverseBuilder.noop
@@ -110,7 +106,7 @@ private class CpgOverlayApplier(graph: Graph) {
   private def addNodeProperties(overlay: CpgOverlay, inverseBuilder: DiffGraph.InverseBuilder): Unit = {
     overlay.getNodePropertyList.asScala.foreach { additionalNodeProperty =>
       val property = additionalNodeProperty.getProperty
-      val odbNode = getOdbNodeForOverlayId(additionalNodeProperty.getNodeId)
+      val odbNode  = getOdbNodeForOverlayId(additionalNodeProperty.getNodeId)
       addPropertyToElement(odbNode, property.getName.name, property.getValue, inverseBuilder)
     }
   }
@@ -131,10 +127,12 @@ private class CpgOverlayApplier(graph: Graph) {
     }
   }
 
-  private def addPropertyToElement(element: Element,
-                                   propertyName: String,
-                                   propertyValue: PropertyValue,
-                                   inverseBuilder: DiffGraph.InverseBuilder): Unit = {
+  private def addPropertyToElement(
+    element: Element,
+    propertyName: String,
+    propertyValue: PropertyValue,
+    inverseBuilder: DiffGraph.InverseBuilder
+  ): Unit = {
     import PropertyValue.ValueCase._
     element match {
       case storedNode: StoredNode =>

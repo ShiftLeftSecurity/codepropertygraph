@@ -4,7 +4,7 @@ libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overf
 
 Compile / sourceGenerators += Projects.schema / Compile / generateDomainClasses
 
-/* generated sources occasionally have some warnings.. 
+/* generated sources occasionally have some warnings..
  * we're trying to minimise them on a best effort basis, but don't want
  * to fail the build because of them
  */

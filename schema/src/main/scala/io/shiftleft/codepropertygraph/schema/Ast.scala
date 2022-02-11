@@ -8,7 +8,7 @@ import overflowdb.storage.ValueTypes
 
 object Ast extends SchemaBase {
 
-  def index: Int = 7
+  def index: Int                           = 7
   override def providedByFrontend: Boolean = true
 
   override def description: String =
@@ -29,20 +29,24 @@ object Ast extends SchemaBase {
       |
       |""".stripMargin
 
-  def apply(builder: SchemaBuilder,
-            base: Base.Schema,
-            namespaces: Namespace.Schema,
-            methodSchema: Method.Schema,
-            typeSchema: Type.Schema,
-            fs: FileSystem.Schema) =
+  def apply(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    namespaces: Namespace.Schema,
+    methodSchema: Method.Schema,
+    typeSchema: Type.Schema,
+    fs: FileSystem.Schema
+  ) =
     new Schema(builder, base, namespaces, methodSchema, typeSchema, fs)
 
-  class Schema(builder: SchemaBuilder,
-               base: Base.Schema,
-               namespaces: Namespace.Schema,
-               methodSchema: Method.Schema,
-               typeSchema: Type.Schema,
-               fs: FileSystem.Schema) {
+  class Schema(
+    builder: SchemaBuilder,
+    base: Base.Schema,
+    namespaces: Namespace.Schema,
+    methodSchema: Method.Schema,
+    typeSchema: Type.Schema,
+    fs: FileSystem.Schema
+  ) {
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     import methodSchema._
     import base._
@@ -203,24 +207,28 @@ object Ast extends SchemaBase {
         .protoId(1),
       Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueTypes.STRING, comment = "The public modifier")
         .protoId(2),
-      Constant(name = "PROTECTED",
-               value = "PROTECTED",
-               valueType = ValueTypes.STRING,
-               comment = "The protected modifier").protoId(3),
+      Constant(
+        name = "PROTECTED",
+        value = "PROTECTED",
+        valueType = ValueTypes.STRING,
+        comment = "The protected modifier"
+      ).protoId(3),
       Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueTypes.STRING, comment = "The private modifier")
         .protoId(4),
       Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueTypes.STRING, comment = "The abstract modifier")
         .protoId(5),
       Constant(name = "NATIVE", value = "NATIVE", valueType = ValueTypes.STRING, comment = "The native modifier")
         .protoId(6),
-      Constant(name = "CONSTRUCTOR",
-               value = "CONSTRUCTOR",
-               valueType = ValueTypes.STRING,
-               comment = "The constructor modifier").protoId(7),
+      Constant(
+        name = "CONSTRUCTOR",
+        value = "CONSTRUCTOR",
+        valueType = ValueTypes.STRING,
+        comment = "The constructor modifier"
+      ).protoId(7),
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueTypes.STRING, comment = "The virtual modifier")
         .protoId(8),
       Constant(name = "INTERNAL", value = "INTERNAL", valueType = ValueTypes.STRING, comment = "The internal modifier")
-        .protoId(9),
+        .protoId(9)
     )
 
     val modifier: NodeType = builder
@@ -274,10 +282,7 @@ object Ast extends SchemaBase {
       .addProperties(typeFullName)
 
     val typeRef: NodeType = builder
-      .addNodeType(
-        name = "TYPE_REF",
-        comment = "Reference to a type/class"
-      )
+      .addNodeType(name = "TYPE_REF", comment = "Reference to a type/class")
       .protoId(335)
       .addProperties(typeFullName)
 
@@ -331,10 +336,12 @@ object Ast extends SchemaBase {
         .protoId(7),
       Constant(name = "ELSE", value = "ELSE", valueType = ValueTypes.STRING, comment = "Represents an else statement")
         .protoId(8),
-      Constant(name = "SWITCH",
-               value = "SWITCH",
-               valueType = ValueTypes.STRING,
-               comment = "Represents a switch statement").protoId(9),
+      Constant(
+        name = "SWITCH",
+        value = "SWITCH",
+        valueType = ValueTypes.STRING,
+        comment = "Represents a switch statement"
+      ).protoId(9),
       Constant(name = "TRY", value = "TRY", valueType = ValueTypes.STRING, comment = "Represents a try statement")
         .protoId(10),
       Constant(name = "THROW", value = "THROW", valueType = ValueTypes.STRING, comment = "Represents a throw statement")
@@ -373,10 +380,7 @@ object Ast extends SchemaBase {
     // Edge types
 
     val ast = builder
-      .addEdgeType(
-        name = "AST",
-        comment = "This edge connects a parent node to its child in the syntax tree."
-      )
+      .addEdgeType(name = "AST", comment = "This edge connects a parent node to its child in the syntax tree.")
       .protoId(3)
 
     val condition = builder
@@ -393,11 +397,13 @@ object Ast extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeParameter)
-      .addOutEdge(edge = ast,
-                  inNode = member,
-                  cardinalityIn = Cardinality.One,
-                  stepNameIn = "typeDecl",
-                  stepNameInDoc = "The type declaration this member is defined in")
+      .addOutEdge(
+        edge = ast,
+        inNode = member,
+        cardinalityIn = Cardinality.One,
+        stepNameIn = "typeDecl",
+        stepNameInDoc = "The type declaration this member is defined in"
+      )
       .addOutEdge(edge = ast, inNode = modifier, cardinalityIn = Cardinality.One)
 
     method
@@ -447,10 +453,12 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = ast, inNode = typeRef)
       .addOutEdge(edge = ast, inNode = ret)
       .addOutEdge(edge = ast, inNode = block, cardinalityIn = Cardinality.One)
-      .addOutEdge(edge = ast,
-                  inNode = local,
-                  stepNameIn = "definingBlock",
-                  stepNameInDoc = "The block in which local is declared.")
+      .addOutEdge(
+        edge = ast,
+        inNode = local,
+        stepNameIn = "definingBlock",
+        stepNameInDoc = "The block in which local is declared."
+      )
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
       .addOutEdge(edge = ast, inNode = controlStructure)
@@ -580,10 +588,12 @@ object Ast extends SchemaBase {
 
     block
       .addOutEdge(edge = ast, inNode = callNode)
-      .addOutEdge(edge = ast,
-                  inNode = local,
-                  stepNameOut = "local",
-                  stepNameOutDoc = "Traverse to locals of this block.")
+      .addOutEdge(
+        edge = ast,
+        inNode = local,
+        stepNameOut = "local",
+        stepNameOutDoc = "Traverse to locals of this block."
+      )
 
     // To refactor
 

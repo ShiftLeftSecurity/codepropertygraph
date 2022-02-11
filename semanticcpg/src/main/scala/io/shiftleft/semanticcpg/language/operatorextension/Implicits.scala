@@ -22,10 +22,10 @@ trait Implicits {
   implicit def toAssignmentTrav(steps: Traversal[OpNodes.Assignment]): AssignmentTraversal =
     new AssignmentTraversal(steps)
 
-  implicit def toTargetExt(call: Expression): TargetMethods = new TargetMethods(call)
+  implicit def toTargetExt(call: Expression): TargetMethods                = new TargetMethods(call)
   implicit def toTargetTrav(steps: Traversal[Expression]): TargetTraversal = new TargetTraversal(steps)
 
-  implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A] = new OpAstNodeMethods(node)
+  implicit def toOpAstNodeExt[A <: AstNode](node: A): OpAstNodeMethods[A]                = new OpAstNodeMethods(node)
   implicit def toOpAstNodeTrav[A <: AstNode](steps: Traversal[A]): OpAstNodeTraversal[A] = new OpAstNodeTraversal(steps)
 
 }

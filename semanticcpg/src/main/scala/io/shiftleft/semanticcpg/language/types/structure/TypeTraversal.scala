@@ -7,86 +7,72 @@ import overflowdb.traversal.{Traversal, toElementTraversal, toNodeTraversal}
 
 class TypeTraversal(val traversal: Traversal[Type]) extends AnyVal {
 
-  /**
-    * Namespaces in which the corresponding type declaration is defined.
-    * */
+  /** Namespaces in which the corresponding type declaration is defined.
+    */
   def namespace: Traversal[Namespace] =
     referencedTypeDecl.namespace
 
-  /**
-    * Methods defined on the corresponding type declaration.
-    * */
+  /** Methods defined on the corresponding type declaration.
+    */
   def method: Traversal[Method] =
     referencedTypeDecl.method
 
-  /**
-    * Filter for types whos corresponding type declaration is in the analyzed jar.
-    * */
+  /** Filter for types whos corresponding type declaration is in the analyzed jar.
+    */
   def internal: Traversal[Type] =
     traversal.where(_.referencedTypeDecl.internal)
 
-  /**
-    * Filter for types whos corresponding type declaration is not in the analyzed jar.
-    * */
+  /** Filter for types whos corresponding type declaration is not in the analyzed jar.
+    */
   def external: Traversal[Type] =
     traversal.where(_.referencedTypeDecl.external)
 
-  /**
-    * Member variables of the corresponding type declaration.
-    * */
+  /** Member variables of the corresponding type declaration.
+    */
   def member: Traversal[Member] =
     referencedTypeDecl.member
 
-  /**
-    * Direct base types of the corresponding type declaration in the inheritance graph.
-    * */
+  /** Direct base types of the corresponding type declaration in the inheritance graph.
+    */
   def baseType: Traversal[Type] =
     referencedTypeDecl.baseType
 
-  /**
-    * Direct and transitive base types of the corresponding type declaration.
-    * */
+  /** Direct and transitive base types of the corresponding type declaration.
+    */
   def baseTypeTransitive: Traversal[Type] =
     traversal.repeat(_.baseType)(_.emitAllButFirst)
 
-  /**
-    * Direct derived types.
-    * */
+  /** Direct derived types.
+    */
   def derivedType: Traversal[Type] =
     derivedTypeDecl.referencingType
 
-  /**
-    * Direct and transitive derived types.
-    * */
+  /** Direct and transitive derived types.
+    */
   def derivedTypeTransitive: Traversal[Type] =
     traversal.repeat(_.derivedType)(_.emitAllButFirst)
 
-  /**
-    * Type declaration which is referenced by this type.
+  /** Type declaration which is referenced by this type.
     */
   def referencedTypeDecl: Traversal[TypeDecl] =
     traversal.out(EdgeTypes.REF).cast[TypeDecl]
 
-  /**
-    * Type declarations which derive from this type.
+  /** Type declarations which derive from this type.
     */
   def derivedTypeDecl: Traversal[TypeDecl] =
     traversal.in(EdgeTypes.INHERITS_FROM).cast[TypeDecl]
 
-  /**
-    * Direct alias type declarations.
+  /** Direct alias type declarations.
     */
   def aliasTypeDecl: Traversal[TypeDecl] =
     traversal.in(EdgeTypes.ALIAS_OF).cast[TypeDecl]
 
-  /**
-    * Direct alias types.
+  /** Direct alias types.
     */
   def aliasType: Traversal[Type] =
     aliasTypeDecl.referencingType
 
-  /**
-    * Direct and transitive alias types.
+  /** Direct and transitive alias types.
     */
   def aliasTypeTransitive: Traversal[Type] =
     traversal.repeat(_.aliasType)(_.emitAllButFirst)

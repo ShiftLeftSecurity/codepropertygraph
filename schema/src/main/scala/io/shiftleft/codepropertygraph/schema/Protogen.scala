@@ -20,11 +20,12 @@ object Protogen {
         goPackage = "github.com/ShiftLeftSecurity/proto/cpg",
         csharpNamespace = "io.shiftleft.proto.cpg",
         uncommonProtoEnumNameMappings = Map(
-          "Languages" -> "LANGUAGES",
+          "Languages"             -> "LANGUAGES",
           "ControlStructureTypes" -> "CONTROL_STRUCTURE_TYPES",
-          "Frameworks" -> "FRAMEWORKS",
+          "Frameworks"            -> "FRAMEWORKS"
         )
-      ))
+      )
+    )
     new CpgSchema(builder)
 
     new ProtoGen(builder.build).run(outputDir)

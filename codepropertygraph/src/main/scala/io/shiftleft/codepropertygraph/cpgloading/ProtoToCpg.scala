@@ -32,7 +32,7 @@ object ProtoToCpg {
 class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
   import ProtoToCpg._
   private val nodeFilter = new NodeFilter
-  private val odbGraph = Cpg.withConfig(overflowConfig).graph
+  private val odbGraph   = Cpg.withConfig(overflowConfig).graph
   // TODO use centralised string interner everywhere, maybe move to odb core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
@@ -88,7 +88,8 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
     odbGraph
       .nodeOption(nodeId)
       .getOrElse(
-        throw new NoSuchElementException("Couldn't find src|dst node " + nodeId + " for edge of type " + typ.name))
+        throw new NoSuchElementException("Couldn't find src|dst node " + nodeId + " for edge of type " + typ.name)
+      )
   }
 
 }

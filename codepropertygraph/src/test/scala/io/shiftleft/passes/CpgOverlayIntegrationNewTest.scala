@@ -19,14 +19,14 @@ import overflowdb.traversal._
 import java.util.Optional
 
 class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
-  val InitialNodeCode = "initialNode"
+  val InitialNodeCode  = "initialNode"
   val Pass1NewNodeCode = "pass1NewNodeCode"
   val Pass2NewNodeCode = "pass2NewNodeCode"
 
   "SimpleCpgPass being serialised to and from overlay protobuf via DiffGraph" in {
     withNewBaseCpg { cpg =>
       val initialNode = cpg.graph.V.has(Properties.CODE -> InitialNodeCode).head.asInstanceOf[StoredNode]
-      val pass1 = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
+      val pass1       = passAddsEdgeTo(initialNode, Pass1NewNodeCode, cpg)
 
       pass1.createAndApply()
       cpg.graph.nodeCount shouldBe 2
@@ -34,7 +34,7 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
       initialNode.out.property(Properties.CODE).toList shouldBe List(Pass1NewNodeCode)
 
       val pass1NewNode = cpg.graph.V.has(Properties.CODE -> Pass1NewNodeCode).head.asInstanceOf[StoredNode]
-      val pass2 = passAddsEdgeTo(pass1NewNode, Pass2NewNodeCode, cpg)
+      val pass2        = passAddsEdgeTo(pass1NewNode, Pass2NewNodeCode, cpg)
 
       pass2.createAndApply()
       cpg.graph.nodeCount shouldBe 3
@@ -48,10 +48,7 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
       val initialNode = cpg.graph.V.has(Properties.CODE, InitialNodeCode).head.asInstanceOf[StoredNode]
 
       // 1) add a new node
-      val addNodeInverse = applyDiffAndGetInverse(cpg)(
-        _.addNode(
-          NewIdentifier().code(null)
-        ))
+      val addNodeInverse = applyDiffAndGetInverse(cpg)(_.addNode(NewIdentifier().code(null)))
       cpg.graph.nodeCount shouldBe 2
       val additionalNode = cpg.graph.V
         .label(Identifier.Label)
@@ -66,13 +63,7 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
         _.addEdge(initialNode, additionalNode, ReachingDef.Label, ReachingDef.PropertyNames.Variable, "true")
       })
       val addEdge2Inverse = applyDiffAndGetInverse(cpg)({
-        _.addEdge(
-          initialNode,
-          additionalNode,
-          ReachingDef.Label,
-          ReachingDef.PropertyNames.Variable,
-          "false"
-        )
+        _.addEdge(initialNode, additionalNode, ReachingDef.Label, ReachingDef.PropertyNames.Variable, "false")
       })
       def initialNodeOutEdges = initialNode.outE.toList
       initialNodeOutEdges.size shouldBe 2
@@ -106,7 +97,7 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
       initialNodeOutEdges.size shouldBe 0
 
       // 1) remove node
-      //DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
+      // DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
       overflowdb.BatchedUpdate.applyDiff(cpg.graph, addNodeInverse, null, null)
       cpg.graph.nodeCount shouldBe 1
     }
@@ -122,11 +113,12 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
   }
 
   /* applies DiffGraph, gets the inverse, serializes and deserializes the inverse (to verify round-trip works) */
-  def applyDiffAndGetInverse(cpg: Cpg)(
-      fun: overflowdb.BatchedUpdate.DiffGraphBuilder => Unit): overflowdb.BatchedUpdate.DiffGraph = {
+  def applyDiffAndGetInverse(
+    cpg: Cpg
+  )(fun: overflowdb.BatchedUpdate.DiffGraphBuilder => Unit): overflowdb.BatchedUpdate.DiffGraph = {
     val builder = new overflowdb.BatchedUpdate.DiffGraphBuilder
     fun(builder)
-    val diff = builder.build()
+    val diff     = builder.build()
     val listener = new BatchUpdateInverseListener
     overflowdb.BatchedUpdate.applyDiff(cpg.graph, diff, null, listener)
     val inverse = listener.getSerialization()

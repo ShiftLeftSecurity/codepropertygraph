@@ -38,7 +38,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     }
 
     "filter with traversal on cpg type" in {
-      def allMethods = cpg.method.l
+      def allMethods    = cpg.method.l
       val publicMethods = allMethods.to(Traversal).where(_.isPublic)
       allMethods.size should be > publicMethods.toList.size
     }
@@ -46,7 +46,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     "filter on id" when {
       "providing one" in {
         // find an arbitrary method so we can find it again in the next step
-        val method: Method = cpg.method.head
+        val method: Method        = cpg.method.head
         val results: List[Method] = cpg.method.id(method.id).toList
         results.size shouldBe 1
         results.head.underlying.id
@@ -54,7 +54,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       "providing multiple" in {
         // find two arbitrary methods so we can find it again in the next step
-        val methods = cpg.method.toList.take(2)
+        val methods               = cpg.method.toList.take(2)
         val results: List[Method] = cpg.method.id(methods.map(_.id): _*).toList
 
         results.size shouldBe 2
@@ -65,7 +65,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
   "find that all method returns are linked to a method" in {
     val returnsWithMethods = cpg.method.methodReturn.l
-    val returns = cpg.methodReturn.l
+    val returns            = cpg.methodReturn.l
     returnsWithMethods.size shouldBe returns.size
   }
 
@@ -74,7 +74,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
     val query = for {
       method <- cpg.method
-      param <- method.parameter
+      param  <- method.parameter
     } yield MethodParamPairs(method.name, param.name)
 
     val pairs: List[MethodParamPairs] = query.toList
@@ -99,24 +99,24 @@ class StepsTest extends AnyWordSpec with Matchers {
 
   "toJson" when {
     "operating on StoredNode" in {
-      val json = cpg.method.nameExact("foo").toJson
-      val parsed = parse(json).children.head //exactly one result for the above query
+      val json   = cpg.method.nameExact("foo").toJson
+      val parsed = parse(json).children.head // exactly one result for the above query
       (parsed \ "_label") shouldBe JString("METHOD")
       (parsed \ "name") shouldBe JString("foo")
     }
 
     "operating on NewNode" in {
       implicit val finder: NodeExtensionFinder = DefaultNodeExtensionFinder
-      val json = cpg.method.name("foo").location.toJson
-      val parsed = parse(json).children.head //exactly one result for the above query
+      val json                                 = cpg.method.name("foo").location.toJson
+      val parsed                               = parse(json).children.head // exactly one result for the above query
       (parsed \ "symbol") shouldBe JString("foo")
       (parsed \ "className") shouldBe JString("AClass")
       (parsed \ "filename") shouldBe JString("N/A")
     }
 
     "operating on primitive" in {
-      val json = cpg.method.name("foo").signature.toJson
-      val parsed = parse(json).children.head //exactly one result for the above query
+      val json   = cpg.method.name("foo").signature.toJson
+      val parsed = parse(json).children.head // exactly one result for the above query
       parsed shouldBe JString("asignature")
     }
   }
@@ -132,7 +132,7 @@ class StepsTest extends AnyWordSpec with Matchers {
     "render nodes as `(label,id): properties`" in {
       def mainMethods: Traversal[Method] = cpg.method.name("woo")
 
-      val nodeId = mainMethods.head.id
+      val nodeId  = mainMethods.head.id
       val printed = mainMethods.p.head
       printed.should(startWith(s"""(METHOD,$nodeId):"""))
       printed.should(include("IS_EXTERNAL: false"))
@@ -178,7 +178,7 @@ class StepsTest extends AnyWordSpec with Matchers {
       val methodStepsHelp = Cpg.emptyCpg.method.help
       methodStepsHelp should include("Available steps for Method")
       methodStepsHelp should include(".namespace")
-      methodStepsHelp should include(".depth") //from AstNode
+      methodStepsHelp should include(".depth") // from AstNode
 
       val methodStepsHelpVerbose = Cpg.emptyCpg.method.helpVerbose
       methodStepsHelpVerbose should include("traversal name")
