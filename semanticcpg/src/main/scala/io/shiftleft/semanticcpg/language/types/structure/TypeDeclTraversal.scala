@@ -83,16 +83,15 @@ class TypeDeclTraversal(val traversal: Traversal[TypeDecl]) extends AnyVal {
   /** If this is an alias type declaration, go to its underlying type declaration else unchanged.
     */
   def unravelAlias: Traversal[TypeDecl] = {
-     traversal.map { typeDecl =>
-       val alias = for {
-         _ <- typeDecl.aliasTypeFullName
-         tpe <- typeDecl._typeViaAliasOfOut.nextOption()
-         tpeDecl <- tpe._typeDeclViaRefOut.nextOption()
-         // TODO MP define named steps in schema ^^^
-       } yield tpeDecl
+    traversal.map { typeDecl =>
+      val alias = for {
+        _        <- typeDecl.aliasTypeFullName
+        tpe      <- typeDecl.aliasedType.nextOption()
+        typeDecl <- tpe.referencedTypeDecl.nextOption()
+      } yield typeDecl
 
-       alias.getOrElse(typeDecl)
-     }
+      alias.getOrElse(typeDecl)
+    }
   }
 
   /** Traverse to canonical type which means unravel aliases until we find a non alias type declaration.
