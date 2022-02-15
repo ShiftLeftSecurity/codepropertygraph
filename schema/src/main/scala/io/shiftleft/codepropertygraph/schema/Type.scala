@@ -187,7 +187,13 @@ object Type extends SchemaBase {
 
     typeDecl
       .addOutEdge(edge = inheritsFrom, inNode = tpe)
-      .addOutEdge(edge = aliasOf, inNode = tpe)
+      .addOutEdge(
+        edge = aliasOf,
+        inNode = tpe,
+        stepNameOut = "aliasedType",
+        stepNameIn = "aliasTypeDecl",
+        stepNameInDoc = "Direct alias type declarations."
+      )
       .addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "typeDecl")
 
     typeArgument

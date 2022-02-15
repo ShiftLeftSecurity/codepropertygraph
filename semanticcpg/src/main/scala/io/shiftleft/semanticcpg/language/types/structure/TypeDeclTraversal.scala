@@ -82,32 +82,21 @@ class TypeDeclTraversal(val traversal: Traversal[TypeDecl]) extends AnyVal {
 
   /** If this is an alias type declaration, go to its underlying type declaration else unchanged.
     */
-  def unravelAlias: Traversal[TypeDecl] =
+  def unravelAlias: Traversal[TypeDecl] = {
     traversal.map { typeDecl =>
-      if (typeDecl.aliasTypeFullName.isDefined)
-        typeDecl._typeViaAliasOfOut.next()._typeDeclViaRefOut.next()
-      else
-        typeDecl
+      val alias = for {
+        tpe      <- typeDecl.aliasedType.nextOption()
+        typeDecl <- tpe.referencedTypeDecl.nextOption()
+      } yield typeDecl
+
+      alias.getOrElse(typeDecl)
     }
+  }
 
   /** Traverse to canonical type which means unravel aliases until we find a non alias type declaration.
     */
-  def canonicalType: Traversal[TypeDecl] = {
-    // We cannot use this compact form because the gremlin implementation at least
-    // in some case seems to have problems with nested "repeat" steps. Since this
-    // step is used in other repeat steps we do not use it here.
-    // until(_.isCanonical).repeat(_.unravelAlias)
-
-    traversal.map { typeDecl =>
-      var currentTypeDecl       = typeDecl
-      var aliasExpansionCounter = 0
-      while (currentTypeDecl.aliasTypeFullName.isDefined && aliasExpansionCounter < maxAliasExpansions) {
-        currentTypeDecl = currentTypeDecl._typeViaAliasOfOut.next()._typeDeclViaRefOut.next()
-        aliasExpansionCounter += 1
-      }
-      currentTypeDecl
-    }
-  }
+  def canonicalType: Traversal[TypeDecl] =
+    traversal.repeat(_.unravelAlias)(_.until(_.isCanonical).times(maxAliasExpansions))
 
   /** Direct alias type declarations.
     */

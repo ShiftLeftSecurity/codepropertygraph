@@ -10,12 +10,12 @@ class TypeTraversal(val traversal: Traversal[Type]) extends AnyVal {
   /** Namespaces in which the corresponding type declaration is defined.
     */
   def namespace: Traversal[Namespace] =
-    referencedTypeDecl.namespace
+    traversal.referencedTypeDecl.namespace
 
   /** Methods defined on the corresponding type declaration.
     */
   def method: Traversal[Method] =
-    referencedTypeDecl.method
+    traversal.referencedTypeDecl.method
 
   /** Filter for types whos corresponding type declaration is in the analyzed jar.
     */
@@ -30,12 +30,12 @@ class TypeTraversal(val traversal: Traversal[Type]) extends AnyVal {
   /** Member variables of the corresponding type declaration.
     */
   def member: Traversal[Member] =
-    referencedTypeDecl.member
+    traversal.referencedTypeDecl.member
 
   /** Direct base types of the corresponding type declaration in the inheritance graph.
     */
   def baseType: Traversal[Type] =
-    referencedTypeDecl.baseType
+    traversal.referencedTypeDecl.baseType
 
   /** Direct and transitive base types of the corresponding type declaration.
     */
@@ -52,25 +52,15 @@ class TypeTraversal(val traversal: Traversal[Type]) extends AnyVal {
   def derivedTypeTransitive: Traversal[Type] =
     traversal.repeat(_.derivedType)(_.emitAllButFirst)
 
-  /** Type declaration which is referenced by this type.
-    */
-  def referencedTypeDecl: Traversal[TypeDecl] =
-    traversal.out(EdgeTypes.REF).cast[TypeDecl]
-
   /** Type declarations which derive from this type.
     */
   def derivedTypeDecl: Traversal[TypeDecl] =
     traversal.in(EdgeTypes.INHERITS_FROM).cast[TypeDecl]
 
-  /** Direct alias type declarations.
-    */
-  def aliasTypeDecl: Traversal[TypeDecl] =
-    traversal.in(EdgeTypes.ALIAS_OF).cast[TypeDecl]
-
   /** Direct alias types.
     */
   def aliasType: Traversal[Type] =
-    aliasTypeDecl.referencingType
+    traversal.aliasTypeDecl.referencingType
 
   /** Direct and transitive alias types.
     */
