@@ -85,7 +85,6 @@ class TypeDeclTraversal(val traversal: Traversal[TypeDecl]) extends AnyVal {
   def unravelAlias: Traversal[TypeDecl] = {
     traversal.map { typeDecl =>
       val alias = for {
-        _        <- typeDecl.aliasTypeFullName
         tpe      <- typeDecl.aliasedType.nextOption()
         typeDecl <- tpe.referencedTypeDecl.nextOption()
       } yield typeDecl
