@@ -33,17 +33,15 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   // Used for O(1) lookups on methods that will work without indexManager
   private val typeMap = mutable.Map.empty[String, TypeDecl]
   // For linking loose method stubs that cannot be resolved by crawling parent types
-  private val methodStubMap = mutable.Map.empty[String, Method]
+  private val methodMap = mutable.Map.empty[String, Method]
 
   private def initMaps(): Unit = {
     cpg.typeDecl.foreach { typeDecl =>
       typeMap += (typeDecl.fullName -> typeDecl)
     }
     cpg.method
-      .filter(m => m.isExternal && !m.name.startsWith("<operator>"))
-      .foreach { method =>
-        methodStubMap += (method.fullName -> method)
-      }
+      .filter(m => !m.name.startsWith("<operator>"))
+      .foreach { method => methodMap += (method.fullName -> method) }
   }
 
   /** Main method of enhancement - to be implemented by child class
@@ -78,7 +76,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   /** Recursively returns all the sub-types of the given type declaration. Does not account for circular hierarchies.
-    */
+   */
   def allSubclasses(typDeclFullName: String): mutable.LinkedHashSet[String] = {
     subclassCache.get(typDeclFullName) match {
       case Some(value) => value
@@ -129,7 +127,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           if (tgtM.isDefined && !callsOut.contains(tgtM.get.fullName)) {
             dstGraph.addEdgeInOriginal(call, tgtM.get, EdgeTypes.CALL)
           } else {
-            printLinkingError(call)
+            fallbackToStaticResolution(call, dstGraph)
           }
         }
       case None => fallbackToStaticResolution(call, dstGraph)
@@ -140,7 +138,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     * resolved from the map of external methods.
     */
   private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
-    methodStubMap.get(call.methodFullName) match {
+    methodMap.get(call.methodFullName) match {
       case Some(tgtM) => dstGraph.addEdgeInOriginal(call, tgtM, EdgeTypes.CALL)
       case None       => printLinkingError(call)
     }
@@ -155,8 +153,8 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   @inline
   private def printLinkingError(call: Call): Unit = {
     logger.info(
-      s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +
-        s"SIGNATURE ${call.signature}, CODE ${call.code}"
+      s"Unable to link dynamic CALL with METHOD_FULL_NAME ${call.methodFullName} and context: " +
+        s"${call.code} @ line ${call.lineNumber}"
     )
   }
 }
