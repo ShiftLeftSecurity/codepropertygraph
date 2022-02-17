@@ -76,7 +76,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   }
 
   /** Recursively returns all the sub-types of the given type declaration. Does not account for circular hierarchies.
-   */
+    */
   def allSubclasses(typDeclFullName: String): mutable.LinkedHashSet[String] = {
     subclassCache.get(typDeclFullName) match {
       case Some(value) => value
