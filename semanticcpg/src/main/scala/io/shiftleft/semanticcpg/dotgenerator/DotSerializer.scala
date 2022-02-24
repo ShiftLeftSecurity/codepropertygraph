@@ -47,6 +47,7 @@ object DotSerializer {
       case param: MethodParameterIn => ("PARAM", param.code).toString
       case local: Local             => (local.label, s"${local.code}: ${local.typeFullName}").toString
       case target: JumpTarget       => (target.label, target.name).toString
+      case modifier: Modifier       => ("MODIFIER", modifier.modifierType).toString()
       case _                        => ""
     })
   }
