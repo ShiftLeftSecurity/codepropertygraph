@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.codedumper
 import io.shiftleft.codepropertygraph.generated.Languages
 import io.shiftleft.codepropertygraph.generated.nodes.{Expression, Local, Method, NewLocation}
 import io.shiftleft.semanticcpg.language._
-import io.shiftleft.x2cpg.IOUtils
+import io.shiftleft.utils.IOUtils
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.nio.file.Paths

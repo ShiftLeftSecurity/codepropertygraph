@@ -1,4 +1,4 @@
-package io.shiftleft.x2cpg
+package io.shiftleft.utils
 
 import java.io.Reader
 import java.nio.charset.{CharsetDecoder, CodingErrorAction}
