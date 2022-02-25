@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.base
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewFile, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.types.structure.FileTraversal
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker
@@ -13,10 +13,8 @@ import scala.collection.mutable
 /** For all nodes with FILENAME fields, create corresponding FILE nodes and connect node with FILE node via outgoing
   * SOURCE_FILE edges.
   */
-class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
-
+class FileCreationPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     val originalFileNameToNode = mutable.Map.empty[String, StoredNode]
     val newFileNameToNode      = mutable.Map.empty[String, NewFile]
 
@@ -35,7 +33,7 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
             file
           }
         )
-        dstGraph.addEdgeFromOriginal(srcNode, newFile, EdgeTypes.SOURCE_FILE)
+        dstGraph.addEdge(srcNode, newFile, EdgeTypes.SOURCE_FILE)
       }
     }
 
@@ -54,7 +52,5 @@ class FileCreationPass(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph,
       Some(createFileIfDoesNotExist)
     )
-
-    Iterator(dstGraph.build())
   }
 }

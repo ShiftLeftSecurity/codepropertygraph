@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.callgraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated._
 import io.shiftleft.codepropertygraph.generated.nodes._
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb._
@@ -15,12 +15,10 @@ import scala.jdk.CollectionConverters._
 /** This pass has MethodStubCreator and TypeDeclStubCreator as prerequisite for language frontends which do not provide
   * method stubs and type decl stubs.
   */
-class MethodRefLinker(cpg: Cpg) extends CpgPass(cpg) {
+class MethodRefLinker(cpg: Cpg) extends SimpleCpgPass(cpg) {
   import MethodRefLinker.linkToSingle
 
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
-
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     // Create REF edges from METHOD_REFs to
     // METHOD
 
@@ -34,13 +32,12 @@ class MethodRefLinker(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph,
       None
     )
-
-    Iterator(dstGraph.build())
   }
 
 }
 
 object MethodRefLinker {
+  import overflowdb.BatchedUpdate.DiffGraphBuilder
   val logger: Logger = LoggerFactory.getLogger(classOf[MethodRefLinker])
 
   def typeDeclFullNameToNode(cpg: Cpg, x: String): Option[TypeDecl] =
@@ -68,7 +65,7 @@ object MethodRefLinker {
     edgeType: String,
     dstNodeMap: String => Option[StoredNode],
     dstFullNameKey: String,
-    dstGraph: DiffGraph.Builder,
+    dstGraph: DiffGraphBuilder,
     dstNotExistsHandler: Option[(StoredNode, String) => Unit]
   ): Unit = {
     var loggedDeprecationWarning = false
@@ -87,7 +84,7 @@ object MethodRefLinker {
             val srcStoredNode = srcNode.asInstanceOf[StoredNode]
             dstNodeMap(dstFullName) match {
               case Some(dstNode) =>
-                dstGraph.addEdgeInOriginal(srcStoredNode, dstNode, edgeType)
+                dstGraph.addEdge(srcStoredNode, dstNode, edgeType)
               case None if dstNotExistsHandler.isDefined =>
                 dstNotExistsHandler.get(srcStoredNode, dstFullName)
               case _ =>
@@ -97,7 +94,7 @@ object MethodRefLinker {
       } else {
         srcNode.out(edgeType).property(Properties.FULL_NAME).nextOption() match {
           case Some(dstFullName) =>
-            dstGraph.addNodeProperty(srcNode.asInstanceOf[StoredNode], dstFullNameKey, dstFullName)
+            dstGraph.setNodeProperty(srcNode.asInstanceOf[StoredNode], dstFullNameKey, dstFullName)
           case None => logger.info(s"Missing outgoing edge of type ${edgeType} from node ${srcNode}")
         }
         if (!loggedDeprecationWarning) {
@@ -119,20 +116,20 @@ object MethodRefLinker {
     dstNodeMap: String => Option[StoredNode],
     getDstFullNames: SRC_NODE_TYPE => Iterable[String],
     dstFullNameKey: String,
-    dstGraph: DiffGraph.Builder
+    dstGraph: DiffGraphBuilder
   ): Unit = {
     var loggedDeprecationWarning = false
     Traversal(cpg.graph.nodes(srcLabels: _*)).cast[SRC_NODE_TYPE].foreach { srcNode =>
       if (!srcNode.outE(edgeType).hasNext) {
         getDstFullNames(srcNode).foreach { dstFullName =>
           dstNodeMap(dstFullName) match {
-            case Some(dstNode) => dstGraph.addEdgeInOriginal(srcNode, dstNode, edgeType)
+            case Some(dstNode) => dstGraph.addEdge(srcNode, dstNode, edgeType)
             case None => logFailedDstLookup(edgeType, srcNode.label, srcNode.id.toString, dstNodeLabel, dstFullName)
           }
         }
       } else {
         val dstFullNames = srcNode.out(edgeType).property(Properties.FULL_NAME).l
-        dstGraph.addNodeProperty(srcNode, dstFullNameKey, dstFullNames)
+        dstGraph.setNodeProperty(srcNode, dstFullNameKey, dstFullNames)
         if (!loggedDeprecationWarning) {
           logger.info(
             s"Using deprecated CPG format with already existing $edgeType edge between" +

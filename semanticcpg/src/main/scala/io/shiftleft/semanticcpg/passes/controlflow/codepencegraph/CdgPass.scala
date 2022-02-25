@@ -12,7 +12,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
   MethodRef,
   Unknown
 }
-import io.shiftleft.passes.{DiffGraph, ParallelCpgPass}
+import io.shiftleft.passes.ForkJoinParallelCpgPass
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.controlflow.cfgdominator.{CfgDominatorFrontier, ReverseCpgCfgAdapter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -21,16 +21,14 @@ import scala.jdk.CollectionConverters._
 
 /** This pass has ContainsEdgePass and CfgDominatorPass as prerequisites.
   */
-class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
+class CdgPass(cpg: Cpg) extends ForkJoinParallelCpgPass[Method](cpg) {
   import CdgPass.logger
 
-  override def partIterator: Iterator[Method] = cpg.method.iterator
+  override def generateParts(): Array[Method] = cpg.method.toArray
 
-  override def runOnPart(method: Method): Iterator[DiffGraph] = {
+  override def runOnPart(dstGraph: DiffGraphBuilder, method: Method): Unit = {
 
     val dominanceFrontier = new CfgDominatorFrontier(new ReverseCpgCfgAdapter, new CpgPostDomTreeAdapter)
-
-    implicit val dstGraph: DiffGraph.Builder = DiffGraph.newBuilder
 
     val cfgNodes         = method._containsOut.asScala.toList
     val postDomFrontiers = dominanceFrontier.calculate(method :: cfgNodes)
@@ -40,7 +38,7 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
         postDomFrontierNode match {
           case _: Literal | _: Identifier | _: Call | _: MethodRef | _: Unknown | _: ControlStructure |
               _: JumpTarget => {
-            dstGraph.addEdgeInOriginal(postDomFrontierNode, node, EdgeTypes.CDG)
+            dstGraph.addEdge(postDomFrontierNode, node, EdgeTypes.CDG)
           }
           case _ =>
             val nodeLabel  = postDomFrontierNode.label
@@ -58,7 +56,6 @@ class CdgPass(cpg: Cpg) extends ParallelCpgPass[Method](cpg) {
         }
       }
     }
-    Iterator(dstGraph.build())
   }
 }
 

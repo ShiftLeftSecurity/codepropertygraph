@@ -2,19 +2,16 @@ package io.shiftleft.semanticcpg.passes.base
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
   linkToSingle,
   typeDeclFullNameToNode,
   typeFullNameToNode
 }
 
-class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
+class TypeUsagePass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
-  override def run(): Iterator[DiffGraph] = {
-
-    val dstGraph = DiffGraph.newBuilder
-
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     // Create REF edges from TYPE nodes to TYPE_DECL
 
     linkToSingle(
@@ -54,7 +51,5 @@ class TypeUsagePass(cpg: Cpg) extends CpgPass(cpg) {
       dstGraph,
       None
     )
-
-    Iterator(dstGraph.build())
   }
 }

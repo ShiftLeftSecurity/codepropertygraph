@@ -26,6 +26,7 @@ import scala.concurrent.duration.DurationLong
   * @param cpg
   *   the source CPG this pass traverses
   */
+@deprecated
 abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase {
 
   /** Main method of pass - to be implemented by child class

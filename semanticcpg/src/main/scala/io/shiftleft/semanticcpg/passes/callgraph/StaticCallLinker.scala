@@ -3,21 +3,20 @@ package io.shiftleft.semanticcpg.passes.callgraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 
-class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
+class StaticCallLinker(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
   import StaticCallLinker._
   private val methodFullNameToNode = mutable.Map.empty[String, StoredNode]
 
   /** Main method of enhancement - to be implemented by child class
     */
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     cpg.method.foreach { method =>
       methodFullNameToNode.put(method.fullName, method)
     }
@@ -30,11 +29,9 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           throw new RuntimeException(exception)
       }
     }
-
-    Iterator(dstGraph.build())
   }
 
-  private def linkCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def linkCall(call: Call, dstGraph: DiffGraphBuilder): Unit = {
     call.dispatchType match {
       case DispatchTypes.STATIC_DISPATCH | DispatchTypes.INLINED =>
         linkStaticCall(call, dstGraph)
@@ -44,10 +41,10 @@ class StaticCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def linkStaticCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def linkStaticCall(call: Call, dstGraph: DiffGraphBuilder): Unit = {
     val resolvedMethodOption = methodFullNameToNode.get(call.methodFullName)
     if (resolvedMethodOption.isDefined) {
-      dstGraph.addEdgeInOriginal(call, resolvedMethodOption.get, EdgeTypes.CALL)
+      dstGraph.addEdge(call, resolvedMethodOption.get, EdgeTypes.CALL)
     } else {
       logger.info(
         s"Unable to link static CALL with METHOD_FULL_NAME ${call.methodFullName}, NAME ${call.name}, " +

@@ -2,7 +2,7 @@ package io.shiftleft.semanticcpg.passes.base
 
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, nodes}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -11,15 +11,13 @@ import org.slf4j.{Logger, LoggerFactory}
   *
   * This pass has MethodStubCreator as prerequisite for language frontends which do not provide method stubs.
   */
-class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
+class MethodDecoratorPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
   import MethodDecoratorPass.logger
 
   private[this] var loggedDeprecatedWarning   = false
   private[this] var loggedMissingTypeFullName = false
 
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
-
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     cpg.parameter.foreach { parameterIn =>
       if (!parameterIn._parameterLinkOut.hasNext) {
         val parameterOut = nodes
@@ -39,7 +37,7 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
         } else {
           if (parameterIn.typeFullName == null) {
             val evalType = parameterIn.typ
-            dstGraph.addEdgeToOriginal(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
+            dstGraph.addEdge(parameterOut, evalType, EdgeTypes.EVAL_TYPE)
             if (!loggedMissingTypeFullName) {
               logger.warn("Using deprecated CPG format with missing TYPE_FULL_NAME on METHOD_PARAMETER_IN nodes.")
               loggedMissingTypeFullName = true
@@ -47,16 +45,14 @@ class MethodDecoratorPass(cpg: Cpg) extends CpgPass(cpg) {
           }
 
           dstGraph.addNode(parameterOut)
-          dstGraph.addEdgeFromOriginal(method.get, parameterOut, EdgeTypes.AST)
-          dstGraph.addEdgeFromOriginal(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
+          dstGraph.addEdge(method.get, parameterOut, EdgeTypes.AST)
+          dstGraph.addEdge(parameterIn, parameterOut, EdgeTypes.PARAMETER_LINK)
         }
       } else if (!loggedDeprecatedWarning) {
         logger.warn("Using deprecated CPG format with PARAMETER_LINK edges")
         loggedDeprecatedWarning = true
       }
     }
-
-    Iterator(dstGraph.build())
   }
 }
 
