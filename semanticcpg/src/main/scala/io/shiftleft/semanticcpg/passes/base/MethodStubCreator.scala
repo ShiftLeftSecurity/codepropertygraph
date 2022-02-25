@@ -22,11 +22,11 @@ class MethodStubCreator(cpg: Cpg) extends SimpleCpgPass(cpg) {
   private val methodToParameterCount = mutable.LinkedHashMap[NameAndSignature, Int]()
 
   override def run(dstGraph: BatchedUpdate.DiffGraphBuilder): Unit = {
-    cpg.method.foreach { method =>
+   for(method <- cpg.method){
       methodFullNameToNode.put(method.fullName, method)
     }
 
-    cpg.call.foreach { call =>
+   for(call <- cpg.call){
       methodToParameterCount.put(NameAndSignature(call.name, call.signature, call.methodFullName), call.argument.size)
     }
 
