@@ -1,6 +1,6 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "2.36"
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % "2.39"
 
 Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
 Compile / generateDomainClasses / fieldName       := "instance"
@@ -13,6 +13,7 @@ generateProtobuf := Def.taskDyn {
 
   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
+      // inputs did not change, don't regenerate
       outputFile
     }
   } else {
