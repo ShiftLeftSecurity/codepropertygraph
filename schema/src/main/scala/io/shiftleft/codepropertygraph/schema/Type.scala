@@ -15,7 +15,7 @@ object Type extends SchemaBase {
   override def description: String =
     """
       |The Type Layer contains information about type declarations, relations between
-      |types, and type instantiation and usage. In its current form, it allows moedling of
+      |types, and type instantiation and usage. In its current form, it allows modelling of
       |parametrized types, type hierarchies and aliases.
       |""".stripMargin
 
