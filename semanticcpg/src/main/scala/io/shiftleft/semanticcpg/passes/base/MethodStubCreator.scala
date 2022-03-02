@@ -30,12 +30,8 @@ class MethodStubCreator(cpg: Cpg) extends SimpleCpgPass(cpg) {
       methodToParameterCount.put(NameAndSignature(call.name, call.signature, call.methodFullName), call.argument.size)
     }
 
-   for((NameAndSignature(name, signature, fullName), parameterCount) <- methodToParameterCount){
-     methodFullNameToNode.get(fullName) match {
-       case None =>
+   for((NameAndSignature(name, signature, fullName), parameterCount) <- methodToParameterCount if !methodFullNameToNode.contains(fullName)){
          createMethodStub(name, fullName, signature, parameterCount, dstGraph)
-       case _ =>
-     }
    }
   }
 

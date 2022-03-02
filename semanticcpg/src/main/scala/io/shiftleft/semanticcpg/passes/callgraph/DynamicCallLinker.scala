@@ -54,13 +54,12 @@ class DynamicCallLinker(cpg: Cpg) extends SimpleCpgPass(cpg) {
     initMaps()
     // ValidM maps class C and method name N to the set of
     // func ptrs implementing N for C and its subclasses
-    cpg.typeDecl
-      .flatMap { c =>
-        c._methodViaAstOut.map { n =>
-          (n.fullName, allSubclasses(c.fullName).flatMap(sc => staticLookup(sc, n)))
-        }.toMap
-      }
-      .foreach { case (methodName, candidates) => validM.put(methodName, candidates) }
+    for(typeDecl <- cpg.typeDecl;
+        method <- typeDecl._methodViaAstOut){
+      val methodName = method.fullName
+      val candidates =  allSubclasses(typeDecl.fullName).flatMap{staticLookup(_, method)}
+      validM.put(methodName, candidates)
+    }
 
     subclassCache.clear()
 
