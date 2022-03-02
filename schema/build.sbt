@@ -13,6 +13,7 @@ generateProtobuf := Def.taskDyn {
 
   if (outputRoot.exists && lastSchemaMd5 == Some(currentSchemaMd5)) {
     Def.task {
+      // inputs did not change, don't regenerate
       outputFile
     }
   } else {
