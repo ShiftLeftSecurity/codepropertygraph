@@ -97,7 +97,13 @@ object MetaData extends SchemaBase {
         value = "JAVASRC",
         valueType = ValueTypes.STRING,
         comment = "Source-based front-end for Java"
-      ).protoId(13)
+      ).protoId(13),
+      Constant(
+        name = "PYTHONSRC",
+        value = "PYTHONSRC",
+        valueType = ValueTypes.STRING,
+        comment = "Source-based front-end for Python"
+      ).protoId(14)
     )
 
   }
