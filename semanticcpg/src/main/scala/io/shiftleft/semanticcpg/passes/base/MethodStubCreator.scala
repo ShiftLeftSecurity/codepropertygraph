@@ -22,17 +22,20 @@ class MethodStubCreator(cpg: Cpg) extends SimpleCpgPass(cpg) {
   private val methodToParameterCount = mutable.LinkedHashMap[NameAndSignature, Int]()
 
   override def run(dstGraph: BatchedUpdate.DiffGraphBuilder): Unit = {
-   for(method <- cpg.method){
+    for (method <- cpg.method) {
       methodFullNameToNode.put(method.fullName, method)
     }
 
-   for(call <- cpg.call){
+    for (call <- cpg.call) {
       methodToParameterCount.put(NameAndSignature(call.name, call.signature, call.methodFullName), call.argument.size)
     }
 
-   for((NameAndSignature(name, signature, fullName), parameterCount) <- methodToParameterCount if !methodFullNameToNode.contains(fullName)){
-         createMethodStub(name, fullName, signature, parameterCount, dstGraph)
-   }
+    for (
+      (NameAndSignature(name, signature, fullName), parameterCount) <- methodToParameterCount
+      if !methodFullNameToNode.contains(fullName)
+    ) {
+      createMethodStub(name, fullName, signature, parameterCount, dstGraph)
+    }
   }
 
   override def finish(): Unit = {
@@ -40,7 +43,6 @@ class MethodStubCreator(cpg: Cpg) extends SimpleCpgPass(cpg) {
     methodToParameterCount.clear()
     super.finish()
   }
-
 
   private def addLineNumberInfo(methodNode: NewMethod, fullName: String): NewMethod = {
     val s = fullName.split(":")

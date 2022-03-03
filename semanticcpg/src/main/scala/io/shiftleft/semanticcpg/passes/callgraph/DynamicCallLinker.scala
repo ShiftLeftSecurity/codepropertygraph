@@ -48,16 +48,18 @@ class DynamicCallLinker(cpg: Cpg) extends SimpleCpgPass(cpg) {
     */
   override def run(dstGraph: DiffGraphBuilder): Unit = {
     // Perform early stopping in the case of no virtual calls
-    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)){
+    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) {
       return;
     }
     initMaps()
     // ValidM maps class C and method name N to the set of
     // func ptrs implementing N for C and its subclasses
-    for(typeDecl <- cpg.typeDecl;
-        method <- typeDecl._methodViaAstOut){
+    for (
+      typeDecl <- cpg.typeDecl;
+      method   <- typeDecl._methodViaAstOut
+    ) {
       val methodName = method.fullName
-      val candidates =  allSubclasses(typeDecl.fullName).flatMap{staticLookup(_, method)}
+      val candidates = allSubclasses(typeDecl.fullName).flatMap { staticLookup(_, method) }
       validM.put(methodName, candidates)
     }
 

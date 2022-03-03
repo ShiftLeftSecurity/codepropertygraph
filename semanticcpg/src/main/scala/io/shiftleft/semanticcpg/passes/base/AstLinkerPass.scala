@@ -17,7 +17,7 @@ class AstLinkerPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
   import MethodRefLinker.{logFailedSrcLookup, logger}
 
-  override def run(dstGraph: DiffGraphBuilder):Unit = {
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     cpg.method.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
     cpg.typeDecl.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
   }
