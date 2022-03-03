@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.callgraph
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{Call, Method, TypeDecl}
 import io.shiftleft.codepropertygraph.generated.{DispatchTypes, EdgeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.language._
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.{NodeDb, NodeRef}
@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
   * Based on the algorithm by Jang, Dongseok & Tatlock, Zachary & Lerner, Sorin. (2014). SAFEDISPATCH: Securing C++
   * Virtual Calls from Memory Corruption Attacks. 10.14722/ndss.2014.23287.
   */
-class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
+class DynamicCallLinker(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
   import DynamicCallLinker._
   // Used to track potential method candidates for a given method fullname. Since our method full names contain the type
@@ -46,20 +46,22 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
 
   /** Main method of enhancement - to be implemented by child class
     */
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     // Perform early stopping in the case of no virtual calls
-    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) return Iterator()
-    else initMaps()
+    if (!cpg.call.exists(_.dispatchType == DispatchTypes.DYNAMIC_DISPATCH)) {
+      return;
+    }
+    initMaps()
     // ValidM maps class C and method name N to the set of
     // func ptrs implementing N for C and its subclasses
-    cpg.typeDecl
-      .flatMap { c =>
-        c._methodViaAstOut.map { n =>
-          (n.fullName, allSubclasses(c.fullName).flatMap(sc => staticLookup(sc, n)))
-        }.toMap
-      }
-      .foreach { case (methodName, candidates) => validM.put(methodName, candidates) }
+    for (
+      typeDecl <- cpg.typeDecl;
+      method   <- typeDecl._methodViaAstOut
+    ) {
+      val methodName = method.fullName
+      val candidates = allSubclasses(typeDecl.fullName).flatMap { staticLookup(_, method) }
+      validM.put(methodName, candidates)
+    }
 
     subclassCache.clear()
 
@@ -71,8 +73,6 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
           throw new RuntimeException(exception)
       }
     }
-
-    Iterator(dstGraph.build())
   }
 
   /** Recursively returns all the sub-types of the given type declaration. Does not account for circular hierarchies.
@@ -114,7 +114,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
     }
   }
 
-  private def linkDynamicCall(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def linkDynamicCall(call: Call, dstGraph: DiffGraphBuilder): Unit = {
     validM.get(call.methodFullName) match {
       case Some(tgts) =>
         val callsOut = call.callOut.fullName.toSetImmutable
@@ -125,7 +125,7 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
             cpg.method.fullNameExact(destMethod).headOption
           }
           if (tgtM.isDefined && !callsOut.contains(tgtM.get.fullName)) {
-            dstGraph.addEdgeInOriginal(call, tgtM.get, EdgeTypes.CALL)
+            dstGraph.addEdge(call, tgtM.get, EdgeTypes.CALL)
           } else {
             fallbackToStaticResolution(call, dstGraph)
           }
@@ -137,9 +137,9 @@ class DynamicCallLinker(cpg: Cpg) extends CpgPass(cpg) {
   /** In the case where the method isn't an internal method and cannot be resolved by crawling TYPE_DECL nodes it can be
     * resolved from the map of external methods.
     */
-  private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraph.Builder): Unit = {
+  private def fallbackToStaticResolution(call: Call, dstGraph: DiffGraphBuilder): Unit = {
     methodMap.get(call.methodFullName) match {
-      case Some(tgtM) => dstGraph.addEdgeInOriginal(call, tgtM, EdgeTypes.CALL)
+      case Some(tgtM) => dstGraph.addEdge(call, tgtM, EdgeTypes.CALL)
       case None       => printLinkingError(call)
     }
   }

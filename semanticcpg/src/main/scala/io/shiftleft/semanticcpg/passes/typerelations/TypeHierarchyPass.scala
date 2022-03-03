@@ -3,15 +3,14 @@ package io.shiftleft.semanticcpg.passes.typerelations
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{linkToMultiple, typeFullNameToNode}
 
 /** Create INHERITS_FROM edges from `TYPE_DECL` nodes to `TYPE` nodes.
   */
-class TypeHierarchyPass(cpg: Cpg) extends CpgPass(cpg) {
+class TypeHierarchyPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     linkToMultiple(
       cpg,
       srcLabels = List(NodeTypes.TYPE_DECL),
@@ -28,6 +27,5 @@ class TypeHierarchyPass(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = PropertyNames.INHERITS_FROM_TYPE_FULL_NAME,
       dstGraph
     )
-    Iterator(dstGraph.build())
   }
 }

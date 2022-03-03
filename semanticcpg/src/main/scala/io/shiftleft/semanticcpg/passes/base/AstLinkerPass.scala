@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.passes.base
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{HasAstParentFullName, HasAstParentType, StoredNode}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, Properties}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
@@ -13,15 +13,13 @@ import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{
 }
 import overflowdb.traversal._
 
-class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
+class AstLinkerPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 
   import MethodRefLinker.{logFailedSrcLookup, logger}
 
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     cpg.method.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
     cpg.typeDecl.whereNot(_.inE(EdgeTypes.AST)).foreach(addAstEdge(_, dstGraph))
-    Iterator(dstGraph.build())
   }
 
   /** For the given method or type declaration, determine its parent in the AST via the AST_PARENT_TYPE and
@@ -30,7 +28,7 @@ class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
     */
   private def addAstEdge(
     methodOrTypeDecl: HasAstParentType with HasAstParentFullName with StoredNode,
-    dstGraph: DiffGraph.Builder
+    dstGraph: DiffGraphBuilder
   ): Unit = {
     val astParentOption: Option[StoredNode] =
       methodOrTypeDecl.astParentType match {
@@ -48,7 +46,7 @@ class AstLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
 
     astParentOption match {
       case Some(astParent) =>
-        dstGraph.addEdgeInOriginal(astParent, methodOrTypeDecl, EdgeTypes.AST)
+        dstGraph.addEdge(astParent, methodOrTypeDecl, EdgeTypes.AST)
       case None =>
         logFailedSrcLookup(
           EdgeTypes.AST,

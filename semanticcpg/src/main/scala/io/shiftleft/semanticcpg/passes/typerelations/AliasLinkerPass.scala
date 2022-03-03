@@ -3,12 +3,11 @@ package io.shiftleft.semanticcpg.passes.typerelations
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.TypeDecl
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes, PropertyNames}
-import io.shiftleft.passes.{CpgPass, DiffGraph}
+import io.shiftleft.passes.SimpleCpgPass
 import io.shiftleft.semanticcpg.passes.callgraph.MethodRefLinker.{linkToMultiple, typeFullNameToNode}
 
-class AliasLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
-  override def run(): Iterator[DiffGraph] = {
-    val dstGraph = DiffGraph.newBuilder
+class AliasLinkerPass(cpg: Cpg) extends SimpleCpgPass(cpg) {
+  override def run(dstGraph: DiffGraphBuilder): Unit = {
     // Create ALIAS_OF edges from TYPE_DECL nodes to
     // TYPE
     linkToMultiple(
@@ -23,6 +22,5 @@ class AliasLinkerPass(cpg: Cpg) extends CpgPass(cpg) {
       dstFullNameKey = PropertyNames.ALIAS_TYPE_FULL_NAME,
       dstGraph
     )
-    Iterator(dstGraph.build())
   }
 }
