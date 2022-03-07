@@ -19,7 +19,7 @@ import scala.jdk.OptionConverters.RichOptional
   * sources or destinations of edges of the diff graph. When the CPG loader adds nodes of the overlay, it therefor needs
   * to reassign ids for nodes if they are already used in the original CPG.
   */
-@deprecated(message = "Please use overflowdb.BatchedUpdate.DiffGraph as a replacement.", since = "approx v1.3.503")
+@deprecated(message = "Please use overflowdb.BatchedUpdate.DiffGraph as a replacement.", since = "v1.3.508")
 sealed trait DiffGraph {
   import DiffGraph._
   import Change.NodeKind._
@@ -191,7 +191,7 @@ object DiffGraph {
 
   @deprecated(
     message = "Please use overflowdb.BatchedUpdate.DiffGraphBuilder as a replacement.",
-    since = "approx v1.3.503"
+    since = "v1.3.508"
   )
   class Builder {
     private var _buffer: mutable.ArrayDeque[Change] = null
@@ -437,8 +437,8 @@ object DiffGraph {
   }
 
   @deprecated(
-    message = "Please use overflowdb.BatchedUpdate.DiffGraphApplier as a replacement.",
-    since = "approx v1.3.503"
+    message = "Please use overflowdb.BatchedUpdate.applyDiff as a replacement.",
+    since = "v1.3.508"
   )
   object Applier {
     def applyDiff(
