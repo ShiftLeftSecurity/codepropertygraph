@@ -11,7 +11,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 @deprecated(
   message = "Please use ForkJoinParallelCpgPass or ConcurrentWriterCpgPass as a replacement.",
-  since = "approx v1.3.503"
+  since = "v1.3.508"
 )
 abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Option[Iterator[KeyPool]] = None)
     extends CpgPassBase {
