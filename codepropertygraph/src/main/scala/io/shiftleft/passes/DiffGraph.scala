@@ -189,10 +189,7 @@ object DiffGraph {
 
   def newBuilder: Builder = new Builder()
 
-  @deprecated(
-    message = "Please use overflowdb.BatchedUpdate.DiffGraphBuilder as a replacement.",
-    since = "v1.3.508"
-  )
+  @deprecated(message = "Please use overflowdb.BatchedUpdate.DiffGraphBuilder as a replacement.", since = "v1.3.508")
   class Builder {
     private var _buffer: mutable.ArrayDeque[Change] = null
     private def buffer: mutable.ArrayDeque[Change] = {
@@ -436,10 +433,7 @@ object DiffGraph {
     }
   }
 
-  @deprecated(
-    message = "Please use overflowdb.BatchedUpdate.applyDiff as a replacement.",
-    since = "v1.3.508"
-  )
+  @deprecated(message = "Please use overflowdb.BatchedUpdate.applyDiff as a replacement.", since = "v1.3.508")
   object Applier {
     def applyDiff(
       diff: DiffGraph,
