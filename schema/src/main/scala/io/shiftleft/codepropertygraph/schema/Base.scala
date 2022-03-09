@@ -99,7 +99,7 @@ object Base extends SchemaBase {
         valueType = ValueType.String,
         comment = "This property denotes a string value as used in a key-value pair."
       )
-      .mandatory(PropertyDefaults.String)
+      .mandatory("")
       .protoId(8)
 
     val content = builder
