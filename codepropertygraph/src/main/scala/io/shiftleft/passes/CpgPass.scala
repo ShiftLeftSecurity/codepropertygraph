@@ -5,10 +5,12 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.{NewNode, StoredNode}
 import org.slf4j.{Logger, LoggerFactory, MDC}
+import overflowdb.BatchedUpdate
 
 import java.lang.{Long => JLong}
 import java.util.function.{BiConsumer, Supplier}
 import scala.concurrent.duration.DurationLong
+import scala.util.{Failure, Success, Try}
 
 /** Base class for CPG pass - a program, which receives an input graph and outputs a sequence of additive diff graphs.
   * These diff graphs can be merged into the original graph ("applied"), they can be serialized into a binary format,
@@ -81,6 +83,15 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
     }
   }
 
+  override def runWithBuilder(builder: BatchedUpdate.DiffGraphBuilder): Int = {
+    var nParts = 0
+    for(diff <- run()){
+      diff.convertToOdbStyle(cpg, builder)
+      nParts += 1
+    }
+    nParts
+  }
+
 }
 
 /* SimpleCpgPass is a possible replacement for CpgPass.
@@ -133,24 +144,13 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * passes eagerly, and releases them only when the entire chain has run.
  * */
 abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends CpgPassBase {
-  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
-  // generate Array of parts that can be processed in parallel
-  def generateParts(): Array[_ <: AnyRef]
-  // setup large data structures, acquire external resources
-  def init(): Unit = {}
-  // release large data structures and external resources
-  def finish(): Unit = {}
-  // main function: add desired changes to builder
-  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
-
-  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+  extends NewStyleCpgPassBase[T]{
 
   override def createApplySerializeAndStore(
-    serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
-    prefix: String = ""
-  ): Unit = {
+                                             serializedCpg: SerializedCpg,
+                                             inverse: Boolean = false,
+                                             prefix: String = ""
+                                           ): Unit = {
     baseLogger.info(s"Start of pass: $name")
     val nanosStart = System.nanoTime()
     var nParts     = 0
@@ -158,35 +158,8 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     var nDiff      = -1
     var nDiffT     = -1
     try {
-      init()
-      val parts = generateParts()
-      nParts = parts.size
-      val diffGraph = nParts match {
-        case 0 => (new DiffGraphBuilder).build()
-        case 1 =>
-          val builder = new DiffGraphBuilder
-          runOnPart(builder, parts(0).asInstanceOf[T])
-          builder.build()
-        case _ =>
-          java.util.Arrays
-            .stream(parts)
-            .parallel()
-            .collect(
-              new Supplier[DiffGraphBuilder] {
-                override def get(): DiffGraphBuilder =
-                  new DiffGraphBuilder
-              },
-              new BiConsumer[DiffGraphBuilder, AnyRef] {
-                override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
-                  runOnPart(builder, part.asInstanceOf[T])
-              },
-              new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
-                override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
-                  leftBuilder.absorb(rightBuilder)
-              }
-            )
-            .build()
-      }
+      val diffGraph = new DiffGraphBuilder
+      nParts = runWithBuilder(diffGraph)
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size()
       val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
@@ -227,9 +200,67 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
           if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
         } else ""
         baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes commited from ${nParts}%d parts.${serializationString}%s"
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
         )
       }
+    }
+  }
+
+}
+
+/** NewStyleCpgPassBase is the shared base between ForkJoinParallelCpgPass and ConcurrentWriterCpgPass,
+  * containing shared boilerplate.
+  * We don't want ConcurrentWriterCpgPass as a subclass of ForkJoinParallelCpgPass because that would make it hard to
+  * whether an instance is non-racy.
+  *
+  * Please don't subclass this directly. The only reason it's not sealed is that this would mess with our file hierarchy.*/
+abstract class NewStyleCpgPassBase[T <: AnyRef]
+    extends CpgPassBase {
+  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
+  // generate Array of parts that can be processed in parallel
+  def generateParts(): Array[_ <: AnyRef]
+  // setup large data structures, acquire external resources
+  def init(): Unit = {}
+  // release large data structures and external resources
+  def finish(): Unit = {}
+  // main function: add desired changes to builder
+  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
+
+  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+
+  override def runWithBuilder(externalBuilder: BatchedUpdate.DiffGraphBuilder): Int = {
+    try {
+      init()
+      val parts = generateParts()
+      val nParts = parts.size
+      nParts match {
+        case 0 =>
+        case 1 =>
+          runOnPart(externalBuilder, parts(0).asInstanceOf[T])
+        case _ =>
+          externalBuilder.absorb(
+          java.util.Arrays
+            .stream(parts)
+            .parallel()
+            .collect(
+              new Supplier[DiffGraphBuilder] {
+                override def get(): DiffGraphBuilder =
+                  new DiffGraphBuilder
+              },
+              new BiConsumer[DiffGraphBuilder, AnyRef] {
+                override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
+                  runOnPart(builder, part.asInstanceOf[T])
+              },
+              new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
+                override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
+                  leftBuilder.absorb(rightBuilder)
+              }
+            )
+          )
+      }
+      nParts
+    } finally {
+      finish()
     }
   }
 }
@@ -249,6 +280,24 @@ trait CpgPassBase {
   /** Name of the pass. By default it is inferred from the name of the class, override if needed.
     */
   def name: String = getClass.getName
+
+  /* Runs the cpg pass, adding changes to the passed builder. Use with caution -- API is unstable.
+     Returns number of parallel parts. Includes setup and finish logic.*/
+  def runWithBuilder(builder: overflowdb.BatchedUpdate.DiffGraphBuilder):Int
+
+  def runWithBuilderLogged(builder: overflowdb.BatchedUpdate.DiffGraphBuilder):Int = {
+    baseLogger.info(s"Start of pass: $name")
+    val nanoStart = System.nanoTime()
+    val size0 = builder.size()
+    Try(runWithBuilder(builder)) match {
+      case Success(nParts) =>
+        baseLogger.info(f"Pass ${name} completed in ${( System.nanoTime() - nanoStart) * 1e-6}%.0f ms.  ${builder.size() - size0}%d changes generated from ${nParts}%d parts.")
+        nParts
+      case Failure(exception) =>
+        baseLogger.warn(f"Pass ${name} failed in ${( System.nanoTime() - nanoStart) * 1e-6}%.0f ms", exception)
+        -1
+    }
+  }
 
   protected def serialize(appliedDiffGraph: AppliedDiffGraph, inverse: Boolean): GeneratedMessageV3 = {
     if (inverse) {

@@ -59,6 +59,19 @@ sealed trait DiffGraph {
     iterator.collect { case Change.SetEdgeProperty(edge, key, value) =>
       DiffGraph.EdgeProperty(edge, key, value)
     }.toVector
+
+  def convertToOdbStyle(cpg: Cpg, builder: overflowdb.BatchedUpdate.DiffGraphBuilder):Unit = {
+    for(change <- iterator) change match {
+      case Change.RemoveNode(nodeId) => builder.removeNode(cpg.graph.node(nodeId))
+      case Change.RemoveNodeProperty(nodeId, propertyKey) => builder.setNodeProperty(cpg.graph.node(nodeId), propertyKey, null)
+      case Change.RemoveEdge(edge) => builder.removeEdge(edge)
+      case Change.RemoveEdgeProperty(_,_) => ???
+      case Change.CreateNode(node) => builder.addNode(node)
+      case Change.SetNodeProperty(node, key, value) => builder.setNodeProperty(node, key, value)
+      case Change.SetEdgeProperty(_,_,_) => ???
+      case Change.CreateEdge(src, dst, label, packedProperties) => builder.addEdge(src, dst, label, packedProperties:_*)
+    }
+  }
 }
 
 object DiffGraph {
