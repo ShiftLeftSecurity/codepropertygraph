@@ -297,7 +297,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     override def run(): Unit = {
       try {
         nDiffT = 0
-        MDC.setContextMap(mdc)
+        //logback chokes on null context maps
+        if(mdc != null) MDC.setContextMap(mdc)
         var terminate   = false
         var index: Int  = 0
         val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
