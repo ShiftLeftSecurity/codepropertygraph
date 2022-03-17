@@ -76,8 +76,6 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral[A](a: A)(implicit f: A => Traversal[Literal]): LiteralTraversal = new LiteralTraversal(f(a))
-
   implicit def toType[A](a: A)(implicit f: A => Traversal[Type]): TypeTraversal = new TypeTraversal(f(a))
   implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): TypeDeclTraversal =
     new TypeDeclTraversal(f(a))
@@ -173,17 +171,20 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
       Traversal.fromSingle(node)
   }
 
+  implicit def toExpression[A <: Expression](a: IterableOnce[A]): ExpressionTraversal[A] =
+    new ExpressionTraversal[A](iterableToTraversal(a))
 }
 
 trait LowPrioImplicits extends LowLowPrioImplicits {
-  implicit def toExpression[A, NodeType <: Expression](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): ExpressionTraversal[NodeType] = new ExpressionTraversal[NodeType](f(a))
 
   implicit def toEvalTypeAccessorsExpression[A, NodeType <: Expression](a: A)(implicit
     f: A => Traversal[NodeType]
   ): EvalTypeAccessors[NodeType] =
     new EvalTypeAccessors(f(a))
+  //implicit def singleToExpression[A <: Expression](a: A): ExpressionTraversal[A] =
+  //  new ExpressionTraversal[A](Traversal.fromSingle(a))
+  //implicit def iterOnceToExpression[A <: Expression](a: IterableOnce[A]): ExpressionTraversal[A] =
+  //  new ExpressionTraversal[A](iterableToTraversal(a))
 }
 
 trait LowLowPrioImplicits {
