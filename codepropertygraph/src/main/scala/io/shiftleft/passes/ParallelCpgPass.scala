@@ -141,7 +141,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
     override def run(): Unit = {
       try {
-        MDC.setContextMap(mdc)
+        //logback chokes on null context maps
+        if(mdc != null) MDC.setContextMap(mdc)
         var terminate  = false
         var index: Int = 0
         while (!terminate) {

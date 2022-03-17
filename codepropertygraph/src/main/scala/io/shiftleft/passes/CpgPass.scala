@@ -195,7 +195,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
         // in the reported timings, and we must have our final log message if finish() throws
         val nanosStop = System.nanoTime()
-        val fracRun = if (nanosBuilt == -1) 100.0 else (nanosBuilt - nanosStart) * 100.0 / (nanosStop - nanosStart + 1)
+        val fracRun = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
         val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
           if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
         } else ""
