@@ -27,11 +27,11 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
   override def runWithBuilder(builder: BatchedUpdate.DiffGraphBuilder): Int = {
     var nParts = 0
-    for(part <- partIterator){
+    for (part <- partIterator) {
       val res = runOnPart(part)
-      if(!res.hasNext) nParts += 1
-      else{
-        for(diff <- res){
+      if (!res.hasNext) nParts += 1
+      else {
+        for (diff <- res) {
           diff.convertToOdbStyle(cpg, builder)
           nParts += 1
         }
@@ -141,8 +141,8 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
 
     override def run(): Unit = {
       try {
-        //logback chokes on null context maps
-        if(mdc != null) MDC.setContextMap(mdc)
+        // logback chokes on null context maps
+        if (mdc != null) MDC.setContextMap(mdc)
         var terminate  = false
         var index: Int = 0
         while (!terminate) {
@@ -297,8 +297,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     override def run(): Unit = {
       try {
         nDiffT = 0
-        //logback chokes on null context maps
-        if(mdc != null) MDC.setContextMap(mdc)
+        // logback chokes on null context maps
+        if (mdc != null) MDC.setContextMap(mdc)
         var terminate   = false
         var index: Int  = 0
         val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
