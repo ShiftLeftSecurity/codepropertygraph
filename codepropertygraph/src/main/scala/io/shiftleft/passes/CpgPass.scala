@@ -281,10 +281,15 @@ trait CpgPassBase {
     */
   def name: String = getClass.getName
 
-  /* Runs the cpg pass, adding changes to the passed builder. Use with caution -- API is unstable.
-     Returns number of parallel parts. Includes setup and finish logic.*/
+  /** Runs the cpg pass, adding changes to the passed builder. Use with caution -- API is unstable. Returns max(nParts,
+    * 1), where nParts is either the number of parallel parts, or the number of iterarator elements in case of legacy
+    * passes. Includes init() and finish() logic.
+    */
   def runWithBuilder(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int
 
+  /** Wraps runWithBuilder with logging, and swallows raised exceptions. Use with caution -- API is unstable. A return
+    * value of -1 indicates failure, otherwise the return value of runWithBuilder is passed through.
+    */
   def runWithBuilderLogged(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int = {
     baseLogger.info(s"Start of pass: $name")
     val nanoStart = System.nanoTime()
