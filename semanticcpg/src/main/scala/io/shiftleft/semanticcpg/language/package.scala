@@ -1,44 +1,13 @@
 package io.shiftleft.semanticcpg
 
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.{
-  AbstractNode,
-  AstNode,
-  Call,
-  CfgNode,
-  ControlStructure,
-  Expression,
-  File,
-  Identifier,
-  Literal,
-  Local,
-  Member,
-  Method,
-  MethodParameterIn,
-  MethodParameterOut,
-  MethodRef,
-  MethodReturn,
-  Namespace,
-  NamespaceBlock,
-  NewNode,
-  StoredNode,
-  Tag,
-  Type,
-  TypeDecl
-}
+import io.shiftleft.codepropertygraph.generated.nodes.{AbstractNode, AstNode, Call, CfgNode, ControlStructure, Expression, File, Identifier, Literal, Local, Member, Method, MethodParameterIn, MethodParameterOut, MethodRef, MethodReturn, Namespace, NamespaceBlock, NewNode, StoredNode, Tag, Type, TypeDecl}
 import io.shiftleft.codepropertygraph.generated.traversal.NodeTraversalImplicits
-import io.shiftleft.semanticcpg.language.bindingextension.{
-  MethodTraversal => BindingMethodTraversal,
-  TypeDeclTraversal => BindingTypeDeclTraversal
-}
+import io.shiftleft.semanticcpg.language.bindingextension.{MethodTraversal => BindingMethodTraversal, TypeDeclTraversal => BindingTypeDeclTraversal}
 import io.shiftleft.semanticcpg.language.callgraphextension.{CallTraversal, MethodTraversal}
 import io.shiftleft.semanticcpg.language.dotextension.{AstNodeDot, CfgNodeDot}
 import io.shiftleft.semanticcpg.language.nodemethods._
-import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{
-  AstNodeTraversal,
-  CfgNodeTraversal,
-  ExpressionTraversal
-}
+import io.shiftleft.semanticcpg.language.types.expressions.generalizations.{AstNodeTraversal, CfgNodeTraversal, ExpressionTraversal}
 import io.shiftleft.semanticcpg.language.types.expressions.{CallTraversal => OriginalCall, _}
 import io.shiftleft.semanticcpg.language.types.propertyaccessors._
 import io.shiftleft.semanticcpg.language.types.structure.{MethodTraversal => OriginalMethod, _}
@@ -123,9 +92,8 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
     Traversal.fromSingle(node)
 
   implicit def toSteps[A](trav: Traversal[A]): Steps[A] = new Steps(trav)
-
-  implicit def toNodeSteps[A, NodeType <: StoredNode](a: A)(implicit f: A => Traversal[NodeType]): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](f(a))
+  implicit def iterOnceToNodeSteps[A <: StoredNode](a: IterableOnce[A]): NodeSteps[A] =
+    new NodeSteps[A](iterableToTraversal(a))
 
   implicit def toNewNodeTrav[NodeType <: NewNode](trav: Traversal[NodeType]): NewNodeSteps[NodeType] =
     new NewNodeSteps[NodeType](trav)
@@ -134,24 +102,41 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toTagTraversal(trav: Traversal[Tag]): TagTraversal = new TagTraversal(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[Local]): EvalTypeAccessors[Local] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMember[A](a: A)(implicit f: A => Traversal[Member]): EvalTypeAccessors[Member] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethod[A](a: A)(implicit f: A => Traversal[Method]): EvalTypeAccessors[Method] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodParameterIn[A](a: A)(implicit
-    f: A => Traversal[MethodParameterIn]
-  ): EvalTypeAccessors[MethodParameterIn] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodParameterOut[A](a: A)(implicit
-    f: A => Traversal[MethodParameterOut]
-  ): EvalTypeAccessors[MethodParameterOut] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodReturn[A](a: A)(implicit
-    f: A => Traversal[MethodReturn]
-  ): EvalTypeAccessors[MethodReturn] =
-    new EvalTypeAccessors(f(a))
+  implicit def singleToEvalTypeAccessorsLocal[A <: Local](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsLocal[A <: Local](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMember[A <: Member](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMember[A <: Member](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMethod[A <: Method](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMethod[A <: Method](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsParameterIn[A <: MethodParameterIn](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsParameterIn[A <: MethodParameterIn](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsParameterOut[A <: MethodParameterOut](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsParameterOut[A <: MethodParameterOut](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMethodReturn[A <: MethodReturn](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMethodReturn[A <: MethodReturn](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsExpression[A <: Expression](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsExpression[A <: Expression](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
   // EvalType accessors ~
 
   // ~ Modifier accessors
@@ -175,19 +160,7 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
     new ExpressionTraversal[A](iterableToTraversal(a))
 }
 
-trait LowPrioImplicits extends LowLowPrioImplicits {
-
-  implicit def toEvalTypeAccessorsExpression[A, NodeType <: Expression](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): EvalTypeAccessors[NodeType] =
-    new EvalTypeAccessors(f(a))
-  //implicit def singleToExpression[A <: Expression](a: A): ExpressionTraversal[A] =
-  //  new ExpressionTraversal[A](Traversal.fromSingle(a))
-  //implicit def iterOnceToExpression[A <: Expression](a: IterableOnce[A]): ExpressionTraversal[A] =
-  //  new ExpressionTraversal[A](iterableToTraversal(a))
-}
-
-trait LowLowPrioImplicits {
+trait LowPrioImplicits {
   implicit def toCfgNode[A, NodeType <: CfgNode](a: A)(implicit
     f: A => Traversal[NodeType]
   ): CfgNodeTraversal[NodeType] =

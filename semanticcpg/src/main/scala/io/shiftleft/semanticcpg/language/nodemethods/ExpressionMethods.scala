@@ -6,7 +6,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, CallRepr, 
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.ICallResolver
 import io.shiftleft.semanticcpg.utils.MemberAccess
-import overflowdb.traversal.Traversal
+import overflowdb.traversal._
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
