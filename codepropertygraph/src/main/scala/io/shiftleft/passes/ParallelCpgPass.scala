@@ -3,6 +3,7 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
+import overflowdb.BatchedUpdate
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
@@ -23,6 +24,21 @@ abstract class ParallelCpgPass[T](cpg: Cpg, outName: String = "", keyPools: Opti
   def runOnPart(part: T): Iterator[DiffGraph]
 
   implicit val executionContext: ExecutionContext = ExecutionContextProvider.getExecutionContext
+
+  override def runWithBuilder(builder: BatchedUpdate.DiffGraphBuilder): Int = {
+    var nParts = 0
+    for (part <- partIterator) {
+      val res = runOnPart(part)
+      if (!res.hasNext) nParts += 1
+      else {
+        for (diff <- res) {
+          diff.convertToOdbStyle(cpg, builder)
+          nParts += 1
+        }
+      }
+    }
+    nParts
+  }
 
   override def createAndApply(): Unit = {
     withWriter() { writer =>
@@ -177,17 +193,9 @@ object ConcurrentWriterCpgPass {
   private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
 abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends CpgPassBase {
-  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
+    extends NewStyleCpgPassBase[T] {
 
   @volatile var nDiffT = -1
-
-  // generate Array of parts that can be processed in parallel
-  def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
-  // setup large data structures, acquire external resources
-  def init(): Unit = {}
-  // release large data structures and external resources
-  def finish(): Unit = {}
 
   /** WARNING: runOnPart is executed in parallel to committing of graph modifications. The upshot is that it is unsafe
     * to read ANY data from cpg, on pain of bad race conditions
@@ -196,10 +204,6 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     *
     * E.g. adding a CFG edge to node X races with reading an AST edge of node X.
     */
-  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
-
-  override def createAndApply(): Unit = createApplySerializeAndStore(null)
-
   override def createApplySerializeAndStore(
     serializedCpg: SerializedCpg,
     inverse: Boolean = false,
@@ -273,7 +277,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
       } else ""
       baseLogger.info(
-        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes commited from ${nParts}%d parts.${serializationString}%s"
+        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
       )
     }
   }
@@ -293,7 +297,8 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     override def run(): Unit = {
       try {
         nDiffT = 0
-        MDC.setContextMap(mdc)
+        // logback chokes on null context maps
+        if (mdc != null) MDC.setContextMap(mdc)
         var terminate   = false
         var index: Int  = 0
         val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
