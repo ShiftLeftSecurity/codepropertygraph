@@ -5,8 +5,6 @@ import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
 import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal._
 
-import scala.jdk.CollectionConverters._
-
 /** An expression (base type)
   */
 class ExpressionTraversal[NodeType <: Expression](val traversal: Traversal[NodeType]) extends AnyVal {
@@ -20,20 +18,17 @@ class ExpressionTraversal[NodeType <: Expression](val traversal: Traversal[NodeT
   /** Traverse to enclosing expression
     */
   def expressionUp: Traversal[Expression] =
-    traversal.in(EdgeTypes.AST).not(_.hasLabel(NodeTypes.LOCAL)).cast[Expression]
+    traversal.flatMap(_.expressionUp)
 
   /** Traverse to sub expressions
     */
   def expressionDown: Traversal[Expression] =
-    traversal
-      .out(EdgeTypes.AST)
-      .not(_.hasLabel(NodeTypes.LOCAL))
-      .cast[Expression]
+    traversal.flatMap(_.expressionDown)
 
   /** If the expression is used as receiver for a call, this traverses to the call.
     */
   def receivedCall: Traversal[Call] =
-    traversal.in(EdgeTypes.RECEIVER).cast[Call]
+    traversal.flatMap(_.receivedCall)
 
   /** Only those expressions which are (direct) arguments of a call
     */
@@ -59,13 +54,7 @@ class ExpressionTraversal[NodeType <: Expression](val traversal: Traversal[NodeT
   /** Traverse to related parameter, if the expression is an argument to a call and the call can be resolved.
     */
   def parameter(implicit callResolver: ICallResolver): Traversal[MethodParameterIn] =
-    for {
-      expr          <- traversal.collect { case node: HasArgumentIndex => node }
-      call          <- expr._argumentIn.asScala
-      calledMethods <- callResolver.getCalledMethods(call.asInstanceOf[CallRepr])
-      paramIn       <- calledMethods._astOut.asScala.collect { case node: MethodParameterIn => node }
-      if paramIn.order == expr.argumentIndex
-    } yield paramIn
+    traversal.flatMap(_.parameter)
 
   /** Traverse to enclosing method
     */

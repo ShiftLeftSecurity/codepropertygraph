@@ -76,58 +76,101 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   // then you need to add an implicit conversion from `Steps[NodeType]` to your type
   // here.
 
-  implicit def toLiteral[A](a: A)(implicit f: A => Traversal[Literal]): LiteralTraversal = new LiteralTraversal(f(a))
+  implicit def singleToTypeTrav[A <: Type](a: A): TypeTraversal =
+    new TypeTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToTypeTrav[A <: Type](a: IterableOnce[A]): TypeTraversal =
+    new TypeTraversal(iterableToTraversal(a))
 
-  implicit def toType[A](a: A)(implicit f: A => Traversal[Type]): TypeTraversal = new TypeTraversal(f(a))
-  implicit def toTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): TypeDeclTraversal =
-    new TypeDeclTraversal(f(a))
-  implicit def toCall(traversal: IterableOnce[Call]): OriginalCall = new OriginalCall(traversal)
-  implicit def toControlStructure[A](a: A)(implicit f: A => Traversal[ControlStructure]): ControlStructureTraversal =
-    new ControlStructureTraversal(f(a))
-  implicit def toIdentifier[A](a: A)(implicit f: A => Traversal[Identifier]): IdentifierTraversal =
-    new IdentifierTraversal(f(a))
+  implicit def singleToTypeDeclTrav[A <: TypeDecl](a: A): TypeDeclTraversal =
+    new TypeDeclTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToTypeDeclTrav[A <: TypeDecl](a: IterableOnce[A]): TypeDeclTraversal =
+    new TypeDeclTraversal(iterableToTraversal(a))
+
+  implicit def iterOnceToOriginalCallTrav[A <: Call](a: IterableOnce[A]): OriginalCall =
+    new OriginalCall(iterableToTraversal(a))
+
+  implicit def singleToControlStructureTrav[A <: ControlStructure](a: A): ControlStructureTraversal =
+    new ControlStructureTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToControlStructureTrav[A <: ControlStructure](a: IterableOnce[A]): ControlStructureTraversal =
+    new ControlStructureTraversal(iterableToTraversal(a))
+
+  implicit def singleToIdentifierTrav[A <: Identifier](a: A): IdentifierTraversal =
+    new IdentifierTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToIdentifierTrav[A <: Identifier](a: IterableOnce[A]): IdentifierTraversal =
+    new IdentifierTraversal(iterableToTraversal(a))
+
   implicit def toMember(traversal: IterableOnce[Member]): MemberTraversal = new MemberTraversal(traversal)
   implicit def toLocal(traversal: IterableOnce[Local]): LocalTraversal    = new LocalTraversal(traversal)
   implicit def toMethod(traversal: IterableOnce[Method]): OriginalMethod  = new OriginalMethod(traversal)
-  implicit def toMethodParameter[A](a: A)(implicit f: A => Traversal[MethodParameterIn]): MethodParameterTraversal =
-    new MethodParameterTraversal(f(a))
-  implicit def toMethodParameterOut[A](a: A)(implicit
-    f: A => Traversal[MethodParameterOut]
+
+  implicit def singleToMethodParameterInTrav[A <: MethodParameterIn](a: A): MethodParameterTraversal =
+    new MethodParameterTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToMethodParameterInTrav[A <: MethodParameterIn](a: IterableOnce[A]): MethodParameterTraversal =
+    new MethodParameterTraversal(iterableToTraversal(a))
+
+  implicit def singleToMethodParameterOutTrav[A <: MethodParameterOut](a: A): MethodParameterOutTraversal =
+    new MethodParameterOutTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToMethodParameterOutTrav[A <: MethodParameterOut](
+    a: IterableOnce[A]
   ): MethodParameterOutTraversal =
-    new MethodParameterOutTraversal(f(a))
-  implicit def toMethodReturn[A](a: A)(implicit f: A => Traversal[MethodReturn]): MethodReturnTraversal =
-    new MethodReturnTraversal(f(a))
-  implicit def toNamespace[A](a: A)(implicit f: A => Traversal[Namespace]): NamespaceTraversal =
-    new NamespaceTraversal(f(a))
-  implicit def toNamespaceBlock[A](a: A)(implicit f: A => Traversal[NamespaceBlock]): NamespaceBlockTraversal =
-    new NamespaceBlockTraversal(f(a))
-  implicit def toFile[A](a: A)(implicit f: A => Traversal[File]): FileTraversal = new FileTraversal(f(a))
+    new MethodParameterOutTraversal(iterableToTraversal(a))
+
+  implicit def iterOnceToMethodReturnTrav[A <: MethodReturn](a: IterableOnce[A]): MethodReturnTraversal =
+    new MethodReturnTraversal(iterableToTraversal(a))
+
+  implicit def singleToNamespaceTrav[A <: Namespace](a: A): NamespaceTraversal =
+    new NamespaceTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToNamespaceTrav[A <: Namespace](a: IterableOnce[A]): NamespaceTraversal =
+    new NamespaceTraversal(iterableToTraversal(a))
+
+  implicit def singleToNamespaceBlockTrav[A <: NamespaceBlock](a: A): NamespaceBlockTraversal =
+    new NamespaceBlockTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToNamespaceBlockTrav[A <: NamespaceBlock](a: IterableOnce[A]): NamespaceBlockTraversal =
+    new NamespaceBlockTraversal(iterableToTraversal(a))
+
+  implicit def singleToFileTrav[A <: File](a: A): FileTraversal =
+    new FileTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToFileTrav[A <: File](a: IterableOnce[A]): FileTraversal =
+    new FileTraversal(iterableToTraversal(a))
 
   // Call graph extension
-  implicit def toMethodForCallGraph[A](a: A)(implicit f: A => Traversal[Method]): MethodTraversal =
-    new MethodTraversal(f(a))
-  implicit def toCallForCallGraph[A](a: A)(implicit f: A => Traversal[Call]): CallTraversal = new CallTraversal(f(a))
+  implicit def singleToMethodTravCallGraphExt[A <: Method](a: A): MethodTraversal =
+    new MethodTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToMethodTravCallGraphExt[A <: Method](a: IterableOnce[A]): MethodTraversal =
+    new MethodTraversal(iterableToTraversal(a))
+  implicit def singleToCallTrav[A <: Call](a: A): CallTraversal =
+    new CallTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToCallTrav[A <: Call](a: IterableOnce[A]): CallTraversal =
+    new CallTraversal(iterableToTraversal(a))
   // / Call graph extension
 
   // Binding extensions
-  implicit def toMethodForBindingExt[A](a: A)(implicit f: A => Traversal[Method]): BindingMethodTraversal =
-    new BindingMethodTraversal(f(a))
-  implicit def toTypeDeclForBindingExt[A](a: A)(implicit f: A => Traversal[TypeDecl]): BindingTypeDeclTraversal =
-    new BindingTypeDeclTraversal(f(a))
+  implicit def singleToBindingMethodTrav[A <: Method](a: A): BindingMethodTraversal =
+    new BindingMethodTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToBindingMethodTrav[A <: Method](a: IterableOnce[A]): BindingMethodTraversal =
+    new BindingMethodTraversal(iterableToTraversal(a))
 
-  implicit def toAstNodeDot[A, NodeType <: AstNode](a: A)(implicit f: A => Traversal[NodeType]): AstNodeDot[NodeType] =
-    new AstNodeDot(f(a))
+  implicit def singleToBindingTypeDeclTrav[A <: TypeDecl](a: A): BindingTypeDeclTraversal =
+    new BindingTypeDeclTraversal(Traversal.fromSingle(a))
+  implicit def iterOnceToBindingTypeDeclTrav[A <: TypeDecl](a: IterableOnce[A]): BindingTypeDeclTraversal =
+    new BindingTypeDeclTraversal(iterableToTraversal(a))
 
-  implicit def toCfgNodeDot[A](a: A)(implicit f: A => Traversal[Method]): CfgNodeDot =
-    new CfgNodeDot(f(a))
+  implicit def singleToAstNodeDot[A <: AstNode](a: A): AstNodeDot[A] =
+    new AstNodeDot(Traversal.fromSingle(a))
+  implicit def iterOnceToAstNodeDot[A <: AstNode](a: IterableOnce[A]): AstNodeDot[A] =
+    new AstNodeDot(iterableToTraversal(a))
+
+  implicit def singleToCfgNodeDot[A <: Method](a: A): CfgNodeDot =
+    new CfgNodeDot(Traversal.fromSingle(a))
+  implicit def iterOnceToCfgNodeDot[A <: Method](a: IterableOnce[A]): CfgNodeDot =
+    new CfgNodeDot(iterableToTraversal(a))
 
   implicit def toTraversal[NodeType <: AbstractNode](node: NodeType): Traversal[NodeType] =
     Traversal.fromSingle(node)
 
   implicit def toSteps[A](trav: Traversal[A]): Steps[A] = new Steps(trav)
-
-  implicit def toNodeSteps[A, NodeType <: StoredNode](a: A)(implicit f: A => Traversal[NodeType]): NodeSteps[NodeType] =
-    new NodeSteps[NodeType](f(a))
+  implicit def iterOnceToNodeSteps[A <: StoredNode](a: IterableOnce[A]): NodeSteps[A] =
+    new NodeSteps[A](iterableToTraversal(a))
 
   implicit def toNewNodeTrav[NodeType <: NewNode](trav: Traversal[NodeType]): NewNodeSteps[NodeType] =
     new NewNodeSteps[NodeType](trav)
@@ -136,33 +179,62 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
   implicit def toTagTraversal(trav: Traversal[Tag]): TagTraversal = new TagTraversal(trav)
 
   // ~ EvalType accessors
-  implicit def toEvalTypeAccessorsLocal[A](a: A)(implicit f: A => Traversal[Local]): EvalTypeAccessors[Local] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMember[A](a: A)(implicit f: A => Traversal[Member]): EvalTypeAccessors[Member] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethod[A](a: A)(implicit f: A => Traversal[Method]): EvalTypeAccessors[Method] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodParameterIn[A](a: A)(implicit
-    f: A => Traversal[MethodParameterIn]
-  ): EvalTypeAccessors[MethodParameterIn] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodParameterOut[A](a: A)(implicit
-    f: A => Traversal[MethodParameterOut]
-  ): EvalTypeAccessors[MethodParameterOut] =
-    new EvalTypeAccessors(f(a))
-  implicit def toEvalTypeAccessorsMethodReturn[A](a: A)(implicit
-    f: A => Traversal[MethodReturn]
-  ): EvalTypeAccessors[MethodReturn] =
-    new EvalTypeAccessors(f(a))
+  implicit def singleToEvalTypeAccessorsLocal[A <: Local](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsLocal[A <: Local](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMember[A <: Member](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMember[A <: Member](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMethod[A <: Method](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMethod[A <: Method](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsParameterIn[A <: MethodParameterIn](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsParameterIn[A <: MethodParameterIn](
+    a: IterableOnce[A]
+  ): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsParameterOut[A <: MethodParameterOut](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsParameterOut[A <: MethodParameterOut](
+    a: IterableOnce[A]
+  ): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsMethodReturn[A <: MethodReturn](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsMethodReturn[A <: MethodReturn](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToEvalTypeAccessorsExpression[A <: Expression](a: A): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToEvalTypeAccessorsExpression[A <: Expression](a: IterableOnce[A]): EvalTypeAccessors[A] =
+    new EvalTypeAccessors[A](iterableToTraversal(a))
+
   // EvalType accessors ~
 
   // ~ Modifier accessors
-  implicit def toModifierAccessorsMember[A](a: A)(implicit f: A => Traversal[Member]): ModifierAccessors[Member] =
-    new ModifierAccessors(f(a))
-  implicit def toModifierAccessorsMethod[A](a: A)(implicit f: A => Traversal[Method]): ModifierAccessors[Method] =
-    new ModifierAccessors(f(a))
-  implicit def toModifierAccessorsTypeDecl[A](a: A)(implicit f: A => Traversal[TypeDecl]): ModifierAccessors[TypeDecl] =
-    new ModifierAccessors(f(a))
+  implicit def singleToModifierAccessorsMember[A <: Member](a: A): ModifierAccessors[A] =
+    new ModifierAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToModifierAccessorsMember[A <: Member](a: IterableOnce[A]): ModifierAccessors[A] =
+    new ModifierAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToModifierAccessorsMethod[A <: Method](a: A): ModifierAccessors[A] =
+    new ModifierAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToModifierAccessorsMethod[A <: Method](a: IterableOnce[A]): ModifierAccessors[A] =
+    new ModifierAccessors[A](iterableToTraversal(a))
+
+  implicit def singleToModifierAccessorsTypeDecl[A <: TypeDecl](a: A): ModifierAccessors[A] =
+    new ModifierAccessors[A](Traversal.fromSingle(a))
+  implicit def iterOnceToModifierAccessorsTypeDecl[A <: TypeDecl](a: IterableOnce[A]): ModifierAccessors[A] =
+    new ModifierAccessors[A](iterableToTraversal(a))
   // Modifier accessors ~
 
   implicit class NewNodeTypeDeco[NodeType <: NewNode](val node: NodeType) extends AnyVal {
@@ -173,26 +245,18 @@ package object language extends operatorextension.Implicits with LowPrioImplicit
       Traversal.fromSingle(node)
   }
 
+  implicit def toExpression[A <: Expression](a: IterableOnce[A]): ExpressionTraversal[A] =
+    new ExpressionTraversal[A](iterableToTraversal(a))
 }
 
-trait LowPrioImplicits extends LowLowPrioImplicits {
-  implicit def toExpression[A, NodeType <: Expression](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): ExpressionTraversal[NodeType] = new ExpressionTraversal[NodeType](f(a))
+trait LowPrioImplicits {
+  implicit def singleToCfgNodeTraversal[A <: CfgNode](a: A): CfgNodeTraversal[A] =
+    new CfgNodeTraversal[A](Traversal.fromSingle(a))
+  implicit def iterOnceToCfgNodeTraversal[A <: CfgNode](a: IterableOnce[A]): CfgNodeTraversal[A] =
+    new CfgNodeTraversal[A](iterableToTraversal(a))
 
-  implicit def toEvalTypeAccessorsExpression[A, NodeType <: Expression](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): EvalTypeAccessors[NodeType] =
-    new EvalTypeAccessors(f(a))
-}
-
-trait LowLowPrioImplicits {
-  implicit def toCfgNode[A, NodeType <: CfgNode](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): CfgNodeTraversal[NodeType] =
-    new CfgNodeTraversal(f(a))
-  implicit def toAstNode[A, NodeType <: AstNode](a: A)(implicit
-    f: A => Traversal[NodeType]
-  ): AstNodeTraversal[NodeType] =
-    new AstNodeTraversal[NodeType](f(a))
+  implicit def singleToAstNodeTraversal[A <: AstNode](a: A): AstNodeTraversal[A] =
+    new AstNodeTraversal[A](Traversal.fromSingle(a))
+  implicit def iterOnceToAstNodeTraversal[A <: AstNode](a: IterableOnce[A]): AstNodeTraversal[A] =
+    new AstNodeTraversal[A](iterableToTraversal(a))
 }

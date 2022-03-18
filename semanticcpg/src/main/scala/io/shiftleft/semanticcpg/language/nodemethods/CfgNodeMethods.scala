@@ -3,7 +3,7 @@ package io.shiftleft.semanticcpg.language.nodemethods
 import io.shiftleft.Implicits.JavaIteratorDeco
 import io.shiftleft.codepropertygraph.generated.nodes._
 import io.shiftleft.semanticcpg.NodeExtension
-import io.shiftleft.semanticcpg.language.{toCfgNode, toCfgNodeMethods}
+import io.shiftleft.semanticcpg.language._
 import overflowdb.traversal.Traversal
 
 import scala.jdk.CollectionConverters._
