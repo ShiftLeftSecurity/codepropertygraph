@@ -29,11 +29,13 @@ class NodeMethods(val node: AbstractNode) extends AnyVal with NodeExtension {
   def newTagNode(tagName: String): NewTagNodePairTraversal = newTagNodePair(tagName, "")
 
   def newTagNodePair(tagName: String, tagValue: String): NewTagNodePairTraversal = {
-    new NewTagNodePairTraversal(Traversal.fromSingle(
-      NewTagNodePair()
-        .tag(NewTag().name(tagName).value(tagValue))
-        .node(node)
-    ))
+    new NewTagNodePairTraversal(
+      Traversal.fromSingle(
+        NewTagNodePair()
+          .tag(NewTag().name(tagName).value(tagValue))
+          .node(node)
+      )
+    )
   }
 
   def tagList: Traversal[TagBase] =

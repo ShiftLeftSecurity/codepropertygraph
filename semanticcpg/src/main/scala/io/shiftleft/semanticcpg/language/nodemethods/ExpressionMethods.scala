@@ -1,8 +1,16 @@
 package io.shiftleft.semanticcpg.language.nodemethods
 
 import io.shiftleft.Implicits.JavaIteratorDeco
+import io.shiftleft.codepropertygraph.generated.nodes.{
+  AstNode,
+  Call,
+  CallRepr,
+  Expression,
+  Local,
+  MethodParameterIn,
+  Type
+}
 import io.shiftleft.codepropertygraph.generated.{EdgeTypes, NodeTypes}
-import io.shiftleft.codepropertygraph.generated.nodes.{AstNode, Call, CallRepr, Expression, Local, MethodParameterIn, Type}
 import io.shiftleft.semanticcpg.NodeExtension
 import io.shiftleft.semanticcpg.language.ICallResolver
 import io.shiftleft.semanticcpg.utils.MemberAccess
