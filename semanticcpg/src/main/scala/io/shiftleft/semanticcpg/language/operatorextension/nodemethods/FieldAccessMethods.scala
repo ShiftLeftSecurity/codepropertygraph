@@ -11,7 +11,7 @@ import io.shiftleft.codepropertygraph.generated.nodes.{
 }
 import io.shiftleft.semanticcpg.language._
 import io.shiftleft.semanticcpg.language.operatorextension.OpNodes
-import overflowdb.traversal.{NodeOps, Traversal}
+import overflowdb.traversal.{NodeOps, Traversal, jIteratortoTraversal}
 
 class FieldAccessMethods(val arrayAccess: OpNodes.FieldAccess) extends AnyVal {
 
@@ -26,17 +26,8 @@ class FieldAccessMethods(val arrayAccess: OpNodes.FieldAccess) extends AnyVal {
     }
   }
 
-  def fieldIdentifier: Traversal[FieldIdentifier] =
-    arrayAccess.start.argument(2).isFieldIdentifier
+  def fieldIdentifier: Traversal[FieldIdentifier] = arrayAccess.start.argument(2).isFieldIdentifier
 
-  def member: Option[Member] = {
-    val base = typeDecl.headOption
-    val name = fieldIdentifier.map(_.canonicalName).headOption
-    (base, name) match {
-      case (Some(b), Some(n)) =>
-        b.member.nameExact(n).headOption
-      case _ => None
-    }
-  }
+  def member: Option[Member] = arrayAccess._refOut.to(Traversal).collectAll[Member].headOption
 
 }
