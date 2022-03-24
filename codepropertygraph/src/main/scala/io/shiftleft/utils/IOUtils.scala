@@ -1,8 +1,8 @@
 package io.shiftleft.utils
 
-import java.io.Reader
+import java.io.{InputStreamReader, Reader}
 import java.nio.charset.{CharsetDecoder, CodingErrorAction}
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import scala.io.{BufferedSource, Codec, Source}
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.util.Using
@@ -16,10 +16,11 @@ object IOUtils {
     * As we are using it in a [[io.shiftleft.passes.ParallelCpgPass]] it needs to be thread-safe. Hence, we make sure to
     * create a new instance everytime.
     */
-  private def createDecoder(): CharsetDecoder =
+  private def createDecoder(): CharsetDecoder = {
     Codec.UTF8.decoder
       .onMalformedInput(CodingErrorAction.REPLACE)
       .onUnmappableCharacter(CodingErrorAction.REPLACE)
+  }
 
   private val boms = Set(
     '\uefbb', // UTF-8
@@ -66,9 +67,43 @@ object IOUtils {
     * @return
     *   a Seq with all lines in the given file as Strings
     */
-  def readLinesInFile(path: Path): Seq[String] =
+  def readLinesInFile(path: Path): Seq[String] = {
     Using.resource(bufferedSourceFromFile(path)) { bufferedSource =>
       contentFromBufferedSource(bufferedSource)
     }
+  }
+
+  def readFile(path: Path): String = {
+    val readLen = 2 << 14
+    val fileLen = Files.size(path)
+    if (fileLen > Int.MaxValue) {
+      throw new RuntimeException(s"File $path is to big. Size: $fileLen")
+    }
+    var readPos = 0
+    var readBuffer = new Array[Char](Math.max(readLen, fileLen.toInt) + readLen)
+    Using.resource(new InputStreamReader(Files.newInputStream(path), createDecoder())) { bufferedReader =>
+      var bytes = 0
+      while (bytes != -1) {
+        if (readBuffer.length - readPos < readLen) {
+          val newReadBuffer = new Array[Char](Math.min(readBuffer.length * 2L, Int.MaxValue).toInt)
+          Array.copy(readBuffer, 0, newReadBuffer, 0, readPos)
+          readBuffer = newReadBuffer
+        }
+        bytes = bufferedReader.read(readBuffer, readPos, readLen)
+        if (bytes != -1) {
+          readPos += bytes
+        }
+      }
+      val withUnpaired =
+        if (readPos > 0 && boms.contains(readBuffer(0))) {
+          new String(readBuffer, 1, readPos - 1)
+        } else {
+          new String(readBuffer, 0, readPos)
+        }
+
+      replaceUnpairedSurrogates(withUnpaired)
+    }
+
+  }
 
 }
