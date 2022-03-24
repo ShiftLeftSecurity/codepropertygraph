@@ -21,6 +21,7 @@ import io.shiftleft.proto.cpg.Cpg.{
   PropertyValue,
   StringList
 }
+import org.slf4j.LoggerFactory.getLogger
 import overflowdb._
 import overflowdb.traversal.{jIteratortoTraversal, toNodeTraversalViaAdditionalImplicit}
 
@@ -280,6 +281,10 @@ object DiffGraphProtoSerializer {
   }
 }
 
+object BatchUpdateListenerLogger {
+  val logger = getLogger(getClass)
+}
+
 class BatchUpdateBiListener(forward: Boolean, inverse: Boolean) extends overflowdb.BatchedUpdate.ModificationListener {
   val forwardListener   = if (forward) new BatchUpdateForwardListener else null
   val backwardsListener = if (inverse) new BatchUpdateInverseListener else null
@@ -327,7 +332,9 @@ class BatchUpdateBiListener(forward: Boolean, inverse: Boolean) extends overflow
 
 class BatchUpdateForwardListener extends overflowdb.BatchedUpdate.ModificationListener {
   import DiffGraphProtoSerializer._
-  val builder = CpgOverlay.newBuilder
+  val builder   = CpgOverlay.newBuilder
+  var hasLogged = false
+  import BatchUpdateListenerLogger.logger
 
   def nodeToId(nn: AbstractNode): Long = nn.asInstanceOf[StoredNode].id()
 
@@ -356,23 +363,27 @@ class BatchUpdateForwardListener extends overflowdb.BatchedUpdate.ModificationLi
   override def onAfterPropertyChange(node: Node, key: String, value: Any): Unit =
     builder.addNodeProperty(addNodeProperty(node.id, key, value.asInstanceOf[AnyRef], nodeToId))
 
-  override def onBeforeRemoveNode(node: Node): Unit =
-    throw new UnsupportedOperationException(
-      "CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph"
-    )
+  override def onBeforeRemoveNode(node: Node): Unit = if (!hasLogged) {
+    hasLogged = true
+    logger.warn("CpgOverlays can be stacked onto each other, therefore they cannot remove nodes from the graph")
+  }
 
-  override def onBeforeRemoveEdge(edge: Edge): Unit =
-    throw new UnsupportedOperationException(
-      "CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph"
-    )
+  override def onBeforeRemoveEdge(edge: Edge): Unit = if (!hasLogged) {
+    hasLogged = true
+    logger.warn("CpgOverlays can be stacked onto each other, therefore they cannot remove edges from the graph")
+  }
 
   override def finish(): Unit = {}
 }
 
 class BatchUpdateInverseListener extends overflowdb.BatchedUpdate.ModificationListener {
   import DiffGraphProtoSerializer._
-  val buffer                                                      = mutable.ArrayBuffer[DiffGraphProto.Entry]()
+  val buffer    = mutable.ArrayBuffer[DiffGraphProto.Entry]()
+  var hasLogged = false
+  import BatchUpdateListenerLogger.logger
+
   private def addEntry(entry: DiffGraphProto.Entry.Builder): Unit = buffer.append(entry.build())
+
   def getSerialization(): DiffGraphProto = {
     val builder = DiffGraphProto.newBuilder()
     buffer.reverseIterator.foreach(builder.addEntries)
@@ -402,11 +413,15 @@ class BatchUpdateInverseListener extends overflowdb.BatchedUpdate.ModificationLi
 
   override def onAfterPropertyChange(node: Node, key: String, value: Any): Unit = {}
 
-  override def onBeforeRemoveNode(node: Node): Unit =
-    throw new UnsupportedOperationException("We currently do not support inversion of node removal")
+  override def onBeforeRemoveNode(node: Node): Unit = if (!hasLogged) {
+    hasLogged = true
+    logger.warn("We currently do not support inversion of node removal")
+  }
 
-  override def onBeforeRemoveEdge(edge: Edge): Unit =
-    throw new UnsupportedOperationException("We currently do not support inversion of edge removal")
+  override def onBeforeRemoveEdge(edge: Edge): Unit = if (!hasLogged) {
+    hasLogged = true
+    logger.warn("We currently do not support inversion of edge removal")
+  }
 
   override def finish(): Unit = {}
 }
