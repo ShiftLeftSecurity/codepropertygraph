@@ -29,7 +29,7 @@ class IOUtilsTests extends AnyWordSpec with Matchers {
     test("\ufffeabc", Some("abc"))
 
     val strBuilder = new StringBuilder()
-    for (_ <- 0 until(100000)) strBuilder.append("abc")
+    for (_ <- 0 until (100000)) strBuilder.append("abc")
 
     test(strBuilder.toString())
   }
@@ -38,5 +38,4 @@ class IOUtilsTests extends AnyWordSpec with Matchers {
     test(new String(Character.toChars(0x10000)), Some("??"))
     test(new String(Character.toChars(0x10FFFF)), Some("??"))
   }
-
 }
