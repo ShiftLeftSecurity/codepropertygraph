@@ -34,4 +34,9 @@ class IOUtilsTests extends AnyWordSpec with Matchers {
     test(strBuilder.toString())
   }
 
+  "surrogate replacement tests" in new Fixture() {
+    test(new String(Character.toChars(0x10000)), Some("??"))
+    test(new String(Character.toChars(0x10FFFF)), Some("??"))
+  }
+
 }

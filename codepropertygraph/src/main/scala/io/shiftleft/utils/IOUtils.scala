@@ -44,13 +44,25 @@ object IOUtils {
     * characters which will require surrogates when encoded. That means any character which lies beyond the basic
     * multilingual plane. You can do that with a simple regular expression.
     */
-  private def replaceUnpairedSurrogates(input: String): String =
-    input.replaceAll("[^\u0000-\uffff]", "???")
+  //private def replaceUnpairedSurrogates(input: String): String =
+    //input.replaceAll("[^\u0000-\uffff]", "???")
+
+  private def replaceSurrogates(buffer: Array[Char]): Unit = {
+    var i = 0
+    val length = buffer.length
+    while (i < length) {
+      val char = buffer(i)
+      if ((char >= '\uD800' && char <= '\uDBFF') || (char >= '\uDC00' && char <= '\uDFFF')) {
+        buffer(i) = '?'
+      }
+      i += 1
+    }
+  }
 
   private def contentFromBufferedSource(bufferedSource: BufferedSource): Seq[String] = {
     val reader = bufferedSource.bufferedReader()
     skipBOMIfPresent(reader)
-    reader.lines().iterator().asScala.map(replaceUnpairedSurrogates).toSeq
+    reader.lines().iterator().asScala.toSeq
   }
 
   private def bufferedSourceFromFile(path: Path): BufferedSource = {
@@ -94,14 +106,17 @@ object IOUtils {
           readPos += bytes
         }
       }
-      val withUnpaired =
+
+      replaceSurrogates(readBuffer)
+
+      val content =
         if (readPos > 0 && boms.contains(readBuffer(0))) {
           new String(readBuffer, 1, readPos - 1)
         } else {
           new String(readBuffer, 0, readPos)
         }
 
-      replaceUnpairedSurrogates(withUnpaired)
+      content
     }
 
   }
