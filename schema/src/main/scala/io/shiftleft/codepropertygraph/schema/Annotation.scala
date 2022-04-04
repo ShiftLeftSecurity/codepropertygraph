@@ -42,7 +42,7 @@ object Annotation extends SchemaBase {
       .addNodeType(name = "ANNOTATION", comment = "A method annotation")
       .protoId(5)
       .addProperties(name, fullName)
-      .extendz(astNode)
+      .extendz(expression)
 
     val annotationParameterAssign: NodeType = builder
       .addNodeType(
