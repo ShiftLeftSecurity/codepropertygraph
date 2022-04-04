@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.Property.ValueType
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
@@ -85,6 +86,17 @@ object Method extends SchemaBase {
       .mandatory(false)
       .protoId(221)
 
+    val parameterIndex = builder
+      .addProperty(
+        name = "PARAMETER_INDEX",
+        valueType = ValueType.Int,
+        comment = """
+            |Specifies the parameter's number. For the `this` parameter, the parameter index `0` is used.
+            |""".stripMargin
+      )
+      .mandatory(PropertyDefaults.Int)
+      .protoId(222)
+
     val methodParameterIn: NodeType = builder
       .addNodeType(
         name = "METHOD_PARAMETER_IN",
@@ -94,7 +106,7 @@ object Method extends SchemaBase {
             |""".stripMargin
       )
       .protoId(34)
-      .addProperties(typeFullName, isVariadic)
+      .addProperties(typeFullName, isVariadic, parameterIndex)
       .extendz(declaration)
 
     val methodParameterOut: NodeType = builder
