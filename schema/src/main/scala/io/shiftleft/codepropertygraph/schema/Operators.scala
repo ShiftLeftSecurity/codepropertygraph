@@ -331,6 +331,13 @@ object Operators extends SchemaBase {
         value = "<operator>.safeNavigation",
         valueType = ValueTypes.STRING,
         comment = "Returns null if the first operator is null, otherwise performs a dereferencing operation"
+      ),
+      Constant(
+        name = "tryCatch",
+        value = "<operator>.tryCatch",
+        valueType = ValueTypes.STRING,
+        comment =
+          "Returns either the last expression in the `try`-block, or the last expression in one of the `catch`/`except`-blocks. The contents of the `finally`-block are ignored."
       )
     )
 
