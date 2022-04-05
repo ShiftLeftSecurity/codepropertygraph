@@ -85,6 +85,16 @@ object IOUtils {
       contentFromBufferedSource(bufferedSource)
     }
 
+  /** Reads a file at the given path and:
+    *   - skips BOM if present
+    *   - removes unpaired surrogates
+    *   - uses UTF-8 encoding (replacing malformed and unmappable characters)
+    *
+    * @param path
+    *   the file path
+    * @return
+    *   the content of file as String
+    */
   def readFile(path: Path): String = {
     val readLen = 2 << 14
     val fileLen = Files.size(path)
@@ -120,48 +130,4 @@ object IOUtils {
     }
 
   }
-
-  /** Reads a file at the given path and:
-    *   - skips BOM if present
-    *   - removes unpaired surrogates
-    *   - uses UTF-8 encoding (replacing malformed and unmappable characters)
-    *
-    * @param path
-    *   the file path
-    * @return
-    *   the content of file as String
-    */
-  def readFile(path: Path): String = {
-    val readLen = 2 << 14
-    val fileLen = Files.size(path)
-    if (fileLen > Int.MaxValue) {
-      throw new RuntimeException(s"File $path is to big. Size: $fileLen")
-    }
-    var readPos    = 0
-    var readBuffer = new Array[Char](Math.max(readLen, fileLen.toInt) + readLen)
-    Using.resource(new InputStreamReader(Files.newInputStream(path), createDecoder())) { reader =>
-      var bytes = 0
-      while (bytes != -1) {
-        if (readBuffer.length - readPos < readLen) {
-          val newReadBuffer = new Array[Char](Math.min(readBuffer.length * 2L, Int.MaxValue).toInt)
-          Array.copy(readBuffer, 0, newReadBuffer, 0, readPos)
-          readBuffer = newReadBuffer
-        }
-        bytes = reader.read(readBuffer, readPos, readLen)
-        if (bytes != -1) {
-          readPos += bytes
-        }
-      }
-      val withUnpaired =
-        if (readPos > 0 && boms.contains(readBuffer(0))) {
-          new String(readBuffer, 1, readPos - 1)
-        } else {
-          new String(readBuffer, 0, readPos)
-        }
-
-      replaceUnpairedSurrogates(withUnpaired)
-    }
-
-  }
-
 }
