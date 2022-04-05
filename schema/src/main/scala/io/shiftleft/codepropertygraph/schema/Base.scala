@@ -6,7 +6,7 @@ import overflowdb.schema._
 
 object Base extends SchemaBase {
 
-  def index: Int                           = Int.MaxValue
+  def docIndex: Int                           = Int.MaxValue
   override def providedByFrontend: Boolean = true
   override def description: String =
     """

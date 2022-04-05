@@ -13,7 +13,7 @@ object Binding extends SchemaBase {
   ) =
     new Schema(builder, base, typeSchema, methodSchema, callGraphSchema)
 
-  override def index: Int = 19
+  override def docIndex: Int = 19
 
   override def description: String =
     """

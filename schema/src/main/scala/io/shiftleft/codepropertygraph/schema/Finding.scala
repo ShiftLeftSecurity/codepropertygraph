@@ -6,7 +6,7 @@ import overflowdb.schema._
 
 object Finding extends SchemaBase {
 
-  def index: Int = 15
+  def docIndex: Int = 15
 
   override def description: String =
     """

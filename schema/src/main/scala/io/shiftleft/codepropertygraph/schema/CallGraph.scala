@@ -8,7 +8,7 @@ import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {
 
-  def index: Int = 8
+  def docIndex: Int = 8
 
   override def description: String =
     """

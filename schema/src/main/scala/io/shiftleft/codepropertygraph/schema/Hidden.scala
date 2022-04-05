@@ -4,7 +4,7 @@ import overflowdb.schema.Property.ValueType
 import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Hidden extends SchemaBase {
-  override def index: Int = -1
+  override def docIndex: Int = -1
 
   override def description: String =
     """

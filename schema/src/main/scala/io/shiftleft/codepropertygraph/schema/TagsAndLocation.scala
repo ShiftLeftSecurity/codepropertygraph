@@ -6,7 +6,7 @@ import overflowdb.schema._
 
 object TagsAndLocation extends SchemaBase {
 
-  override def index: Int = 17
+  override def docIndex: Int = 17
 
   override def description: String =
     """
