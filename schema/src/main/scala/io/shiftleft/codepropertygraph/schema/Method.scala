@@ -8,7 +8,7 @@ object Method extends SchemaBase {
   def apply(builder: SchemaBuilder, base: Base.Schema, typeSchema: Type.Schema, fs: FileSystem.Schema) =
     new Schema(builder, base, typeSchema, fs)
 
-  def docIndex: Int                           = 5
+  def docIndex: Int                        = 5
   override def providedByFrontend: Boolean = true
 
   override def description: String =

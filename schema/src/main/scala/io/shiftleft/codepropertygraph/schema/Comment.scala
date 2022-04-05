@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 
 object Comment extends SchemaBase {
-  def docIndex                       = 12
+  def docIndex                    = 12
   override def providedByFrontend = true
 
   override def description = ""

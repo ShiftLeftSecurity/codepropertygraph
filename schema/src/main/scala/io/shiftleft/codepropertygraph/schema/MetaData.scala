@@ -7,7 +7,7 @@ import overflowdb.storage.ValueTypes
 
 object MetaData extends SchemaBase {
 
-  def docIndex: Int                           = 2
+  def docIndex: Int                        = 2
   override def providedByFrontend: Boolean = true
 
   override def description: String =
