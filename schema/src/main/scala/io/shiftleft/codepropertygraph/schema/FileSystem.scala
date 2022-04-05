@@ -6,7 +6,7 @@ import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object FileSystem extends SchemaBase {
 
-  def index: Int = 3
+  def docIndex: Int = 3
   override def description: String =
     """
       |CPGs are created from sets of files and the File System Layer describes the layout of

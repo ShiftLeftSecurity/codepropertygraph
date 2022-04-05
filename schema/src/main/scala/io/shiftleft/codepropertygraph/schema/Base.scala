@@ -6,7 +6,7 @@ import overflowdb.schema._
 
 object Base extends SchemaBase {
 
-  def index: Int                           = Int.MaxValue
+  def docIndex: Int                        = Int.MaxValue
   override def providedByFrontend: Boolean = true
   override def description: String =
     """
@@ -62,6 +62,19 @@ object Base extends SchemaBase {
       )
       .mandatory(false)
       .protoId(7)
+
+    val index = builder
+      .addProperty(
+        name = "INDEX",
+        valueType = ValueType.Int,
+        comment = """
+                    |Specifies an index, e.g., for a parameter or argument.
+                    | Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit
+                    | self / this parameter.
+                    |""".stripMargin
+      )
+      .mandatory(PropertyDefaults.Int)
+      .protoId(222)
 
     val name = builder
       .addProperty(

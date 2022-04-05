@@ -6,7 +6,7 @@ import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 
 object ProtoSerialize extends SchemaBase {
 
-  override def index: Int = Int.MaxValue
+  override def docIndex: Int = Int.MaxValue
 
   override def description: String =
     """

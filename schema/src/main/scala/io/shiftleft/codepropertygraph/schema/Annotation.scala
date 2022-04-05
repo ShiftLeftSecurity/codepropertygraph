@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.schema
 import overflowdb.schema._
 
 object Annotation extends SchemaBase {
-  def index: Int = 20
+  def docIndex: Int = 20
 
   override def providedByFrontend: Boolean = true
 

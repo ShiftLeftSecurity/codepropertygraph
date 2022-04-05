@@ -4,7 +4,7 @@ import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object Namespace extends SchemaBase {
 
-  def index: Int = 4
+  def docIndex: Int = 4
 
   override def description: String =
     """

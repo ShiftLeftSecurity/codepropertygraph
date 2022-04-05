@@ -6,7 +6,7 @@ import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 
 object Pdg extends SchemaBase {
 
-  def index: Int = 11
+  def docIndex: Int = 11
   override def description: String =
     """
       The Program Dependence Graph Layer contains a program dependence graph for
