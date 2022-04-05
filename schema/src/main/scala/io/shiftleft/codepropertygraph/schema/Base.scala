@@ -63,6 +63,18 @@ object Base extends SchemaBase {
       .mandatory(false)
       .protoId(7)
 
+    val index = builder
+      .addProperty(
+        name = "INDEX",
+        valueType = ValueType.Int,
+        comment = """
+                    |Specifies an index, e.g., for a parameter.
+                    |""".stripMargin
+      )
+      .mandatory(PropertyDefaults.Int)
+      .protoId(222)
+
+
     val name = builder
       .addProperty(
         name = "NAME",
