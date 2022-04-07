@@ -338,6 +338,12 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment =
           "Returns either the last expression in the `try`-block, or the last expression in one of the `catch`/`except`-blocks. The contents of the `finally`-block are ignored."
+      ),
+      Constant(
+        name = "alloc",
+        value = "<operator>.alloc",
+        valueType = ValueTypes.STRING,
+        comment = "Allocates memory for an object of a specific type"
       )
     )
 
