@@ -74,7 +74,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.Int)
-      .protoId(222)
+      .protoId(2223)
 
     val name = builder
       .addProperty(
