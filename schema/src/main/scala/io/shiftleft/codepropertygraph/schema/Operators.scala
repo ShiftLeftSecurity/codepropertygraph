@@ -344,7 +344,7 @@ object Operators extends SchemaBase {
         value = "<operator>.alloc",
         valueType = ValueTypes.STRING,
         comment = "Allocates memory for an object of a specific type"
-      ),
+      )
     )
 
   }
