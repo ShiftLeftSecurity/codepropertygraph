@@ -19,6 +19,7 @@ object Hidden extends SchemaBase {
     methodSchema: Method.Schema,
     typeDecl: Type.Schema,
     ast: Ast.Schema,
+    cfg: Cfg.Schema,
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
@@ -29,6 +30,7 @@ object Hidden extends SchemaBase {
     methodSchema: Method.Schema,
     typeDeclSchema: Type.Schema,
     astSchema: Ast.Schema,
+    cfgSchema: Cfg.Schema,
     fsSchema: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) {
@@ -224,6 +226,15 @@ object Hidden extends SchemaBase {
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
 
+    val pointsTo = builder
+      .addEdgeType(
+        name = "POINTS_TO",
+        comment = """Used for calculating points-to sets for resolving object aliasing.
+                    |""".stripMargin
+      )
+      .protoId(12345)
+
+    cfg.cfgNode.addOutEdge(edge = pointsTo, inNode = cfg.cfgNode)
   }
 
 }
