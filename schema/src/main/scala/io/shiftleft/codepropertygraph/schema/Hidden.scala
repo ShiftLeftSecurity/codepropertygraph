@@ -19,10 +19,9 @@ object Hidden extends SchemaBase {
     methodSchema: Method.Schema,
     typeDecl: Type.Schema,
     ast: Ast.Schema,
-    cfg: Cfg.Schema,
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema
-  ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
+  ) = new Schema(builder, base, methodSchema, typeDecl, ast, fs, callGraph)
 
   class Schema(
     builder: SchemaBuilder,
@@ -30,7 +29,6 @@ object Hidden extends SchemaBase {
     methodSchema: Method.Schema,
     typeDeclSchema: Type.Schema,
     astSchema: Ast.Schema,
-    cfg: Cfg.Schema,
     fsSchema: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) {
