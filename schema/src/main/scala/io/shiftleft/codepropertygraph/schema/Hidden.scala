@@ -234,7 +234,7 @@ object Hidden extends SchemaBase {
       )
       .protoId(12345)
 
-    cfg.cfgNode.addOutEdge(edge = pointsTo, inNode = cfg.cfgNode)
+    cfgSchema.cfgNode.addOutEdge(edge = pointsTo, inNode = cfgSchema.cfgNode)
   }
 
 }
