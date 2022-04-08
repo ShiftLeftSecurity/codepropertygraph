@@ -345,6 +345,12 @@ object Operators extends SchemaBase {
         valueType = ValueTypes.STRING,
         comment = "Allocates memory for an object of a specific type"
       )
+      Constant(
+        name = "alloc",
+        value = "<operator>.alloc",
+        valueType = ValueTypes.STRING,
+        comment = "Represents a memory allocation of an object, struct, or array"
+      ),
     )
 
   }
