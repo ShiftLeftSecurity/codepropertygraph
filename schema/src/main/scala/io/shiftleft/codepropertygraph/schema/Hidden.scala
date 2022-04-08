@@ -21,7 +21,7 @@ object Hidden extends SchemaBase {
     ast: Ast.Schema,
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema
-  ) = new Schema(builder, base, methodSchema, typeDecl, ast, fs, callGraph)
+  ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph)
 
   class Schema(
     builder: SchemaBuilder,
