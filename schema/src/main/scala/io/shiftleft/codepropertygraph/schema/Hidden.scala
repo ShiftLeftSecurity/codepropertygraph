@@ -30,7 +30,7 @@ object Hidden extends SchemaBase {
     methodSchema: Method.Schema,
     typeDeclSchema: Type.Schema,
     astSchema: Ast.Schema,
-    cfg: Cfg.Schema,
+    cfgSchema: Cfg.Schema,
     fsSchema: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) {
@@ -226,17 +226,15 @@ object Hidden extends SchemaBase {
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
 
-    val dataFlow = builder
+    val pointsTo = builder
       .addEdgeType(
-        name = "DATA_FLOW",
-        comment = """
-                    |EXPERIMENTAL: This edge indicates data flow between two CFG nodes. This is calculated on calls to
-                    |reachableBy using REACHING_DEFs edges and used to store cached data to improve the performance of
-                    |incremental data flow analysis.""".stripMargin
+        name = "POINTS_TO",
+        comment = """Used for calculating points-to sets for resolving object aliasing.
+                    |""".stripMargin
       )
       .protoId(12345)
 
-    cfg.cfgNode.addOutEdge(edge = dataFlow, inNode = cfg.cfgNode)
+    cfgSchema.cfgNode.addOutEdge(edge = pointsTo, inNode = cfgSchema.cfgNode)
   }
 
 }
