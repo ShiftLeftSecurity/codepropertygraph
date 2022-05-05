@@ -18,11 +18,9 @@ object Operators extends SchemaBase {
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
 // constants
-    /**
-      * TODO next time we have a breaking change, consider unifying the `operator` prefix - 
-      * some entries have an `s` appendix which should be dropped
-      * see https://github.com/joernio/joern/issues/1348 
-      * and https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1629
+    /** TODO next time we have a breaking change, consider unifying the `operator` prefix - some entries have an `s`
+      * appendix which should be dropped see https://github.com/joernio/joern/issues/1348 and
+      * https://github.com/ShiftLeftSecurity/codepropertygraph/issues/1629
       */
     val operators = builder.addConstants(
       category = "Operators",
