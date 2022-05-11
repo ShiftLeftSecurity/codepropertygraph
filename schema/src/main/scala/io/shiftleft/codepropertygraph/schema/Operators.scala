@@ -111,19 +111,9 @@ object Operators extends SchemaBase {
         valueType = ValueType.String,
         comment = ""
       ),
-      Constant(
-        name = "assignmentAnd",
-        value = "<operators>.assignmentAnd",
-        valueType = ValueType.String,
-        comment = ""
-      ),
+      Constant(name = "assignmentAnd", value = "<operators>.assignmentAnd", valueType = ValueType.String, comment = ""),
       Constant(name = "assignmentOr", value = "<operators>.assignmentOr", valueType = ValueType.String, comment = ""),
-      Constant(
-        name = "assignmentXor",
-        value = "<operators>.assignmentXor",
-        valueType = ValueType.String,
-        comment = ""
-      ),
+      Constant(name = "assignmentXor", value = "<operators>.assignmentXor", valueType = ValueType.String, comment = ""),
       Constant(
         name = "arrayInitializer",
         value = "<operator>.arrayInitializer",
