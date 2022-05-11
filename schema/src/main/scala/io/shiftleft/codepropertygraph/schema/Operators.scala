@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema._
 import overflowdb.schema.Property.ValueType
+import overflowdb.schema._
 
 object Operators extends SchemaBase {
 
