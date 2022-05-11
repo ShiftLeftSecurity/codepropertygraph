@@ -4,7 +4,6 @@ import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import overflowdb.schema.EdgeType.Cardinality
 import overflowdb.schema.Property.ValueType
 import overflowdb.schema.{Constant, SchemaBuilder, SchemaInfo}
-import overflowdb.storage.ValueTypes
 
 object CallGraph extends SchemaBase {
 
@@ -85,21 +84,21 @@ object CallGraph extends SchemaBase {
       Constant(
         name = "BY_REFERENCE",
         value = "BY_REFERENCE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment =
           "A parameter or return of a function is passed by reference which means an address is used behind the scenes"
       ).protoId(1),
       Constant(
         name = "BY_SHARING",
         value = "BY_SHARING",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment =
           "Only applicable to object parameter or return values. The pointer to the object is passed by value but the object itself is not copied and changes to it are thus propagated out of the method context"
       ).protoId(2),
       Constant(
         name = "BY_VALUE",
         value = "BY_VALUE",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment = "A parameter or return of a function passed by value which means a flat copy is used"
       ).protoId(3)
     )
@@ -160,19 +159,19 @@ object CallGraph extends SchemaBase {
       Constant(
         name = "STATIC_DISPATCH",
         value = "STATIC_DISPATCH",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment = "For statically dispatched calls the call target is known before program execution"
       ).protoId(1),
       Constant(
         name = "DYNAMIC_DISPATCH",
         value = "DYNAMIC_DISPATCH",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment = "For dynamically dispatched calls the target is determined during runtime"
       ).protoId(2),
       Constant(
         name = "INLINED",
         value = "INLINED",
-        valueType = ValueTypes.STRING,
+        valueType = ValueType.String,
         comment = "For macro expansions, code is inlined."
       ).protoId(3)
     )
