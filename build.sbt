@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.128+2-549672b8"
+val overflowdbVersion = "1.130"
 
 inThisBuild(
   List(
