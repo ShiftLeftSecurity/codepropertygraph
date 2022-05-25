@@ -80,12 +80,12 @@ ThisBuild / scalacOptions ++= Seq(
 )
 ThisBuild / compile / javacOptions ++= Seq(
   "-g", // debug symbols
-  "-source",
-  "1.8",
-  "-target",
-  "1.8",
   "-Xlint"
 )
+
+// ensure this build is binary compatible with java 8
+ThisBuild / compile / javacOptions += "--release=8"
+ThisBuild / scalacOptions ++= Seq("-target:jvm-1.8", "--release", "8")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 Global / onLoad := {
