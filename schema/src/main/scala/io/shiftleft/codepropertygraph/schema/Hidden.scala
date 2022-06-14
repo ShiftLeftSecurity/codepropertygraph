@@ -112,6 +112,10 @@ object Hidden extends SchemaBase {
       .addProperties(name)
       .extendz(expression)
 
+    // node relations
+    templateDOM.addOutEdge(edge = ast, inNode = expression)
+    templateDOM.addInEdge(edge = argument, outNode = expression)
+
     /*
      * Dependencies
      * */
