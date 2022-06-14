@@ -99,6 +99,23 @@ object Hidden extends SchemaBase {
       .addOutEdge(edge = ref, inNode = local, cardinalityOut = EdgeType.Cardinality.One)
       .addOutEdge(edge = ref, inNode = methodParameterIn)
 
+    /* TemplateDOM
+     */
+
+    // node types
+    val templateDOM: NodeType = builder
+      .addNodeType(
+        name = "TEMPLATE_DOM",
+        comment = "This node represents a DOM node used in template languages, e.g., JSX/TSX"
+      )
+      .protoId(417)
+      .addProperties(name)
+      .extendz(expression)
+
+    // node relations
+    templateDOM.addOutEdge(edge = ast, inNode = expression)
+    templateDOM.addInEdge(edge = argument, outNode = expression)
+
     /*
      * Dependencies
      * */
