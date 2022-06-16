@@ -3,29 +3,33 @@ package io.shiftleft.utils
 import java.io.Reader
 import java.nio.charset.{CharsetDecoder, CodingErrorAction}
 import java.nio.file.Path
+import java.util.regex.Pattern
 import scala.io.{BufferedSource, Codec, Source}
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.util.Using
 
 object IOUtils {
 
+  private val surrogatePattern: Pattern = Pattern.compile("[^\u0000-\uffff]")
+
+  private val boms: Set[Char] = Set(
+    '\uefbb', // UTF-8
+    '\ufeff', // UTF-16 (BE)
+    '\ufffe'  // UTF-16 (LE)
+  )
+
   /** Creates a new UTF-8 decoder. Sadly, instances of CharsetDecoder are not thread-safe as the doc states: 'Instances
     * of this class are not safe for use by multiple concurrent threads.' (copied from:
     * [[java.nio.charset.CharsetDecoder]])
     *
-    * As we are using it in a [[io.shiftleft.passes.ParallelCpgPass]] it needs to be thread-safe. Hence, we make sure to
-    * create a new instance everytime.
+    * As we are using it in a [[io.shiftleft.passes.ForkJoinParallelCpgPass]] or
+    * [[io.shiftleft.passes.ConcurrentWriterCpgPass]] a it needs to be thread-safe. Hence, we make sure to create a new
+    * instance everytime.
     */
   private def createDecoder(): CharsetDecoder =
     Codec.UTF8.decoder
       .onMalformedInput(CodingErrorAction.REPLACE)
       .onUnmappableCharacter(CodingErrorAction.REPLACE)
-
-  private val boms = Set(
-    '\uefbb', // UTF-8
-    '\ufeff', // UTF-16 (BE)
-    '\ufffe'  // UTF-16 (LE)
-  )
 
   private def skipBOMIfPresent(reader: Reader): Unit = {
     reader.mark(1)
@@ -44,16 +48,12 @@ object IOUtils {
     * multilingual plane. You can do that with a simple regular expression.
     */
   private def replaceUnpairedSurrogates(input: String): String =
-    input.replaceAll("[^\u0000-\uffff]", "???")
+    surrogatePattern.matcher(input).replaceAll("???")
 
   private def contentFromBufferedSource(bufferedSource: BufferedSource): Seq[String] = {
     val reader = bufferedSource.bufferedReader()
     skipBOMIfPresent(reader)
     reader.lines().iterator().asScala.map(replaceUnpairedSurrogates).toSeq
-  }
-
-  private def bufferedSourceFromFile(path: Path): BufferedSource = {
-    Source.fromFile(path.toFile)(createDecoder())
   }
 
   /** Reads a file at the given path and:
@@ -67,8 +67,6 @@ object IOUtils {
     *   a Seq with all lines in the given file as Strings
     */
   def readLinesInFile(path: Path): Seq[String] =
-    Using.resource(bufferedSourceFromFile(path)) { bufferedSource =>
-      contentFromBufferedSource(bufferedSource)
-    }
+    Using.resource(Source.fromFile(path.toFile)(createDecoder()))(contentFromBufferedSource)
 
 }
