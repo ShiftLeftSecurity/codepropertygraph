@@ -23,9 +23,10 @@ object TagsAndLocation extends SchemaBase {
     methodSchema: Method.Schema,
     ast: Ast.Schema,
     fs: FileSystem.Schema,
-    callGraph: CallGraph.Schema
+    callGraph: CallGraph.Schema,
+    metaData: MetaData.Schema
   ) =
-    new Schema(builder, base, typeSchema, methodSchema, ast, fs, callGraph)
+    new Schema(builder, base, typeSchema, methodSchema, ast, fs, callGraph, metaData)
 
   class Schema(
     builder: SchemaBuilder,
@@ -34,7 +35,8 @@ object TagsAndLocation extends SchemaBase {
     methodSchema: Method.Schema,
     ast: Ast.Schema,
     fs: FileSystem.Schema,
-    callGraph: CallGraph.Schema
+    callGraph: CallGraph.Schema,
+    metaData: MetaData.Schema
   ) {
     import base._
     import typeSchema._
@@ -132,6 +134,8 @@ object TagsAndLocation extends SchemaBase {
     jumpTarget.addOutEdge(edge = taggedBy, inNode = tag)
     file.addOutEdge(edge = taggedBy, inNode = tag)
     methodParameterOut.addOutEdge(edge = taggedBy, inNode = tag)
+    /*tags attached to metaData contain global information about the cpg, in ad-hoc structured way*/
+    metaData.metaData.addOutEdge(edge = taggedBy, inNode = tag)
   }
 
 }
