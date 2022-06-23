@@ -30,14 +30,14 @@ object Namespace extends SchemaBase {
                     |This block may be introduced via a `package` statement in Java or
                     |a `namespace{ }` statement in C++.
                     |
-                    |The `FULL_NAME` field contains the namespace name in a human-readable format.
+                    |The `FULL_NAME` field contains a unique identifier to represent the namespace block
+                    |itself not just the namespace it references. So in addition to the namespace name
+                    |it can be useful to use the containing file name to derive a unique identifier.
+                    |
+                    |The `NAME` field contains the namespace name in a human-readable format.
                     |The name should be given in dot-separated form where a dot indicates
                     |the the right hand side is a sub namespace of the left hand side, e.g.,
                     |`foo.bar` denotes the namespace `bar` contained in the namespace `foo`.
-                    |
-                    |The `NAME` field contains the name of the namespace without the names of
-                    |its parent namespaces, e.g., for the namespace `foo.woo.bar`, the `NAME`
-                    |field is `bar`.
                     |
                     |""".stripMargin
       )
