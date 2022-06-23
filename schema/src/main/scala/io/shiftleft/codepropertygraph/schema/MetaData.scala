@@ -51,6 +51,15 @@ object MetaData extends SchemaBase {
       .mandatory(PropertyDefaults.String)
       .protoId(19)
 
+    val root = builder
+      .addProperty(
+        name = "ROOT",
+        valueType = ValueType.String,
+        comment = "The path to the root directory of the source/binary this CPG is generated from."
+      )
+      .protoId(1199)
+      .mandatory(PropertyDefaults.String)
+
     val metaData: NodeType = builder
       .addNodeType(
         name = "META_DATA",
@@ -64,7 +73,7 @@ object MetaData extends SchemaBase {
                     | """.stripMargin
       )
       .protoId(39)
-      .addProperties(language, version, overlays, hash)
+      .addProperties(language, version, overlays, hash, root)
 
     val languages = builder.addConstants(
       category = "Languages",

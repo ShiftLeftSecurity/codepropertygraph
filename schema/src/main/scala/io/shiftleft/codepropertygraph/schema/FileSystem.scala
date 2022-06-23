@@ -27,11 +27,11 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "FILENAME",
         valueType = ValueType.String,
-        comment = """The absolute path of the source file this node was generated from. This field
-            |must be set but may be set to the value `<unknown>` to indicate that no source
-            |file can be associated with the node, e.g., because the node represents an
-            |entity known to exist because it is referenced, but for which the file that
-            |is is declared in is unknown.
+        comment = """The path of the source file this node was generated from, relative to the root
+            |path in the meta data node. This field must be set but may be set to the value `<unknown>` to
+            |indicate that no source file can be associated with the node, e.g., because the node represents
+            |an entity known to exist because it is referenced, but for which the file that is is declared in
+            |is unknown.
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
