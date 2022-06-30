@@ -21,6 +21,7 @@ fi
 
 declare -A repos=(
   [overflowdb]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-core
+  [overflowdbCodegen]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-codegen_2.12
 )
 
 function latest_version {
@@ -71,6 +72,7 @@ function update {
 
 if [ "$DEPENDENCY" == "" ]; then
   update overflowdb
+  update overflowdbCodegen
 else
   DEPENDENCY="${DEPENDENCY#--only=}"
   update $DEPENDENCY
