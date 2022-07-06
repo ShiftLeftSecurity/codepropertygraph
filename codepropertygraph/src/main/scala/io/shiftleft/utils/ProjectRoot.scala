@@ -1,6 +1,7 @@
 package io.shiftleft.utils
 
 import better.files.File
+
 import scala.annotation.tailrec
 
 /** Finds the relative location of the project root.
