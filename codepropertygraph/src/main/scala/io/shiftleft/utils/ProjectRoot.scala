@@ -2,6 +2,8 @@ package io.shiftleft.utils
 
 import better.files.File
 
+import scala.annotation.tailrec
+
 /** Finds the relative location of the project root.
   *
   * Used in tests which rely on the working directory - unfortunately Intellij and sbt have different default working
@@ -23,14 +25,14 @@ object ProjectRoot {
   def findRelativePath: String = {
     val fileThatOnlyExistsInRoot = ".git"
 
-    for (depth <- 0 to SEARCH_DEPTH) {
+    @tailrec def loop(depth: Int): String = {
       val pathPrefix = "./" + "../" * depth
-      if (File(s"$pathPrefix$fileThatOnlyExistsInRoot").exists) {
-        return pathPrefix
-      }
+      if (File(s"$pathPrefix$fileThatOnlyExistsInRoot").exists) pathPrefix
+      else if (depth < SEARCH_DEPTH) loop(depth + 1)
+      else throw SearchDepthExceededError
     }
 
-    throw SearchDepthExceededError
+    loop(0)
   }
 
   def find: File =
