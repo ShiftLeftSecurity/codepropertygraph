@@ -33,7 +33,7 @@ object Schema2Json extends App {
 
   private def schemaIndex(schemaInfo: SchemaInfo) =
     schemaInfo.definedIn
-      .map(_.getDeclaringClass.getDeclaredMethod("index").invoke(null).asInstanceOf[Int])
+      .map(_.getDeclaringClass.getDeclaredMethod("docIndex").invoke(null).asInstanceOf[Int])
       .getOrElse(Int.MaxValue)
 
   private def isSchemaHidden(schemaInfo: SchemaInfo) =
