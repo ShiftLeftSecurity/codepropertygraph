@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
+import overflowdb.schema.EdgeType.Cardinality
 import overflowdb.schema.Property.ValueType
 import overflowdb.schema._
 
@@ -19,29 +20,20 @@ object TagsAndLocation extends SchemaBase {
   def apply(
     builder: SchemaBuilder,
     base: Base.Schema,
-    typeSchema: Type.Schema,
-    methodSchema: Method.Schema,
-    ast: Ast.Schema,
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) =
-    new Schema(builder, base, typeSchema, methodSchema, ast, fs, callGraph)
+    new Schema(builder, base, fs, callGraph)
 
   class Schema(
     builder: SchemaBuilder,
     base: Base.Schema,
-    typeSchema: Type.Schema,
-    methodSchema: Method.Schema,
-    ast: Ast.Schema,
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema
   ) {
     import base._
-    import typeSchema._
-    import methodSchema._
-    import ast._
-    import fs._
     import callGraph._
+    import fs._
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
 // node properties
@@ -114,24 +106,7 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(tag, "tag", Property.Cardinality.One(Property.Default(null)))
       .addContainedNode(builder.anyNode, "node", Property.Cardinality.One(Property.Default(null)))
 
-    method.addOutEdge(edge = taggedBy, inNode = tag)
-    methodReturn.addOutEdge(edge = taggedBy, inNode = tag)
-    literal.addOutEdge(edge = taggedBy, inNode = tag)
-    local.addOutEdge(edge = taggedBy, inNode = tag)
-    member.addOutEdge(edge = taggedBy, inNode = tag)
-    callNode.addOutEdge(edge = taggedBy, inNode = tag)
-    identifier.addOutEdge(edge = taggedBy, inNode = tag)
-    fieldIdentifier.addOutEdge(edge = taggedBy, inNode = tag)
-    methodParameterIn.addOutEdge(edge = taggedBy, inNode = tag)
-    ret.addOutEdge(edge = taggedBy, inNode = tag)
-    block.addOutEdge(edge = taggedBy, inNode = tag)
-    unknown.addOutEdge(edge = taggedBy, inNode = tag)
-    controlStructure.addOutEdge(edge = taggedBy, inNode = tag)
-    methodRef.addOutEdge(edge = taggedBy, inNode = tag)
-    typeRef.addOutEdge(edge = taggedBy, inNode = tag)
-    jumpTarget.addOutEdge(edge = taggedBy, inNode = tag)
-    file.addOutEdge(edge = taggedBy, inNode = tag)
-    methodParameterOut.addOutEdge(edge = taggedBy, inNode = tag)
+    builder.anyNode.addOutEdge(edge = taggedBy, inNode = tag, cardinalityIn = Cardinality.One, stepNameOut = "taggedBy", stepNameIn = "taggedNode")
   }
 
 }
