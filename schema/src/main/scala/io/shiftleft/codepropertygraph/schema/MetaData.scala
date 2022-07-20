@@ -124,6 +124,6 @@ object MetaData extends SchemaBase {
         valueType = ValueType.String,
         comment = "Solidity language frontend"
       ).protoId(16)
-      )
+    )
   }
 }
