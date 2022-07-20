@@ -117,8 +117,13 @@ object MetaData extends SchemaBase {
         value = "JSSRC",
         valueType = ValueType.String,
         comment = "Source-based JS frontend based on Babel"
-      ).protoId(15)
+      ).protoId(15),
+      Constant(
+        name = "SOLIDITY",
+        value = "SOLIDITY",
+        valueType = ValueType.String,
+        comment = "Solidity language frontend"
+      ).protoId(16)
     )
   }
-
 }
