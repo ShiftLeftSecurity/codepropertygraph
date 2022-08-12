@@ -114,24 +114,26 @@ object TagsAndLocation extends SchemaBase {
       .addContainedNode(tag, "tag", Property.Cardinality.One(Property.Default(null)))
       .addContainedNode(builder.anyNode, "node", Property.Cardinality.One(Property.Default(null)))
 
-    method.addOutEdge(edge = taggedBy, inNode = tag)
-    methodReturn.addOutEdge(edge = taggedBy, inNode = tag)
-    literal.addOutEdge(edge = taggedBy, inNode = tag)
-    local.addOutEdge(edge = taggedBy, inNode = tag)
-    member.addOutEdge(edge = taggedBy, inNode = tag)
-    callNode.addOutEdge(edge = taggedBy, inNode = tag)
-    identifier.addOutEdge(edge = taggedBy, inNode = tag)
-    fieldIdentifier.addOutEdge(edge = taggedBy, inNode = tag)
-    methodParameterIn.addOutEdge(edge = taggedBy, inNode = tag)
-    ret.addOutEdge(edge = taggedBy, inNode = tag)
-    block.addOutEdge(edge = taggedBy, inNode = tag)
-    unknown.addOutEdge(edge = taggedBy, inNode = tag)
-    controlStructure.addOutEdge(edge = taggedBy, inNode = tag)
-    methodRef.addOutEdge(edge = taggedBy, inNode = tag)
-    typeRef.addOutEdge(edge = taggedBy, inNode = tag)
-    jumpTarget.addOutEdge(edge = taggedBy, inNode = tag)
-    file.addOutEdge(edge = taggedBy, inNode = tag)
-    methodParameterOut.addOutEdge(edge = taggedBy, inNode = tag)
+    Seq(
+      method,
+      methodReturn,
+      literal,
+      local,
+      member,
+      callNode,
+      identifier,
+      fieldIdentifier,
+      methodParameterIn,
+      ret,
+      block,
+      unknown,
+      controlStructure,
+      methodRef,
+      typeRef,
+      jumpTarget,
+      file,
+      methodParameterOut
+    ).foreach(_.addOutEdge(edge = taggedBy, inNode = tag))
   }
 
 }
