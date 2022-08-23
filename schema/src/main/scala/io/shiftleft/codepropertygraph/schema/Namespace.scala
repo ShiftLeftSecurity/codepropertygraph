@@ -50,7 +50,7 @@ object Namespace extends SchemaBase {
         comment = """This node represents a namespace. Similar to FILE nodes, NAMESPACE nodes
                     |serve as indices that allow all definitions inside a namespace to be
                     |obtained by following outgoing edges from a NAMESPACE node.
-                    |                    |
+                    |
                     |NAMESPACE nodes MUST NOT be created by language frontends. Instead,
                     |they are generated from NAMESPACE_BLOCK nodes automatically upon
                     |first loading of the CPG.
