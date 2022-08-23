@@ -36,7 +36,7 @@ object Namespace extends SchemaBase {
                     |
                     |The `NAME` field contains the namespace name in a human-readable format.
                     |The name should be given in dot-separated form where a dot indicates
-                    |the the right hand side is a sub namespace of the left hand side, e.g.,
+                    |that the right hand side is a sub namespace of the left hand side, e.g.,
                     |`foo.bar` denotes the namespace `bar` contained in the namespace `foo`.
                     |
                     |""".stripMargin
