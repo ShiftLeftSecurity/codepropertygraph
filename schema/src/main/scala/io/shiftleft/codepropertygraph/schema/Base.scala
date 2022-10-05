@@ -92,6 +92,15 @@ object Base extends SchemaBase {
         comment = """This is the fully-qualified name of an entity, e.g., the fully-qualified
                     |name of a method or type. The details of what constitutes a fully-qualified
                     |name are language specific. This field SHOULD be human readable.
+                    |
+                    |This can be considered like a linkage name, and is used for the same purpose.
+                    |Hence, there should not be multiple nodes with the same LABEL / FULL_NAME
+                    |combination, on pain of silent linker failures. Ensuring uniqueness may well
+                    |require name-mangling.
+                    |
+                    |An exception is the ANNOTATION node. These are not global linkage-level objects,
+                    |and there is not expectation that their FULL_NAMEs are unique. This is a mistake
+                    | / inconsistency in the schema that is unfortunately too late to fix.
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)

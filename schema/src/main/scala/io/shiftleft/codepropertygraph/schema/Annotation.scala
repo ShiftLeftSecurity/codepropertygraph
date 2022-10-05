@@ -39,7 +39,15 @@ object Annotation extends SchemaBase {
 
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     val annotation: NodeType = builder
-      .addNodeType(name = "ANNOTATION", comment = "A method annotation")
+      .addNodeType(name = "ANNOTATION", comment =
+        """A method annotation.
+          |
+          |Even though ANNOTATION nodes have a FULL_NAME, they are not global linkage-level objects, and there is no
+          |expectation of uniqueness of FULL_NAMEs. This is a mistake / inconsistency in the schema that is unfortunately
+          |too late to fix.
+          |
+          |Formally, ANNOTATION extends EXPRESSION. This is plain wrong in most languages, and is a mistake in the
+          |schema that is unfortunately too late to fix.""".stripMargin)
       .protoId(5)
       .addProperties(name, fullName)
       .extendz(expression)
