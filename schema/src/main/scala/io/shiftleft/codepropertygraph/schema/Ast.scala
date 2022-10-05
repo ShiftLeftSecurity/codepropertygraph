@@ -227,7 +227,11 @@ object Ast extends SchemaBase {
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueType.String, comment = "The virtual modifier")
         .protoId(8),
       Constant(name = "INTERNAL", value = "INTERNAL", valueType = ValueType.String, comment = "The internal modifier")
-        .protoId(9)
+        .protoId(9),
+      Constant(name = "FINAL", value = "FINAL", valueType = ValueType.String, comment = "The final modifier")
+        .protoId(10),
+      Constant(name = "READONLY", value = "READONLY", valueType = ValueType.String, comment = "The readonly modifier")
+        .protoId(11)
     )
 
     val modifier: NodeType = builder
