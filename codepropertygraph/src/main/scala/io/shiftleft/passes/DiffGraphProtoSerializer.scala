@@ -80,6 +80,18 @@ object DiffGraphProtoSerializer {
     builder
   }
 
+  def addNode(node: StoredNode): CpgStruct.Node = {
+    val nodeBuilder = CpgStruct.Node.newBuilder
+      .setKey(node.id())
+      .setType(NodeType.valueOf(node.label))
+    node.propertiesMap.asScala.foreach {
+      case (key, value) if !key.startsWith("_") =>
+        val property = nodeProperty(key, value, null)
+        nodeBuilder.addProperty(property)
+    }
+
+    nodeBuilder.build
+  }
   def addNode(node: NewNode, nodeToId: NewNode => Long): CpgStruct.Node = {
     val nodeId = nodeToId(node)
 
@@ -338,7 +350,7 @@ class BatchUpdateForwardListener extends overflowdb.BatchedUpdate.ModificationLi
 
   def nodeToId(nn: AbstractNode): Long = nn.asInstanceOf[StoredNode].id()
 
-  override def onAfterInitNewNode(node: Node): Unit = builder.addNode(addNode(node.asInstanceOf[NewNode], nodeToId))
+  override def onAfterInitNewNode(node: Node): Unit = builder.addNode(addNode(node.asInstanceOf[StoredNode]))
 
   override def onAfterAddNewEdge(edge: Edge): Unit =
     builder.addEdge(
@@ -415,6 +427,7 @@ class BatchUpdateInverseListener extends overflowdb.BatchedUpdate.ModificationLi
 
   override def onBeforeRemoveNode(node: Node): Unit = if (!hasLogged) {
     hasLogged = true
+    // we _do_ support inversion of node removal now. We don't support edge removal, though.
     logger.warn("We currently do not support inversion of node removal")
   }
 
