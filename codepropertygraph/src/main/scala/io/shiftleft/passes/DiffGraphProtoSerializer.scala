@@ -427,7 +427,7 @@ class BatchUpdateInverseListener extends overflowdb.BatchedUpdate.ModificationLi
 
   override def onBeforeRemoveNode(node: Node): Unit = if (!hasLogged) {
     hasLogged = true
-    //we _do_ support inversion of node removal now. We don't support edge removal, though.
+    // we _do_ support inversion of node removal now. We don't support edge removal, though.
     logger.warn("We currently do not support inversion of node removal")
   }
 
