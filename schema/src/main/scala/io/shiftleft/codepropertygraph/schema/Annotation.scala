@@ -39,7 +39,14 @@ object Annotation extends SchemaBase {
 
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
     val annotation: NodeType = builder
-      .addNodeType(name = "ANNOTATION", comment = "A method annotation")
+      .addNodeType(
+        name = "ANNOTATION",
+        comment = """A method annotation.
+          |The semantics of the FULL_NAME property on this node differ from the usual FULL_NAME
+          |semantics in the sense that FULL_NAME describes the represented annotation class/interface
+          |itself and not the ANNOTATION node.
+          |""".stripMargin
+      )
       .protoId(5)
       .addProperties(name, fullName)
       .extendz(expression)
