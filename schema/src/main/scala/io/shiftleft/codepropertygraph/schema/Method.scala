@@ -106,7 +106,7 @@ object Method extends SchemaBase {
             |""".stripMargin
       )
       .protoId(33)
-      .addProperties(typeFullName, isVariadic)
+      .addProperties(typeFullName, isVariadic, index)
       .extendz(declaration)
 
     val methodReturn: NodeType = builder
