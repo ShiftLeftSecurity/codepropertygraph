@@ -244,14 +244,6 @@ trait CpgPassBase {
     }
   }
 
-  protected def serialize(appliedDiffGraph: AppliedDiffGraph, inverse: Boolean): GeneratedMessageV3 = {
-    if (inverse) {
-      new DiffGraphProtoSerializer().serialize(appliedDiffGraph.inverseDiffGraph.get)
-    } else {
-      new DiffGraphProtoSerializer().serialize(appliedDiffGraph)
-    }
-  }
-
   protected def generateOutFileName(prefix: String, outName: String, index: Int): String = {
     val outputName = {
       if (outName.isEmpty) {
@@ -282,20 +274,4 @@ trait CpgPassBase {
     }
   }
 
-}
-
-/** Diff Graph that has been applied to a source graph. This is a wrapper around diff graph, which additionally provides
-  * a map from nodes to graph ids.
-  */
-case class AppliedDiffGraph(
-  diffGraph: DiffGraph,
-  inverseDiffGraph: Option[DiffGraph],
-  private val nodeToOdbNode: java.util.IdentityHashMap[NewNode, StoredNode]
-) {
-
-  /** Obtain the id this node has in the applied graph
-    */
-  def nodeToGraphId(node: NewNode): JLong = {
-    nodeToOdbNode.get(node).id
-  }
 }
