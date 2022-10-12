@@ -12,89 +12,7 @@ import java.util.function.{BiConsumer, Supplier}
 import scala.concurrent.duration.DurationLong
 import scala.util.{Failure, Success, Try}
 
-/** Base class for CPG pass - a program, which receives an input graph and outputs a sequence of additive diff graphs.
-  * These diff graphs can be merged into the original graph ("applied"), they can be serialized into a binary format,
-  * and finally, they can be added to an existing cpg.bin.zip file.
-  *
-  * A pass is provided by inheriting from this class and implementing `run`, a method, which creates the sequence of
-  * diff graphs from an input graph.
-  *
-  * Overview of steps and their meaning:
-  *
-  *   1. Create: A sequence of diff graphs is created from the source graph 2. Apply: Each diff graph can be applied to
-  *      the source graph 3. Serialize: After applying a diff graph, the diff graph can be serialized into a CPG overlay
-  *      4. Store: The CPG overlay can be stored in a serialized CPG.
-  *
-  * @param cpg
-  *   the source CPG this pass traverses
-  */
-@deprecated(message = "Please use SimpleCpgPass as a replacement.", since = "v1.3.508")
-abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None) extends CpgPassBase {
-
-  /** Main method of pass - to be implemented by child class
-    */
-  def run(): Iterator[DiffGraph]
-
-  /** Execute the pass and apply result to the underlying graph
-    */
-  override def createAndApply(): Unit =
-    withStartEndTimesLogged {
-      run().foreach(diffGraph => DiffGraph.Applier.applyDiff(diffGraph, cpg, undoable = false, keyPool))
-    }
-
-  /** Execute and create a serialized overlay
-    * @param inverse
-    *   invert the diffgraph before serializing
-    */
-  def createApplyAndSerialize(inverse: Boolean = false): Iterator[GeneratedMessageV3] =
-    withStartEndTimesLogged {
-      val overlays = run().map { diffGraph =>
-        val appliedDiffGraph = DiffGraph.Applier.applyDiff(diffGraph, cpg, inverse, keyPool)
-        serialize(appliedDiffGraph, inverse)
-      }
-      overlays
-    }
-
-  /** Run a CPG pass to create diff graphs, apply diff graphs, create corresponding overlays and add them to the
-    * serialized CPG. The name of the overlay is derived from the class name of the pass.
-    *
-    * @param serializedCpg
-    *   the destination serialized CPG to add overlays to
-    * @param inverse
-    *   invert the diffgraph before serializing
-    * @param prefix
-    *   a prefix to add to the output name
-    */
-  override def createApplySerializeAndStore(
-    serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
-    prefix: String = ""
-  ): Unit = {
-    if (serializedCpg.isEmpty) {
-      createAndApply()
-    } else {
-      val overlays = createApplyAndSerialize(inverse)
-      overlays.zipWithIndex.foreach {
-        case (overlay, index) => {
-          val name = generateOutFileName(prefix, outName, index)
-          store(overlay, name, serializedCpg)
-        }
-      }
-    }
-  }
-
-  override def runWithBuilder(builder: BatchedUpdate.DiffGraphBuilder): Int = {
-    var nParts = 0
-    for (diff <- run()) {
-      diff.convertToOdbStyle(cpg, builder)
-      nParts += 1
-    }
-    nParts
-  }
-
-}
-
-/* SimpleCpgPass is a possible replacement for CpgPass.
+/* SimpleCpgPass is a replacement for CpgPass.
  *
  *  Instead of returning an Iterator[DiffGraph], the `run` fuction gets a DiffGraphBuilder as input, and can attach its
  *  modifications to it (i.e. mutate the builder).
@@ -108,6 +26,26 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
  * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * // description of now-removed `CpgPass` class
+ *
+ * Base class for CPG pass - a program, which receives an input graph and outputs a sequence of additive diff graphs.
+ * These diff graphs can be merged into the original graph ("applied"), they can be serialized into a binary format,
+ * and finally, they can be added to an existing cpg.bin.zip file.
+ *
+ * A pass is provided by inheriting from this class and implementing `run`, a method, which creates the sequence of
+ * diff graphs from an input graph.
+ *
+ * Overview of steps and their meaning:
+ *
+ *   1. Create: A sequence of diff graphs is created from the source graph 2. Apply: Each diff graph can be applied to
+ *      the source graph 3. Serialize: After applying a diff graph, the diff graph can be serialized into a CPG overlay
+ *      4. Store: The CPG overlay can be stored in a serialized CPG.
+ *
+ * @param cpg
+ *   the source CPG this pass traverses
+ *
  * */
 
 abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
@@ -266,7 +204,7 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
 }
 
 object CpgPassBase {
-  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPass])
+  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPassBase])
 }
 
 trait CpgPassBase {

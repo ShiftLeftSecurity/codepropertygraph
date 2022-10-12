@@ -1,24 +1,25 @@
 package io.shiftleft.mypass
 
-import gremlin.scala.ScalaGraph
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.cpgloading.CpgLoader
-import io.shiftleft.diffgraph.DiffGraph
-import io.shiftleft.passes.{CpgPass, CpgPassRunner}
+import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
+import io.shiftleft.codepropertygraph.generated.nodes.NewFile
+import io.shiftleft.passes.SimpleCpgPass
 
-class SamplePass(graph : ScalaGraph) extends CpgPass(graph) {
-  override def run(): Iterator[DiffGraph] = {
-   val diffGraph = new DiffGraph
-    // Construct additive diff here
-    Iterator(diffGraph)
+class SamplePass(cpg: Cpg) extends SimpleCpgPass(cpg) {
+  override def run(builder: DiffGraphBuilder): Unit = {
+    val fileNode = NewFile().name("foo")
+    builder.addNode(fileNode)
   }
 }
 
 object SamplePassMain extends App {
   val filename = "src_cpg.bin.zip"
-  val cpg = CpgLoader.load(filename)
+  val odbConfig    = new overflowdb.Config().withStorageLocation(filename)
+  val loaderConfig = CpgLoaderConfig().withOverflowConfig(odbConfig)
+  val cpg = CpgLoader.loadFromOverflowDb(loaderConfig)
   val serializedCpg = new SerializedCpg("/tmp/dst.bin.zip")
-  val runner = new CpgPassRunner(serializedCpg)
-  val pass = new SamplePass(cpg.graph)
-  runner.createStoreAndApplyOverlay(pass)
+  val pass = new SamplePass(cpg)
+  pass.createApplySerializeAndStore(serializedCpg)
 }
+
