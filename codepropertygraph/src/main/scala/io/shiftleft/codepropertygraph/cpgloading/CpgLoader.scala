@@ -54,9 +54,6 @@ object CpgLoader {
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit =
     new CpgLoader().addOverlays(overlayFilenames, cpg)
 
-  def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit =
-    new CpgLoader().addDiffGraphs(diffGraphFilenames, cpg)
-
   /** Determine whether the CPG is a legacy (proto) CPG
     *
     * @param filename
@@ -104,12 +101,6 @@ private class CpgLoader {
   def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
     overlayFilenames.foreach { overlayFilename =>
       CpgOverlayLoader.load(overlayFilename, cpg)
-    }
-  }
-
-  def addDiffGraphs(diffGraphFilenames: Seq[String], cpg: Cpg): Unit = {
-    diffGraphFilenames.foreach { filename =>
-      CpgOverlayLoader.loadInverse(filename, cpg)
     }
   }
 
