@@ -32,21 +32,6 @@ private[cpgloading] object CpgOverlayLoader {
       .get
   }
 
-  def loadInverse(filename: String, baseCpg: Cpg): Unit = {
-    ProtoCpgLoader
-      .loadDiffGraphs(filename)
-      .map { diffGraphs =>
-        diffGraphs.toList.reverse.map { diffGraph =>
-          DiffGraph.Applier.applyDiff(DiffGraph.fromProto(diffGraph, baseCpg), baseCpg)
-        }
-      }
-      .recover { case e: IOException =>
-        logger.error("Failed to load overlay from " + filename, e)
-        Nil
-      }
-      .get
-  }
-
 }
 
 /** Component to merge CPG overlay into existing graph
