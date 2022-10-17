@@ -136,19 +136,11 @@ object Hidden extends SchemaBase {
       )
       .protoId(58)
 
-    val usedIn = builder
-      .addProperty(
-        name = "USED_IN",
-        valueType = ValueType.String,
-        comment = "The name of the file for which this include is valid"
-      )
-      .protoId(22919)
-
     // node types
     val dependency: NodeType = builder
       .addNodeType(name = "DEPENDENCY", comment = "This node represents a dependency")
       .protoId(35)
-      .addProperties(version, name, dependencyGroupId, usedIn)
+      .addProperties(version, name, dependencyGroupId)
 
     /*
      * Type hints
