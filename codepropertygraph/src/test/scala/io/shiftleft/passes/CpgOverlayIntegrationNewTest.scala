@@ -79,7 +79,6 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
 
       // now apply all inverse diffgraphs in the reverse order...
       // TODO 4) remove edge property - not needed for now?
-//      DiffGraph.Applier.applyDiff(addEdgePropertyInverse, cpg)
 //      initialNode.start.outE.value(PropertyNames.ALIAS).toList shouldBe List.empty
 
       // 3) remove node property
@@ -93,11 +92,9 @@ class CpgOverlayIntegrationNewTest extends AnyWordSpec with Matchers {
       initialNode.outE.property(Properties.VARIABLE).toList shouldBe List("true")
       overflowdb.BatchedUpdate.applyDiff(cpg.graph, addEdge1Inverse, null, null)
 
-      // DiffGraph.Applier.applyDiff(addEdge1Inverse, cpg)
       initialNodeOutEdges.size shouldBe 0
 
       // 1) remove node
-      // DiffGraph.Applier.applyDiff(addNodeInverse, cpg)
       overflowdb.BatchedUpdate.applyDiff(cpg.graph, addNodeInverse, null, null)
       cpg.graph.nodeCount shouldBe 1
     }
