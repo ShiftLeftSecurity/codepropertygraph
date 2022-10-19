@@ -44,16 +44,6 @@ object CpgLoader {
   def createIndexes(cpg: Cpg): Unit =
     new CpgLoader().createIndexes(cpg)
 
-  /** Load and apply overlays from archives to the given CPG.
-    *
-    * @param overlayFilenames
-    *   filenames of proto archives
-    * @param cpg
-    *   The CPG to apply overlays to
-    */
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit =
-    new CpgLoader().addOverlays(overlayFilenames, cpg)
-
   /** Determine whether the CPG is a legacy (proto) CPG
     *
     * @param filename
@@ -97,11 +87,5 @@ private class CpgLoader {
 
   def createIndexes(cpg: Cpg): Unit =
     cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
-
-  def addOverlays(overlayFilenames: Seq[String], cpg: Cpg): Unit = {
-    overlayFilenames.foreach { overlayFilename =>
-      CpgOverlayLoader.load(overlayFilename, cpg)
-    }
-  }
 
 }

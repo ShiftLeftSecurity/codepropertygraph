@@ -108,23 +108,12 @@ object DiffGraphProtoSerializer {
     nodeBuilder.build
   }
 
-  def addEdge(change: DiffGraph.Change.CreateEdge, nodeToId: NewNode => Long): CpgStruct.Edge = {
-    val srcId: Long =
-      if (change.sourceNodeKind == DiffGraph.Change.NodeKind.New)
-        nodeToId(change.src.asInstanceOf[NewNode])
-      else
-        change.src.asInstanceOf[Node].id
-
-    val dstId: Long =
-      if (change.destinationNodeKind == DiffGraph.Change.NodeKind.New)
-        nodeToId(change.dst.asInstanceOf[NewNode])
-      else
-        change.dst.asInstanceOf[Node].id
-
-    makeEdge(change.label, srcId, dstId, change.properties)
+  def propertiesHash(edge: Edge): Array[Byte] = {
+    val propertiesAsString = edge.propertiesMap.asScala.toList.sortBy(_._1).mkString
+    MessageDigest.getInstance("MD5").digest(propertiesAsString.getBytes)
   }
 
-  def makeEdge(label: String, srcId: Long, dstId: Long, properties: DiffGraph.Properties) = {
+  def makeEdge(label: String, srcId: Long, dstId: Long, properties: Seq[(String, AnyRef)]) = {
     val edgeBuilder = CpgStruct.Edge.newBuilder()
 
     edgeBuilder
@@ -147,7 +136,7 @@ object DiffGraphProtoSerializer {
       .setOutNodeKey(edge.outNode.id)
       .setInNodeKey(edge.inNode.id)
       .setEdgeType(EdgeType.valueOf(edge.label))
-      .setPropertiesHash(ByteString.copyFrom(DiffGraph.propertiesHash(edge.asInstanceOf[Edge])))
+      .setPropertiesHash(ByteString.copyFrom(propertiesHash(edge.asInstanceOf[Edge])))
       .build
 
   def removeNodePropertyProto(nodeId: Long, propertyKey: String) = {
@@ -437,62 +426,4 @@ class BatchUpdateInverseListener extends overflowdb.BatchedUpdate.ModificationLi
   }
 
   override def finish(): Unit = {}
-}
-
-/** Provides functionality to serialize diff graphs and add them to existing serialized CPGs as graph overlays.
-  */
-class DiffGraphProtoSerializer {
-  import DiffGraphProtoSerializer._
-
-  /** Generates a serialized graph overlay representing this graph
-    */
-  def serialize(appliedDiffGraph: AppliedDiffGraph): CpgOverlay = {
-    import DiffGraph.Change._
-    val builder                     = CpgOverlay.newBuilder
-    def nodeToId(nn: NewNode): Long = appliedDiffGraph.nodeToGraphId(nn)
-    appliedDiffGraph.diffGraph.iterator.foreach {
-      case CreateNode(newNode) =>
-        builder.addNode(addNode(newNode, nodeToId))
-      case c: CreateEdge =>
-        builder.addEdge(addEdge(c, nodeToId))
-      case SetNodeProperty(node, key, value) =>
-        builder.addNodeProperty(addNodeProperty(node.id, key, value, nodeToId))
-      case SetEdgeProperty(edge, key, value) =>
-        builder.addEdgeProperty(addEdgeProperty(edge, key, value))
-      case RemoveNode(_) | RemoveNodeProperty(_, _) | RemoveEdge(_) | RemoveEdgeProperty(_, _) =>
-        throw new UnsupportedOperationException(
-          "CpgOverlays can be stacked onto each other, therefor they cannot remove anything from the graph"
-        )
-    }
-    builder.build()
-  }
-
-  /** Create a proto representation of a (potentially unapplied) DiffGraph (which may also be an The DiffGraph may not
-    * (yet) be applied, and it may be an InverseDiffGraph, e.g. as created by
-    * {{{DiffGraph.Applier.applyDiff(..., undoable = true)}}}
-    */
-  def serialize(diffGraph: DiffGraph): DiffGraphProto = {
-    import DiffGraph.Change._
-    val builder = DiffGraphProto.newBuilder
-
-    def newEntry = DiffGraphProto.Entry.newBuilder
-
-    diffGraph.iterator
-      .map {
-        case SetNodeProperty(node, key, value) =>
-          newEntry.setNodeProperty(addNodeProperty(node.id, key, value, null))
-        case SetEdgeProperty(edge, key, value) =>
-          newEntry.setEdgeProperty(addEdgeProperty(edge, key, value))
-        case RemoveNode(nodeId) => newEntry.setRemoveNode(removeNodeProto(nodeId))
-        case RemoveEdge(edge)   => newEntry.setRemoveEdge(removeEdgeProto(edge))
-        case RemoveNodeProperty(nodeId, propertyKey) =>
-          newEntry.setRemoveNodeProperty(removeNodePropertyProto(nodeId, propertyKey))
-        case RemoveEdgeProperty(edge, propertyKey) =>
-          newEntry.setRemoveEdgeProperty(removeEdgePropertyProto(edge, propertyKey))
-        case other => throw new NotImplementedError(s"not (yet?) supported for DiffGraph: ${other.getClass}")
-      }
-      .foreach(builder.addEntries)
-    builder.build()
-  }
-
 }

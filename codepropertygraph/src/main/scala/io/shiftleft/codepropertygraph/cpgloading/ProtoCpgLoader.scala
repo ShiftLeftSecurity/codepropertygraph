@@ -4,7 +4,7 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, DiffGraph}
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.slf4j.{Logger, LoggerFactory}
 import overflowdb.Config
 
@@ -68,9 +68,6 @@ object ProtoCpgLoader {
 
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
     loadOverlays(fileName, CpgOverlay.parseFrom)
-
-  def loadDiffGraphs(fileName: String): Try[Iterator[DiffGraph]] =
-    loadOverlays(fileName, DiffGraph.parseFrom)
 
   private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
     Using(new ZipArchive(fileName)) { zip =>
