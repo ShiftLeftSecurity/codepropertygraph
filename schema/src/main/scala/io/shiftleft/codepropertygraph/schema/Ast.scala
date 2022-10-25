@@ -348,7 +348,9 @@ object Ast extends SchemaBase {
       Constant(name = "TRY", value = "TRY", valueType = ValueType.String, comment = "Represents a try statement")
         .protoId(10),
       Constant(name = "THROW", value = "THROW", valueType = ValueType.String, comment = "Represents a throw statement")
-        .protoId(11)
+        .protoId(11),
+      Constant(name = "MATCH", value = "MATCH", valueType = ValueType.String, comment = "Represents a match expression")
+        .protoId(12)
     )
 
     val controlStructure: NodeType = builder
