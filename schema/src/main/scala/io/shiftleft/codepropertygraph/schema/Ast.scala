@@ -350,7 +350,9 @@ object Ast extends SchemaBase {
       Constant(name = "THROW", value = "THROW", valueType = ValueType.String, comment = "Represents a throw statement")
         .protoId(11),
       Constant(name = "MATCH", value = "MATCH", valueType = ValueType.String, comment = "Represents a match expression")
-        .protoId(12)
+        .protoId(12),
+      Constant(name = "YIELD", value = "YIELD", valueType = ValueType.String, comment = "Represents a yield expression")
+        .protoId(13)
     )
 
     val controlStructure: NodeType = builder
