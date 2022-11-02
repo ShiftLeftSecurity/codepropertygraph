@@ -11,43 +11,12 @@ import scala.annotation.nowarn
 import scala.concurrent.duration.DurationLong
 import scala.util.{Failure, Success, Try}
 
-/* SimpleCpgPass is a replacement for CpgPass.
+/* CpgPass
  *
- *  Instead of returning an Iterator[DiffGraph], the `run` fuction gets a DiffGraphBuilder as input, and can attach its
- *  modifications to it (i.e. mutate the builder).
- *
- * CpgPass has somewhat subtle semantics with respect to lazy evaluation order of the returned iterator and graph writes.
- * The subtleties are gone with SimpleCpgPass.
- *
- * Note that SimpleCpgPass does not support lazy evaluation to reduce peak memory consumption. Take care before porting passes that
- * write large amounts of data that risk OOM errors.
- *
- * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
- * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
- * passes eagerly, and releases them only when the entire chain has run.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * // description of now-removed `CpgPass` class
- *
- * Base class for CPG pass - a program, which receives an input graph and outputs a sequence of additive diff graphs.
- * These diff graphs can be merged into the original graph ("applied"), they can be serialized into a binary format,
- * and finally, they can be added to an existing cpg.bin.zip file.
- *
- * A pass is provided by inheriting from this class and implementing `run`, a method, which creates the sequence of
- * diff graphs from an input graph.
- *
- * Overview of steps and their meaning:
- *
- *   1. Create: A sequence of diff graphs is created from the source graph 2. Apply: Each diff graph can be applied to
- *      the source graph 3. Serialize: After applying a diff graph, the diff graph can be serialized into a CPG overlay
- *      4. Store: The CPG overlay can be stored in a serialized CPG.
- *
- * @param cpg
- *   the source CPG this pass traverses
- *
+ * Base class of a program which receives a CPG as input for the purpose of modifying it.
  * */
 
-abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
 
   def run(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit
@@ -57,6 +26,9 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
   final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
 }
+
+@deprecated abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
+    extends CpgPass(cpg, outName, keyPool)
 
 /* ForkJoinParallelCpgPass is a possible replacement for CpgPass and ParallelCpgPass.
  *
