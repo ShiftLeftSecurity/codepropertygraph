@@ -5,6 +5,7 @@ import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.annotation.nowarn
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -35,8 +36,11 @@ object ConcurrentWriterCpgPass {
   private val writerQueueCapacity   = 4
   private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
-abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends NewStyleCpgPassBase[T] {
+abstract class ConcurrentWriterCpgPass[T <: AnyRef](
+  cpg: Cpg,
+  @nowarn outName: String = "",
+  keyPool: Option[KeyPool] = None
+) extends NewStyleCpgPassBase[T] {
 
   @volatile var nDiffT = -1
 
@@ -63,7 +67,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
     nParts = parts.size
     val partIter        = parts.iterator
     val completionQueue = mutable.ArrayDeque[Future[overflowdb.BatchedUpdate.DiffGraph]]()
-    val writer          = new Writer(serializedCpg, prefix, inverse, MDC.getCopyOfContextMap())
+    val writer          = new Writer(MDC.getCopyOfContextMap())
     val writerThread    = new Thread(writer)
     writerThread.setName("Writer")
     writerThread.start()
@@ -116,21 +120,14 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       // in the reported timings, and we must have our final log message if finish() throws
 
       val nanosStop = System.nanoTime()
-      val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
-        if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
-      } else ""
+
       baseLogger.info(
-        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
+        f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
       )
     }
   }
 
-  private class Writer(
-    serializedCpg: SerializedCpg,
-    prefix: String,
-    inverse: Boolean,
-    mdc: java.util.Map[String, String]
-  ) extends Runnable {
+  private class Writer(mdc: java.util.Map[String, String]) extends Runnable {
 
     val queue =
       new LinkedBlockingQueue[Option[overflowdb.BatchedUpdate.DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
@@ -142,38 +139,17 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
         nDiffT = 0
         // logback chokes on null context maps
         if (mdc != null) MDC.setContextMap(mdc)
-        var terminate   = false
-        var index: Int  = 0
-        val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
-        val withInverse = doSerialize && inverse
+        var terminate  = false
+        var index: Int = 0
         while (!terminate) {
           queue.take() match {
             case None =>
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              val listener =
-                if (withInverse) new BatchUpdateInverseListener
-                else if (doSerialize) new BatchUpdateForwardListener
-                else null
-
               nDiffT += overflowdb.BatchedUpdate
-                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), listener)
+                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
                 .transitiveModifications()
-
-              if (withInverse) {
-                store(
-                  listener.asInstanceOf[BatchUpdateInverseListener].getSerialization(),
-                  generateOutFileName(prefix, outName, 0),
-                  serializedCpg
-                )
-              } else if (doSerialize) {
-                store(
-                  listener.asInstanceOf[BatchUpdateForwardListener].builder.build(),
-                  generateOutFileName(prefix, outName, 0),
-                  serializedCpg
-                )
-              }
               index += 1
           }
         }
