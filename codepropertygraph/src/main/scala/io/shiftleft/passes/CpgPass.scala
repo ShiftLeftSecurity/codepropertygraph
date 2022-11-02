@@ -7,6 +7,7 @@ import org.slf4j.{Logger, LoggerFactory, MDC}
 import overflowdb.BatchedUpdate
 
 import java.util.function.{BiConsumer, Supplier}
+import scala.annotation.nowarn
 import scala.concurrent.duration.DurationLong
 import scala.util.{Failure, Success, Try}
 
@@ -79,8 +80,11 @@ abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[Key
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends NewStyleCpgPassBase[T] {
+abstract class ForkJoinParallelCpgPass[T <: AnyRef](
+  cpg: Cpg,
+  @nowarn outName: String = "",
+  keyPool: Option[KeyPool] = None
+) extends NewStyleCpgPassBase[T] {
 
   override def createApplySerializeAndStore(
     serializedCpg: SerializedCpg,
@@ -98,28 +102,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, outName: String = 
       nParts = runWithBuilder(diffGraph)
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size()
-      val doSerialize = serializedCpg != null && !serializedCpg.isEmpty
-      val withInverse = doSerialize && inverse
-      val listener =
-        if (withInverse) new BatchUpdateInverseListener else if (doSerialize) new BatchUpdateForwardListener else null
 
       nDiffT = overflowdb.BatchedUpdate
-        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), listener)
+        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
         .transitiveModifications()
 
-      if (withInverse) {
-        store(
-          listener.asInstanceOf[BatchUpdateInverseListener].getSerialization(),
-          generateOutFileName(prefix, outName, 0),
-          serializedCpg
-        )
-      } else if (doSerialize) {
-        store(
-          listener.asInstanceOf[BatchUpdateForwardListener].builder.build(),
-          generateOutFileName(prefix, outName, 0),
-          serializedCpg
-        )
-      }
     } catch {
       case exc: Exception =>
         baseLogger.error(s"Pass ${name} failed", exc)
