@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
+import overflowdb.schema.Property.ValueType
 import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object VersionControl extends SchemaBase {
@@ -17,7 +18,6 @@ object VersionControl extends SchemaBase {
   def apply(builder: SchemaBuilder) = new Schema(builder)
 
   class Schema(builder: SchemaBuilder) {
-    import base._
 
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
@@ -94,7 +94,7 @@ object VersionControl extends SchemaBase {
                     |""".stripMargin
       )
       .protoId(2150)
-      .addProperties(system, remote, branch, author, revisionId, revisionMessage, modifiedFiles)
+      .addProperties(vcsSystem, remote, branch, author, revisionId, revisionMessage, modifiedFiles)
 
   }
 }
