@@ -90,9 +90,10 @@ object VersionControl extends SchemaBase {
     val vcsNode: NodeType = builder
       .addNodeType(
         name = "VERSION_CONTROL",
-        comment = """This node type represents version control system agnostic details about what version of a code base
-                    |generated this code property graph.
-                    |""".stripMargin
+        comment =
+          """This node type represents version control system agnostic details about what version of a code base
+            |generated this code property graph.
+            |""".stripMargin
       )
       .protoId(2150)
       .addProperties(vcsSystem, remote, branch, author, revisionId, revisionMessage, modifiedFiles)
