@@ -50,7 +50,6 @@ object VersionControl extends SchemaBase {
           """This field holds the name of the current branch this version of the code is developed on. This is usually a
             |branch from a more stable branch.
             |""".stripMargin
-
       )
       .protoId(2153)
 
@@ -90,8 +89,7 @@ object VersionControl extends SchemaBase {
     val vcsNode: NodeType = builder
       .addNodeType(
         name = "VERSION_CONTROL",
-        comment =
-          """This node type represents version control system agnostic details about what version of a code base
+        comment = """This node type represents version control system agnostic details about what version of a code base
             |generated this code property graph.
             |""".stripMargin
       )
