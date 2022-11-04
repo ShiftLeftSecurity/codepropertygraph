@@ -28,11 +28,27 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment =
           """This field holds the name of the version control system used. This corresponds to the systems that are
-            |supported for being detected e.g. `GIT`.
+            |supported for being detected e.g. `GIT` or `SVN`.
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
       .protoId(2151)
+
+    val versionControlSystems = builder.addConstants(
+      category = "VersionControlSystems",
+      Constant(
+        name = "GIT",
+        value = "GIT",
+        valueType = ValueType.String,
+        comment = "Git is a distributed version control system."
+      ).protoId(2158),
+      Constant(
+        name = "SVN",
+        value = "SVN",
+        valueType = ValueType.String,
+        comment = "Apache Subversion, a centralized version control system."
+      ).protoId(2159)
+    )
 
     val remote = builder
       .addProperty(
@@ -51,6 +67,7 @@ object VersionControl extends SchemaBase {
             |branch from a more stable branch.
             |""".stripMargin
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2153)
 
     val author = builder
@@ -59,6 +76,7 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment = "The name or alias of the developer or authored the code change."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2154)
 
     val revisionId = builder
@@ -67,6 +85,7 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment = "The unique identifier of the code change revision object."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2155)
 
     val revisionMessage = builder
@@ -75,6 +94,7 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment = "The author's message describing the code change for this revision."
       )
+      .mandatory(PropertyDefaults.String)
       .protoId(2156)
 
     val modifiedFiles = builder
