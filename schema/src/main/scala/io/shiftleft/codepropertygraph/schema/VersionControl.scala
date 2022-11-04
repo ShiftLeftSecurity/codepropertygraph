@@ -41,13 +41,13 @@ object VersionControl extends SchemaBase {
         value = "GIT",
         valueType = ValueType.String,
         comment = "Git is a distributed version control system."
-      ).protoId(2158),
+      ).protoId(2152),
       Constant(
         name = "SVN",
         value = "SVN",
         valueType = ValueType.String,
         comment = "Apache Subversion, a centralized version control system."
-      ).protoId(2159)
+      ).protoId(2153)
     )
 
     val remote = builder
@@ -56,7 +56,7 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment = "This field holds the URI of the remote host of the repository if one is present."
       )
-      .protoId(2152)
+      .protoId(2154)
 
     val branch = builder
       .addProperty(
@@ -68,7 +68,7 @@ object VersionControl extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2153)
+      .protoId(2155)
 
     val author = builder
       .addProperty(
@@ -77,7 +77,7 @@ object VersionControl extends SchemaBase {
         comment = "The name or alias of the developer or authored the code change."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2154)
+      .protoId(2156)
 
     val revisionId = builder
       .addProperty(
@@ -86,7 +86,16 @@ object VersionControl extends SchemaBase {
         comment = "The unique identifier of the code change revision object."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2155)
+      .protoId(2157)
+
+    val parentRevisionId = builder
+      .addProperty(
+        name = "PARENT_REVISION_ID",
+        valueType = ValueType.String,
+        comment = "The unique identifier of the parent code change revision object."
+      )
+      .mandatory(PropertyDefaults.String)
+      .protoId(2158)
 
     val revisionMessage = builder
       .addProperty(
@@ -95,7 +104,7 @@ object VersionControl extends SchemaBase {
         comment = "The author's message describing the code change for this revision."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2156)
+      .protoId(2159)
 
     val modifiedFiles = builder
       .addProperty(
@@ -104,7 +113,16 @@ object VersionControl extends SchemaBase {
         comment = "Full paths relative to the project root directory of files that were modified during the revision."
       )
       .asList()
-      .protoId(2157)
+      .protoId(2160)
+
+    val tags = builder
+      .addProperty(
+        name = "REVISION_TAGS",
+        valueType = ValueType.String,
+        comment = "The tags associated with this revision. This does not include tags put on by forward commits."
+      )
+      .asList()
+      .protoId(2161)
 
     val vcsNode: NodeType = builder
       .addNodeType(
@@ -114,7 +132,17 @@ object VersionControl extends SchemaBase {
             |""".stripMargin
       )
       .protoId(2150)
-      .addProperties(vcsSystem, remote, branch, author, revisionId, revisionMessage, modifiedFiles)
+      .addProperties(
+        vcsSystem,
+        remote,
+        branch,
+        author,
+        revisionId,
+        parentRevisionId,
+        revisionMessage,
+        modifiedFiles,
+        tags
+      )
 
   }
 }
