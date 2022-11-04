@@ -94,7 +94,6 @@ object VersionControl extends SchemaBase {
         valueType = ValueType.String,
         comment = "The unique identifier of the parent code change revision object."
       )
-      .mandatory(PropertyDefaults.String)
       .protoId(2158)
 
     val revisionMessage = builder
