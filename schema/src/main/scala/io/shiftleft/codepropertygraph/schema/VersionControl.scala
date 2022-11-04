@@ -90,10 +90,11 @@ object VersionControl extends SchemaBase {
 
     val parentRevisionId = builder
       .addProperty(
-        name = "PARENT_REVISION_ID",
+        name = "PARENT_REVISION_IDS",
         valueType = ValueType.String,
-        comment = "The unique identifier of the parent code change revision object."
+        comment = "A list of unique identifiers of the direct parent code change revision objects."
       )
+      .asList()
       .protoId(2158)
 
     val revisionMessage = builder
