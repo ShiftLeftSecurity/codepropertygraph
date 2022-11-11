@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
 import overflowdb.schema.EdgeType.Cardinality
+import overflowdb.schema.Property.ValueType
 import overflowdb.schema.{SchemaBuilder, SchemaInfo}
 
 object Cfg extends SchemaBase {
@@ -101,6 +102,20 @@ object Cfg extends SchemaBase {
 
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)
+
+    val depthFirstOrder = builder
+      .addProperty(
+        name = "DEPTH_FIRST_ORDER",
+        valueType = ValueType.Int,
+        comment = s"""The depth first ordering number. This is the reverse of a post order numbering.
+             |Among other things this can be to detect retreating CFG edges and back edges
+             |in reducible CFGs""".stripMargin
+      )
+      .mandatory(-1)
+      .protoId(17)
+
+    cfgNode.addProperties(depthFirstOrder)
+
   }
 
 }
