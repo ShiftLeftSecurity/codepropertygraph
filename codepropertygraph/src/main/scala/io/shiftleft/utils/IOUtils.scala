@@ -47,8 +47,15 @@ object IOUtils {
     * characters which will require surrogates when encoded. That means any character which lies beyond the basic
     * multilingual plane. You can do that with a simple regular expression.
     */
-  private def replaceUnpairedSurrogates(input: String): String =
-    surrogatePattern.matcher(input).replaceAll("???")
+  private def replaceUnpairedSurrogates(input: String): String = {
+    val matches = surrogatePattern.matcher(input)
+    if (matches.find()) {
+      val size = matches.end() - matches.start()
+      matches.replaceAll("?" * size)
+    } else {
+      input
+    }
+  }
 
   private def contentFromBufferedSource(bufferedSource: BufferedSource): Seq[String] = {
     val reader = bufferedSource.bufferedReader()
