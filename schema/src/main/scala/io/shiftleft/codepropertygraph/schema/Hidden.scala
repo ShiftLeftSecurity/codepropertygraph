@@ -23,8 +23,9 @@ object Hidden extends SchemaBase {
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema,
     pdg: Pdg.Schema,
-    tags: TagsAndLocation.Schema
-  ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph, pdg, tags)
+    tags: TagsAndLocation.Schema,
+    shortcuts: Shortcuts.Schema
+  ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph, pdg, tags, shortcuts)
 
   class Schema(
     builder: SchemaBuilder,
@@ -36,7 +37,8 @@ object Hidden extends SchemaBase {
     fsSchema: FileSystem.Schema,
     callGraph: CallGraph.Schema,
     pdg: Pdg.Schema,
-    tags: TagsAndLocation.Schema
+    tags: TagsAndLocation.Schema,
+    shortcuts: Shortcuts.Schema
   ) {
 
     import base._
@@ -47,6 +49,7 @@ object Hidden extends SchemaBase {
     import typeDeclSchema._
     import pdg._
     import tags._
+    import shortcuts._
 
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
@@ -123,6 +126,8 @@ object Hidden extends SchemaBase {
     templateDOM.addOutEdge(edge = reachingDef, inNode = expression)
     templateDOM.addOutEdge(edge = taggedBy, inNode = tag)
     templateDOM.addInEdge(edge = argument, outNode = expression)
+    templateDOM.addInEdge(edge = contains, outNode = method)
+    templateDOM.addInEdge(edge = contains, outNode = file)
 
     /*
      * Dependencies
