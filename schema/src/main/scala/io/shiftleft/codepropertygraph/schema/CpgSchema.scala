@@ -28,8 +28,8 @@ class CpgSchema(builder: SchemaBuilder) {
   val binding         = Binding(builder, base, typeSchema, method, callGraph)
   val annotation      = Annotation(builder, base, method, typeSchema, ast, shortcuts)
   val finding         = Finding(builder, base)
-  val hidden          = Hidden(builder, base, method, typeSchema, ast, cfg, fs, callGraph, pdg, tagsAndLocation, shortcuts)
-  val protoSerialize  = ProtoSerialize(builder, ast)
+  val hidden = Hidden(builder, base, method, typeSchema, ast, cfg, fs, callGraph, pdg, tagsAndLocation, shortcuts)
+  val protoSerialize = ProtoSerialize(builder, ast)
 }
 
 object CpgSchema {
