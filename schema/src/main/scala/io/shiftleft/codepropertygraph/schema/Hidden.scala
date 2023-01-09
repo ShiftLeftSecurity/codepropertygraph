@@ -242,6 +242,7 @@ object Hidden extends SchemaBase {
     importNode.addProperty(explicitAs)
     importNode.addProperty(isWildcard)
     importNode.addProperty(isExplicit)
+    importNode.addProperty(code)
 
     val imports = builder
       .addEdgeType(name = "IMPORTS", comment = "Edge from imports to dependencies")
