@@ -184,7 +184,6 @@ object Hidden extends SchemaBase {
             |languages like Javascript.
             |""".stripMargin
       )
-      .extendz(astNode)
 
     val importedEntity = builder
       .addProperty(
@@ -248,11 +247,18 @@ object Hidden extends SchemaBase {
       .addEdgeType(name = "IMPORTS", comment = "Edge from imports to dependencies")
       .protoId(23663)
 
-    importNode.addOutEdge(edge = imports, inNode = dependency)
+    val isCallForImport = builder
+      .addEdgeType(
+        name = "IS_CALL_FOR_IMPORT",
+        comment = """Edge from CALL statement in the AST to the IMPORT.
+        |We use this edge to traverse from the logical representation of the IMPORT
+        |to the corresponding import statement in the AST.
+        |""".stripMargin
+      )
+      .protoId(23664)
 
-    block.addOutEdge(edge = ast, inNode = importNode)
-    file.addOutEdge(edge = ast, inNode = importNode)
-    typeDecl.addOutEdge(edge = ast, inNode = importNode)
+    importNode.addOutEdge(edge = imports, inNode = dependency)
+    callNode.addOutEdge(edge = isCallForImport, inNode = importNode)
 
     val pointsTo = builder
       .addEdgeType(
