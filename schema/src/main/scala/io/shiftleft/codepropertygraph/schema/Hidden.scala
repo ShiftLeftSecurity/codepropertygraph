@@ -248,7 +248,16 @@ object Hidden extends SchemaBase {
       .addEdgeType(name = "IMPORTS", comment = "Edge from imports to dependencies")
       .protoId(23663)
 
+    val isCallForImport = builder.addEdgeType(
+      name = "IS_CALL_FOR_IMPORT",
+      comment = """Edge from CALL statement in the AST to the IMPORT.
+￼        |We use this edge to traverse from the logical representation of the IMPORT
+￼        |to the corresponding import statement in the AST.
+￼        |""".stripMargin
+    ).protoId(23664)
+
     importNode.addOutEdge(edge = imports, inNode = dependency)
+    callNode.addOutEdge(edge = isCallForImport, inNode = importNode)
 
     block.addOutEdge(edge = ast, inNode = importNode)
     file.addOutEdge(edge = ast, inNode = importNode)
