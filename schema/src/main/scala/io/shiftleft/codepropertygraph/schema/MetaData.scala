@@ -123,7 +123,13 @@ object MetaData extends SchemaBase {
         value = "SOLIDITY",
         valueType = ValueType.String,
         comment = "Solidity language frontend"
-      ).protoId(16)
+      ).protoId(16),
+      Constant(
+        name = "RUBYSRC",
+        value = "RUBYSRC",
+        valueType = ValueType.String,
+        comment = "Source-based frontend for Ruby"
+      ).protoId(17)
     )
   }
 }
