@@ -32,7 +32,7 @@ object Cfg extends SchemaBase {
         comment = """This is the base class for all control flow nodes. It is itself
             |a child class of `AST_NODE`, that is, all control flow graph nodes
             |are also syntax tree nodes in the CPG specification.
-            |"""".stripMargin
+            |""".stripMargin
       )
       .extendz(astNode)
 
