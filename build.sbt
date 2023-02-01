@@ -41,7 +41,11 @@ ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild
 // If we fork we immediately stumble upon https://github.com/sbt/sbt/issues/3892 and https://github.com/sbt/sbt/issues/3892
 ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild / baseDirectory).value}"
 
-ThisBuild / libraryDependencies ++= Seq("org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.19.0" % Test)
+ThisBuild / libraryDependencies ++= Seq(
+  "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.19.0" % Optional,
+  "org.apache.logging.log4j" % "log4j-core"        % "2.19.0" % Optional,
+  // `Optional` means "not transitive", but still included in "stage/lib"
+)
 
 // Scalafix / imports check setup
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0-alpha.1"
