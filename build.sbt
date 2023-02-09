@@ -1,14 +1,14 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.160"
-val overflowdbCodegenVersion = "2.72"
+val overflowdbVersion = "1.167"
+val overflowdbCodegenVersion = "2.82"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
     scalaVersion       := "2.13.8",
-    crossScalaVersions := Seq("2.13.8", "3.2.1"),
+    crossScalaVersions := Seq("2.13.8", "3.2.2"),
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
