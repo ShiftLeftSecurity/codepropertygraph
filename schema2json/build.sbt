@@ -4,7 +4,6 @@ dependsOn(Projects.schema)
 
 libraryDependencies ++= Seq(
   "org.json4s"            %% "json4s-native" % Versions.json4s,
-  "com.github.pathikrit"  %% "better-files"  % "3.9.2",
   "org.scalatest"         %% "scalatest"     % Versions.scalatest % Test
 )
 
