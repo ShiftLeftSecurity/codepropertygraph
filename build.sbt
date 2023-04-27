@@ -64,14 +64,12 @@ ThisBuild / scalacOptions ++= Seq(
   // "-Xfatal-warnings",
   "-Wconf:cat=deprecation:w,any:e",
   "-language:implicitConversions",
-  "-Xtarget:8" // TODO use -release
+  "-release", "8",
 )
 ThisBuild / compile / javacOptions ++= Seq(
   "-g", // debug symbols
-  "-source",
-  "1.8",
-  "-target",
-  "1.8", //TODO use -release
+  "--release",
+  "8",
   "-Xlint"
 )
 
