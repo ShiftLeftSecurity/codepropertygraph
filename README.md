@@ -59,7 +59,6 @@ switch the default compiler version for the duration of the shell session with `
 Code style is automatically verified by external tools:
 
 * [scalafmt](https://github.com/scalameta/scalafmt)
-* [scalafix](https://github.com/scalacenter/scalafix)
 
 If your PR build fails code formatting check, simply run `sbt format` and submit the change along with the rest of the code. The commands runs necessary formatting in the right order.
 
