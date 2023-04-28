@@ -75,7 +75,7 @@ object IOUtils {
       val read   = reader.read(buffer)
       productive = read > 0
       if (productive) {
-        stringBuilder.append(buffer)
+        stringBuilder.appendAll(buffer, 0, read)
       }
     }
 
