@@ -63,6 +63,25 @@ object IOUtils {
     reader.lines().iterator().asScala.map(replaceUnpairedSurrogates).toSeq
   }
 
+  private def contentStringFromBufferedSource(bufferedSource: BufferedSource): String = {
+    val reader        = bufferedSource.bufferedReader()
+    val stringBuilder = new StringBuilder
+    val bufferSize    = 1024
+    var productive    = true
+
+    skipBOMIfPresent(reader)
+    while (productive) {
+      val buffer = new Array[Char](bufferSize)
+      val read   = reader.read(buffer)
+      productive = read > 0
+      if (productive) {
+        stringBuilder.appendAll(buffer, 0, read)
+      }
+    }
+
+    replaceUnpairedSurrogates(stringBuilder.toString)
+  }
+
   /** Reads a file at the given path and:
     *   - skips BOM if present
     *   - removes unpaired surrogates
@@ -75,5 +94,18 @@ object IOUtils {
     */
   def readLinesInFile(path: Path): Seq[String] =
     Using.resource(Source.fromFile(path.toFile)(createDecoder()))(contentFromBufferedSource)
+
+  /** Reads a file at the given path and:
+    *   - skips BOM if present
+    *   - removes unpaired surrogates
+    *   - uses UTF-8 encoding (replacing malformed and unmappable characters)
+    *
+    * @param path
+    *   the file path
+    * @return
+    *   a String with the given file's contents
+    */
+  def readEntireFile(path: Path): String =
+    Using.resource(Source.fromFile(path.toFile)(createDecoder()))(contentStringFromBufferedSource)
 
 }
