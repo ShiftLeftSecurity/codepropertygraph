@@ -17,7 +17,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
       val cpg  = Cpg.emptyCpg
-      val pool = keyPools.flatMap(_.headOption)
+      val pool = keyPools.flatMap(_.nextOption())
       class MyPass(cpg: Cpg) extends ConcurrentWriterCpgPass[String](cpg, "MyPass", pool) {
         override def generateParts(): Array[String] = Array("foo", "bar")
 
