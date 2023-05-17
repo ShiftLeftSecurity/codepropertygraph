@@ -7,7 +7,7 @@ val overflowdbCodegenVersion = "2.87"
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "3.3.0-RC5",
+    scalaVersion       := "3.3.0-RC6",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
