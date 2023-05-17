@@ -65,6 +65,7 @@ lazy val schema2json       = Projects.schema2json
 addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 
 ThisBuild / scalacOptions ++= Seq(
+  "-release", "8",
   "-deprecation",
   "-feature",
   // "-Xfatal-warnings",
@@ -72,10 +73,9 @@ ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions"
 ) ++ (
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((3, _)) => Seq("-Xtarget:8")
+    case Some((3, _)) => Seq()
     case _ =>
       Seq(
-        "-target:jvm-1.8",
         "-Ywarn-unused", // required by scalafix
         "-Ycache-macro-class-loader:last-modified",
         "-Ybackend-parallelism",
@@ -83,13 +83,10 @@ ThisBuild / scalacOptions ++= Seq(
       )
   }
 )
-ThisBuild / compile / javacOptions ++= Seq(
+
+ThisBuild / javacOptions ++= Seq(
   "-g", // debug symbols
-  "-source",
-  "1.8",
-  "-target",
-  "1.8",
-  "-Xlint"
+  "--release", "8"
 )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
