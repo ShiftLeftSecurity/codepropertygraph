@@ -153,6 +153,7 @@ object Type extends SchemaBase {
       )
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
+    tpe.starterName = Some("typ")
 
     // edges
 
