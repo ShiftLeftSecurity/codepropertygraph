@@ -42,9 +42,9 @@ installProtoc := {
           s"unknown platform name/arch ($name/$arch), please add in `proto-bindings/build.sbt` match"
         )
     }
-    val url = new URL(
+    val url = new URI(
       s"https://github.com/protocolbuffers/protobuf/releases/download/v$protocVersion/protoc-$protocVersion-$platform.zip"
-    )
+    ).toURL
 
     println(s"downloading $url and extracting into $protocLocalDir")
     val outdir = new File(protocLocalDir)
