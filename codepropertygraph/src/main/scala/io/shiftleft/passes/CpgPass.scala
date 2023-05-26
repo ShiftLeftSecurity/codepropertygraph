@@ -4,6 +4,7 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.slf4j.{Logger, LoggerFactory, MDC}
+import overflowdb.BatchedUpdate
 
 import java.util.function.{BiConsumer, Supplier}
 import scala.annotation.nowarn
@@ -18,11 +19,11 @@ import scala.util.{Failure, Success, Try}
 abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
 
-  def run(builder: DiffGraphBuilder): Unit
+  def run(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit
 
   final override def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
 
-  final override def runOnPart(builder: DiffGraphBuilder, part: AnyRef): Unit =
+  final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
 }
 
@@ -110,6 +111,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
   * hierarchy.
   */
 abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
+  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
   // setup large data structures, acquire external resources
@@ -121,7 +123,7 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
-  override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
+  override def runWithBuilder(externalBuilder: BatchedUpdate.DiffGraphBuilder): Int = {
     try {
       init()
       val parts  = generateParts()
@@ -163,7 +165,6 @@ object CpgPassBase {
 }
 
 trait CpgPassBase {
-  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.CpgDiffGraphBuilder
 
   protected def baseLogger: Logger = CpgPassBase.baseLogger
 
@@ -179,12 +180,12 @@ trait CpgPassBase {
     * 1), where nParts is either the number of parallel parts, or the number of iterarator elements in case of legacy
     * passes. Includes init() and finish() logic.
     */
-  def runWithBuilder(builder: DiffGraphBuilder): Int
+  def runWithBuilder(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int
 
   /** Wraps runWithBuilder with logging, and swallows raised exceptions. Use with caution -- API is unstable. A return
     * value of -1 indicates failure, otherwise the return value of runWithBuilder is passed through.
     */
-  def runWithBuilderLogged(builder: DiffGraphBuilder): Int = {
+  def runWithBuilderLogged(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int = {
     baseLogger.info(s"Start of pass: $name")
     val nanoStart = System.nanoTime()
     val size0     = builder.size()

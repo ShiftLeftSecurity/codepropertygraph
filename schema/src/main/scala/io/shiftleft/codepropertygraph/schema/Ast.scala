@@ -298,7 +298,7 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .protoId(30)
-    ret.starterName = Some("ret")
+      .starterName("ret")
 
     val controlStructureType = builder
       .addProperty(
