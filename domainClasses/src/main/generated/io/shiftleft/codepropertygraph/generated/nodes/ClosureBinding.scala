@@ -74,8 +74,8 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case _                     => super.propertyDefaultValue(propertyKey)
     }
 
-  def refOut: Iterator[AstNode] = get().refOut
-  override def _refOut          = get()._refOut
+  def refOut: Iterator[Declaration] = get().refOut
+  override def _refOut              = get()._refOut
 
   /** Traverse to METHOD_PARAMETER_IN via REF OUT edge.
     */
@@ -95,13 +95,13 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   def captureIn: Iterator[Expression] = get().captureIn
   override def _captureIn             = get()._captureIn
 
-  /** Traverse to TYPE_REF via CAPTURE IN edge.
-    */
-  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
-
   /** Traverse to METHOD_REF via CAPTURE IN edge.
     */
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCaptureIn
+
+  /** Traverse to TYPE_REF via CAPTURE IN edge.
+    */
+  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -171,8 +171,8 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   }
 
   import overflowdb.traversal._
-  def refOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _refOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def refOut: Iterator[Declaration] = createAdjacentNodeScalaIteratorByOffSet[Declaration](0)
+  override def _refOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] =
     refOut.collectAll[MethodParameterIn]
   def _localViaRefOut: Local = try { refOut.collectAll[Local].next() }
@@ -190,8 +190,8 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
 
   def captureIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](2)
   override def _captureIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef]     = captureIn.collectAll[TypeRef]
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = captureIn.collectAll[MethodRef]
+  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef]     = captureIn.collectAll[TypeRef]
 
   override def label: String = {
     ClosureBinding.Label

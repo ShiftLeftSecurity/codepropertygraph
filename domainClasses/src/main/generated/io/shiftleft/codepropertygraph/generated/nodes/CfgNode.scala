@@ -290,10 +290,20 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
   def _cfgNodeViaCfgIn: overflowdb.traversal.Traversal[CfgNode] =
     cfgIn.collectAll[CfgNode]
 
+  /** Traverse to DECLARATION via CFG IN edge.
+    */
+  def _declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
+    cfgIn.collectAll[Declaration]
+
   /** Traverse to AST_NODE via CFG IN edge.
     */
   def _astNodeViaCfgIn: overflowdb.traversal.Traversal[AstNode] =
     cfgIn.collectAll[AstNode]
+
+  /** Traverse to METHOD via CFG IN edge.
+    */
+  def _methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
+    cfgIn.collectAll[Method]
 
   /** Traverse to JUMP_TARGET via CFG IN edge.
     */
@@ -305,35 +315,15 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
   def _expressionViaCfgIn: overflowdb.traversal.Traversal[Expression] =
     cfgIn.collectAll[Expression]
 
-  /** Traverse to BLOCK via CFG IN edge.
+  /** Traverse to FIELD_IDENTIFIER via CFG IN edge.
     */
-  def _blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
-    cfgIn.collectAll[Block]
+  def _fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    cfgIn.collectAll[FieldIdentifier]
 
   /** Traverse to CONTROL_STRUCTURE via CFG IN edge.
     */
   def _controlStructureViaCfgIn: overflowdb.traversal.Traversal[ControlStructure] =
     cfgIn.collectAll[ControlStructure]
-
-  /** Traverse to LITERAL via CFG IN edge.
-    */
-  def _literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
-    cfgIn.collectAll[Literal]
-
-  /** Traverse to TYPE_REF via CFG IN edge.
-    */
-  def _typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
-    cfgIn.collectAll[TypeRef]
-
-  /** Traverse to DECLARATION via CFG IN edge.
-    */
-  def _declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
-    cfgIn.collectAll[Declaration]
-
-  /** Traverse to METHOD via CFG IN edge.
-    */
-  def _methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
-    cfgIn.collectAll[Method]
 
   /** Traverse to CALL via CFG IN edge.
     */
@@ -345,20 +335,30 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
   def _callReprViaCfgIn: overflowdb.traversal.Traversal[CallRepr] =
     cfgIn.collectAll[CallRepr]
 
-  /** Traverse to FIELD_IDENTIFIER via CFG IN edge.
+  /** Traverse to BLOCK via CFG IN edge.
     */
-  def _fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    cfgIn.collectAll[FieldIdentifier]
+  def _blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
+    cfgIn.collectAll[Block]
+
+  /** Traverse to LITERAL via CFG IN edge.
+    */
+  def _literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
+    cfgIn.collectAll[Literal]
+
+  /** Traverse to METHOD_REF via CFG IN edge.
+    */
+  def _methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
+    cfgIn.collectAll[MethodRef]
 
   /** Traverse to IDENTIFIER via CFG IN edge.
     */
   def _identifierViaCfgIn: overflowdb.traversal.Traversal[Identifier] =
     cfgIn.collectAll[Identifier]
 
-  /** Traverse to METHOD_REF via CFG IN edge.
+  /** Traverse to TYPE_REF via CFG IN edge.
     */
-  def _methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
-    cfgIn.collectAll[MethodRef]
+  def _typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
+    cfgIn.collectAll[TypeRef]
 
   /** Traverse to UNKNOWN via CFG IN edge.
     */

@@ -76,81 +76,81 @@ class Tag(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/iss
     */
   def _localViaTaggedByIn: overflowdb.traversal.Traversal[Local] = get()._localViaTaggedByIn
 
-  /** Traverse to JUMP_TARGET via TAGGED_BY IN edge.
+  /** Traverse to METHOD_REF via TAGGED_BY IN edge.
     */
-  def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaTaggedByIn
-
-  /** Traverse to METHOD via TAGGED_BY IN edge.
-    */
-  def _methodViaTaggedByIn: overflowdb.traversal.Traversal[Method] = get()._methodViaTaggedByIn
-
-  /** Traverse to CALL via TAGGED_BY IN edge.
-    */
-  def _callViaTaggedByIn: overflowdb.traversal.Traversal[Call] = get()._callViaTaggedByIn
-
-  /** Traverse to RETURN via TAGGED_BY IN edge.
-    */
-  def _returnViaTaggedByIn: overflowdb.traversal.Traversal[Return] = get()._returnViaTaggedByIn
-
-  /** Traverse to MEMBER via TAGGED_BY IN edge.
-    */
-  def _memberViaTaggedByIn: overflowdb.traversal.Traversal[Member] = get()._memberViaTaggedByIn
-
-  /** Traverse to UNKNOWN via TAGGED_BY IN edge.
-    */
-  def _unknownViaTaggedByIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaTaggedByIn
-
-  /** Traverse to IDENTIFIER via TAGGED_BY IN edge.
-    */
-  def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaTaggedByIn
+  def _methodRefViaTaggedByIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaTaggedByIn
 
   /** Traverse to TEMPLATE_DOM via TAGGED_BY IN edge.
     */
   def _templateDomViaTaggedByIn: overflowdb.traversal.Traversal[TemplateDom] = get()._templateDomViaTaggedByIn
 
-  /** Traverse to BLOCK via TAGGED_BY IN edge.
+  /** Traverse to METHOD via TAGGED_BY IN edge.
     */
-  def _blockViaTaggedByIn: overflowdb.traversal.Traversal[Block] = get()._blockViaTaggedByIn
+  def _methodViaTaggedByIn: overflowdb.traversal.Traversal[Method] = get()._methodViaTaggedByIn
+
+  /** Traverse to JUMP_TARGET via TAGGED_BY IN edge.
+    */
+  def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaTaggedByIn
 
   /** Traverse to METHOD_RETURN via TAGGED_BY IN edge.
     */
   def _methodReturnViaTaggedByIn: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaTaggedByIn
 
-  /** Traverse to TYPE_REF via TAGGED_BY IN edge.
+  /** Traverse to CALL via TAGGED_BY IN edge.
     */
-  def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaTaggedByIn
+  def _callViaTaggedByIn: overflowdb.traversal.Traversal[Call] = get()._callViaTaggedByIn
+
+  /** Traverse to FIELD_IDENTIFIER via TAGGED_BY IN edge.
+    */
+  def _fieldIdentifierViaTaggedByIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaTaggedByIn
 
   /** Traverse to FILE via TAGGED_BY IN edge.
     */
   def _fileViaTaggedByIn: overflowdb.traversal.Traversal[File] = get()._fileViaTaggedByIn
 
-  /** Traverse to METHOD_REF via TAGGED_BY IN edge.
+  /** Traverse to IDENTIFIER via TAGGED_BY IN edge.
     */
-  def _methodRefViaTaggedByIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaTaggedByIn
-
-  /** Traverse to METHOD_PARAMETER_IN via TAGGED_BY IN edge.
-    */
-  def _methodParameterInViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    get()._methodParameterInViaTaggedByIn
-
-  /** Traverse to LITERAL via TAGGED_BY IN edge.
-    */
-  def _literalViaTaggedByIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaTaggedByIn
-
-  /** Traverse to METHOD_PARAMETER_OUT via TAGGED_BY IN edge.
-    */
-  def _methodParameterOutViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterOut] =
-    get()._methodParameterOutViaTaggedByIn
+  def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaTaggedByIn
 
   /** Traverse to CONTROL_STRUCTURE via TAGGED_BY IN edge.
     */
   def _controlStructureViaTaggedByIn: overflowdb.traversal.Traversal[ControlStructure] =
     get()._controlStructureViaTaggedByIn
 
-  /** Traverse to FIELD_IDENTIFIER via TAGGED_BY IN edge.
+  /** Traverse to LITERAL via TAGGED_BY IN edge.
     */
-  def _fieldIdentifierViaTaggedByIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaTaggedByIn
+  def _literalViaTaggedByIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaTaggedByIn
+
+  /** Traverse to UNKNOWN via TAGGED_BY IN edge.
+    */
+  def _unknownViaTaggedByIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaTaggedByIn
+
+  /** Traverse to METHOD_PARAMETER_OUT via TAGGED_BY IN edge.
+    */
+  def _methodParameterOutViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterOut] =
+    get()._methodParameterOutViaTaggedByIn
+
+  /** Traverse to TYPE_REF via TAGGED_BY IN edge.
+    */
+  def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaTaggedByIn
+
+  /** Traverse to RETURN via TAGGED_BY IN edge.
+    */
+  def _returnViaTaggedByIn: overflowdb.traversal.Traversal[Return] = get()._returnViaTaggedByIn
+
+  /** Traverse to METHOD_PARAMETER_IN via TAGGED_BY IN edge.
+    */
+  def _methodParameterInViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    get()._methodParameterInViaTaggedByIn
+
+  /** Traverse to BLOCK via TAGGED_BY IN edge.
+    */
+  def _blockViaTaggedByIn: overflowdb.traversal.Traversal[Block] = get()._blockViaTaggedByIn
+
+  /** Traverse to MEMBER via TAGGED_BY IN edge.
+    */
+  def _memberViaTaggedByIn: overflowdb.traversal.Traversal[Member] = get()._memberViaTaggedByIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -217,28 +217,28 @@ class TagDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with TagBa
   def taggedByIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _taggedByIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _localViaTaggedByIn: overflowdb.traversal.Traversal[Local]               = taggedByIn.collectAll[Local]
-  def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget]     = taggedByIn.collectAll[JumpTarget]
-  def _methodViaTaggedByIn: overflowdb.traversal.Traversal[Method]             = taggedByIn.collectAll[Method]
-  def _callViaTaggedByIn: overflowdb.traversal.Traversal[Call]                 = taggedByIn.collectAll[Call]
-  def _returnViaTaggedByIn: overflowdb.traversal.Traversal[Return]             = taggedByIn.collectAll[Return]
-  def _memberViaTaggedByIn: overflowdb.traversal.Traversal[Member]             = taggedByIn.collectAll[Member]
-  def _unknownViaTaggedByIn: overflowdb.traversal.Traversal[Unknown]           = taggedByIn.collectAll[Unknown]
-  def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier]     = taggedByIn.collectAll[Identifier]
-  def _templateDomViaTaggedByIn: overflowdb.traversal.Traversal[TemplateDom]   = taggedByIn.collectAll[TemplateDom]
-  def _blockViaTaggedByIn: overflowdb.traversal.Traversal[Block]               = taggedByIn.collectAll[Block]
-  def _methodReturnViaTaggedByIn: overflowdb.traversal.Traversal[MethodReturn] = taggedByIn.collectAll[MethodReturn]
-  def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef]           = taggedByIn.collectAll[TypeRef]
-  def _fileViaTaggedByIn: overflowdb.traversal.Traversal[File]                 = taggedByIn.collectAll[File]
   def _methodRefViaTaggedByIn: overflowdb.traversal.Traversal[MethodRef]       = taggedByIn.collectAll[MethodRef]
-  def _methodParameterInViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    taggedByIn.collectAll[MethodParameterIn]
-  def _literalViaTaggedByIn: overflowdb.traversal.Traversal[Literal] = taggedByIn.collectAll[Literal]
-  def _methodParameterOutViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterOut] =
-    taggedByIn.collectAll[MethodParameterOut]
-  def _controlStructureViaTaggedByIn: overflowdb.traversal.Traversal[ControlStructure] =
-    taggedByIn.collectAll[ControlStructure]
+  def _templateDomViaTaggedByIn: overflowdb.traversal.Traversal[TemplateDom]   = taggedByIn.collectAll[TemplateDom]
+  def _methodViaTaggedByIn: overflowdb.traversal.Traversal[Method]             = taggedByIn.collectAll[Method]
+  def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget]     = taggedByIn.collectAll[JumpTarget]
+  def _methodReturnViaTaggedByIn: overflowdb.traversal.Traversal[MethodReturn] = taggedByIn.collectAll[MethodReturn]
+  def _callViaTaggedByIn: overflowdb.traversal.Traversal[Call]                 = taggedByIn.collectAll[Call]
   def _fieldIdentifierViaTaggedByIn: overflowdb.traversal.Traversal[FieldIdentifier] =
     taggedByIn.collectAll[FieldIdentifier]
+  def _fileViaTaggedByIn: overflowdb.traversal.Traversal[File]             = taggedByIn.collectAll[File]
+  def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier] = taggedByIn.collectAll[Identifier]
+  def _controlStructureViaTaggedByIn: overflowdb.traversal.Traversal[ControlStructure] =
+    taggedByIn.collectAll[ControlStructure]
+  def _literalViaTaggedByIn: overflowdb.traversal.Traversal[Literal] = taggedByIn.collectAll[Literal]
+  def _unknownViaTaggedByIn: overflowdb.traversal.Traversal[Unknown] = taggedByIn.collectAll[Unknown]
+  def _methodParameterOutViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterOut] =
+    taggedByIn.collectAll[MethodParameterOut]
+  def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef] = taggedByIn.collectAll[TypeRef]
+  def _returnViaTaggedByIn: overflowdb.traversal.Traversal[Return]   = taggedByIn.collectAll[Return]
+  def _methodParameterInViaTaggedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    taggedByIn.collectAll[MethodParameterIn]
+  def _blockViaTaggedByIn: overflowdb.traversal.Traversal[Block]   = taggedByIn.collectAll[Block]
+  def _memberViaTaggedByIn: overflowdb.traversal.Traversal[Member] = taggedByIn.collectAll[Member]
 
   override def label: String = {
     Tag.Label

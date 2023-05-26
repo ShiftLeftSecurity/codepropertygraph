@@ -39,15 +39,15 @@ object ArrayInitializer {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation
     ).asJava,
     List(
+      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation
     ).asJava
   )
@@ -67,7 +67,7 @@ object ArrayInitializer {
   }
 }
 
-trait ArrayInitializerBase extends AbstractNode with ExpressionBase with AstNodeBase {
+trait ArrayInitializerBase extends AbstractNode with AstNodeBase with ExpressionBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def argumentIndex: scala.Int
@@ -83,8 +83,8 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
     extends NodeRef[ArrayInitializerDb](graph_4762, id_4762)
     with ArrayInitializerBase
     with StoredNode
-    with Expression
-    with AstNode {
+    with AstNode
+    with Expression {
   override def argumentIndex: scala.Int      = get().argumentIndex
   override def argumentName: Option[String]  = get().argumentName
   override def code: String                  = get().code
@@ -99,13 +99,6 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
       case _                => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[Literal] = get().astOut
-  override def _astOut          = get()._astOut
-
-  /** Traverse to LITERAL via AST OUT edge.
-    */
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
-
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
 
@@ -116,8 +109,18 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
   def pointsToOut: Iterator[CfgNode] = get().pointsToOut
   override def _pointsToOut          = get()._pointsToOut
 
+  def astOut: Iterator[Literal] = get().astOut
+  override def _astOut          = get()._astOut
+
+  /** Traverse to LITERAL via AST OUT edge.
+    */
+  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
+
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut
+
+  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
+  override def _pointsToIn          = get()._pointsToIn
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -129,9 +132,6 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
 
   def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
   override def _reachingDefIn              = get()._reachingDefIn
-
-  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
-  override def _pointsToIn          = get()._pointsToIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -181,8 +181,8 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
 class ArrayInitializerDb(ref: NodeRef[NodeDb])
     extends NodeDb(ref)
     with StoredNode
-    with Expression
     with AstNode
+    with Expression
     with ArrayInitializerBase {
 
   override def layoutInformation: NodeLayoutInformation = ArrayInitializer.layoutInformation
@@ -227,30 +227,30 @@ class ArrayInitializerDb(ref: NodeRef[NodeDb])
   }
 
   import overflowdb.traversal._
-  def astOut: Iterator[Literal] = createAdjacentNodeScalaIteratorByOffSet[Literal](0)
-  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = astOut.collectAll[Literal]
-
-  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](1)
-  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](0)
+  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
-  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](2)
-  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](1)
+  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  def astOut: Iterator[Literal] = createAdjacentNodeScalaIteratorByOffSet[Literal](2)
+  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = astOut.collectAll[Literal]
 
   def argumentOut: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](3)
   override def _argumentOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
 
-  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](4)
-  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
+  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+
+  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](5)
+  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
 
-  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](5)
-  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-
-  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](6)
+  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
 
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](7)
   override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)

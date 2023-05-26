@@ -87,17 +87,17 @@ class Modifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
 
-  /** Traverse to MEMBER via AST IN edge.
+  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
+  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
   def _typeDeclViaAstIn: TypeDecl = get()._typeDeclViaAstIn
 
-  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
+  /** Traverse to MEMBER via AST IN edge.
     */
-  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
+  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
@@ -187,9 +187,9 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   }
 
   import overflowdb.traversal._
-  def astIn: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _astIn                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
+  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
   def _typeDeclViaAstIn: TypeDecl = try { astIn.collectAll[TypeDecl].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -198,8 +198,8 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
         e
       )
   }
-  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown]                   = astIn.collectAll[Unknown]
+  def _memberViaAstIn: overflowdb.traversal.Traversal[Member]   = astIn.collectAll[Member]
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
   def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>

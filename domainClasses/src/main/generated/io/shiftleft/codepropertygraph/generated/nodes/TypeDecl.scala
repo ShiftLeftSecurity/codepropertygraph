@@ -69,12 +69,12 @@ object TypeDecl {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.Binds.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.AliasOf.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.InheritsFrom.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.AliasOf.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Binds.layoutInformation
     ).asJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
@@ -146,23 +146,30 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
       case _                      => super.propertyDefaultValue(propertyKey)
     }
 
-  def bindsOut: Iterator[Binding] = get().bindsOut
-  override def _bindsOut          = get()._bindsOut
+  def sourceFileOut: Iterator[File] = get().sourceFileOut
+  override def _sourceFileOut       = get()._sourceFileOut
 
-  /** Traverse to BINDING via BINDS OUT edge.
+  /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
-  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = get()._bindingViaBindsOut
+  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
+
+  def aliasOfOut: Iterator[Type] = get().aliasOfOut
+  override def _aliasOfOut       = get()._aliasOfOut
+
+  /** Traverse to TYPE via ALIAS_OF OUT edge.
+    */
+  def aliasedType: overflowdb.traversal.Traversal[Type] = get().aliasedType
 
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut
 
-  /** Traverse to IMPORT via AST OUT edge.
+  /** Traverse to ANNOTATION via AST OUT edge.
     */
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
 
-  /** Traverse to TYPE_DECL via AST OUT edge.
+  /** Traverse to MODIFIER via AST OUT edge.
     */
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstOut
+  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
 
   /** Traverse to TYPE_PARAMETER via AST OUT edge.
     */
@@ -172,17 +179,17 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _memberViaAstOut: overflowdb.traversal.Traversal[Member] = get()._memberViaAstOut
 
-  /** Traverse to ANNOTATION via AST OUT edge.
-    */
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
-
   /** Traverse to METHOD via AST OUT edge.
     */
   def _methodViaAstOut: overflowdb.traversal.Traversal[Method] = get()._methodViaAstOut
 
-  /** Traverse to MODIFIER via AST OUT edge.
+  /** Traverse to TYPE_DECL via AST OUT edge.
     */
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
+  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstOut
+
+  /** Traverse to IMPORT via AST OUT edge.
+    */
+  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
 
   def inheritsFromOut: Iterator[Type] = get().inheritsFromOut
   override def _inheritsFromOut       = get()._inheritsFromOut
@@ -191,13 +198,6 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _typeViaInheritsFromOut: overflowdb.traversal.Traversal[Type] = get()._typeViaInheritsFromOut
 
-  def sourceFileOut: Iterator[File] = get().sourceFileOut
-  override def _sourceFileOut       = get()._sourceFileOut
-
-  /** Traverse to FILE via SOURCE_FILE OUT edge.
-    */
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
-
   def containsOut: Iterator[Method] = get().containsOut
   override def _containsOut         = get()._containsOut
 
@@ -205,12 +205,12 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
 
-  def aliasOfOut: Iterator[Type] = get().aliasOfOut
-  override def _aliasOfOut       = get()._aliasOfOut
+  def bindsOut: Iterator[Binding] = get().bindsOut
+  override def _bindsOut          = get()._bindsOut
 
-  /** Traverse to TYPE via ALIAS_OF OUT edge.
+  /** Traverse to BINDING via BINDS OUT edge.
     */
-  def aliasedType: overflowdb.traversal.Traversal[Type] = get().aliasedType
+  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = get()._bindingViaBindsOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -367,35 +367,35 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   }
 
   import overflowdb.traversal._
-  def bindsOut: Iterator[Binding] = createAdjacentNodeScalaIteratorByOffSet[Binding](0)
-  override def _bindsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = bindsOut.collectAll[Binding]
+  def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](0)
+  override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
 
-  def astOut: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = astOut.collectAll[Import]
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl]           = astOut.collectAll[TypeDecl]
+  def aliasOfOut: Iterator[Type]                        = createAdjacentNodeScalaIteratorByOffSet[Type](1)
+  override def _aliasOfOut                              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def aliasedType: overflowdb.traversal.Traversal[Type] = aliasOfOut.collectAll[Type]
+
+  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
+  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation]       = astOut.collectAll[Annotation]
+  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]           = astOut.collectAll[Modifier]
   def _typeParameterViaAstOut: overflowdb.traversal.Traversal[TypeParameter] = astOut.collectAll[TypeParameter]
   def _memberViaAstOut: overflowdb.traversal.Traversal[Member]               = astOut.collectAll[Member]
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation]       = astOut.collectAll[Annotation]
   def _methodViaAstOut: overflowdb.traversal.Traversal[Method]               = astOut.collectAll[Method]
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]           = astOut.collectAll[Modifier]
+  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl]           = astOut.collectAll[TypeDecl]
+  def _importViaAstOut: overflowdb.traversal.Traversal[Import]               = astOut.collectAll[Import]
 
-  def inheritsFromOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](2)
-  override def _inheritsFromOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def inheritsFromOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](3)
+  override def _inheritsFromOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
   def _typeViaInheritsFromOut: overflowdb.traversal.Traversal[Type] = inheritsFromOut.collectAll[Type]
-
-  def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](3)
-  override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
 
   def containsOut: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](4)
   override def _containsOut         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
   def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = containsOut.collectAll[Method]
 
-  def aliasOfOut: Iterator[Type]                        = createAdjacentNodeScalaIteratorByOffSet[Type](5)
-  override def _aliasOfOut                              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def aliasedType: overflowdb.traversal.Traversal[Type] = aliasOfOut.collectAll[Type]
+  def bindsOut: Iterator[Binding] = createAdjacentNodeScalaIteratorByOffSet[Binding](5)
+  override def _bindsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = bindsOut.collectAll[Binding]
 
   def astIn: Iterator[AstNode]               = createAdjacentNodeScalaIteratorByOffSet[AstNode](6)
   override def _astIn                        = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)

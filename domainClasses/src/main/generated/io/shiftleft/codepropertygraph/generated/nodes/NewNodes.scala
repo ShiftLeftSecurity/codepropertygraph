@@ -410,7 +410,7 @@ object NewArrayInitializer {
   def apply(): NewArrayInitializer = new NewArrayInitializer
 }
 
-class NewArrayInitializer extends NewNode with ArrayInitializerBase with ExpressionNew with AstNodeNew {
+class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNodeNew with ExpressionNew {
   type StoredType = ArrayInitializer
 
   var order: scala.Int              = -1: Int
@@ -702,7 +702,7 @@ object NewCall {
   def apply(): NewCall = new NewCall
 }
 
-class NewCall extends NewNode with CallBase with ExpressionNew with CallReprNew {
+class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew {
   type StoredType = Call
 
   var typeFullName: String                        = "<empty>"
@@ -2206,7 +2206,7 @@ object NewLocal {
   def apply(): NewLocal = new NewLocal
 }
 
-class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNew {
+class NewLocal extends NewNode with LocalBase with DeclarationNew with AstNodeNew {
   type StoredType = Local
 
   var typeFullName: String                        = "<empty>"
@@ -2470,7 +2470,7 @@ object NewMember {
   def apply(): NewMember = new NewMember
 }
 
-class NewMember extends NewNode with MemberBase with AstNodeNew with DeclarationNew {
+class NewMember extends NewNode with MemberBase with DeclarationNew with AstNodeNew {
   type StoredType = Member
 
   var typeFullName: String                        = "<empty>"
@@ -2670,7 +2670,7 @@ object NewMethod {
   def apply(): NewMethod = new NewMethod
 }
 
-class NewMethod extends NewNode with MethodBase with CfgNodeNew with AstNodeNew with DeclarationNew {
+class NewMethod extends NewNode with MethodBase with CfgNodeNew with DeclarationNew with AstNodeNew {
   type StoredType = Method
 
   var signature: String                = ""
@@ -2860,8 +2860,8 @@ class NewMethodParameterIn
     extends NewNode
     with MethodParameterInBase
     with CfgNodeNew
-    with AstNodeNew
-    with DeclarationNew {
+    with DeclarationNew
+    with AstNodeNew {
   type StoredType = MethodParameterIn
 
   var typeFullName: String                        = "<empty>"
@@ -3007,8 +3007,8 @@ class NewMethodParameterOut
     extends NewNode
     with MethodParameterOutBase
     with CfgNodeNew
-    with AstNodeNew
-    with DeclarationNew {
+    with DeclarationNew
+    with AstNodeNew {
   type StoredType = MethodParameterOut
 
   var typeFullName: String          = "<empty>"

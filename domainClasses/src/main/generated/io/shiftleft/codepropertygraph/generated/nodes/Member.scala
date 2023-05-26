@@ -42,9 +42,9 @@ object Member {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation
     ).asJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
@@ -67,7 +67,7 @@ object Member {
   }
 }
 
-trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase {
+trait MemberBase extends AbstractNode with DeclarationBase with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
@@ -84,8 +84,8 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     extends NodeRef[MemberDb](graph_4762, id_4762)
     with MemberBase
     with StoredNode
-    with AstNode
-    with Declaration {
+    with Declaration
+    with AstNode {
   override def code: String                                = get().code
   override def columnNumber: Option[Integer]               = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
@@ -102,17 +102,6 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case _                => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
-
-  /** Traverse to ANNOTATION via AST OUT edge.
-    */
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
-
-  /** Traverse to MODIFIER via AST OUT edge.
-    */
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
-
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
 
@@ -128,6 +117,17 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
+
+  def astOut: Iterator[AstNode] = get().astOut
+  override def _astOut          = get()._astOut
+
+  /** Traverse to ANNOTATION via AST OUT edge.
+    */
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
+
+  /** Traverse to MODIFIER via AST OUT edge.
+    */
+  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -193,7 +193,7 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def productArity  = 8
 }
 
-class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with Declaration with MemberBase {
+class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Declaration with AstNode with MemberBase {
 
   override def layoutInformation: NodeLayoutInformation = Member.layoutInformation
 
@@ -245,18 +245,18 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   }
 
   import overflowdb.traversal._
-  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]     = astOut.collectAll[Modifier]
-
-  def evalTypeOut: Iterator[Type]               = createAdjacentNodeScalaIteratorByOffSet[Type](1)
-  override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def evalTypeOut: Iterator[Type]               = createAdjacentNodeScalaIteratorByOffSet[Type](0)
+  override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def typ: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](1)
+  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
+
+  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
+  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
+  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]     = astOut.collectAll[Modifier]
 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
