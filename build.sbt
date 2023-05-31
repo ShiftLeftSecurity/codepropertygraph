@@ -47,11 +47,6 @@ ThisBuild / libraryDependencies ++= Seq(
   // `Optional` means "not transitive", but still included in "stage/lib"
 )
 
-// Scalafix / imports check setup
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0-alpha.1"
-ThisBuild / semanticdbEnabled                              := true
-ThisBuild / semanticdbVersion := "4.5.0" // alternative thay may work again in future: `scalafixSemanticdb.revision`
-
 name           := "codepropertygraph"
 publish / skip := true
 
@@ -60,9 +55,6 @@ lazy val domainClasses     = Projects.domainClasses
 lazy val protoBindings     = Projects.protoBindings
 lazy val codepropertygraph = Projects.codepropertygraph
 lazy val schema2json       = Projects.schema2json
-
-// Once sbt-scalafmt is at version > 2.x, use scalafmtAll
-addCommandAlias("format", ";scalafixAll OrganizeImports;scalafmt;test:scalafmt")
 
 ThisBuild / scalacOptions ++= Seq(
   "-release", "8",
@@ -76,7 +68,6 @@ ThisBuild / scalacOptions ++= Seq(
     case Some((3, _)) => Seq()
     case _ =>
       Seq(
-        "-Ywarn-unused", // required by scalafix
         "-Ycache-macro-class-loader:last-modified",
         "-Ybackend-parallelism",
         "4"
