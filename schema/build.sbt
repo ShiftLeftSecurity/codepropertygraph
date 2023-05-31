@@ -2,8 +2,11 @@ name := "codepropertygraph-schema"
 
 libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % Versions.overflowdbCodegen
 
-Compile / generateDomainClasses / classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
-Compile / generateDomainClasses / fieldName       := "instance"
+lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
+enablePlugins(OdbCodegenSbtPlugin)
+generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
+generateDomainClasses/fieldName       := "instance"
+generateDomainClasses/outputDir       := (Projects.domainClasses / generatedSrcDir).value
 
 val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {
