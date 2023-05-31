@@ -81,13 +81,13 @@ class AnnotationParameterAssign(graph_4762: Graph, id_4762: Long /*cf https://gi
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut
 
-  /** Traverse to ANNOTATION_LITERAL via AST OUT edge.
-    */
-  def _annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] = get()._annotationLiteralViaAstOut
-
   /** Traverse to ANNOTATION via AST OUT edge.
     */
   def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
+
+  /** Traverse to ANNOTATION_LITERAL via AST OUT edge.
+    */
+  def _annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] = get()._annotationLiteralViaAstOut
 
   /** Traverse to ANNOTATION_PARAMETER via AST OUT edge.
     */
@@ -185,9 +185,9 @@ class AnnotationParameterAssignDb(ref: NodeRef[NodeDb])
   import overflowdb.traversal._
   def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
   def _annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] =
     astOut.collectAll[AnnotationLiteral]
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
   def _annotationParameterViaAstOut: overflowdb.traversal.Traversal[AnnotationParameter] =
     astOut.collectAll[AnnotationParameter]
   def _arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = astOut.collectAll[ArrayInitializer]

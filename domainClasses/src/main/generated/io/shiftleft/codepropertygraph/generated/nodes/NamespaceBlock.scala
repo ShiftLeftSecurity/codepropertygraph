@@ -43,9 +43,9 @@ object NamespaceBlock {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation
     ).asJava,
     List(io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation).asJava
   )
@@ -100,13 +100,6 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case _           => super.propertyDefaultValue(propertyKey)
     }
 
-  def sourceFileOut: Iterator[File] = get().sourceFileOut
-  override def _sourceFileOut       = get()._sourceFileOut
-
-  /** Traverse to FILE via SOURCE_FILE OUT edge.
-    */
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
-
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut
 
@@ -124,6 +117,13 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   /** Traverse to NAMESPACE via REF OUT edge.
     */
   def _namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = get()._namespaceViaRefOut
+
+  def sourceFileOut: Iterator[File] = get().sourceFileOut
+  override def _sourceFileOut       = get()._sourceFileOut
+
+  /** Traverse to FILE via SOURCE_FILE OUT edge.
+    */
+  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
 
   def astIn: Iterator[File] = get().astIn
   override def _astIn       = get()._astIn
@@ -224,18 +224,18 @@ class NamespaceBlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   }
 
   import overflowdb.traversal._
-  def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](0)
-  override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
-
-  def astOut: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def astOut: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _astOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _methodViaAstOut: overflowdb.traversal.Traversal[Method] = astOut.collectAll[Method]
   def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = astOut.collectAll[TypeDecl]
 
-  def refOut: Iterator[Namespace] = createAdjacentNodeScalaIteratorByOffSet[Namespace](2)
-  override def _refOut            = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def refOut: Iterator[Namespace] = createAdjacentNodeScalaIteratorByOffSet[Namespace](1)
+  override def _refOut            = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
   def _namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = refOut.collectAll[Namespace]
+
+  def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](2)
+  override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
 
   def astIn: Iterator[File]       = createAdjacentNodeScalaIteratorByOffSet[File](3)
   override def _astIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)

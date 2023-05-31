@@ -91,21 +91,21 @@ class Modifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
 
-  /** Traverse to TYPE_DECL via AST IN edge.
-    */
-  def _typeDeclViaAstIn: TypeDecl = get()._typeDeclViaAstIn
-
   /** Traverse to MEMBER via AST IN edge.
     */
   def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
 
-  /** Traverse to UNKNOWN via AST IN edge.
-    */
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
-
   /** Traverse to METHOD via AST IN edge.
     */
   def _methodViaAstIn: Method = get()._methodViaAstIn
+
+  /** Traverse to TYPE_DECL via AST IN edge.
+    */
+  def _typeDeclViaAstIn: TypeDecl = get()._typeDeclViaAstIn
+
+  /** Traverse to UNKNOWN via AST IN edge.
+    */
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -190,16 +190,7 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
-  def _typeDeclViaAstIn: TypeDecl = try { astIn.collectAll[TypeDecl].next() }
-  catch {
-    case e: java.util.NoSuchElementException =>
-      throw new overflowdb.SchemaViolationException(
-        "IN edge with label AST to an adjacent TYPE_DECL is mandatory, but not defined for this MODIFIER node with id=" + id,
-        e
-      )
-  }
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member]   = astIn.collectAll[Member]
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
+  def _memberViaAstIn: overflowdb.traversal.Traversal[Member]                     = astIn.collectAll[Member]
   def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -208,6 +199,15 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
         e
       )
   }
+  def _typeDeclViaAstIn: TypeDecl = try { astIn.collectAll[TypeDecl].next() }
+  catch {
+    case e: java.util.NoSuchElementException =>
+      throw new overflowdb.SchemaViolationException(
+        "IN edge with label AST to an adjacent TYPE_DECL is mandatory, but not defined for this MODIFIER node with id=" + id,
+        e
+      )
+  }
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
   override def label: String = {
     Modifier.Label

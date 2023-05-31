@@ -70,7 +70,7 @@ object Local {
   }
 }
 
-trait LocalBase extends AbstractNode with DeclarationBase with AstNodeBase {
+trait LocalBase extends AbstractNode with AstNodeBase with DeclarationBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def closureBindingId: Option[String]
@@ -88,8 +88,8 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
     extends NodeRef[LocalDb](graph_4762, id_4762)
     with LocalBase
     with StoredNode
-    with Declaration
-    with AstNode {
+    with AstNode
+    with Declaration {
   override def closureBindingId: Option[String]            = get().closureBindingId
   override def code: String                                = get().code
   override def columnNumber: Option[Integer]               = get().columnNumber
@@ -134,9 +134,9 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
   def astIn: Iterator[Expression] = get().astIn
   override def _astIn             = get()._astIn
 
-  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
+  /** Traverse to BLOCK via AST IN edge.
     */
-  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
+  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = get()._blockViaAstIn
 
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */
@@ -144,9 +144,9 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
   @overflowdb.traversal.help.Doc(info = """The block in which local is declared.""")
   def definingBlock: overflowdb.traversal.Traversal[Block] = get().definingBlock
 
-  /** Traverse to BLOCK via AST IN edge.
+  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = get()._blockViaAstIn
+  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
@@ -211,7 +211,7 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
   override def productArity  = 9
 }
 
-class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Declaration with AstNode with LocalBase {
+class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with Declaration with LocalBase {
 
   override def layoutInformation: NodeLayoutInformation = Local.layoutInformation
 
@@ -280,11 +280,11 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Dec
   override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def astIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](3)
-  override def _astIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def astIn: Iterator[Expression]                           = createAdjacentNodeScalaIteratorByOffSet[Expression](3)
+  override def _astIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = astIn.collectAll[Block]
+  def definingBlock: overflowdb.traversal.Traversal[Block]  = astIn.collectAll[Block]
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
-  def definingBlock: overflowdb.traversal.Traversal[Block]                        = astIn.collectAll[Block]
-  def _blockViaAstIn: overflowdb.traversal.Traversal[Block]                       = astIn.collectAll[Block]
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown]                   = astIn.collectAll[Unknown]
 
   def refIn: Iterator[StoredNode] = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)

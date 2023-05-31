@@ -90,13 +90,13 @@ class TypeParameter(graph_4762: Graph, id_4762: Long /*cf https://github.com/sca
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
 
-  /** Traverse to TYPE_DECL via AST IN edge.
-    */
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
-
   /** Traverse to METHOD via AST IN edge.
     */
   def _methodViaAstIn: Method = get()._methodViaAstIn
+
+  /** Traverse to TYPE_DECL via AST IN edge.
+    */
+  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
   def bindsToIn: Iterator[TypeArgument] = get().bindsToIn
   override def _bindsToIn               = get()._bindsToIn
@@ -187,7 +187,6 @@ class TypeParameterDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode 
   import overflowdb.traversal._
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
   def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -196,6 +195,7 @@ class TypeParameterDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode 
         e
       )
   }
+  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
 
   def bindsToIn: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](1)
   override def _bindsToIn               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)

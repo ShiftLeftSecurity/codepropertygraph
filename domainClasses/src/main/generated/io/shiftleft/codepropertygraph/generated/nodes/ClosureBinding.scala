@@ -32,8 +32,8 @@ object ClosureBinding {
     PropertyNames.allAsJava,
     List(io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation).asJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.CapturedBy.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Capture.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Capture.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.CapturedBy.layoutInformation
     ).asJava
   )
 
@@ -74,23 +74,16 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case _                     => super.propertyDefaultValue(propertyKey)
     }
 
-  def refOut: Iterator[Declaration] = get().refOut
-  override def _refOut              = get()._refOut
-
-  /** Traverse to METHOD_PARAMETER_IN via REF OUT edge.
-    */
-  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaRefOut
+  def refOut: Iterator[AstNode] = get().refOut
+  override def _refOut          = get()._refOut
 
   /** Traverse to LOCAL via REF OUT edge.
     */
   def _localViaRefOut: Local = get()._localViaRefOut
 
-  def capturedByIn: Iterator[Local] = get().capturedByIn
-  override def _capturedByIn        = get()._capturedByIn
-
-  /** Traverse to LOCAL via CAPTURED_BY IN edge.
+  /** Traverse to METHOD_PARAMETER_IN via REF OUT edge.
     */
-  def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = get()._localViaCapturedByIn
+  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaRefOut
 
   def captureIn: Iterator[Expression] = get().captureIn
   override def _captureIn             = get()._captureIn
@@ -102,6 +95,13 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   /** Traverse to TYPE_REF via CAPTURE IN edge.
     */
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
+
+  def capturedByIn: Iterator[Local] = get().capturedByIn
+  override def _capturedByIn        = get()._capturedByIn
+
+  /** Traverse to LOCAL via CAPTURED_BY IN edge.
+    */
+  def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = get()._localViaCapturedByIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -171,10 +171,8 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   }
 
   import overflowdb.traversal._
-  def refOut: Iterator[Declaration] = createAdjacentNodeScalaIteratorByOffSet[Declaration](0)
-  override def _refOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] =
-    refOut.collectAll[MethodParameterIn]
+  def refOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _refOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _localViaRefOut: Local = try { refOut.collectAll[Local].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -183,15 +181,17 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
         e
       )
   }
+  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] =
+    refOut.collectAll[MethodParameterIn]
 
-  def capturedByIn: Iterator[Local] = createAdjacentNodeScalaIteratorByOffSet[Local](1)
-  override def _capturedByIn        = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = capturedByIn.collectAll[Local]
-
-  def captureIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](2)
-  override def _captureIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def captureIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
+  override def _captureIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = captureIn.collectAll[MethodRef]
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef]     = captureIn.collectAll[TypeRef]
+
+  def capturedByIn: Iterator[Local] = createAdjacentNodeScalaIteratorByOffSet[Local](2)
+  override def _capturedByIn        = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = capturedByIn.collectAll[Local]
 
   override def label: String = {
     ClosureBinding.Label
