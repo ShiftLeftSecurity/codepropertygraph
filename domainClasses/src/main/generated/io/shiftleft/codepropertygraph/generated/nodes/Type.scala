@@ -37,10 +37,10 @@ object Type {
       io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation
     ).asJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.InheritsFrom.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.AliasOf.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.AliasOf.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.InheritsFrom.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation
     ).asJava
   )
 
@@ -99,6 +99,78 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   @overflowdb.traversal.help.Doc(info = """Type declaration which is referenced by this type.""")
   def referencedTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().referencedTypeDecl
 
+  def aliasOfIn: Iterator[TypeDecl] = get().aliasOfIn
+  override def _aliasOfIn           = get()._aliasOfIn
+
+  /** Direct alias type declarations. Traverse to TYPE_DECL via ALIAS_OF IN edge.
+    */
+  /** Direct alias type declarations. */
+  @overflowdb.traversal.help.Doc(info = """Direct alias type declarations.""")
+  def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().aliasTypeDecl
+
+  def evalTypeIn: Iterator[AstNode] = get().evalTypeIn
+  override def _evalTypeIn          = get()._evalTypeIn
+
+  /** Traverse to ARRAY_INITIALIZER via EVAL_TYPE IN edge.
+    */
+  def _arrayInitializerViaEvalTypeIn: overflowdb.traversal.Traversal[ArrayInitializer] =
+    get()._arrayInitializerViaEvalTypeIn
+
+  /** Traverse to BLOCK via EVAL_TYPE IN edge.
+    */
+  def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block] = get()._blockViaEvalTypeIn
+
+  /** Traverse to CALL via EVAL_TYPE IN edge.
+    */
+  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call] = get()._callViaEvalTypeIn
+
+  /** Traverse to CONTROL_STRUCTURE via EVAL_TYPE IN edge.
+    */
+  def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaEvalTypeIn
+
+  /** Traverse to IDENTIFIER via EVAL_TYPE IN edge.
+    */
+  def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaEvalTypeIn
+
+  /** Traverse to LITERAL via EVAL_TYPE IN edge.
+    */
+  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaEvalTypeIn
+
+  /** Traverse to LOCAL via EVAL_TYPE IN edge.
+    */
+  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local] = get()._localViaEvalTypeIn
+
+  /** Traverse to MEMBER via EVAL_TYPE IN edge.
+    */
+  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member] = get()._memberViaEvalTypeIn
+
+  /** Traverse to METHOD_PARAMETER_IN via EVAL_TYPE IN edge.
+    */
+  def _methodParameterInViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    get()._methodParameterInViaEvalTypeIn
+
+  /** Traverse to METHOD_PARAMETER_OUT via EVAL_TYPE IN edge.
+    */
+  def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
+    get()._methodParameterOutViaEvalTypeIn
+
+  /** Traverse to METHOD_REF via EVAL_TYPE IN edge.
+    */
+  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaEvalTypeIn
+
+  /** Traverse to METHOD_RETURN via EVAL_TYPE IN edge.
+    */
+  def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaEvalTypeIn
+
+  /** Traverse to TYPE_REF via EVAL_TYPE IN edge.
+    */
+  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaEvalTypeIn
+
+  /** Traverse to UNKNOWN via EVAL_TYPE IN edge.
+    */
+  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaEvalTypeIn
+
   def inheritsFromIn: Iterator[TypeDecl] = get().inheritsFromIn
   override def _inheritsFromIn           = get()._inheritsFromIn
 
@@ -112,78 +184,6 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   /** Traverse to TYPE_ARGUMENT via REF IN edge.
     */
   def _typeArgumentViaRefIn: overflowdb.traversal.Traversal[TypeArgument] = get()._typeArgumentViaRefIn
-
-  def evalTypeIn: Iterator[AstNode] = get().evalTypeIn
-  override def _evalTypeIn          = get()._evalTypeIn
-
-  /** Traverse to MEMBER via EVAL_TYPE IN edge.
-    */
-  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member] = get()._memberViaEvalTypeIn
-
-  /** Traverse to METHOD_RETURN via EVAL_TYPE IN edge.
-    */
-  def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaEvalTypeIn
-
-  /** Traverse to METHOD_REF via EVAL_TYPE IN edge.
-    */
-  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaEvalTypeIn
-
-  /** Traverse to LOCAL via EVAL_TYPE IN edge.
-    */
-  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local] = get()._localViaEvalTypeIn
-
-  /** Traverse to CONTROL_STRUCTURE via EVAL_TYPE IN edge.
-    */
-  def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaEvalTypeIn
-
-  /** Traverse to CALL via EVAL_TYPE IN edge.
-    */
-  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call] = get()._callViaEvalTypeIn
-
-  /** Traverse to ARRAY_INITIALIZER via EVAL_TYPE IN edge.
-    */
-  def _arrayInitializerViaEvalTypeIn: overflowdb.traversal.Traversal[ArrayInitializer] =
-    get()._arrayInitializerViaEvalTypeIn
-
-  /** Traverse to LITERAL via EVAL_TYPE IN edge.
-    */
-  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaEvalTypeIn
-
-  /** Traverse to BLOCK via EVAL_TYPE IN edge.
-    */
-  def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block] = get()._blockViaEvalTypeIn
-
-  /** Traverse to METHOD_PARAMETER_OUT via EVAL_TYPE IN edge.
-    */
-  def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
-    get()._methodParameterOutViaEvalTypeIn
-
-  /** Traverse to METHOD_PARAMETER_IN via EVAL_TYPE IN edge.
-    */
-  def _methodParameterInViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    get()._methodParameterInViaEvalTypeIn
-
-  /** Traverse to TYPE_REF via EVAL_TYPE IN edge.
-    */
-  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaEvalTypeIn
-
-  /** Traverse to IDENTIFIER via EVAL_TYPE IN edge.
-    */
-  def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaEvalTypeIn
-
-  /** Traverse to UNKNOWN via EVAL_TYPE IN edge.
-    */
-  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaEvalTypeIn
-
-  def aliasOfIn: Iterator[TypeDecl] = get().aliasOfIn
-  override def _aliasOfIn           = get()._aliasOfIn
-
-  /** Direct alias type declarations. Traverse to TYPE_DECL via ALIAS_OF IN edge.
-    */
-  /** Direct alias type declarations. */
-  @overflowdb.traversal.help.Doc(info = """Direct alias type declarations.""")
-  def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().aliasTypeDecl
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -261,38 +261,38 @@ class TypeDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Type
   override def _refOut           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
   def referencedTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = refOut.collectAll[TypeDecl]
 
-  def inheritsFromIn: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](2)
-  override def _inheritsFromIn           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _typeDeclViaInheritsFromIn: overflowdb.traversal.Traversal[TypeDecl] = inheritsFromIn.collectAll[TypeDecl]
+  def aliasOfIn: Iterator[TypeDecl]                           = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](2)
+  override def _aliasOfIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = aliasOfIn.collectAll[TypeDecl]
 
-  def refIn: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](3)
-  override def _refIn               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def _typeArgumentViaRefIn: overflowdb.traversal.Traversal[TypeArgument] = refIn.collectAll[TypeArgument]
-
-  def evalTypeIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](4)
-  override def _evalTypeIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member]             = evalTypeIn.collectAll[Member]
-  def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = evalTypeIn.collectAll[MethodReturn]
-  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef]       = evalTypeIn.collectAll[MethodRef]
-  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local]               = evalTypeIn.collectAll[Local]
-  def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
-    evalTypeIn.collectAll[ControlStructure]
-  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call] = evalTypeIn.collectAll[Call]
+  def evalTypeIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
+  override def _evalTypeIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
   def _arrayInitializerViaEvalTypeIn: overflowdb.traversal.Traversal[ArrayInitializer] =
     evalTypeIn.collectAll[ArrayInitializer]
-  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal] = evalTypeIn.collectAll[Literal]
-  def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block]     = evalTypeIn.collectAll[Block]
-  def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
-    evalTypeIn.collectAll[MethodParameterOut]
+  def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block] = evalTypeIn.collectAll[Block]
+  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call]   = evalTypeIn.collectAll[Call]
+  def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
+    evalTypeIn.collectAll[ControlStructure]
+  def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = evalTypeIn.collectAll[Identifier]
+  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal]       = evalTypeIn.collectAll[Literal]
+  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local]           = evalTypeIn.collectAll[Local]
+  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member]         = evalTypeIn.collectAll[Member]
   def _methodParameterInViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     evalTypeIn.collectAll[MethodParameterIn]
-  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef]       = evalTypeIn.collectAll[TypeRef]
-  def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = evalTypeIn.collectAll[Identifier]
-  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown]       = evalTypeIn.collectAll[Unknown]
+  def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
+    evalTypeIn.collectAll[MethodParameterOut]
+  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef]       = evalTypeIn.collectAll[MethodRef]
+  def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = evalTypeIn.collectAll[MethodReturn]
+  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef]           = evalTypeIn.collectAll[TypeRef]
+  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown]           = evalTypeIn.collectAll[Unknown]
 
-  def aliasOfIn: Iterator[TypeDecl]                           = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](5)
-  override def _aliasOfIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = aliasOfIn.collectAll[TypeDecl]
+  def inheritsFromIn: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](4)
+  override def _inheritsFromIn           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def _typeDeclViaInheritsFromIn: overflowdb.traversal.Traversal[TypeDecl] = inheritsFromIn.collectAll[TypeDecl]
+
+  def refIn: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](5)
+  override def _refIn               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def _typeArgumentViaRefIn: overflowdb.traversal.Traversal[TypeArgument] = refIn.collectAll[TypeArgument]
 
   override def label: String = {
     Type.Label

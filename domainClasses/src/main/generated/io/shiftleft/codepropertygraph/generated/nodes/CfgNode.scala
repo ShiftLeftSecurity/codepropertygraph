@@ -166,6 +166,88 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
   def _arrayInitializerViaPointsToOut: overflowdb.traversal.Traversal[ArrayInitializer] =
     pointsToOut.collectAll[ArrayInitializer]
 
+  def cfgIn: Iterator[_ <: StoredNode]
+
+  /** Traverse to EXPRESSION via CFG IN edge.
+    */
+  def _expressionViaCfgIn: overflowdb.traversal.Traversal[Expression] =
+    cfgIn.collectAll[Expression]
+
+  /** Traverse to AST_NODE via CFG IN edge.
+    */
+  def _astNodeViaCfgIn: overflowdb.traversal.Traversal[AstNode] =
+    cfgIn.collectAll[AstNode]
+
+  /** Traverse to CFG_NODE via CFG IN edge.
+    */
+  def _cfgNodeViaCfgIn: overflowdb.traversal.Traversal[CfgNode] =
+    cfgIn.collectAll[CfgNode]
+
+  /** Traverse to BLOCK via CFG IN edge.
+    */
+  def _blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
+    cfgIn.collectAll[Block]
+
+  /** Traverse to CALL via CFG IN edge.
+    */
+  def _callViaCfgIn: overflowdb.traversal.Traversal[Call] =
+    cfgIn.collectAll[Call]
+
+  /** Traverse to CALL_REPR via CFG IN edge.
+    */
+  def _callReprViaCfgIn: overflowdb.traversal.Traversal[CallRepr] =
+    cfgIn.collectAll[CallRepr]
+
+  /** Traverse to CONTROL_STRUCTURE via CFG IN edge.
+    */
+  def _controlStructureViaCfgIn: overflowdb.traversal.Traversal[ControlStructure] =
+    cfgIn.collectAll[ControlStructure]
+
+  /** Traverse to FIELD_IDENTIFIER via CFG IN edge.
+    */
+  def _fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    cfgIn.collectAll[FieldIdentifier]
+
+  /** Traverse to IDENTIFIER via CFG IN edge.
+    */
+  def _identifierViaCfgIn: overflowdb.traversal.Traversal[Identifier] =
+    cfgIn.collectAll[Identifier]
+
+  /** Traverse to JUMP_TARGET via CFG IN edge.
+    */
+  def _jumpTargetViaCfgIn: overflowdb.traversal.Traversal[JumpTarget] =
+    cfgIn.collectAll[JumpTarget]
+
+  /** Traverse to LITERAL via CFG IN edge.
+    */
+  def _literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
+    cfgIn.collectAll[Literal]
+
+  /** Traverse to DECLARATION via CFG IN edge.
+    */
+  def _declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
+    cfgIn.collectAll[Declaration]
+
+  /** Traverse to METHOD via CFG IN edge.
+    */
+  def _methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
+    cfgIn.collectAll[Method]
+
+  /** Traverse to METHOD_REF via CFG IN edge.
+    */
+  def _methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
+    cfgIn.collectAll[MethodRef]
+
+  /** Traverse to TYPE_REF via CFG IN edge.
+    */
+  def _typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
+    cfgIn.collectAll[TypeRef]
+
+  /** Traverse to UNKNOWN via CFG IN edge.
+    */
+  def _unknownViaCfgIn: overflowdb.traversal.Traversal[Unknown] =
+    cfgIn.collectAll[Unknown]
+
   def pointsToIn: Iterator[_ <: StoredNode]
 
   /** Traverse to METHOD_PARAMETER_IN via POINTS_TO IN edge.
@@ -282,87 +364,5 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
     */
   def _blockViaPointsToIn: overflowdb.traversal.Traversal[Block] =
     pointsToIn.collectAll[Block]
-
-  def cfgIn: Iterator[_ <: StoredNode]
-
-  /** Traverse to CFG_NODE via CFG IN edge.
-    */
-  def _cfgNodeViaCfgIn: overflowdb.traversal.Traversal[CfgNode] =
-    cfgIn.collectAll[CfgNode]
-
-  /** Traverse to DECLARATION via CFG IN edge.
-    */
-  def _declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
-    cfgIn.collectAll[Declaration]
-
-  /** Traverse to AST_NODE via CFG IN edge.
-    */
-  def _astNodeViaCfgIn: overflowdb.traversal.Traversal[AstNode] =
-    cfgIn.collectAll[AstNode]
-
-  /** Traverse to METHOD via CFG IN edge.
-    */
-  def _methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
-    cfgIn.collectAll[Method]
-
-  /** Traverse to JUMP_TARGET via CFG IN edge.
-    */
-  def _jumpTargetViaCfgIn: overflowdb.traversal.Traversal[JumpTarget] =
-    cfgIn.collectAll[JumpTarget]
-
-  /** Traverse to EXPRESSION via CFG IN edge.
-    */
-  def _expressionViaCfgIn: overflowdb.traversal.Traversal[Expression] =
-    cfgIn.collectAll[Expression]
-
-  /** Traverse to FIELD_IDENTIFIER via CFG IN edge.
-    */
-  def _fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    cfgIn.collectAll[FieldIdentifier]
-
-  /** Traverse to CONTROL_STRUCTURE via CFG IN edge.
-    */
-  def _controlStructureViaCfgIn: overflowdb.traversal.Traversal[ControlStructure] =
-    cfgIn.collectAll[ControlStructure]
-
-  /** Traverse to CALL via CFG IN edge.
-    */
-  def _callViaCfgIn: overflowdb.traversal.Traversal[Call] =
-    cfgIn.collectAll[Call]
-
-  /** Traverse to CALL_REPR via CFG IN edge.
-    */
-  def _callReprViaCfgIn: overflowdb.traversal.Traversal[CallRepr] =
-    cfgIn.collectAll[CallRepr]
-
-  /** Traverse to BLOCK via CFG IN edge.
-    */
-  def _blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
-    cfgIn.collectAll[Block]
-
-  /** Traverse to LITERAL via CFG IN edge.
-    */
-  def _literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
-    cfgIn.collectAll[Literal]
-
-  /** Traverse to METHOD_REF via CFG IN edge.
-    */
-  def _methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
-    cfgIn.collectAll[MethodRef]
-
-  /** Traverse to IDENTIFIER via CFG IN edge.
-    */
-  def _identifierViaCfgIn: overflowdb.traversal.Traversal[Identifier] =
-    cfgIn.collectAll[Identifier]
-
-  /** Traverse to TYPE_REF via CFG IN edge.
-    */
-  def _typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
-    cfgIn.collectAll[TypeRef]
-
-  /** Traverse to UNKNOWN via CFG IN edge.
-    */
-  def _unknownViaCfgIn: overflowdb.traversal.Traversal[Unknown] =
-    cfgIn.collectAll[Unknown]
 
 }

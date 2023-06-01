@@ -12,3 +12,5 @@ Compile/compile := (Compile/compile).dependsOn(Projects.schema/Compile/generateD
  * to fail the build because of them
  */
 Compile / scalacOptions --= Seq("-Wconf:cat=deprecation:w,any:e", "-Wunused", "-Ywarn-unused")
+
+cleanFiles += baseDirectory.value / "src/main/generated"

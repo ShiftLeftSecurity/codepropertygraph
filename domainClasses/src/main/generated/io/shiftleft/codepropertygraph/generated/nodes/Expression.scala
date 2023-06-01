@@ -33,7 +33,7 @@ object Expression {
 
 }
 
-trait ExpressionBase extends AbstractNode with CfgNodeBase with AstNodeBase {
+trait ExpressionBase extends AbstractNode with AstNodeBase with CfgNodeBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
@@ -42,7 +42,7 @@ trait ExpressionBase extends AbstractNode with CfgNodeBase with AstNodeBase {
   def order: scala.Int
 }
 
-trait ExpressionNew extends NewNode with CfgNodeNew with AstNodeNew {
+trait ExpressionNew extends NewNode with AstNodeNew with CfgNodeNew {
   def argumentIndex_=(value: scala.Int): Unit
   def argumentName_=(value: Option[String]): Unit
   def code_=(value: String): Unit
@@ -57,7 +57,7 @@ trait ExpressionNew extends NewNode with CfgNodeNew with AstNodeNew {
   def order: scala.Int
 }
 
-trait Expression extends StoredNode with ExpressionBase with CfgNode with AstNode {
+trait Expression extends StoredNode with ExpressionBase with AstNode with CfgNode {
   import overflowdb.traversal._
   def argumentOut: Iterator[_ <: StoredNode]
 
@@ -66,15 +66,15 @@ trait Expression extends StoredNode with ExpressionBase with CfgNode with AstNod
   def _expressionViaArgumentOut: overflowdb.traversal.Traversal[Expression] =
     argumentOut.collectAll[Expression]
 
-  /** Traverse to CFG_NODE via ARGUMENT OUT edge.
-    */
-  def _cfgNodeViaArgumentOut: overflowdb.traversal.Traversal[CfgNode] =
-    argumentOut.collectAll[CfgNode]
-
   /** Traverse to AST_NODE via ARGUMENT OUT edge.
     */
   def _astNodeViaArgumentOut: overflowdb.traversal.Traversal[AstNode] =
     argumentOut.collectAll[AstNode]
+
+  /** Traverse to CFG_NODE via ARGUMENT OUT edge.
+    */
+  def _cfgNodeViaArgumentOut: overflowdb.traversal.Traversal[CfgNode] =
+    argumentOut.collectAll[CfgNode]
 
   /** Traverse to TEMPLATE_DOM via ARGUMENT OUT edge.
     */
@@ -88,15 +88,15 @@ trait Expression extends StoredNode with ExpressionBase with CfgNode with AstNod
   def _expressionViaAstIn: overflowdb.traversal.Traversal[Expression] =
     astIn.collectAll[Expression]
 
-  /** Traverse to CFG_NODE via AST IN edge.
-    */
-  def _cfgNodeViaAstIn: overflowdb.traversal.Traversal[CfgNode] =
-    astIn.collectAll[CfgNode]
-
   /** Traverse to AST_NODE via AST IN edge.
     */
   def _astNodeViaAstIn: overflowdb.traversal.Traversal[AstNode] =
     astIn.collectAll[AstNode]
+
+  /** Traverse to CFG_NODE via AST IN edge.
+    */
+  def _cfgNodeViaAstIn: overflowdb.traversal.Traversal[CfgNode] =
+    astIn.collectAll[CfgNode]
 
   /** Traverse to TEMPLATE_DOM via AST IN edge.
     */
@@ -110,15 +110,15 @@ trait Expression extends StoredNode with ExpressionBase with CfgNode with AstNod
   def _expressionViaReachingDefIn: overflowdb.traversal.Traversal[Expression] =
     reachingDefIn.collectAll[Expression]
 
-  /** Traverse to CFG_NODE via REACHING_DEF IN edge.
-    */
-  def _cfgNodeViaReachingDefIn: overflowdb.traversal.Traversal[CfgNode] =
-    reachingDefIn.collectAll[CfgNode]
-
   /** Traverse to AST_NODE via REACHING_DEF IN edge.
     */
   def _astNodeViaReachingDefIn: overflowdb.traversal.Traversal[AstNode] =
     reachingDefIn.collectAll[AstNode]
+
+  /** Traverse to CFG_NODE via REACHING_DEF IN edge.
+    */
+  def _cfgNodeViaReachingDefIn: overflowdb.traversal.Traversal[CfgNode] =
+    reachingDefIn.collectAll[CfgNode]
 
   /** Traverse to TEMPLATE_DOM via REACHING_DEF IN edge.
     */

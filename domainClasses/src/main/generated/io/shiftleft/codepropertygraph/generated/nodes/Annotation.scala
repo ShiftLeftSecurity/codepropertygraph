@@ -45,15 +45,15 @@ object Annotation {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation
     ).asJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation
     ).asJava
   )
 
@@ -109,8 +109,8 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
       case _                => super.propertyDefaultValue(propertyKey)
     }
 
-  def pointsToOut: Iterator[CfgNode] = get().pointsToOut
-  override def _pointsToOut          = get()._pointsToOut
+  def argumentOut: Iterator[TemplateDom] = get().argumentOut
+  override def _argumentOut              = get()._argumentOut
 
   def astOut: Iterator[AnnotationParameterAssign] = get().astOut
   override def _astOut                            = get()._astOut
@@ -120,26 +120,11 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     get()._annotationParameterAssignViaAstOut
 
-  def argumentOut: Iterator[TemplateDom] = get().argumentOut
-  override def _argumentOut              = get()._argumentOut
-
-  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
-  override def _pointsToIn          = get()._pointsToIn
+  def pointsToOut: Iterator[CfgNode] = get().pointsToOut
+  override def _pointsToOut          = get()._pointsToOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
-
-  /** Traverse to METHOD via AST IN edge.
-    */
-  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = get()._methodViaAstIn
-
-  /** Traverse to TYPE_DECL via AST IN edge.
-    */
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
-
-  /** Traverse to METHOD_PARAMETER_IN via AST IN edge.
-    */
-  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaAstIn
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
@@ -150,11 +135,26 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
     */
   def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
 
-  def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
-  override def _reachingDefIn              = get()._reachingDefIn
+  /** Traverse to METHOD via AST IN edge.
+    */
+  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = get()._methodViaAstIn
+
+  /** Traverse to METHOD_PARAMETER_IN via AST IN edge.
+    */
+  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaAstIn
+
+  /** Traverse to TYPE_DECL via AST IN edge.
+    */
+  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
+
+  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
+  override def _pointsToIn          = get()._pointsToIn
+
+  def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
+  override def _reachingDefIn              = get()._reachingDefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -254,8 +254,8 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   }
 
   import overflowdb.traversal._
-  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](0)
-  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def argumentOut: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](0)
+  override def _argumentOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
   def astOut: Iterator[AnnotationParameterAssign] =
     createAdjacentNodeScalaIteratorByOffSet[AnnotationParameterAssign](1)
@@ -263,27 +263,27 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astOut.collectAll[AnnotationParameterAssign]
 
-  def argumentOut: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](2)
-  override def _argumentOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](2)
+  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
-  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-
-  def astIn: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](4)
-  override def _astIn                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = astIn.collectAll[Method]
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
-  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    astIn.collectAll[MethodParameterIn]
+  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
+  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
   def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
+  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = astIn.collectAll[Method]
+  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    astIn.collectAll[MethodParameterIn]
+  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
 
-  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](5)
-  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
+  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
 
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](5)
+  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+
+  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](6)
+  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
 
   override def label: String = {
     Annotation.Label

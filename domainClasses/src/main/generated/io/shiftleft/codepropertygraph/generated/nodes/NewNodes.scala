@@ -1916,7 +1916,7 @@ object NewJumpTarget {
   def apply(): NewJumpTarget = new NewJumpTarget
 }
 
-class NewJumpTarget extends NewNode with JumpTargetBase with CfgNodeNew with AstNodeNew {
+class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with CfgNodeNew {
   type StoredType = JumpTarget
 
   var parserTypeName: String        = "<empty>"
@@ -2206,7 +2206,7 @@ object NewLocal {
   def apply(): NewLocal = new NewLocal
 }
 
-class NewLocal extends NewNode with LocalBase with DeclarationNew with AstNodeNew {
+class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNew {
   type StoredType = Local
 
   var typeFullName: String                        = "<empty>"
@@ -2470,7 +2470,7 @@ object NewMember {
   def apply(): NewMember = new NewMember
 }
 
-class NewMember extends NewNode with MemberBase with DeclarationNew with AstNodeNew {
+class NewMember extends NewNode with MemberBase with AstNodeNew with DeclarationNew {
   type StoredType = Member
 
   var typeFullName: String                        = "<empty>"
@@ -2670,7 +2670,7 @@ object NewMethod {
   def apply(): NewMethod = new NewMethod
 }
 
-class NewMethod extends NewNode with MethodBase with CfgNodeNew with DeclarationNew with AstNodeNew {
+class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew with DeclarationNew {
   type StoredType = Method
 
   var signature: String                = ""
@@ -2859,9 +2859,9 @@ object NewMethodParameterIn {
 class NewMethodParameterIn
     extends NewNode
     with MethodParameterInBase
+    with AstNodeNew
     with CfgNodeNew
-    with DeclarationNew
-    with AstNodeNew {
+    with DeclarationNew {
   type StoredType = MethodParameterIn
 
   var typeFullName: String                        = "<empty>"
@@ -3006,9 +3006,9 @@ object NewMethodParameterOut {
 class NewMethodParameterOut
     extends NewNode
     with MethodParameterOutBase
+    with AstNodeNew
     with CfgNodeNew
-    with DeclarationNew
-    with AstNodeNew {
+    with DeclarationNew {
   type StoredType = MethodParameterOut
 
   var typeFullName: String          = "<empty>"

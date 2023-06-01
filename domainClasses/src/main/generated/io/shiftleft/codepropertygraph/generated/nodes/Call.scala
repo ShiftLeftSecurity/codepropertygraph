@@ -69,33 +69,33 @@ object Call {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Call.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Receiver.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Call.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cdg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.IsCallForImport.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.IsCallForImport.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Receiver.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
     ).asJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Receiver.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cdg.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Condition.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Condition.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.Receiver.layoutInformation
     ).asJava
   )
 
@@ -190,58 +190,89 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case _                  => super.propertyDefaultValue(propertyKey)
     }
 
-  def dominateOut: Iterator[CfgNode] = get().dominateOut
-  override def _dominateOut          = get()._dominateOut
+  def argumentOut: Iterator[CfgNode] = get().argumentOut
+  override def _argumentOut          = get()._argumentOut
 
-  /** Traverse to METHOD_REF via DOMINATE OUT edge.
+  /** Traverse to BLOCK via ARGUMENT OUT edge.
     */
-  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateOut
+  def _blockViaArgumentOut: overflowdb.traversal.Traversal[Block] = get()._blockViaArgumentOut
 
-  /** Traverse to FIELD_IDENTIFIER via DOMINATE OUT edge.
+  /** Traverse to CALL via ARGUMENT OUT edge.
     */
-  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaDominateOut
+  def _callViaArgumentOut: overflowdb.traversal.Traversal[Call] = get()._callViaArgumentOut
 
-  /** Traverse to LITERAL via DOMINATE OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via ARGUMENT OUT edge.
     */
-  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateOut
+  def _controlStructureViaArgumentOut: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaArgumentOut
 
-  /** Traverse to RETURN via DOMINATE OUT edge.
+  /** Traverse to FIELD_IDENTIFIER via ARGUMENT OUT edge.
     */
-  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateOut
+  def _fieldIdentifierViaArgumentOut: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaArgumentOut
 
-  /** Traverse to CALL via DOMINATE OUT edge.
+  /** Traverse to IDENTIFIER via ARGUMENT OUT edge.
     */
-  def _callViaDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaDominateOut
+  def _identifierViaArgumentOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaArgumentOut
 
-  /** Traverse to TYPE_REF via DOMINATE OUT edge.
+  /** Traverse to JUMP_TARGET via ARGUMENT OUT edge.
     */
-  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateOut
+  def _jumpTargetViaArgumentOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaArgumentOut
 
-  /** Traverse to CONTROL_STRUCTURE via DOMINATE OUT edge.
+  /** Traverse to LITERAL via ARGUMENT OUT edge.
     */
-  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaDominateOut
+  def _literalViaArgumentOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaArgumentOut
 
-  /** Traverse to JUMP_TARGET via DOMINATE OUT edge.
+  /** Traverse to METHOD_REF via ARGUMENT OUT edge.
     */
-  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateOut
+  def _methodRefViaArgumentOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaArgumentOut
 
-  /** Traverse to BLOCK via DOMINATE OUT edge.
+  /** Traverse to TYPE_REF via ARGUMENT OUT edge.
     */
-  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateOut
+  def _typeRefViaArgumentOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaArgumentOut
 
-  /** Traverse to METHOD_RETURN via DOMINATE OUT edge.
+  /** Traverse to UNKNOWN via ARGUMENT OUT edge.
     */
-  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaDominateOut
+  def _unknownViaArgumentOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaArgumentOut
 
-  /** Traverse to UNKNOWN via DOMINATE OUT edge.
-    */
-  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateOut
+  def astOut: Iterator[Expression] = get().astOut
+  override def _astOut             = get()._astOut
 
-  /** Traverse to IDENTIFIER via DOMINATE OUT edge.
+  /** Traverse to BLOCK via AST OUT edge.
     */
-  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaDominateOut
+  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = get()._blockViaAstOut
+
+  /** Traverse to CALL via AST OUT edge.
+    */
+  def _callViaAstOut: overflowdb.traversal.Traversal[Call] = get()._callViaAstOut
+
+  /** Traverse to CONTROL_STRUCTURE via AST OUT edge.
+    */
+  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstOut
+
+  /** Traverse to FIELD_IDENTIFIER via AST OUT edge.
+    */
+  def _fieldIdentifierViaAstOut: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaAstOut
+
+  /** Traverse to IDENTIFIER via AST OUT edge.
+    */
+  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaAstOut
+
+  /** Traverse to LITERAL via AST OUT edge.
+    */
+  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
+
+  /** Traverse to METHOD_REF via AST OUT edge.
+    */
+  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaAstOut
+
+  /** Traverse to RETURN via AST OUT edge.
+    */
+  def _returnViaAstOut: overflowdb.traversal.Traversal[Return] = get()._returnViaAstOut
+
+  /** Traverse to TYPE_REF via AST OUT edge.
+    */
+  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaAstOut
 
   def callOut: Iterator[Method] = get().callOut
   override def _callOut         = get()._callOut
@@ -250,41 +281,116 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _methodViaCallOut: overflowdb.traversal.Traversal[Method] = get()._methodViaCallOut
 
-  def receiverOut: Iterator[Expression] = get().receiverOut
-  override def _receiverOut             = get()._receiverOut
+  def cdgOut: Iterator[CfgNode] = get().cdgOut
+  override def _cdgOut          = get()._cdgOut
 
-  /** Traverse to BLOCK via RECEIVER OUT edge.
+  /** Traverse to BLOCK via CDG OUT edge.
     */
-  def _blockViaReceiverOut: Option[Block] = get()._blockViaReceiverOut
+  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgOut
 
-  /** Traverse to LITERAL via RECEIVER OUT edge.
+  /** Traverse to CALL via CDG OUT edge.
     */
-  def _literalViaReceiverOut: Option[Literal] = get()._literalViaReceiverOut
+  def _callViaCdgOut: overflowdb.traversal.Traversal[Call] = get()._callViaCdgOut
 
-  /** Traverse to UNKNOWN via RECEIVER OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via CDG OUT edge.
     */
-  def _unknownViaReceiverOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaReceiverOut
+  def _controlStructureViaCdgOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgOut
 
-  /** Traverse to CONTROL_STRUCTURE via RECEIVER OUT edge.
+  /** Traverse to FIELD_IDENTIFIER via CDG OUT edge.
     */
-  def _controlStructureViaReceiverOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaReceiverOut
+  def _fieldIdentifierViaCdgOut: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgOut
 
-  /** Traverse to CALL via RECEIVER OUT edge.
+  /** Traverse to IDENTIFIER via CDG OUT edge.
     */
-  def _callViaReceiverOut: Option[Call] = get()._callViaReceiverOut
+  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgOut
 
-  /** Traverse to TYPE_REF via RECEIVER OUT edge.
+  /** Traverse to JUMP_TARGET via CDG OUT edge.
     */
-  def _typeRefViaReceiverOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReceiverOut
+  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgOut
 
-  /** Traverse to METHOD_REF via RECEIVER OUT edge.
+  /** Traverse to LITERAL via CDG OUT edge.
     */
-  def _methodRefViaReceiverOut: Option[MethodRef] = get()._methodRefViaReceiverOut
+  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgOut
 
-  /** Traverse to IDENTIFIER via RECEIVER OUT edge.
+  /** Traverse to METHOD_REF via CDG OUT edge.
     */
-  def _identifierViaReceiverOut: Option[Identifier] = get()._identifierViaReceiverOut
+  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgOut
+
+  /** Traverse to METHOD_RETURN via CDG OUT edge.
+    */
+  def _methodReturnViaCdgOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaCdgOut
+
+  /** Traverse to RETURN via CDG OUT edge.
+    */
+  def _returnViaCdgOut: overflowdb.traversal.Traversal[Return] = get()._returnViaCdgOut
+
+  /** Traverse to TYPE_REF via CDG OUT edge.
+    */
+  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgOut
+
+  /** Traverse to UNKNOWN via CDG OUT edge.
+    */
+  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgOut
+
+  def cfgOut: Iterator[CfgNode] = get().cfgOut
+  override def _cfgOut          = get()._cfgOut
+
+  /** Traverse to CFG_NODE via CFG OUT edge.
+    */
+  def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = get()._cfgNodeViaCfgOut
+
+  def dominateOut: Iterator[CfgNode] = get().dominateOut
+  override def _dominateOut          = get()._dominateOut
+
+  /** Traverse to BLOCK via DOMINATE OUT edge.
+    */
+  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateOut
+
+  /** Traverse to CALL via DOMINATE OUT edge.
+    */
+  def _callViaDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaDominateOut
+
+  /** Traverse to CONTROL_STRUCTURE via DOMINATE OUT edge.
+    */
+  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaDominateOut
+
+  /** Traverse to FIELD_IDENTIFIER via DOMINATE OUT edge.
+    */
+  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaDominateOut
+
+  /** Traverse to IDENTIFIER via DOMINATE OUT edge.
+    */
+  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaDominateOut
+
+  /** Traverse to JUMP_TARGET via DOMINATE OUT edge.
+    */
+  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateOut
+
+  /** Traverse to LITERAL via DOMINATE OUT edge.
+    */
+  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateOut
+
+  /** Traverse to METHOD_REF via DOMINATE OUT edge.
+    */
+  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateOut
+
+  /** Traverse to METHOD_RETURN via DOMINATE OUT edge.
+    */
+  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaDominateOut
+
+  /** Traverse to RETURN via DOMINATE OUT edge.
+    */
+  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateOut
+
+  /** Traverse to TYPE_REF via DOMINATE OUT edge.
+    */
+  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateOut
+
+  /** Traverse to UNKNOWN via DOMINATE OUT edge.
+    */
+  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateOut
 
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
@@ -293,54 +399,83 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = get()._typeViaEvalTypeOut
 
+  def isCallForImportOut: Iterator[Import] = get().isCallForImportOut
+  override def _isCallForImportOut         = get()._isCallForImportOut
+
+  /** Traverse to IMPORT via IS_CALL_FOR_IMPORT OUT edge.
+    */
+  def _importViaIsCallForImportOut: overflowdb.traversal.Traversal[Import] = get()._importViaIsCallForImportOut
+
   def pointsToOut: Iterator[CfgNode] = get().pointsToOut
   override def _pointsToOut          = get()._pointsToOut
 
-  def astOut: Iterator[Expression] = get().astOut
-  override def _astOut             = get()._astOut
+  def postDominateOut: Iterator[CfgNode] = get().postDominateOut
+  override def _postDominateOut          = get()._postDominateOut
 
-  /** Traverse to CONTROL_STRUCTURE via AST OUT edge.
+  /** Traverse to BLOCK via POST_DOMINATE OUT edge.
     */
-  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstOut
+  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateOut
 
-  /** Traverse to LITERAL via AST OUT edge.
+  /** Traverse to CALL via POST_DOMINATE OUT edge.
     */
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
+  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateOut
 
-  /** Traverse to TYPE_REF via AST OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE OUT edge.
     */
-  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaAstOut
+  def _controlStructureViaPostDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaPostDominateOut
 
-  /** Traverse to FIELD_IDENTIFIER via AST OUT edge.
+  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE OUT edge.
     */
-  def _fieldIdentifierViaAstOut: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaAstOut
+  def _fieldIdentifierViaPostDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaPostDominateOut
 
-  /** Traverse to CALL via AST OUT edge.
+  /** Traverse to IDENTIFIER via POST_DOMINATE OUT edge.
     */
-  def _callViaAstOut: overflowdb.traversal.Traversal[Call] = get()._callViaAstOut
+  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateOut
 
-  /** Traverse to METHOD_REF via AST OUT edge.
+  /** Traverse to JUMP_TARGET via POST_DOMINATE OUT edge.
     */
-  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaAstOut
+  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateOut
 
-  /** Traverse to BLOCK via AST OUT edge.
+  /** Traverse to LITERAL via POST_DOMINATE OUT edge.
     */
-  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = get()._blockViaAstOut
+  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateOut
 
-  /** Traverse to IDENTIFIER via AST OUT edge.
+  /** Traverse to METHOD via POST_DOMINATE OUT edge.
     */
-  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaAstOut
+  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method] = get()._methodViaPostDominateOut
 
-  /** Traverse to RETURN via AST OUT edge.
+  /** Traverse to METHOD_REF via POST_DOMINATE OUT edge.
     */
-  def _returnViaAstOut: overflowdb.traversal.Traversal[Return] = get()._returnViaAstOut
+  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateOut
+
+  /** Traverse to RETURN via POST_DOMINATE OUT edge.
+    */
+  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateOut
+
+  /** Traverse to TYPE_REF via POST_DOMINATE OUT edge.
+    */
+  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateOut
+
+  /** Traverse to UNKNOWN via POST_DOMINATE OUT edge.
+    */
+  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateOut
 
   def reachingDefOut: Iterator[CfgNode] = get().reachingDefOut
   override def _reachingDefOut          = get()._reachingDefOut
 
-  /** Traverse to RETURN via REACHING_DEF OUT edge.
+  /** Traverse to CALL via REACHING_DEF OUT edge.
     */
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefOut
+  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefOut
+
+  /** Traverse to IDENTIFIER via REACHING_DEF OUT edge.
+    */
+  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefOut
+
+  /** Traverse to LITERAL via REACHING_DEF OUT edge.
+    */
+  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefOut
 
   /** Traverse to METHOD_PARAMETER_OUT via REACHING_DEF OUT edge.
     */
@@ -351,117 +486,49 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefOut
 
+  /** Traverse to RETURN via REACHING_DEF OUT edge.
+    */
+  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefOut
+
   /** Traverse to TYPE_REF via REACHING_DEF OUT edge.
     */
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
 
-  /** Traverse to IDENTIFIER via REACHING_DEF OUT edge.
+  def receiverOut: Iterator[Expression] = get().receiverOut
+  override def _receiverOut             = get()._receiverOut
+
+  /** Traverse to BLOCK via RECEIVER OUT edge.
     */
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefOut
+  def _blockViaReceiverOut: Option[Block] = get()._blockViaReceiverOut
 
-  /** Traverse to LITERAL via REACHING_DEF OUT edge.
+  /** Traverse to CALL via RECEIVER OUT edge.
     */
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefOut
+  def _callViaReceiverOut: Option[Call] = get()._callViaReceiverOut
 
-  /** Traverse to CALL via REACHING_DEF OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via RECEIVER OUT edge.
     */
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefOut
+  def _controlStructureViaReceiverOut: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaReceiverOut
 
-  def argumentOut: Iterator[CfgNode] = get().argumentOut
-  override def _argumentOut          = get()._argumentOut
-
-  /** Traverse to METHOD_REF via ARGUMENT OUT edge.
+  /** Traverse to IDENTIFIER via RECEIVER OUT edge.
     */
-  def _methodRefViaArgumentOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaArgumentOut
+  def _identifierViaReceiverOut: Option[Identifier] = get()._identifierViaReceiverOut
 
-  /** Traverse to JUMP_TARGET via ARGUMENT OUT edge.
+  /** Traverse to LITERAL via RECEIVER OUT edge.
     */
-  def _jumpTargetViaArgumentOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaArgumentOut
+  def _literalViaReceiverOut: Option[Literal] = get()._literalViaReceiverOut
 
-  /** Traverse to FIELD_IDENTIFIER via ARGUMENT OUT edge.
+  /** Traverse to METHOD_REF via RECEIVER OUT edge.
     */
-  def _fieldIdentifierViaArgumentOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaArgumentOut
+  def _methodRefViaReceiverOut: Option[MethodRef] = get()._methodRefViaReceiverOut
 
-  /** Traverse to BLOCK via ARGUMENT OUT edge.
+  /** Traverse to TYPE_REF via RECEIVER OUT edge.
     */
-  def _blockViaArgumentOut: overflowdb.traversal.Traversal[Block] = get()._blockViaArgumentOut
+  def _typeRefViaReceiverOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReceiverOut
 
-  /** Traverse to IDENTIFIER via ARGUMENT OUT edge.
+  /** Traverse to UNKNOWN via RECEIVER OUT edge.
     */
-  def _identifierViaArgumentOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaArgumentOut
-
-  /** Traverse to CONTROL_STRUCTURE via ARGUMENT OUT edge.
-    */
-  def _controlStructureViaArgumentOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaArgumentOut
-
-  /** Traverse to UNKNOWN via ARGUMENT OUT edge.
-    */
-  def _unknownViaArgumentOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaArgumentOut
-
-  /** Traverse to CALL via ARGUMENT OUT edge.
-    */
-  def _callViaArgumentOut: overflowdb.traversal.Traversal[Call] = get()._callViaArgumentOut
-
-  /** Traverse to LITERAL via ARGUMENT OUT edge.
-    */
-  def _literalViaArgumentOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaArgumentOut
-
-  /** Traverse to TYPE_REF via ARGUMENT OUT edge.
-    */
-  def _typeRefViaArgumentOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaArgumentOut
-
-  def cdgOut: Iterator[CfgNode] = get().cdgOut
-  override def _cdgOut          = get()._cdgOut
-
-  /** Traverse to LITERAL via CDG OUT edge.
-    */
-  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgOut
-
-  /** Traverse to CONTROL_STRUCTURE via CDG OUT edge.
-    */
-  def _controlStructureViaCdgOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgOut
-
-  /** Traverse to CALL via CDG OUT edge.
-    */
-  def _callViaCdgOut: overflowdb.traversal.Traversal[Call] = get()._callViaCdgOut
-
-  /** Traverse to JUMP_TARGET via CDG OUT edge.
-    */
-  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgOut
-
-  /** Traverse to IDENTIFIER via CDG OUT edge.
-    */
-  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgOut
-
-  /** Traverse to UNKNOWN via CDG OUT edge.
-    */
-  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgOut
-
-  /** Traverse to METHOD_REF via CDG OUT edge.
-    */
-  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgOut
-
-  /** Traverse to FIELD_IDENTIFIER via CDG OUT edge.
-    */
-  def _fieldIdentifierViaCdgOut: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgOut
-
-  /** Traverse to METHOD_RETURN via CDG OUT edge.
-    */
-  def _methodReturnViaCdgOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaCdgOut
-
-  /** Traverse to TYPE_REF via CDG OUT edge.
-    */
-  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgOut
-
-  /** Traverse to BLOCK via CDG OUT edge.
-    */
-  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgOut
-
-  /** Traverse to RETURN via CDG OUT edge.
-    */
-  def _returnViaCdgOut: overflowdb.traversal.Traversal[Return] = get()._returnViaCdgOut
+  def _unknownViaReceiverOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaReceiverOut
 
   def refOut: Iterator[Member] = get().refOut
   override def _refOut         = get()._refOut
@@ -479,161 +546,243 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  def isCallForImportOut: Iterator[Import] = get().isCallForImportOut
-  override def _isCallForImportOut         = get()._isCallForImportOut
+  def argumentIn: Iterator[Expression] = get().argumentIn
+  override def _argumentIn             = get()._argumentIn
 
-  /** Traverse to IMPORT via IS_CALL_FOR_IMPORT OUT edge.
+  /** Traverse to CALL via ARGUMENT IN edge.
     */
-  def _importViaIsCallForImportOut: overflowdb.traversal.Traversal[Import] = get()._importViaIsCallForImportOut
+  def _callViaArgumentIn: Option[Call] = get()._callViaArgumentIn
 
-  def cfgOut: Iterator[CfgNode] = get().cfgOut
-  override def _cfgOut          = get()._cfgOut
-
-  /** Traverse to CFG_NODE via CFG OUT edge.
+  /** Traverse to RETURN via ARGUMENT IN edge.
     */
-  def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = get()._cfgNodeViaCfgOut
+  def _returnViaArgumentIn: Option[Return] = get()._returnViaArgumentIn
 
-  def postDominateOut: Iterator[CfgNode] = get().postDominateOut
-  override def _postDominateOut          = get()._postDominateOut
+  def astIn: Iterator[Expression] = get().astIn
+  override def _astIn             = get()._astIn
 
-  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE OUT edge.
+  /** Traverse to BLOCK via AST IN edge.
     */
-  def _controlStructureViaPostDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaPostDominateOut
+  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = get()._blockViaAstIn
 
-  /** Traverse to RETURN via POST_DOMINATE OUT edge.
+  /** Traverse to CALL via AST IN edge.
     */
-  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateOut
+  def _callViaAstIn: overflowdb.traversal.Traversal[Call] = get()._callViaAstIn
 
-  /** Traverse to METHOD_REF via POST_DOMINATE OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateOut
+  def _controlStructureViaAstIn: ControlStructure = get()._controlStructureViaAstIn
 
-  /** Traverse to UNKNOWN via POST_DOMINATE OUT edge.
+  /** Traverse to RETURN via AST IN edge.
     */
-  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateOut
+  def _returnViaAstIn: overflowdb.traversal.Traversal[Return] = get()._returnViaAstIn
 
-  /** Traverse to IDENTIFIER via POST_DOMINATE OUT edge.
+  /** Traverse to UNKNOWN via AST IN edge.
     */
-  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateOut
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
 
-  /** Traverse to LITERAL via POST_DOMINATE OUT edge.
-    */
-  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateOut
+  def cdgIn: Iterator[CfgNode] = get().cdgIn
+  override def _cdgIn          = get()._cdgIn
 
-  /** Traverse to CALL via POST_DOMINATE OUT edge.
+  /** Traverse to BLOCK via CDG IN edge.
     */
-  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateOut
+  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgIn
 
-  /** Traverse to METHOD via POST_DOMINATE OUT edge.
+  /** Traverse to CALL via CDG IN edge.
     */
-  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method] = get()._methodViaPostDominateOut
+  def _callViaCdgIn: overflowdb.traversal.Traversal[Call] = get()._callViaCdgIn
 
-  /** Traverse to BLOCK via POST_DOMINATE OUT edge.
+  /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
     */
-  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateOut
+  def _controlStructureViaCdgIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgIn
 
-  /** Traverse to JUMP_TARGET via POST_DOMINATE OUT edge.
+  /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
     */
-  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateOut
+  def _fieldIdentifierViaCdgIn: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgIn
 
-  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE OUT edge.
+  /** Traverse to IDENTIFIER via CDG IN edge.
     */
-  def _fieldIdentifierViaPostDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaPostDominateOut
+  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgIn
 
-  /** Traverse to TYPE_REF via POST_DOMINATE OUT edge.
+  /** Traverse to JUMP_TARGET via CDG IN edge.
     */
-  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateOut
+  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgIn
+
+  /** Traverse to LITERAL via CDG IN edge.
+    */
+  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgIn
+
+  /** Traverse to METHOD_REF via CDG IN edge.
+    */
+  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgIn
+
+  /** Traverse to TYPE_REF via CDG IN edge.
+    */
+  def _typeRefViaCdgIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgIn
+
+  /** Traverse to UNKNOWN via CDG IN edge.
+    */
+  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgIn
+
+  def cfgIn: Iterator[CfgNode] = get().cfgIn
+  override def _cfgIn          = get()._cfgIn
+
+  def conditionIn: Iterator[ControlStructure] = get().conditionIn
+  override def _conditionIn                   = get()._conditionIn
+
+  /** Traverse to CONTROL_STRUCTURE via CONDITION IN edge.
+    */
+  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaConditionIn
+
+  def containsIn: Iterator[Method] = get().containsIn
+  override def _containsIn         = get()._containsIn
+
+  /** Traverse to METHOD via CONTAINS IN edge.
+    */
+  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
 
   def dominateIn: Iterator[CfgNode] = get().dominateIn
   override def _dominateIn          = get()._dominateIn
 
-  /** Traverse to METHOD_REF via DOMINATE IN edge.
+  /** Traverse to BLOCK via DOMINATE IN edge.
     */
-  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateIn
-
-  /** Traverse to FIELD_IDENTIFIER via DOMINATE IN edge.
-    */
-  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaDominateIn
-
-  /** Traverse to LITERAL via DOMINATE IN edge.
-    */
-  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateIn
-
-  /** Traverse to RETURN via DOMINATE IN edge.
-    */
-  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateIn
+  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateIn
 
   /** Traverse to CALL via DOMINATE IN edge.
     */
   def _callViaDominateIn: overflowdb.traversal.Traversal[Call] = get()._callViaDominateIn
-
-  /** Traverse to TYPE_REF via DOMINATE IN edge.
-    */
-  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateIn
 
   /** Traverse to CONTROL_STRUCTURE via DOMINATE IN edge.
     */
   def _controlStructureViaDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
     get()._controlStructureViaDominateIn
 
-  /** Traverse to JUMP_TARGET via DOMINATE IN edge.
+  /** Traverse to FIELD_IDENTIFIER via DOMINATE IN edge.
     */
-  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateIn
-
-  /** Traverse to BLOCK via DOMINATE IN edge.
-    */
-  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateIn
-
-  /** Traverse to UNKNOWN via DOMINATE IN edge.
-    */
-  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateIn
+  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaDominateIn
 
   /** Traverse to IDENTIFIER via DOMINATE IN edge.
     */
   def _identifierViaDominateIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaDominateIn
 
+  /** Traverse to JUMP_TARGET via DOMINATE IN edge.
+    */
+  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateIn
+
+  /** Traverse to LITERAL via DOMINATE IN edge.
+    */
+  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateIn
+
   /** Traverse to METHOD via DOMINATE IN edge.
     */
   def _methodViaDominateIn: overflowdb.traversal.Traversal[Method] = get()._methodViaDominateIn
 
-  def receiverIn: Iterator[Call] = get().receiverIn
-  override def _receiverIn       = get()._receiverIn
-
-  /** Traverse to CALL via RECEIVER IN edge.
+  /** Traverse to METHOD_REF via DOMINATE IN edge.
     */
-  def _callViaReceiverIn: Option[Call] = get()._callViaReceiverIn
+  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateIn
+
+  /** Traverse to RETURN via DOMINATE IN edge.
+    */
+  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateIn
+
+  /** Traverse to TYPE_REF via DOMINATE IN edge.
+    */
+  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateIn
+
+  /** Traverse to UNKNOWN via DOMINATE IN edge.
+    */
+  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateIn
 
   def pointsToIn: Iterator[CfgNode] = get().pointsToIn
   override def _pointsToIn          = get()._pointsToIn
 
-  def astIn: Iterator[Expression] = get().astIn
-  override def _astIn             = get()._astIn
+  def postDominateIn: Iterator[CfgNode] = get().postDominateIn
+  override def _postDominateIn          = get()._postDominateIn
 
-  /** Traverse to UNKNOWN via AST IN edge.
+  /** Traverse to BLOCK via POST_DOMINATE IN edge.
     */
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateIn
 
-  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
+  /** Traverse to CALL via POST_DOMINATE IN edge.
     */
-  def _controlStructureViaAstIn: ControlStructure = get()._controlStructureViaAstIn
+  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateIn
 
-  /** Traverse to CALL via AST IN edge.
+  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
-  def _callViaAstIn: overflowdb.traversal.Traversal[Call] = get()._callViaAstIn
+  def _controlStructureViaPostDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaPostDominateIn
 
-  /** Traverse to BLOCK via AST IN edge.
+  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE IN edge.
     */
-  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = get()._blockViaAstIn
+  def _fieldIdentifierViaPostDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    get()._fieldIdentifierViaPostDominateIn
 
-  /** Traverse to RETURN via AST IN edge.
+  /** Traverse to IDENTIFIER via POST_DOMINATE IN edge.
     */
-  def _returnViaAstIn: overflowdb.traversal.Traversal[Return] = get()._returnViaAstIn
+  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateIn
+
+  /** Traverse to JUMP_TARGET via POST_DOMINATE IN edge.
+    */
+  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateIn
+
+  /** Traverse to LITERAL via POST_DOMINATE IN edge.
+    */
+  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateIn
+
+  /** Traverse to METHOD_REF via POST_DOMINATE IN edge.
+    */
+  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateIn
+
+  /** Traverse to METHOD_RETURN via POST_DOMINATE IN edge.
+    */
+  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
+    get()._methodReturnViaPostDominateIn
+
+  /** Traverse to RETURN via POST_DOMINATE IN edge.
+    */
+  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateIn
+
+  /** Traverse to TYPE_REF via POST_DOMINATE IN edge.
+    */
+  def _typeRefViaPostDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateIn
+
+  /** Traverse to UNKNOWN via POST_DOMINATE IN edge.
+    */
+  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateIn
 
   def reachingDefIn: Iterator[CfgNode] = get().reachingDefIn
   override def _reachingDefIn          = get()._reachingDefIn
+
+  /** Traverse to BLOCK via REACHING_DEF IN edge.
+    */
+  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefIn
+
+  /** Traverse to CALL via REACHING_DEF IN edge.
+    */
+  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefIn
+
+  /** Traverse to CONTROL_STRUCTURE via REACHING_DEF IN edge.
+    */
+  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
+    get()._controlStructureViaReachingDefIn
+
+  /** Traverse to IDENTIFIER via REACHING_DEF IN edge.
+    */
+  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefIn
+
+  /** Traverse to LITERAL via REACHING_DEF IN edge.
+    */
+  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefIn
+
+  /** Traverse to METHOD via REACHING_DEF IN edge.
+    */
+  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = get()._methodViaReachingDefIn
+
+  /** Traverse to METHOD_PARAMETER_IN via REACHING_DEF IN edge.
+    */
+  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    get()._methodParameterInViaReachingDefIn
 
   /** Traverse to METHOD_PARAMETER_OUT via REACHING_DEF IN edge.
     */
@@ -644,169 +793,20 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefIn
 
-  /** Traverse to METHOD_PARAMETER_IN via REACHING_DEF IN edge.
-    */
-  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    get()._methodParameterInViaReachingDefIn
-
   /** Traverse to TYPE_REF via REACHING_DEF IN edge.
     */
   def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefIn
-
-  /** Traverse to BLOCK via REACHING_DEF IN edge.
-    */
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefIn
-
-  /** Traverse to IDENTIFIER via REACHING_DEF IN edge.
-    */
-  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefIn
-
-  /** Traverse to CONTROL_STRUCTURE via REACHING_DEF IN edge.
-    */
-  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaReachingDefIn
-
-  /** Traverse to LITERAL via REACHING_DEF IN edge.
-    */
-  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefIn
 
   /** Traverse to UNKNOWN via REACHING_DEF IN edge.
     */
   def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaReachingDefIn
 
-  /** Traverse to CALL via REACHING_DEF IN edge.
+  def receiverIn: Iterator[Call] = get().receiverIn
+  override def _receiverIn       = get()._receiverIn
+
+  /** Traverse to CALL via RECEIVER IN edge.
     */
-  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefIn
-
-  /** Traverse to METHOD via REACHING_DEF IN edge.
-    */
-  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = get()._methodViaReachingDefIn
-
-  def argumentIn: Iterator[Expression] = get().argumentIn
-  override def _argumentIn             = get()._argumentIn
-
-  /** Traverse to RETURN via ARGUMENT IN edge.
-    */
-  def _returnViaArgumentIn: Option[Return] = get()._returnViaArgumentIn
-
-  /** Traverse to CALL via ARGUMENT IN edge.
-    */
-  def _callViaArgumentIn: Option[Call] = get()._callViaArgumentIn
-
-  def cdgIn: Iterator[CfgNode] = get().cdgIn
-  override def _cdgIn          = get()._cdgIn
-
-  /** Traverse to LITERAL via CDG IN edge.
-    */
-  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgIn
-
-  /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
-    */
-  def _controlStructureViaCdgIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgIn
-
-  /** Traverse to CALL via CDG IN edge.
-    */
-  def _callViaCdgIn: overflowdb.traversal.Traversal[Call] = get()._callViaCdgIn
-
-  /** Traverse to JUMP_TARGET via CDG IN edge.
-    */
-  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgIn
-
-  /** Traverse to IDENTIFIER via CDG IN edge.
-    */
-  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgIn
-
-  /** Traverse to UNKNOWN via CDG IN edge.
-    */
-  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgIn
-
-  /** Traverse to METHOD_REF via CDG IN edge.
-    */
-  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgIn
-
-  /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
-    */
-  def _fieldIdentifierViaCdgIn: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgIn
-
-  /** Traverse to TYPE_REF via CDG IN edge.
-    */
-  def _typeRefViaCdgIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgIn
-
-  /** Traverse to BLOCK via CDG IN edge.
-    */
-  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgIn
-
-  def cfgIn: Iterator[CfgNode] = get().cfgIn
-  override def _cfgIn          = get()._cfgIn
-
-  def postDominateIn: Iterator[CfgNode] = get().postDominateIn
-  override def _postDominateIn          = get()._postDominateIn
-
-  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
-    */
-  def _controlStructureViaPostDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaPostDominateIn
-
-  /** Traverse to RETURN via POST_DOMINATE IN edge.
-    */
-  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateIn
-
-  /** Traverse to METHOD_RETURN via POST_DOMINATE IN edge.
-    */
-  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
-    get()._methodReturnViaPostDominateIn
-
-  /** Traverse to METHOD_REF via POST_DOMINATE IN edge.
-    */
-  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateIn
-
-  /** Traverse to UNKNOWN via POST_DOMINATE IN edge.
-    */
-  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateIn
-
-  /** Traverse to IDENTIFIER via POST_DOMINATE IN edge.
-    */
-  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateIn
-
-  /** Traverse to LITERAL via POST_DOMINATE IN edge.
-    */
-  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateIn
-
-  /** Traverse to CALL via POST_DOMINATE IN edge.
-    */
-  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateIn
-
-  /** Traverse to BLOCK via POST_DOMINATE IN edge.
-    */
-  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateIn
-
-  /** Traverse to JUMP_TARGET via POST_DOMINATE IN edge.
-    */
-  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateIn
-
-  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE IN edge.
-    */
-  def _fieldIdentifierViaPostDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaPostDominateIn
-
-  /** Traverse to TYPE_REF via POST_DOMINATE IN edge.
-    */
-  def _typeRefViaPostDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateIn
-
-  def containsIn: Iterator[Method] = get().containsIn
-  override def _containsIn         = get()._containsIn
-
-  /** Traverse to METHOD via CONTAINS IN edge.
-    */
-  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
-
-  def conditionIn: Iterator[ControlStructure] = get().conditionIn
-  override def _conditionIn                   = get()._conditionIn
-
-  /** Traverse to CONTROL_STRUCTURE via CONDITION IN edge.
-    */
-  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaConditionIn
+  def _callViaReceiverIn: Option[Call] = get()._callViaReceiverIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -934,159 +934,141 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
   }
 
   import overflowdb.traversal._
-  def dominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](0)
-  override def _dominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef] = dominateOut.collectAll[MethodRef]
-  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    dominateOut.collectAll[FieldIdentifier]
-  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal] = dominateOut.collectAll[Literal]
-  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return]   = dominateOut.collectAll[Return]
-  def _callViaDominateOut: overflowdb.traversal.Traversal[Call]       = dominateOut.collectAll[Call]
-  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef] = dominateOut.collectAll[TypeRef]
-  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    dominateOut.collectAll[ControlStructure]
-  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget]     = dominateOut.collectAll[JumpTarget]
-  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block]               = dominateOut.collectAll[Block]
-  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = dominateOut.collectAll[MethodReturn]
-  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown]           = dominateOut.collectAll[Unknown]
-  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier]     = dominateOut.collectAll[Identifier]
-
-  def callOut: Iterator[Method]                                 = createAdjacentNodeScalaIteratorByOffSet[Method](1)
-  override def _callOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _methodViaCallOut: overflowdb.traversal.Traversal[Method] = callOut.collectAll[Method]
-
-  def receiverOut: Iterator[Expression]       = createAdjacentNodeScalaIteratorByOffSet[Expression](2)
-  override def _receiverOut                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _blockViaReceiverOut: Option[Block]     = receiverOut.collectAll[Block].nextOption()
-  def _literalViaReceiverOut: Option[Literal] = receiverOut.collectAll[Literal].nextOption()
-  def _unknownViaReceiverOut: overflowdb.traversal.Traversal[Unknown] = receiverOut.collectAll[Unknown]
-  def _controlStructureViaReceiverOut: overflowdb.traversal.Traversal[ControlStructure] =
-    receiverOut.collectAll[ControlStructure]
-  def _callViaReceiverOut: Option[Call]                               = receiverOut.collectAll[Call].nextOption()
-  def _typeRefViaReceiverOut: overflowdb.traversal.Traversal[TypeRef] = receiverOut.collectAll[TypeRef]
-  def _methodRefViaReceiverOut: Option[MethodRef]                     = receiverOut.collectAll[MethodRef].nextOption()
-  def _identifierViaReceiverOut: Option[Identifier]                   = receiverOut.collectAll[Identifier].nextOption()
-
-  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](3)
-  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
-
-  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
-  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-
-  def astOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](5)
-  override def _astOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = astOut.collectAll[ControlStructure]
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal]                   = astOut.collectAll[Literal]
-  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef]                   = astOut.collectAll[TypeRef]
-  def _fieldIdentifierViaAstOut: overflowdb.traversal.Traversal[FieldIdentifier]   = astOut.collectAll[FieldIdentifier]
-  def _callViaAstOut: overflowdb.traversal.Traversal[Call]                         = astOut.collectAll[Call]
-  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef]               = astOut.collectAll[MethodRef]
-  def _blockViaAstOut: overflowdb.traversal.Traversal[Block]                       = astOut.collectAll[Block]
-  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier]             = astOut.collectAll[Identifier]
-  def _returnViaAstOut: overflowdb.traversal.Traversal[Return]                     = astOut.collectAll[Return]
-
-  def reachingDefOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _reachingDefOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = reachingDefOut.collectAll[Return]
-  def _methodParameterOutViaReachingDefOut: overflowdb.traversal.Traversal[MethodParameterOut] =
-    reachingDefOut.collectAll[MethodParameterOut]
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef]   = reachingDefOut.collectAll[MethodRef]
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]       = reachingDefOut.collectAll[TypeRef]
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
-
-  def argumentOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](7)
-  override def _argumentOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
-  def _methodRefViaArgumentOut: overflowdb.traversal.Traversal[MethodRef]   = argumentOut.collectAll[MethodRef]
-  def _jumpTargetViaArgumentOut: overflowdb.traversal.Traversal[JumpTarget] = argumentOut.collectAll[JumpTarget]
-  def _fieldIdentifierViaArgumentOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    argumentOut.collectAll[FieldIdentifier]
-  def _blockViaArgumentOut: overflowdb.traversal.Traversal[Block]           = argumentOut.collectAll[Block]
-  def _identifierViaArgumentOut: overflowdb.traversal.Traversal[Identifier] = argumentOut.collectAll[Identifier]
+  def argumentOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](0)
+  override def _argumentOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def _blockViaArgumentOut: overflowdb.traversal.Traversal[Block] = argumentOut.collectAll[Block]
+  def _callViaArgumentOut: overflowdb.traversal.Traversal[Call]   = argumentOut.collectAll[Call]
   def _controlStructureViaArgumentOut: overflowdb.traversal.Traversal[ControlStructure] =
     argumentOut.collectAll[ControlStructure]
-  def _unknownViaArgumentOut: overflowdb.traversal.Traversal[Unknown] = argumentOut.collectAll[Unknown]
-  def _callViaArgumentOut: overflowdb.traversal.Traversal[Call]       = argumentOut.collectAll[Call]
-  def _literalViaArgumentOut: overflowdb.traversal.Traversal[Literal] = argumentOut.collectAll[Literal]
-  def _typeRefViaArgumentOut: overflowdb.traversal.Traversal[TypeRef] = argumentOut.collectAll[TypeRef]
+  def _fieldIdentifierViaArgumentOut: overflowdb.traversal.Traversal[FieldIdentifier] =
+    argumentOut.collectAll[FieldIdentifier]
+  def _identifierViaArgumentOut: overflowdb.traversal.Traversal[Identifier] = argumentOut.collectAll[Identifier]
+  def _jumpTargetViaArgumentOut: overflowdb.traversal.Traversal[JumpTarget] = argumentOut.collectAll[JumpTarget]
+  def _literalViaArgumentOut: overflowdb.traversal.Traversal[Literal]       = argumentOut.collectAll[Literal]
+  def _methodRefViaArgumentOut: overflowdb.traversal.Traversal[MethodRef]   = argumentOut.collectAll[MethodRef]
+  def _typeRefViaArgumentOut: overflowdb.traversal.Traversal[TypeRef]       = argumentOut.collectAll[TypeRef]
+  def _unknownViaArgumentOut: overflowdb.traversal.Traversal[Unknown]       = argumentOut.collectAll[Unknown]
 
-  def cdgOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](8)
-  override def _cdgOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
-  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal]                   = cdgOut.collectAll[Literal]
+  def astOut: Iterator[Expression]                           = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
+  override def _astOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = astOut.collectAll[Block]
+  def _callViaAstOut: overflowdb.traversal.Traversal[Call]   = astOut.collectAll[Call]
+  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = astOut.collectAll[ControlStructure]
+  def _fieldIdentifierViaAstOut: overflowdb.traversal.Traversal[FieldIdentifier]   = astOut.collectAll[FieldIdentifier]
+  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier]             = astOut.collectAll[Identifier]
+  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal]                   = astOut.collectAll[Literal]
+  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef]               = astOut.collectAll[MethodRef]
+  def _returnViaAstOut: overflowdb.traversal.Traversal[Return]                     = astOut.collectAll[Return]
+  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef]                   = astOut.collectAll[TypeRef]
+
+  def callOut: Iterator[Method]                                 = createAdjacentNodeScalaIteratorByOffSet[Method](2)
+  override def _callOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _methodViaCallOut: overflowdb.traversal.Traversal[Method] = callOut.collectAll[Method]
+
+  def cdgOut: Iterator[CfgNode]                              = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
+  override def _cdgOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block] = cdgOut.collectAll[Block]
+  def _callViaCdgOut: overflowdb.traversal.Traversal[Call]   = cdgOut.collectAll[Call]
   def _controlStructureViaCdgOut: overflowdb.traversal.Traversal[ControlStructure] = cdgOut.collectAll[ControlStructure]
-  def _callViaCdgOut: overflowdb.traversal.Traversal[Call]                         = cdgOut.collectAll[Call]
-  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget]             = cdgOut.collectAll[JumpTarget]
-  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier]             = cdgOut.collectAll[Identifier]
-  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown]                   = cdgOut.collectAll[Unknown]
-  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef]               = cdgOut.collectAll[MethodRef]
   def _fieldIdentifierViaCdgOut: overflowdb.traversal.Traversal[FieldIdentifier]   = cdgOut.collectAll[FieldIdentifier]
+  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier]             = cdgOut.collectAll[Identifier]
+  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget]             = cdgOut.collectAll[JumpTarget]
+  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal]                   = cdgOut.collectAll[Literal]
+  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef]               = cdgOut.collectAll[MethodRef]
   def _methodReturnViaCdgOut: overflowdb.traversal.Traversal[MethodReturn]         = cdgOut.collectAll[MethodReturn]
-  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef]                   = cdgOut.collectAll[TypeRef]
-  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block]                       = cdgOut.collectAll[Block]
   def _returnViaCdgOut: overflowdb.traversal.Traversal[Return]                     = cdgOut.collectAll[Return]
+  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef]                   = cdgOut.collectAll[TypeRef]
+  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown]                   = cdgOut.collectAll[Unknown]
 
-  def refOut: Iterator[Member]                                 = createAdjacentNodeScalaIteratorByOffSet[Member](9)
-  override def _refOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
-  def referencedMember: overflowdb.traversal.Traversal[Member] = refOut.collectAll[Member]
-
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](10)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](10)
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
-
-  def isCallForImportOut: Iterator[Import] = createAdjacentNodeScalaIteratorByOffSet[Import](11)
-  override def _isCallForImportOut         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](11)
-  def _importViaIsCallForImportOut: overflowdb.traversal.Traversal[Import] = isCallForImportOut.collectAll[Import]
-
-  def cfgOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](12)
-  override def _cfgOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](12)
+  def cfgOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
+  override def _cfgOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
   def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = cfgOut.collectAll[CfgNode]
 
-  def postDominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](13)
-  override def _postDominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](13)
+  def dominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](5)
+  override def _dominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block] = dominateOut.collectAll[Block]
+  def _callViaDominateOut: overflowdb.traversal.Traversal[Call]   = dominateOut.collectAll[Call]
+  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
+    dominateOut.collectAll[ControlStructure]
+  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
+    dominateOut.collectAll[FieldIdentifier]
+  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier]     = dominateOut.collectAll[Identifier]
+  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget]     = dominateOut.collectAll[JumpTarget]
+  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal]           = dominateOut.collectAll[Literal]
+  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef]       = dominateOut.collectAll[MethodRef]
+  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = dominateOut.collectAll[MethodReturn]
+  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return]             = dominateOut.collectAll[Return]
+  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef]           = dominateOut.collectAll[TypeRef]
+  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown]           = dominateOut.collectAll[Unknown]
+
+  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](6)
+  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
+
+  def isCallForImportOut: Iterator[Import] = createAdjacentNodeScalaIteratorByOffSet[Import](7)
+  override def _isCallForImportOut         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
+  def _importViaIsCallForImportOut: overflowdb.traversal.Traversal[Import] = isCallForImportOut.collectAll[Import]
+
+  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](8)
+  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
+
+  def postDominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](9)
+  override def _postDominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
+  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block] = postDominateOut.collectAll[Block]
+  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call]   = postDominateOut.collectAll[Call]
   def _controlStructureViaPostDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
     postDominateOut.collectAll[ControlStructure]
-  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return]         = postDominateOut.collectAll[Return]
-  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef]   = postDominateOut.collectAll[MethodRef]
-  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown]       = postDominateOut.collectAll[Unknown]
-  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = postDominateOut.collectAll[Identifier]
-  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal]       = postDominateOut.collectAll[Literal]
-  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call]             = postDominateOut.collectAll[Call]
-  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method]         = postDominateOut.collectAll[Method]
-  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block]           = postDominateOut.collectAll[Block]
-  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = postDominateOut.collectAll[JumpTarget]
   def _fieldIdentifierViaPostDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
     postDominateOut.collectAll[FieldIdentifier]
-  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef] = postDominateOut.collectAll[TypeRef]
+  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = postDominateOut.collectAll[Identifier]
+  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = postDominateOut.collectAll[JumpTarget]
+  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal]       = postDominateOut.collectAll[Literal]
+  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method]         = postDominateOut.collectAll[Method]
+  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef]   = postDominateOut.collectAll[MethodRef]
+  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return]         = postDominateOut.collectAll[Return]
+  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef]       = postDominateOut.collectAll[TypeRef]
+  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown]       = postDominateOut.collectAll[Unknown]
 
-  def dominateIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](14)
-  override def _dominateIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](14)
-  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef] = dominateIn.collectAll[MethodRef]
-  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    dominateIn.collectAll[FieldIdentifier]
-  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal] = dominateIn.collectAll[Literal]
-  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return]   = dominateIn.collectAll[Return]
-  def _callViaDominateIn: overflowdb.traversal.Traversal[Call]       = dominateIn.collectAll[Call]
-  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef] = dominateIn.collectAll[TypeRef]
-  def _controlStructureViaDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    dominateIn.collectAll[ControlStructure]
-  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = dominateIn.collectAll[JumpTarget]
-  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block]           = dominateIn.collectAll[Block]
-  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown]       = dominateIn.collectAll[Unknown]
-  def _identifierViaDominateIn: overflowdb.traversal.Traversal[Identifier] = dominateIn.collectAll[Identifier]
-  def _methodViaDominateIn: overflowdb.traversal.Traversal[Method]         = dominateIn.collectAll[Method]
+  def reachingDefOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](10)
+  override def _reachingDefOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](10)
+  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
+  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
+  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
+  def _methodParameterOutViaReachingDefOut: overflowdb.traversal.Traversal[MethodParameterOut] =
+    reachingDefOut.collectAll[MethodParameterOut]
+  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = reachingDefOut.collectAll[MethodRef]
+  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]       = reachingDefOut.collectAll[Return]
+  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]     = reachingDefOut.collectAll[TypeRef]
 
-  def receiverIn: Iterator[Call]       = createAdjacentNodeScalaIteratorByOffSet[Call](15)
-  override def _receiverIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](15)
-  def _callViaReceiverIn: Option[Call] = receiverIn.collectAll[Call].nextOption()
+  def receiverOut: Iterator[Expression]   = createAdjacentNodeScalaIteratorByOffSet[Expression](11)
+  override def _receiverOut               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](11)
+  def _blockViaReceiverOut: Option[Block] = receiverOut.collectAll[Block].nextOption()
+  def _callViaReceiverOut: Option[Call]   = receiverOut.collectAll[Call].nextOption()
+  def _controlStructureViaReceiverOut: overflowdb.traversal.Traversal[ControlStructure] =
+    receiverOut.collectAll[ControlStructure]
+  def _identifierViaReceiverOut: Option[Identifier]                   = receiverOut.collectAll[Identifier].nextOption()
+  def _literalViaReceiverOut: Option[Literal]                         = receiverOut.collectAll[Literal].nextOption()
+  def _methodRefViaReceiverOut: Option[MethodRef]                     = receiverOut.collectAll[MethodRef].nextOption()
+  def _typeRefViaReceiverOut: overflowdb.traversal.Traversal[TypeRef] = receiverOut.collectAll[TypeRef]
+  def _unknownViaReceiverOut: overflowdb.traversal.Traversal[Unknown] = receiverOut.collectAll[Unknown]
 
-  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](16)
-  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](16)
+  def refOut: Iterator[Member]                                 = createAdjacentNodeScalaIteratorByOffSet[Member](12)
+  override def _refOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](12)
+  def referencedMember: overflowdb.traversal.Traversal[Member] = refOut.collectAll[Member]
 
-  def astIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](17)
-  override def _astIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](17)
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
+  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](13)
+  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](13)
+  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
+
+  def argumentIn: Iterator[Expression]     = createAdjacentNodeScalaIteratorByOffSet[Expression](14)
+  override def _argumentIn                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](14)
+  def _callViaArgumentIn: Option[Call]     = argumentIn.collectAll[Call].nextOption()
+  def _returnViaArgumentIn: Option[Return] = argumentIn.collectAll[Return].nextOption()
+
+  def astIn: Iterator[Expression]                           = createAdjacentNodeScalaIteratorByOffSet[Expression](15)
+  override def _astIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](15)
+  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = astIn.collectAll[Block]
+  def _callViaAstIn: overflowdb.traversal.Traversal[Call]   = astIn.collectAll[Call]
   def _controlStructureViaAstIn: ControlStructure = try { astIn.collectAll[ControlStructure].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -1095,74 +1077,92 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
         e
       )
   }
-  def _callViaAstIn: overflowdb.traversal.Traversal[Call]     = astIn.collectAll[Call]
-  def _blockViaAstIn: overflowdb.traversal.Traversal[Block]   = astIn.collectAll[Block]
-  def _returnViaAstIn: overflowdb.traversal.Traversal[Return] = astIn.collectAll[Return]
+  def _returnViaAstIn: overflowdb.traversal.Traversal[Return]   = astIn.collectAll[Return]
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
-  def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](18)
-  override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](18)
-  def _methodParameterOutViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterOut] =
-    reachingDefIn.collectAll[MethodParameterOut]
-  def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = reachingDefIn.collectAll[MethodRef]
-  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    reachingDefIn.collectAll[MethodParameterIn]
-  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef]       = reachingDefIn.collectAll[TypeRef]
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block]           = reachingDefIn.collectAll[Block]
-  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = reachingDefIn.collectAll[Identifier]
-  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
-    reachingDefIn.collectAll[ControlStructure]
-  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = reachingDefIn.collectAll[Literal]
-  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown] = reachingDefIn.collectAll[Unknown]
-  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call]       = reachingDefIn.collectAll[Call]
-  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method]   = reachingDefIn.collectAll[Method]
-
-  def argumentIn: Iterator[Expression]     = createAdjacentNodeScalaIteratorByOffSet[Expression](19)
-  override def _argumentIn                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](19)
-  def _returnViaArgumentIn: Option[Return] = argumentIn.collectAll[Return].nextOption()
-  def _callViaArgumentIn: Option[Call]     = argumentIn.collectAll[Call].nextOption()
-
-  def cdgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](20)
-  override def _cdgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](20)
-  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal]                   = cdgIn.collectAll[Literal]
+  def cdgIn: Iterator[CfgNode]                              = createAdjacentNodeScalaIteratorByOffSet[CfgNode](16)
+  override def _cdgIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](16)
+  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block] = cdgIn.collectAll[Block]
+  def _callViaCdgIn: overflowdb.traversal.Traversal[Call]   = cdgIn.collectAll[Call]
   def _controlStructureViaCdgIn: overflowdb.traversal.Traversal[ControlStructure] = cdgIn.collectAll[ControlStructure]
-  def _callViaCdgIn: overflowdb.traversal.Traversal[Call]                         = cdgIn.collectAll[Call]
-  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget]             = cdgIn.collectAll[JumpTarget]
-  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier]             = cdgIn.collectAll[Identifier]
-  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown]                   = cdgIn.collectAll[Unknown]
-  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef]               = cdgIn.collectAll[MethodRef]
   def _fieldIdentifierViaCdgIn: overflowdb.traversal.Traversal[FieldIdentifier]   = cdgIn.collectAll[FieldIdentifier]
+  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier]             = cdgIn.collectAll[Identifier]
+  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget]             = cdgIn.collectAll[JumpTarget]
+  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal]                   = cdgIn.collectAll[Literal]
+  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef]               = cdgIn.collectAll[MethodRef]
   def _typeRefViaCdgIn: overflowdb.traversal.Traversal[TypeRef]                   = cdgIn.collectAll[TypeRef]
-  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block]                       = cdgIn.collectAll[Block]
+  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown]                   = cdgIn.collectAll[Unknown]
 
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](21)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](21)
+  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](17)
+  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](17)
+
+  def conditionIn: Iterator[ControlStructure] = createAdjacentNodeScalaIteratorByOffSet[ControlStructure](18)
+  override def _conditionIn                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](18)
+  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
+    conditionIn.collectAll[ControlStructure]
+
+  def containsIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](19)
+  override def _containsIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](19)
+  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = containsIn.collectAll[Method]
+
+  def dominateIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](20)
+  override def _dominateIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](20)
+  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block] = dominateIn.collectAll[Block]
+  def _callViaDominateIn: overflowdb.traversal.Traversal[Call]   = dominateIn.collectAll[Call]
+  def _controlStructureViaDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
+    dominateIn.collectAll[ControlStructure]
+  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+    dominateIn.collectAll[FieldIdentifier]
+  def _identifierViaDominateIn: overflowdb.traversal.Traversal[Identifier] = dominateIn.collectAll[Identifier]
+  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = dominateIn.collectAll[JumpTarget]
+  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal]       = dominateIn.collectAll[Literal]
+  def _methodViaDominateIn: overflowdb.traversal.Traversal[Method]         = dominateIn.collectAll[Method]
+  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef]   = dominateIn.collectAll[MethodRef]
+  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return]         = dominateIn.collectAll[Return]
+  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef]       = dominateIn.collectAll[TypeRef]
+  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown]       = dominateIn.collectAll[Unknown]
+
+  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](21)
+  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](21)
 
   def postDominateIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](22)
   override def _postDominateIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](22)
+  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block] = postDominateIn.collectAll[Block]
+  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call]   = postDominateIn.collectAll[Call]
   def _controlStructureViaPostDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
     postDominateIn.collectAll[ControlStructure]
-  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return] = postDominateIn.collectAll[Return]
-  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
-    postDominateIn.collectAll[MethodReturn]
-  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef]   = postDominateIn.collectAll[MethodRef]
-  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown]       = postDominateIn.collectAll[Unknown]
-  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = postDominateIn.collectAll[Identifier]
-  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal]       = postDominateIn.collectAll[Literal]
-  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call]             = postDominateIn.collectAll[Call]
-  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block]           = postDominateIn.collectAll[Block]
-  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = postDominateIn.collectAll[JumpTarget]
   def _fieldIdentifierViaPostDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
     postDominateIn.collectAll[FieldIdentifier]
+  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = postDominateIn.collectAll[Identifier]
+  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = postDominateIn.collectAll[JumpTarget]
+  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal]       = postDominateIn.collectAll[Literal]
+  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef]   = postDominateIn.collectAll[MethodRef]
+  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
+    postDominateIn.collectAll[MethodReturn]
+  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return]   = postDominateIn.collectAll[Return]
   def _typeRefViaPostDominateIn: overflowdb.traversal.Traversal[TypeRef] = postDominateIn.collectAll[TypeRef]
+  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = postDominateIn.collectAll[Unknown]
 
-  def containsIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](23)
-  override def _containsIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](23)
-  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = containsIn.collectAll[Method]
+  def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](23)
+  override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](23)
+  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = reachingDefIn.collectAll[Block]
+  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call]   = reachingDefIn.collectAll[Call]
+  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
+    reachingDefIn.collectAll[ControlStructure]
+  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = reachingDefIn.collectAll[Identifier]
+  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal]       = reachingDefIn.collectAll[Literal]
+  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method]         = reachingDefIn.collectAll[Method]
+  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    reachingDefIn.collectAll[MethodParameterIn]
+  def _methodParameterOutViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterOut] =
+    reachingDefIn.collectAll[MethodParameterOut]
+  def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = reachingDefIn.collectAll[MethodRef]
+  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef]     = reachingDefIn.collectAll[TypeRef]
+  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown]     = reachingDefIn.collectAll[Unknown]
 
-  def conditionIn: Iterator[ControlStructure] = createAdjacentNodeScalaIteratorByOffSet[ControlStructure](24)
-  override def _conditionIn                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](24)
-  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
-    conditionIn.collectAll[ControlStructure]
+  def receiverIn: Iterator[Call]       = createAdjacentNodeScalaIteratorByOffSet[Call](24)
+  override def _receiverIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](24)
+  def _callViaReceiverIn: Option[Call] = receiverIn.collectAll[Call].nextOption()
 
   override def label: String = {
     Call.Label

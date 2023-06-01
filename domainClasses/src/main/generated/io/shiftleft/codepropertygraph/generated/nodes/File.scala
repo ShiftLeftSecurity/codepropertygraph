@@ -39,9 +39,9 @@ object File {
     Label,
     PropertyNames.allAsJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
     ).asJava,
     List(io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation).asJava
   )
@@ -92,42 +92,42 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
+  def astOut: Iterator[AstNode] = get().astOut
+  override def _astOut          = get()._astOut
+
+  /** Traverse to COMMENT via AST OUT edge.
+    */
+  def comment: overflowdb.traversal.Traversal[Comment] = get().comment
+
+  /** Traverse to IMPORT via AST OUT edge.
+    */
+  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
+
+  /** Traverse to NAMESPACE_BLOCK via AST OUT edge.
+    */
+  def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = get()._namespaceBlockViaAstOut
+
+  def containsOut: Iterator[AstNode] = get().containsOut
+  override def _containsOut          = get()._containsOut
+
+  /** Traverse to METHOD via CONTAINS OUT edge.
+    */
+  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
+
+  /** Traverse to TEMPLATE_DOM via CONTAINS OUT edge.
+    */
+  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = get()._templateDomViaContainsOut
+
+  /** Traverse to TYPE_DECL via CONTAINS OUT edge.
+    */
+  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaContainsOut
+
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
-
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
-
-  /** Traverse to NAMESPACE_BLOCK via AST OUT edge.
-    */
-  def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = get()._namespaceBlockViaAstOut
-
-  /** Traverse to IMPORT via AST OUT edge.
-    */
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
-
-  /** Traverse to COMMENT via AST OUT edge.
-    */
-  def comment: overflowdb.traversal.Traversal[Comment] = get().comment
-
-  def containsOut: Iterator[AstNode] = get().containsOut
-  override def _containsOut          = get()._containsOut
-
-  /** Traverse to TYPE_DECL via CONTAINS OUT edge.
-    */
-  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaContainsOut
-
-  /** Traverse to TEMPLATE_DOM via CONTAINS OUT edge.
-    */
-  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = get()._templateDomViaContainsOut
-
-  /** Traverse to METHOD via CONTAINS OUT edge.
-    */
-  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
 
   def sourceFileIn: Iterator[AstNode] = get().sourceFileIn
   override def _sourceFileIn          = get()._sourceFileIn
@@ -136,13 +136,13 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def method: overflowdb.traversal.Traversal[Method] = get().method
 
-  /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
-    */
-  def typeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().typeDecl
-
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
   def namespaceBlock: overflowdb.traversal.Traversal[NamespaceBlock] = get().namespaceBlock
+
+  /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
+    */
+  def typeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().typeDecl
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -230,27 +230,27 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
   }
 
   import overflowdb.traversal._
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](0)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def astOut: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _astOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def comment: overflowdb.traversal.Traversal[Comment]         = astOut.collectAll[Comment]
+  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = astOut.collectAll[Import]
+  def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = astOut.collectAll[NamespaceBlock]
+
+  def containsOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
+  override def _containsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method]           = containsOut.collectAll[Method]
+  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = containsOut.collectAll[TemplateDom]
+  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl]       = containsOut.collectAll[TypeDecl]
+
+  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
+  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = astOut.collectAll[NamespaceBlock]
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import]                 = astOut.collectAll[Import]
-  def comment: overflowdb.traversal.Traversal[Comment]                         = astOut.collectAll[Comment]
-
-  def containsOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
-  override def _containsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl]       = containsOut.collectAll[TypeDecl]
-  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = containsOut.collectAll[TemplateDom]
-  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method]           = containsOut.collectAll[Method]
-
-  def sourceFileIn: Iterator[AstNode]                    = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
-  override def _sourceFileIn                             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def method: overflowdb.traversal.Traversal[Method]     = sourceFileIn.collectAll[Method]
-  def typeDecl: overflowdb.traversal.Traversal[TypeDecl] = sourceFileIn.collectAll[TypeDecl]
+  def sourceFileIn: Iterator[AstNode]                = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
+  override def _sourceFileIn                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def method: overflowdb.traversal.Traversal[Method] = sourceFileIn.collectAll[Method]
   def namespaceBlock: overflowdb.traversal.Traversal[NamespaceBlock] = sourceFileIn.collectAll[NamespaceBlock]
+  def typeDecl: overflowdb.traversal.Traversal[TypeDecl]             = sourceFileIn.collectAll[TypeDecl]
 
   override def label: String = {
     File.Label

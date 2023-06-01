@@ -46,8 +46,8 @@ object Import {
     PropertyNames.allAsJava,
     List(io.shiftleft.codepropertygraph.generated.edges.Imports.layoutInformation).asJava,
     List(
-      io.shiftleft.codepropertygraph.generated.edges.IsCallForImport.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.IsCallForImport.layoutInformation
     ).asJava
   )
 
@@ -109,19 +109,8 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = get()._dependencyViaImportsOut
 
-  def isCallForImportIn: Iterator[Call] = get().isCallForImportIn
-  override def _isCallForImportIn       = get()._isCallForImportIn
-
-  /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
-    */
-  def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = get()._callViaIsCallForImportIn
-
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
-
-  /** Traverse to TYPE_DECL via AST IN edge.
-    */
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
   /** Traverse to BLOCK via AST IN edge.
     */
@@ -130,6 +119,17 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   /** Traverse to FILE via AST IN edge.
     */
   def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
+
+  /** Traverse to TYPE_DECL via AST IN edge.
+    */
+  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
+
+  def isCallForImportIn: Iterator[Call] = get().isCallForImportIn
+  override def _isCallForImportIn       = get()._isCallForImportIn
+
+  /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
+    */
+  def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = get()._callViaIsCallForImportIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -239,15 +239,15 @@ class ImportDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   override def _importsOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = importsOut.collectAll[Dependency]
 
-  def isCallForImportIn: Iterator[Call] = createAdjacentNodeScalaIteratorByOffSet[Call](1)
-  override def _isCallForImportIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = isCallForImportIn.collectAll[Call]
-
-  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
-  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def astIn: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
+  override def _astIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = astIn.collectAll[Block]
+  def _fileViaAstIn: overflowdb.traversal.Traversal[File]   = astIn.collectAll[File]
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
-  def _blockViaAstIn: overflowdb.traversal.Traversal[Block]       = astIn.collectAll[Block]
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File]         = astIn.collectAll[File]
+
+  def isCallForImportIn: Iterator[Call] = createAdjacentNodeScalaIteratorByOffSet[Call](2)
+  override def _isCallForImportIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = isCallForImportIn.collectAll[Call]
 
   override def label: String = {
     Import.Label
