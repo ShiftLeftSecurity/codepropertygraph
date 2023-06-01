@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Method */
-class MethodTraversalExtGen[NodeType <: Method](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class MethodTraversalExtGen[NodeType <: Method](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Root of the abstract syntax tree Traverse to BLOCK via AST OUT edge.
     */

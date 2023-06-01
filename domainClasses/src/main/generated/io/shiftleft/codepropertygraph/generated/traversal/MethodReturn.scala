@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for MethodReturn */
-class MethodReturnTraversalExtGen[NodeType <: MethodReturn](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class MethodReturnTraversalExtGen[NodeType <: MethodReturn](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to RETURN via CFG IN edge.
     */

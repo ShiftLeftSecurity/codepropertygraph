@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Location */
-class LocationTraversalExtGen[NodeType <: Location](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class LocationTraversalExtGen[NodeType <: Location](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to className property */
   def className: Iterator[String] =

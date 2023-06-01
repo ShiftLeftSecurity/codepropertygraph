@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for TemplateDom */
-class TemplateDomTraversalExtGen[NodeType <: TemplateDom](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class TemplateDomTraversalExtGen[NodeType <: TemplateDom](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to argumentIndex property */
   def argumentIndex: Iterator[scala.Int] =

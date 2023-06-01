@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Member */
-class MemberTraversalExtGen[NodeType <: Member](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class MemberTraversalExtGen[NodeType <: Member](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */

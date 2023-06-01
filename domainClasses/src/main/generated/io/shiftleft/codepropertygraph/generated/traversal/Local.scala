@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Local */
-class LocalTraversalExtGen[NodeType <: Local](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class LocalTraversalExtGen[NodeType <: Local](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */

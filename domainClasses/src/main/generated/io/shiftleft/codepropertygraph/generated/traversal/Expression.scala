@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Expression */
-class ExpressionTraversalExtGen[NodeType <: Expression](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class ExpressionTraversalExtGen[NodeType <: Expression](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to argumentIndex property */
   def argumentIndex: Iterator[scala.Int] =

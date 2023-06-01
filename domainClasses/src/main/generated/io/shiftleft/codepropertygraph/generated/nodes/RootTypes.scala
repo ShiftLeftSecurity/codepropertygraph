@@ -20,8 +20,10 @@ object Misc {
   def isRegex(pattern: String): Boolean = pattern.exists(reChars.contains(_))
 }
 
+trait StaticType[+T]
+
 /** Abstract supertype for overflowdb.Node and NewNode */
-trait AbstractNode extends overflowdb.NodeOrDetachedNode {
+trait AbstractNode extends overflowdb.NodeOrDetachedNode with StaticType[AnyRef] {
   def label: String
 }
 

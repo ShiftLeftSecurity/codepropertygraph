@@ -4,8 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for ControlStructure */
-class ControlStructureTraversalExtGen[NodeType <: ControlStructure](val traversal: IterableOnce[NodeType])
-    extends AnyVal {
+class ControlStructureTraversalExtGen[NodeType <: ControlStructure](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to argumentIndex property */
   def argumentIndex: Iterator[scala.Int] =

@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for AstNode */
-class AstNodeTraversalExtGen[NodeType <: AstNode](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class AstNodeTraversalExtGen[NodeType <: AstNode](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to code property */
   def code: Iterator[String] =

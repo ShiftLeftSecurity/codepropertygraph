@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for MethodParameterOut */
-class MethodParameterOutTraversalExtGen[NodeType <: MethodParameterOut](val traversal: IterableOnce[NodeType])
+class MethodParameterOutTraversalExtGen[NodeType <: MethodParameterOut](val traversal: Iterator[NodeType])
     extends AnyVal {
 
   /** Traverse to METHOD_PARAMETER_IN via PARAMETER_LINK IN edge.

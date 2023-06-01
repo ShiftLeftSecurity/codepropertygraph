@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Type */
-class TypeTraversalExtGen[NodeType <: Type](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class TypeTraversalExtGen[NodeType <: Type](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Direct alias type declarations. Traverse to TYPE_DECL via ALIAS_OF IN edge.
     */

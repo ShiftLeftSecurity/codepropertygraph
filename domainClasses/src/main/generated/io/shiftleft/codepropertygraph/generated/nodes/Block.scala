@@ -179,15 +179,15 @@ class Block(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
     */
   def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
 
+  /** Traverse to LOCAL via AST OUT edge.
+    */
+  def _localViaAstOut: overflowdb.traversal.Traversal[Local] = get()._localViaAstOut
+
   /** Traverse to locals of this block. Traverse to LOCAL via AST OUT edge.
     */
   /** Traverse to locals of this block. */
   @overflowdb.traversal.help.Doc(info = """Traverse to locals of this block.""")
   def local: overflowdb.traversal.Traversal[Local] = get().local
-
-  /** Traverse to LOCAL via AST OUT edge.
-    */
-  def _localViaAstOut: overflowdb.traversal.Traversal[Local] = get()._localViaAstOut
 
   /** Traverse to METHOD_REF via AST OUT edge.
     */
@@ -759,8 +759,8 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
   def _importViaAstOut: overflowdb.traversal.Traversal[Import]                     = astOut.collectAll[Import]
   def _jumpTargetViaAstOut: overflowdb.traversal.Traversal[JumpTarget]             = astOut.collectAll[JumpTarget]
   def _literalViaAstOut: overflowdb.traversal.Traversal[Literal]                   = astOut.collectAll[Literal]
-  def local: overflowdb.traversal.Traversal[Local]                                 = astOut.collectAll[Local]
   def _localViaAstOut: overflowdb.traversal.Traversal[Local]                       = astOut.collectAll[Local]
+  def local: overflowdb.traversal.Traversal[Local]                                 = astOut.collectAll[Local]
   def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef]               = astOut.collectAll[MethodRef]
   def _returnViaAstOut: overflowdb.traversal.Traversal[Return]                     = astOut.collectAll[Return]
   def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef]                   = astOut.collectAll[TypeRef]
