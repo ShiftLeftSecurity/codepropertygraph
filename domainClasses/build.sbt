@@ -13,4 +13,7 @@ Compile/compile := (Compile/compile).dependsOn(Projects.schema/Compile/generateD
  */
 Compile / scalacOptions --= Seq("-Wconf:cat=deprecation:w,any:e", "-Wunused", "-Ywarn-unused")
 
-cleanFiles += baseDirectory.value / "src/main/generated"
+// TODO uncomment, or rather find a better way to delete the generated files on `sbt clean`...
+// this is just a temporarily commented out to fix the release build...
+// minified command that fails if the below line isn't commented: `sbt clean doc`
+// cleanFiles += baseDirectory.value / "src/main/generated"
