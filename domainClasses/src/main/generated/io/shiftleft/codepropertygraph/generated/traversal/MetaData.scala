@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for MetaData */
-class MetaDataTraversalExtGen[NodeType <: MetaData](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class MetaDataTraversalExtGen[NodeType <: MetaData](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to hash property */
   def hash: Iterator[String] =

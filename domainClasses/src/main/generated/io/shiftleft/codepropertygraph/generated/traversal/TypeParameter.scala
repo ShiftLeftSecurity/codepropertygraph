@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for TypeParameter */
-class TypeParameterTraversalExtGen[NodeType <: TypeParameter](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class TypeParameterTraversalExtGen[NodeType <: TypeParameter](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to code property */
   def code: Iterator[String] =

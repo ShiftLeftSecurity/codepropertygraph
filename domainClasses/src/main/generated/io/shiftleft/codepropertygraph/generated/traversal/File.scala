@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for File */
-class FileTraversalExtGen[NodeType <: File](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class FileTraversalExtGen[NodeType <: File](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to METHOD via SOURCE_FILE IN edge.
     */

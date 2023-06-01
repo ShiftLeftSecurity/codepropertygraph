@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for ConfigFile */
-class ConfigFileTraversalExtGen[NodeType <: ConfigFile](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class ConfigFileTraversalExtGen[NodeType <: ConfigFile](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to content property */
   def content: Iterator[String] =

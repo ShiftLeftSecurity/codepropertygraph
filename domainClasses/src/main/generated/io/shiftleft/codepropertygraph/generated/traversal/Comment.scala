@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Comment */
-class CommentTraversalExtGen[NodeType <: Comment](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class CommentTraversalExtGen[NodeType <: Comment](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */

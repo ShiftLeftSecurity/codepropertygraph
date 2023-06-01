@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for MethodRef */
-class MethodRefTraversalExtGen[NodeType <: MethodRef](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class MethodRefTraversalExtGen[NodeType <: MethodRef](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to referenced method. Traverse to METHOD via REF OUT edge.
     */

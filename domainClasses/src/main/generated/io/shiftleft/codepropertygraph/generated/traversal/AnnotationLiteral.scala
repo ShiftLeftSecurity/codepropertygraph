@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for AnnotationLiteral */
-class AnnotationLiteralTraversalExtGen[NodeType <: AnnotationLiteral](val traversal: IterableOnce[NodeType])
+class AnnotationLiteralTraversalExtGen[NodeType <: AnnotationLiteral](val traversal: Iterator[NodeType])
     extends AnyVal {
 
   /** Traverse to argumentIndex property */

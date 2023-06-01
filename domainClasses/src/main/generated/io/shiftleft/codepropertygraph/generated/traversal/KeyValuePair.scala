@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for KeyValuePair */
-class KeyValuePairTraversalExtGen[NodeType <: KeyValuePair](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class KeyValuePairTraversalExtGen[NodeType <: KeyValuePair](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to key property */
   def key: Iterator[String] =

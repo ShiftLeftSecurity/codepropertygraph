@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Dependency */
-class DependencyTraversalExtGen[NodeType <: Dependency](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class DependencyTraversalExtGen[NodeType <: Dependency](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to dependencyGroupId property */
   def dependencyGroupId: Iterator[String] =

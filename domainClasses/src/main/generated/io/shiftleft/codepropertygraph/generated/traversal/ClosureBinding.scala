@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for ClosureBinding */
-class ClosureBindingTraversalExtGen[NodeType <: ClosureBinding](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class ClosureBindingTraversalExtGen[NodeType <: ClosureBinding](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to closureBindingId property */
   def closureBindingId: Iterator[String] =

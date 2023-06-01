@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for Binding */
-class BindingTraversalExtGen[NodeType <: Binding](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class BindingTraversalExtGen[NodeType <: Binding](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */

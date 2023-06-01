@@ -185,6 +185,7 @@ object Hidden extends SchemaBase {
             |""".stripMargin
       )
       .extendz(astNode)
+      .starterName("imports")
 
     val importedEntity = builder
       .addProperty(

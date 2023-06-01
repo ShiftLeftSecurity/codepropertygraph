@@ -4,7 +4,7 @@ import overflowdb.traversal._
 import io.shiftleft.codepropertygraph.generated.nodes._
 
 /** Traversal steps for TypeDecl */
-class TypeDeclTraversalExtGen[NodeType <: TypeDecl](val traversal: IterableOnce[NodeType]) extends AnyVal {
+class TypeDeclTraversalExtGen[NodeType <: TypeDecl](val traversal: Iterator[NodeType]) extends AnyVal {
 
   /** Traverse to NAMESPACE_BLOCK via AST IN edge.
     */
