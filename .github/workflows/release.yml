@@ -3,10 +3,11 @@ name: master & release build
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:    # allow to manually trigger this workflow
 
 jobs:
   test-codepropertygraph:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
       with:
@@ -31,7 +32,7 @@ jobs:
   release:
     concurrency: release
     needs: [test-codepropertygraph]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
