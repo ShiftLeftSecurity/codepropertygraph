@@ -6,7 +6,7 @@ enablePlugins(ProtobufPlugin)
 val protocLocalDir   = "protoc"
 val protocBinaryPath = s"$protocLocalDir/bin/protoc"
 ProtobufConfig / protobufProtoc := protocBinaryPath
-ProtobufConfig / version        := "3.10.0"
+ProtobufConfig / version        := "3.18.0"
 ProtobufConfig / sourceDirectories += (ProtobufConfig / protobufExternalIncludePath).value
 ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate)
   .dependsOn(copyLatestCpgProto)
