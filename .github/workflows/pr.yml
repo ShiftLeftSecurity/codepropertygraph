@@ -24,6 +24,6 @@ jobs:
     - name: Compile and run tests
       run: sbt +test
     - name: Check formatting
-      run: sbt scalafmtCheck Test/scalafmtCheck
+      run: sbt ++2.13.8 scalafmtCheck Test/scalafmtCheck
     - run: echo "Previous step failed because code is not formatted. Run 'sbt scalafmt'"
       if: ${{ failure() }}
