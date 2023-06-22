@@ -260,21 +260,12 @@ object Hidden extends SchemaBase {
       .protoId(23664)
 
     importNode.addOutEdge(edge = imports, inNode = dependency)
+    importNode.addOutEdge(edge = taggedBy, inNode = tag)
     callNode.addOutEdge(edge = isCallForImport, inNode = importNode)
 
     block.addOutEdge(edge = ast, inNode = importNode)
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
-
-    val pointsTo = builder
-      .addEdgeType(
-        name = "POINTS_TO",
-        comment = """Used for calculating points-to sets for resolving object aliasing.
-                    |""".stripMargin
-      )
-      .protoId(12345)
-
-    cfgSchema.cfgNode.addOutEdge(edge = pointsTo, inNode = cfgSchema.cfgNode)
   }
 
 }
