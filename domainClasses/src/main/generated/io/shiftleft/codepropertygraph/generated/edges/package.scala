@@ -35,7 +35,6 @@ object Factories {
     InheritsFrom.factory,
     IsCallForImport.factory,
     ParameterLink.factory,
-    PointsTo.factory,
     PostDominate.factory,
     ReachingDef.factory,
     Receiver.factory,
