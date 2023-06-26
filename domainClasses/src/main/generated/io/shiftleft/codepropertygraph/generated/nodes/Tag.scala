@@ -98,6 +98,10 @@ class Tag(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/iss
     */
   def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaTaggedByIn
 
+  /** Traverse to IMPORT via TAGGED_BY IN edge.
+    */
+  def _importViaTaggedByIn: overflowdb.traversal.Traversal[Import] = get()._importViaTaggedByIn
+
   /** Traverse to JUMP_TARGET via TAGGED_BY IN edge.
     */
   def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaTaggedByIn
@@ -224,6 +228,7 @@ class TagDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with TagBa
     taggedByIn.collectAll[FieldIdentifier]
   def _fileViaTaggedByIn: overflowdb.traversal.Traversal[File]             = taggedByIn.collectAll[File]
   def _identifierViaTaggedByIn: overflowdb.traversal.Traversal[Identifier] = taggedByIn.collectAll[Identifier]
+  def _importViaTaggedByIn: overflowdb.traversal.Traversal[Import]         = taggedByIn.collectAll[Import]
   def _jumpTargetViaTaggedByIn: overflowdb.traversal.Traversal[JumpTarget] = taggedByIn.collectAll[JumpTarget]
   def _literalViaTaggedByIn: overflowdb.traversal.Traversal[Literal]       = taggedByIn.collectAll[Literal]
   def _localViaTaggedByIn: overflowdb.traversal.Traversal[Local]           = taggedByIn.collectAll[Local]

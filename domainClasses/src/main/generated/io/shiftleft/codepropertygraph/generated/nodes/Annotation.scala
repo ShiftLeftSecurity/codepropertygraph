@@ -46,20 +46,18 @@ object Annotation {
     PropertyNames.allAsJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation
+      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation
     ).asJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation
     ).asJava
   )
 
   object Edges {
-    val Out: Array[String] = Array("ARGUMENT", "AST", "POINTS_TO")
-    val In: Array[String]  = Array("AST", "CFG", "POINTS_TO", "REACHING_DEF")
+    val Out: Array[String] = Array("ARGUMENT", "AST")
+    val In: Array[String]  = Array("AST", "CFG", "REACHING_DEF")
   }
 
   val factory = new NodeFactory[AnnotationDb] {
@@ -120,9 +118,6 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     get()._annotationParameterAssignViaAstOut
 
-  def pointsToOut: Iterator[CfgNode] = get().pointsToOut
-  override def _pointsToOut          = get()._pointsToOut
-
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
 
@@ -149,9 +144,6 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
-
-  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
-  override def _pointsToIn          = get()._pointsToIn
 
   def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
   override def _reachingDefIn              = get()._reachingDefIn
@@ -263,11 +255,8 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astOut.collectAll[AnnotationParameterAssign]
 
-  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](2)
-  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-
-  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
-  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
+  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
   def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
@@ -276,14 +265,11 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     astIn.collectAll[MethodParameterIn]
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
 
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
+  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
 
-  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](5)
-  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-
-  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](6)
-  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](4)
+  override def _reachingDefIn              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
 
   override def label: String = {
     Annotation.Label

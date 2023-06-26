@@ -62,7 +62,6 @@ trait StoredNode extends Node with AbstractNode with Product {
   def _inheritsFromIn: Iterator[StoredNode]     = Iterator.empty
   def _isCallForImportIn: Iterator[StoredNode]  = Iterator.empty
   def _parameterLinkIn: Iterator[StoredNode]    = Iterator.empty
-  def _pointsToIn: Iterator[StoredNode]         = Iterator.empty
   def _postDominateIn: Iterator[StoredNode]     = Iterator.empty
   def _reachingDefIn: Iterator[StoredNode]      = Iterator.empty
   def _receiverIn: Iterator[StoredNode]         = Iterator.empty
@@ -87,7 +86,6 @@ trait StoredNode extends Node with AbstractNode with Product {
   def _inheritsFromOut: Iterator[StoredNode]    = Iterator.empty
   def _isCallForImportOut: Iterator[StoredNode] = Iterator.empty
   def _parameterLinkOut: Iterator[StoredNode]   = Iterator.empty
-  def _pointsToOut: Iterator[StoredNode]        = Iterator.empty
   def _postDominateOut: Iterator[StoredNode]    = Iterator.empty
   def _reachingDefOut: Iterator[StoredNode]     = Iterator.empty
   def _receiverOut: Iterator[StoredNode]        = Iterator.empty
