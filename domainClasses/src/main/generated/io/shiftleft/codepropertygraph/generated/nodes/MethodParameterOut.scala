@@ -51,7 +51,6 @@ object MethodParameterOut {
     PropertyNames.allAsJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
     ).asJava,
@@ -59,14 +58,13 @@ object MethodParameterOut {
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ParameterLink.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PointsTo.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation
     ).asJava
   )
 
   object Edges {
-    val Out: Array[String] = Array("EVAL_TYPE", "POINTS_TO", "REACHING_DEF", "TAGGED_BY")
-    val In: Array[String]  = Array("AST", "CFG", "PARAMETER_LINK", "POINTS_TO", "REACHING_DEF")
+    val Out: Array[String] = Array("EVAL_TYPE", "REACHING_DEF", "TAGGED_BY")
+    val In: Array[String]  = Array("AST", "CFG", "PARAMETER_LINK", "REACHING_DEF")
   }
 
   val factory = new NodeFactory[MethodParameterOutDb] {
@@ -131,9 +129,6 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
   @overflowdb.traversal.help.Doc(info = """Traverse to parameter type""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
-  def pointsToOut: Iterator[CfgNode] = get().pointsToOut
-  override def _pointsToOut          = get()._pointsToOut
-
   def reachingDefOut: Iterator[Expression] = get().reachingDefOut
   override def _reachingDefOut             = get()._reachingDefOut
 
@@ -184,9 +179,6 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
   /** Traverse to METHOD_PARAMETER_IN via PARAMETER_LINK IN edge.
     */
   def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = get().asInput
-
-  def pointsToIn: Iterator[CfgNode] = get().pointsToIn
-  override def _pointsToIn          = get()._pointsToIn
 
   def reachingDefIn: Iterator[CfgNode] = get().reachingDefIn
   override def _reachingDefIn          = get()._reachingDefIn
@@ -351,11 +343,8 @@ class MethodParameterOutDb(ref: NodeRef[NodeDb])
   override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
   def typ: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
-  def pointsToOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](1)
-  override def _pointsToOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-
-  def reachingDefOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](2)
-  override def _reachingDefOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def reachingDefOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
+  override def _reachingDefOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
   def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
   def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
   def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
@@ -363,12 +352,12 @@ class MethodParameterOutDb(ref: NodeRef[NodeDb])
   def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]         = reachingDefOut.collectAll[Return]
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]       = reachingDefOut.collectAll[TypeRef]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](3)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
+  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](4)
-  override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](3)
+  override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
   def method: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -378,18 +367,15 @@ class MethodParameterOutDb(ref: NodeRef[NodeDb])
       )
   }
 
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](5)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
+  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
 
-  def parameterLinkIn: Iterator[MethodParameterIn] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterIn](6)
-  override def _parameterLinkIn                    = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def parameterLinkIn: Iterator[MethodParameterIn] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterIn](5)
+  override def _parameterLinkIn                    = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
   def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = parameterLinkIn.collectAll[MethodParameterIn]
 
-  def pointsToIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](7)
-  override def _pointsToIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
-
-  def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](8)
-  override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
+  def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
+  override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
   def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = reachingDefIn.collectAll[Block]
   def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call]   = reachingDefIn.collectAll[Call]
   def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =

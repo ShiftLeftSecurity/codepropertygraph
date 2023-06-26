@@ -80,9 +80,6 @@ public static final String IS_CALL_FOR_IMPORT = "IS_CALL_FOR_IMPORT";
 method output parameter. */
 public static final String PARAMETER_LINK = "PARAMETER_LINK";
 
-/** Used for calculating points-to sets for resolving object aliasing. */
-public static final String POINTS_TO = "POINTS_TO";
-
 /** This edge indicates that the source node immediately post dominates the destination node. */
 public static final String POST_DOMINATE = "POST_DOMINATE";
 
@@ -130,7 +127,6 @@ add(IMPORTS);
 add(INHERITS_FROM);
 add(IS_CALL_FOR_IMPORT);
 add(PARAMETER_LINK);
-add(POINTS_TO);
 add(POST_DOMINATE);
 add(REACHING_DEF);
 add(RECEIVER);

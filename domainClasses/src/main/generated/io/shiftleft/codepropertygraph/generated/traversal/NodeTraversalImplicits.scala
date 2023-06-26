@@ -191,8 +191,6 @@ class StoredNodeTraversalExtGen[NodeType <: StoredNode](val traversal: Iterator[
   def _isCallForImportIn: Iterator[StoredNode]  = traversal.flatMap { _._isCallForImportIn }
   def _parameterLinkOut: Iterator[StoredNode]   = traversal.flatMap { _._parameterLinkOut }
   def _parameterLinkIn: Iterator[StoredNode]    = traversal.flatMap { _._parameterLinkIn }
-  def _pointsToOut: Iterator[StoredNode]        = traversal.flatMap { _._pointsToOut }
-  def _pointsToIn: Iterator[StoredNode]         = traversal.flatMap { _._pointsToIn }
   def _postDominateOut: Iterator[StoredNode]    = traversal.flatMap { _._postDominateOut }
   def _postDominateIn: Iterator[StoredNode]     = traversal.flatMap { _._postDominateIn }
   def _reachingDefOut: Iterator[StoredNode]     = traversal.flatMap { _._reachingDefOut }
