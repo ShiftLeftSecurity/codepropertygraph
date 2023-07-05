@@ -7,8 +7,7 @@ val overflowdbCodegenVersion = "2.97"
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "2.13.8",
-    crossScalaVersions := Seq("2.13.8", "3.3.0"),
+    scalaVersion       := "3.3.0",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
@@ -63,16 +62,6 @@ ThisBuild / scalacOptions ++= Seq(
   // "-Xfatal-warnings",
   "-Wconf:cat=deprecation:w,any:e",
   "-language:implicitConversions"
-) ++ (
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((3, _)) => Seq()
-    case _ =>
-      Seq(
-        "-Ycache-macro-class-loader:last-modified",
-        "-Ybackend-parallelism",
-        "4"
-      )
-  }
 )
 
 ThisBuild / javacOptions ++= Seq(
