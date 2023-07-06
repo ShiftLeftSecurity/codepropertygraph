@@ -31,9 +31,23 @@ object Type extends SchemaBase {
         name = "TYPE_FULL_NAME",
         valueType = ValueType.String,
         comment = """This field contains the fully-qualified static type name of the program
-                    |construct represented by a node. It is the name of an instantiated type, e.g.,
-                    |`java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-                    |cannot be determined, this field should be set to the empty string.
+                    |construct represented by a node. For static languages like Java and CSharp
+                    |this property is supposed to be filled with type names guaranteed to be
+                    |correct. E.g. type names coming from a compiler library or byte code.
+                    |Dynamic languages have no static type information and are supposed
+                    |to fill this property with always the same type name which indicates "any".
+                    |This is why for example for Javascript the type name "ANY" is used.
+                    |Type full names for higher kinded types like `java.util.List<T>` can
+                    |appear with or without a concrete types for `T`. Two examples for Java
+                    |illustrate this:
+                    |  1. `List<Integer> l = null`
+                    |     Here the IDENTIFIER and LOCAL nodes for `l` have `java.lang.List<T>`
+                    |     as type full name.
+                    |  2. `class SomeGenericClass<A> { void doStuff(List<A> par1) { ... } }`
+                    |     Here the METHOD_PARAMETER_IN node for `par` has `java.lang.List<A>`
+                    |     as type full name.
+                    |If the type cannot be determined, use some indicative name reflecting this
+                    |fact like "<unresolved>".
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
