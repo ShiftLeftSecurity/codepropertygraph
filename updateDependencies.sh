@@ -20,7 +20,7 @@ else
 fi
 
 declare -A repos=(
-  [overflowdb]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-core
+  [overflowdb]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-core_3
   [overflowdbCodegen]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-codegen_2.12
 )
 
