@@ -55,8 +55,18 @@ object CallGraph extends SchemaBase {
       .addProperty(
         name = "METHOD_FULL_NAME",
         valueType = ValueType.String,
-        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
-                    |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
+        comment = """The FULL_NAME of a method. Used to link CALL and METHOD nodes.
+                    |For METHOD nodes this property must be a unique fully-qualified name.
+                    |For CALL nodes this property has different semantics depending on the
+                    |CALL nodes DISPATCH_TYPE property.
+                    |For DISPATCH_TYPE STATIC_DISPATCH this property contains the
+                    |fully-qualified name of the called method.
+                    |For DISPATCH_TYPE DYNAMIC_DISPATCH this property contains the
+                    |fully-qualified name of the assured interface method which is
+                    |straight forward for statically typed languages like Java and CSharp.
+                    |For dynamically typed languages no interface assurance exists so
+                    |frontends should indicate by some name like "<unknown>".
+                    |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
       .protoId(54)

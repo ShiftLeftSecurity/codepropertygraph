@@ -155,7 +155,14 @@ object Hidden extends SchemaBase {
       .addProperty(
         name = "DYNAMIC_TYPE_HINT_FULL_NAME",
         valueType = ValueType.String,
-        comment = "Type hint for the dynamic type"
+        comment = """This is a multi valued property which gives information about all observable
+            |runtime types for the node carrying this property. This means if e.g. an
+            |expression has the static TYPE_FULL_NAME `SomeInterface` which is implemented
+            |by `ImplA`, `ImplB` and `ImplC` and DYNAMIC_TYPE_HINT_FULL_NAME is given as
+            |`List(ImplA, ImplB)`, that only `ImplA` and `ImplB` can ever be observed
+            |as runtime times and never `ImplC`. This property is used to enable shortcuts
+            |in data flow tracker implementations.
+            |""".stripMargin
       )
       .asList()
       .protoId(1591)
