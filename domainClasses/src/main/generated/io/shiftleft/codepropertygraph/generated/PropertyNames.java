@@ -89,7 +89,7 @@ runtime as it may depend on the type of an object (as is the case for virtual me
 calls) or calculation of an offset. */
 public static final String DISPATCH_TYPE = "DISPATCH_TYPE";
 
-/** Type hint for the dynamic type */
+/** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
 public static final String DYNAMIC_TYPE_HINT_FULL_NAME = "DYNAMIC_TYPE_HINT_FULL_NAME";
 
 /** For formal method input parameters, output parameters, and return parameters,
@@ -219,6 +219,9 @@ public static final String PACKAGE_NAME = "PACKAGE_NAME";
 /** AST node type name emitted by parser. */
 public static final String PARSER_TYPE_NAME = "PARSER_TYPE_NAME";
 
+/** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are correct. This property is used to capture observations between node interactions during a 'may-analysis'. */
+public static final String POSSIBLE_TYPES = "POSSIBLE_TYPES";
+
 /** The path to the root directory of the source/binary this CPG is generated from. */
 public static final String ROOT = "ROOT";
 
@@ -301,6 +304,7 @@ add(ORDER);
 add(OVERLAYS);
 add(PACKAGE_NAME);
 add(PARSER_TYPE_NAME);
+add(POSSIBLE_TYPES);
 add(ROOT);
 add(SIGNATURE);
 add(SYMBOL);

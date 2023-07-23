@@ -16,9 +16,19 @@ object Block {
     val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
     val LineNumber              = "LINE_NUMBER"
     val Order                   = "ORDER"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
-    val all: Set[String] =
-      Set(ArgumentIndex, ArgumentName, Code, ColumnNumber, DynamicTypeHintFullName, LineNumber, Order, TypeFullName)
+    val all: Set[String] = Set(
+      ArgumentIndex,
+      ArgumentName,
+      Code,
+      ColumnNumber,
+      DynamicTypeHintFullName,
+      LineNumber,
+      Order,
+      PossibleTypes,
+      TypeFullName
+    )
     val allAsJava: java.util.Set[String] = all.asJava
   }
 
@@ -30,6 +40,7 @@ object Block {
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
     val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
   }
@@ -106,6 +117,7 @@ trait BlockBase extends AbstractNode with ExpressionBase {
   def dynamicTypeHintFullName: IndexedSeq[String]
   def lineNumber: Option[Integer]
   def order: scala.Int
+  def possibleTypes: IndexedSeq[String]
   def typeFullName: String
 
 }
@@ -122,6 +134,7 @@ class Block(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
   override def lineNumber: Option[Integer]                 = get().lineNumber
   override def order: scala.Int                            = get().order
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
@@ -652,7 +665,8 @@ class Block(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
       case 5 => "dynamicTypeHintFullName"
       case 6 => "lineNumber"
       case 7 => "order"
-      case 8 => "typeFullName"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -665,11 +679,12 @@ class Block(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
       case 5 => dynamicTypeHintFullName
       case 6 => lineNumber
       case 7 => order
-      case 8 => typeFullName
+      case 8 => possibleTypes
+      case 9 => typeFullName
     }
 
   override def productPrefix = "Block"
-  override def productArity  = 9
+  override def productArity  = 10
 }
 
 class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Expression with BlockBase {
@@ -690,6 +705,8 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
   def lineNumber: Option[Integer]                          = Option(_lineNumber)
   private var _order: scala.Int                            = Block.PropertyDefaults.Order
   def order: scala.Int                                     = _order
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _typeFullName: String                        = Block.PropertyDefaults.TypeFullName
   def typeFullName: String                                 = _typeFullName
 
@@ -705,6 +722,7 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
     }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("ORDER", order)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("TYPE_FULL_NAME", typeFullName)
 
     properties
@@ -722,6 +740,7 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
     }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
     properties
@@ -930,7 +949,8 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
       case 5 => "dynamicTypeHintFullName"
       case 6 => "lineNumber"
       case 7 => "order"
-      case 8 => "typeFullName"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -943,11 +963,12 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
       case 5 => dynamicTypeHintFullName
       case 6 => lineNumber
       case 7 => order
-      case 8 => typeFullName
+      case 8 => possibleTypes
+      case 9 => typeFullName
     }
 
   override def productPrefix = "Block"
-  override def productArity  = 9
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[BlockDb]
 
@@ -960,6 +981,7 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
       case "DYNAMIC_TYPE_HINT_FULL_NAME" => this._dynamicTypeHintFullName
       case "LINE_NUMBER"                 => this._lineNumber
       case "ORDER"                       => this._order
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "TYPE_FULL_NAME"              => this._typeFullName
 
       case _ => null
@@ -990,8 +1012,26 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
-      case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
       case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -1018,6 +1058,9 @@ class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Exp
       else collection.immutable.ArraySeq.empty
     this._lineNumber = newNode.asInstanceOf[NewBlock].lineNumber.orNull
     this._order = newNode.asInstanceOf[NewBlock].order
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewBlock].possibleTypes != null) newNode.asInstanceOf[NewBlock].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._typeFullName = newNode.asInstanceOf[NewBlock].typeFullName
 
   }

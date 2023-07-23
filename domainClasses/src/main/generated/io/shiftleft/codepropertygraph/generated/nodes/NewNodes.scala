@@ -582,6 +582,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   type StoredType = Block
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
@@ -601,6 +602,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
     newInstance.lineNumber = this.lineNumber
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -646,6 +648,11 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -662,6 +669,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
     }
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -669,31 +677,33 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.lineNumber
-      case 3 => this.dynamicTypeHintFullName
-      case 4 => this.columnNumber
-      case 5 => this.code
-      case 6 => this.argumentName
-      case 7 => this.argumentIndex
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.lineNumber
+      case 4 => this.dynamicTypeHintFullName
+      case 5 => this.columnNumber
+      case 6 => this.code
+      case 7 => this.argumentName
+      case 8 => this.argumentIndex
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "lineNumber"
-      case 3 => "dynamicTypeHintFullName"
-      case 4 => "columnNumber"
-      case 5 => "code"
-      case 6 => "argumentName"
-      case 7 => "argumentIndex"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "lineNumber"
+      case 4 => "dynamicTypeHintFullName"
+      case 5 => "columnNumber"
+      case 6 => "code"
+      case 7 => "argumentName"
+      case 8 => "argumentIndex"
       case _ => ""
     }
 
   override def productPrefix = "NewBlock"
-  override def productArity  = 8
+  override def productArity  = 9
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewBlock]
 }
@@ -707,6 +717,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
 
   var typeFullName: String                        = "<empty>"
   var signature: String                           = ""
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var methodFullName: String                      = "<empty>"
@@ -732,6 +743,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     newInstance.methodFullName = this.methodFullName
     newInstance.name = this.name
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.signature = this.signature
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
@@ -793,6 +805,11 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def signature(value: String): this.type = {
     this.signature = value
     this
@@ -817,6 +834,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     if (!(("<empty>") == methodFullName)) { res += "METHOD_FULL_NAME" -> methodFullName }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("") == signature)) { res += "SIGNATURE" -> signature }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
@@ -826,16 +844,17 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     n match {
       case 0  => this.typeFullName
       case 1  => this.signature
-      case 2  => this.order
-      case 3  => this.name
-      case 4  => this.methodFullName
-      case 5  => this.lineNumber
-      case 6  => this.dynamicTypeHintFullName
-      case 7  => this.dispatchType
-      case 8  => this.columnNumber
-      case 9  => this.code
-      case 10 => this.argumentName
-      case 11 => this.argumentIndex
+      case 2  => this.possibleTypes
+      case 3  => this.order
+      case 4  => this.name
+      case 5  => this.methodFullName
+      case 6  => this.lineNumber
+      case 7  => this.dynamicTypeHintFullName
+      case 8  => this.dispatchType
+      case 9  => this.columnNumber
+      case 10 => this.code
+      case 11 => this.argumentName
+      case 12 => this.argumentIndex
       case _  => null
     }
 
@@ -843,21 +862,22 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     n match {
       case 0  => "typeFullName"
       case 1  => "signature"
-      case 2  => "order"
-      case 3  => "name"
-      case 4  => "methodFullName"
-      case 5  => "lineNumber"
-      case 6  => "dynamicTypeHintFullName"
-      case 7  => "dispatchType"
-      case 8  => "columnNumber"
-      case 9  => "code"
-      case 10 => "argumentName"
-      case 11 => "argumentIndex"
+      case 2  => "possibleTypes"
+      case 3  => "order"
+      case 4  => "name"
+      case 5  => "methodFullName"
+      case 6  => "lineNumber"
+      case 7  => "dynamicTypeHintFullName"
+      case 8  => "dispatchType"
+      case 9  => "columnNumber"
+      case 10 => "code"
+      case 11 => "argumentName"
+      case 12 => "argumentIndex"
       case _  => ""
     }
 
   override def productPrefix = "NewCall"
-  override def productArity  = 12
+  override def productArity  = 13
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewCall]
 }
@@ -1546,6 +1566,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   type StoredType = Identifier
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var lineNumber: Option[Integer]                 = None
@@ -1567,6 +1588,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -1617,6 +1639,11 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -1634,6 +1661,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -1641,33 +1669,35 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.name
-      case 3 => this.lineNumber
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.columnNumber
-      case 6 => this.code
-      case 7 => this.argumentName
-      case 8 => this.argumentIndex
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.name
+      case 4 => this.lineNumber
+      case 5 => this.dynamicTypeHintFullName
+      case 6 => this.columnNumber
+      case 7 => this.code
+      case 8 => this.argumentName
+      case 9 => this.argumentIndex
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "name"
-      case 3 => "lineNumber"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "columnNumber"
-      case 6 => "code"
-      case 7 => "argumentName"
-      case 8 => "argumentIndex"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "name"
+      case 4 => "lineNumber"
+      case 5 => "dynamicTypeHintFullName"
+      case 6 => "columnNumber"
+      case 7 => "code"
+      case 8 => "argumentName"
+      case 9 => "argumentIndex"
       case _ => ""
     }
 
   override def productPrefix = "NewIdentifier"
-  override def productArity  = 9
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewIdentifier]
 }
@@ -2086,6 +2116,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   type StoredType = Literal
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
@@ -2105,6 +2136,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
     newInstance.lineNumber = this.lineNumber
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -2150,6 +2182,11 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -2166,6 +2203,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
     }
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -2173,31 +2211,33 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.lineNumber
-      case 3 => this.dynamicTypeHintFullName
-      case 4 => this.columnNumber
-      case 5 => this.code
-      case 6 => this.argumentName
-      case 7 => this.argumentIndex
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.lineNumber
+      case 4 => this.dynamicTypeHintFullName
+      case 5 => this.columnNumber
+      case 6 => this.code
+      case 7 => this.argumentName
+      case 8 => this.argumentIndex
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "lineNumber"
-      case 3 => "dynamicTypeHintFullName"
-      case 4 => "columnNumber"
-      case 5 => "code"
-      case 6 => "argumentName"
-      case 7 => "argumentIndex"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "lineNumber"
+      case 4 => "dynamicTypeHintFullName"
+      case 5 => "columnNumber"
+      case 6 => "code"
+      case 7 => "argumentName"
+      case 8 => "argumentIndex"
       case _ => ""
     }
 
   override def productPrefix = "NewLiteral"
-  override def productArity  = 8
+  override def productArity  = 9
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewLiteral]
 }
@@ -2210,6 +2250,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   type StoredType = Local
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var lineNumber: Option[Integer]                 = None
@@ -2229,6 +2270,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -2274,6 +2316,11 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -2290,6 +2337,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -2297,31 +2345,33 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.name
-      case 3 => this.lineNumber
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.columnNumber
-      case 6 => this.code
-      case 7 => this.closureBindingId
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.name
+      case 4 => this.lineNumber
+      case 5 => this.dynamicTypeHintFullName
+      case 6 => this.columnNumber
+      case 7 => this.code
+      case 8 => this.closureBindingId
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "name"
-      case 3 => "lineNumber"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "columnNumber"
-      case 6 => "code"
-      case 7 => "closureBindingId"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "name"
+      case 4 => "lineNumber"
+      case 5 => "dynamicTypeHintFullName"
+      case 6 => "columnNumber"
+      case 7 => "code"
+      case 8 => "closureBindingId"
       case _ => ""
     }
 
   override def productPrefix = "NewLocal"
-  override def productArity  = 8
+  override def productArity  = 9
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewLocal]
 }
@@ -2474,6 +2524,7 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   type StoredType = Member
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var lineNumber: Option[Integer]                 = None
@@ -2491,6 +2542,7 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -2529,6 +2581,11 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -2544,6 +2601,7 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -2551,29 +2609,31 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.name
-      case 3 => this.lineNumber
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.columnNumber
-      case 6 => this.code
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.name
+      case 4 => this.lineNumber
+      case 5 => this.dynamicTypeHintFullName
+      case 6 => this.columnNumber
+      case 7 => this.code
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "name"
-      case 3 => "lineNumber"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "columnNumber"
-      case 6 => "code"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "name"
+      case 4 => "lineNumber"
+      case 5 => "dynamicTypeHintFullName"
+      case 6 => "columnNumber"
+      case 7 => "code"
       case _ => ""
     }
 
   override def productPrefix = "NewMember"
-  override def productArity  = 7
+  override def productArity  = 8
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMember]
 }
@@ -2865,6 +2925,7 @@ class NewMethodParameterIn
   type StoredType = MethodParameterIn
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var lineNumber: Option[Integer]                 = None
@@ -2888,6 +2949,7 @@ class NewMethodParameterIn
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -2941,6 +3003,11 @@ class NewMethodParameterIn
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -2959,42 +3026,45 @@ class NewMethodParameterIn
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.name
-      case 3 => this.lineNumber
-      case 4 => this.isVariadic
-      case 5 => this.index
-      case 6 => this.evaluationStrategy
-      case 7 => this.dynamicTypeHintFullName
-      case 8 => this.columnNumber
-      case 9 => this.code
-      case _ => null
+      case 0  => this.typeFullName
+      case 1  => this.possibleTypes
+      case 2  => this.order
+      case 3  => this.name
+      case 4  => this.lineNumber
+      case 5  => this.isVariadic
+      case 6  => this.index
+      case 7  => this.evaluationStrategy
+      case 8  => this.dynamicTypeHintFullName
+      case 9  => this.columnNumber
+      case 10 => this.code
+      case _  => null
     }
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "name"
-      case 3 => "lineNumber"
-      case 4 => "isVariadic"
-      case 5 => "index"
-      case 6 => "evaluationStrategy"
-      case 7 => "dynamicTypeHintFullName"
-      case 8 => "columnNumber"
-      case 9 => "code"
-      case _ => ""
+      case 0  => "typeFullName"
+      case 1  => "possibleTypes"
+      case 2  => "order"
+      case 3  => "name"
+      case 4  => "lineNumber"
+      case 5  => "isVariadic"
+      case 6  => "index"
+      case 7  => "evaluationStrategy"
+      case 8  => "dynamicTypeHintFullName"
+      case 9  => "columnNumber"
+      case 10 => "code"
+      case _  => ""
     }
 
   override def productPrefix = "NewMethodParameterIn"
-  override def productArity  = 10
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodParameterIn]
 }
@@ -3142,6 +3212,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   type StoredType = MethodRef
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var methodFullName: String                      = "<empty>"
   var lineNumber: Option[Integer]                 = None
@@ -3163,6 +3234,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
     newInstance.lineNumber = this.lineNumber
     newInstance.methodFullName = this.methodFullName
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -3213,6 +3285,11 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -3230,6 +3307,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == methodFullName)) { res += "METHOD_FULL_NAME" -> methodFullName }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -3237,33 +3315,35 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.methodFullName
-      case 3 => this.lineNumber
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.columnNumber
-      case 6 => this.code
-      case 7 => this.argumentName
-      case 8 => this.argumentIndex
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.methodFullName
+      case 4 => this.lineNumber
+      case 5 => this.dynamicTypeHintFullName
+      case 6 => this.columnNumber
+      case 7 => this.code
+      case 8 => this.argumentName
+      case 9 => this.argumentIndex
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "methodFullName"
-      case 3 => "lineNumber"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "columnNumber"
-      case 6 => "code"
-      case 7 => "argumentName"
-      case 8 => "argumentIndex"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "methodFullName"
+      case 4 => "lineNumber"
+      case 5 => "dynamicTypeHintFullName"
+      case 6 => "columnNumber"
+      case 7 => "code"
+      case 8 => "argumentName"
+      case 9 => "argumentIndex"
       case _ => ""
     }
 
   override def productPrefix = "NewMethodRef"
-  override def productArity  = 9
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodRef]
 }
@@ -3276,6 +3356,7 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   type StoredType = MethodReturn
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var lineNumber: Option[Integer]                 = None
   var evaluationStrategy: String                  = "<empty>"
@@ -3293,6 +3374,7 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
     newInstance.evaluationStrategy = this.evaluationStrategy
     newInstance.lineNumber = this.lineNumber
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -3331,6 +3413,11 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -3346,6 +3433,7 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
     if (!(("<empty>") == evaluationStrategy)) { res += "EVALUATION_STRATEGY" -> evaluationStrategy }
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -3353,29 +3441,31 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.lineNumber
-      case 3 => this.evaluationStrategy
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.columnNumber
-      case 6 => this.code
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.lineNumber
+      case 4 => this.evaluationStrategy
+      case 5 => this.dynamicTypeHintFullName
+      case 6 => this.columnNumber
+      case 7 => this.code
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "lineNumber"
-      case 3 => "evaluationStrategy"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "columnNumber"
-      case 6 => "code"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "lineNumber"
+      case 4 => "evaluationStrategy"
+      case 5 => "dynamicTypeHintFullName"
+      case 6 => "columnNumber"
+      case 7 => "code"
       case _ => ""
     }
 
   override def productPrefix = "NewMethodReturn"
-  override def productArity  = 7
+  override def productArity  = 8
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodReturn]
 }
@@ -4404,6 +4494,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   type StoredType = TypeRef
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
@@ -4423,6 +4514,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
     newInstance.lineNumber = this.lineNumber
     newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -4468,6 +4560,11 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -4484,6 +4581,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
     }
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
@@ -4491,31 +4589,33 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.typeFullName
-      case 1 => this.order
-      case 2 => this.lineNumber
-      case 3 => this.dynamicTypeHintFullName
-      case 4 => this.columnNumber
-      case 5 => this.code
-      case 6 => this.argumentName
-      case 7 => this.argumentIndex
+      case 1 => this.possibleTypes
+      case 2 => this.order
+      case 3 => this.lineNumber
+      case 4 => this.dynamicTypeHintFullName
+      case 5 => this.columnNumber
+      case 6 => this.code
+      case 7 => this.argumentName
+      case 8 => this.argumentIndex
       case _ => null
     }
 
   override def productElementName(n: Int): String =
     n match {
       case 0 => "typeFullName"
-      case 1 => "order"
-      case 2 => "lineNumber"
-      case 3 => "dynamicTypeHintFullName"
-      case 4 => "columnNumber"
-      case 5 => "code"
-      case 6 => "argumentName"
-      case 7 => "argumentIndex"
+      case 1 => "possibleTypes"
+      case 2 => "order"
+      case 3 => "lineNumber"
+      case 4 => "dynamicTypeHintFullName"
+      case 5 => "columnNumber"
+      case 6 => "code"
+      case 7 => "argumentName"
+      case 8 => "argumentIndex"
       case _ => ""
     }
 
   override def productPrefix = "NewTypeRef"
-  override def productArity  = 8
+  override def productArity  = 9
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewTypeRef]
 }
@@ -4528,6 +4628,7 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   type StoredType = Unknown
 
   var typeFullName: String                        = "<empty>"
+  var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var parserTypeName: String                      = "<empty>"
   var order: scala.Int                            = -1: Int
   var lineNumber: Option[Integer]                 = None
@@ -4551,6 +4652,7 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
     newInstance.lineNumber = this.lineNumber
     newInstance.order = this.order
     newInstance.parserTypeName = this.parserTypeName
+    newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -4606,6 +4708,11 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
     this
   }
 
+  def possibleTypes(value: IterableOnce[String]): this.type = {
+    this.possibleTypes = value.iterator.to(collection.immutable.ArraySeq)
+    this
+  }
+
   def typeFullName(value: String): this.type = {
     this.typeFullName = value
     this
@@ -4624,42 +4731,45 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
     if (!(("<empty>") == parserTypeName)) { res += "PARSER_TYPE_NAME" -> parserTypeName }
+    if (possibleTypes != null && possibleTypes.nonEmpty) { res += "POSSIBLE_TYPES" -> possibleTypes }
     if (!(("<empty>") == typeFullName)) { res += "TYPE_FULL_NAME" -> typeFullName }
     res
   }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.typeFullName
-      case 1 => this.parserTypeName
-      case 2 => this.order
-      case 3 => this.lineNumber
-      case 4 => this.dynamicTypeHintFullName
-      case 5 => this.containedRef
-      case 6 => this.columnNumber
-      case 7 => this.code
-      case 8 => this.argumentName
-      case 9 => this.argumentIndex
-      case _ => null
+      case 0  => this.typeFullName
+      case 1  => this.possibleTypes
+      case 2  => this.parserTypeName
+      case 3  => this.order
+      case 4  => this.lineNumber
+      case 5  => this.dynamicTypeHintFullName
+      case 6  => this.containedRef
+      case 7  => this.columnNumber
+      case 8  => this.code
+      case 9  => this.argumentName
+      case 10 => this.argumentIndex
+      case _  => null
     }
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "typeFullName"
-      case 1 => "parserTypeName"
-      case 2 => "order"
-      case 3 => "lineNumber"
-      case 4 => "dynamicTypeHintFullName"
-      case 5 => "containedRef"
-      case 6 => "columnNumber"
-      case 7 => "code"
-      case 8 => "argumentName"
-      case 9 => "argumentIndex"
-      case _ => ""
+      case 0  => "typeFullName"
+      case 1  => "possibleTypes"
+      case 2  => "parserTypeName"
+      case 3  => "order"
+      case 4  => "lineNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "containedRef"
+      case 7  => "columnNumber"
+      case 8  => "code"
+      case 9  => "argumentName"
+      case 10 => "argumentIndex"
+      case _  => ""
     }
 
   override def productPrefix = "NewUnknown"
-  override def productArity  = 10
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewUnknown]
 }

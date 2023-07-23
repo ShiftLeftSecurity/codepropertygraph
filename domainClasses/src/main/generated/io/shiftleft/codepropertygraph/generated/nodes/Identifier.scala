@@ -17,6 +17,7 @@ object Identifier {
     val LineNumber              = "LINE_NUMBER"
     val Name                    = "NAME"
     val Order                   = "ORDER"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
     val all: Set[String] = Set(
       ArgumentIndex,
@@ -27,6 +28,7 @@ object Identifier {
       LineNumber,
       Name,
       Order,
+      PossibleTypes,
       TypeFullName
     )
     val allAsJava: java.util.Set[String] = all.asJava
@@ -41,6 +43,7 @@ object Identifier {
     val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
   }
@@ -119,6 +122,7 @@ trait IdentifierBase extends AbstractNode with ExpressionBase {
   def lineNumber: Option[Integer]
   def name: String
   def order: scala.Int
+  def possibleTypes: IndexedSeq[String]
   def typeFullName: String
 
 }
@@ -136,6 +140,7 @@ class Identifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def lineNumber: Option[Integer]                 = get().lineNumber
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
@@ -652,34 +657,36 @@ class Identifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "argumentIndex"
-      case 2 => "argumentName"
-      case 3 => "code"
-      case 4 => "columnNumber"
-      case 5 => "dynamicTypeHintFullName"
-      case 6 => "lineNumber"
-      case 7 => "name"
-      case 8 => "order"
-      case 9 => "typeFullName"
+      case 0  => "id"
+      case 1  => "argumentIndex"
+      case 2  => "argumentName"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "lineNumber"
+      case 7  => "name"
+      case 8  => "order"
+      case 9  => "possibleTypes"
+      case 10 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => argumentIndex
-      case 2 => argumentName
-      case 3 => code
-      case 4 => columnNumber
-      case 5 => dynamicTypeHintFullName
-      case 6 => lineNumber
-      case 7 => name
-      case 8 => order
-      case 9 => typeFullName
+      case 0  => id
+      case 1  => argumentIndex
+      case 2  => argumentName
+      case 3  => code
+      case 4  => columnNumber
+      case 5  => dynamicTypeHintFullName
+      case 6  => lineNumber
+      case 7  => name
+      case 8  => order
+      case 9  => possibleTypes
+      case 10 => typeFullName
     }
 
   override def productPrefix = "Identifier"
-  override def productArity  = 10
+  override def productArity  = 11
 }
 
 class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Expression with IdentifierBase {
@@ -702,6 +709,8 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   def name: String                                         = _name
   private var _order: scala.Int                            = Identifier.PropertyDefaults.Order
   def order: scala.Int                                     = _order
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _typeFullName: String                        = Identifier.PropertyDefaults.TypeFullName
   def typeFullName: String                                 = _typeFullName
 
@@ -718,6 +727,7 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("NAME", name)
     properties.put("ORDER", order)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("TYPE_FULL_NAME", typeFullName)
 
     properties
@@ -736,6 +746,7 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!(("<empty>") == name)) { properties.put("NAME", name) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
     properties
@@ -923,34 +934,36 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "argumentIndex"
-      case 2 => "argumentName"
-      case 3 => "code"
-      case 4 => "columnNumber"
-      case 5 => "dynamicTypeHintFullName"
-      case 6 => "lineNumber"
-      case 7 => "name"
-      case 8 => "order"
-      case 9 => "typeFullName"
+      case 0  => "id"
+      case 1  => "argumentIndex"
+      case 2  => "argumentName"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "lineNumber"
+      case 7  => "name"
+      case 8  => "order"
+      case 9  => "possibleTypes"
+      case 10 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => argumentIndex
-      case 2 => argumentName
-      case 3 => code
-      case 4 => columnNumber
-      case 5 => dynamicTypeHintFullName
-      case 6 => lineNumber
-      case 7 => name
-      case 8 => order
-      case 9 => typeFullName
+      case 0  => id
+      case 1  => argumentIndex
+      case 2  => argumentName
+      case 3  => code
+      case 4  => columnNumber
+      case 5  => dynamicTypeHintFullName
+      case 6  => lineNumber
+      case 7  => name
+      case 8  => order
+      case 9  => possibleTypes
+      case 10 => typeFullName
     }
 
   override def productPrefix = "Identifier"
-  override def productArity  = 10
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[IdentifierDb]
 
@@ -964,6 +977,7 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
       case "LINE_NUMBER"                 => this._lineNumber
       case "NAME"                        => this._name
       case "ORDER"                       => this._order
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "TYPE_FULL_NAME"              => this._typeFullName
 
       case _ => null
@@ -994,9 +1008,27 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
-      case "NAME"           => this._name = value.asInstanceOf[String]
-      case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "NAME"        => this._name = value.asInstanceOf[String]
+      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
       case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -1024,6 +1056,9 @@ class IdentifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     this._lineNumber = newNode.asInstanceOf[NewIdentifier].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewIdentifier].name
     this._order = newNode.asInstanceOf[NewIdentifier].order
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewIdentifier].possibleTypes != null) newNode.asInstanceOf[NewIdentifier].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._typeFullName = newNode.asInstanceOf[NewIdentifier].typeFullName
 
   }

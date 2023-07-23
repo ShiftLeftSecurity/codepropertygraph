@@ -490,6 +490,10 @@ class CallTraversalExtGen[NodeType <: Call](val traversal: Iterator[NodeType]) e
     traversal.filter { node => !vset.contains(node.order) }
   }
 
+  /** Traverse to possibleTypes property */
+  def possibleTypes: Iterator[String] =
+    traversal.flatMap(_.possibleTypes)
+
   /** Traverse to signature property */
   def signature: Iterator[String] =
     traversal.map(_.signature)

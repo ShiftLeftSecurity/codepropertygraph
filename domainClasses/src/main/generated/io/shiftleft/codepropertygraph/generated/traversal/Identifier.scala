@@ -369,6 +369,10 @@ class IdentifierTraversalExtGen[NodeType <: Identifier](val traversal: Iterator[
     traversal.filter { node => !vset.contains(node.order) }
   }
 
+  /** Traverse to possibleTypes property */
+  def possibleTypes: Iterator[String] =
+    traversal.flatMap(_.possibleTypes)
+
   /** Traverse to typeFullName property */
   def typeFullName: Iterator[String] =
     traversal.map(_.typeFullName)

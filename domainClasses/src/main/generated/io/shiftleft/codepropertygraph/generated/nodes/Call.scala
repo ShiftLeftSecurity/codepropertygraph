@@ -19,6 +19,7 @@ object Call {
     val MethodFullName          = "METHOD_FULL_NAME"
     val Name                    = "NAME"
     val Order                   = "ORDER"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val Signature               = "SIGNATURE"
     val TypeFullName            = "TYPE_FULL_NAME"
     val all: Set[String] = Set(
@@ -32,6 +33,7 @@ object Call {
       MethodFullName,
       Name,
       Order,
+      PossibleTypes,
       Signature,
       TypeFullName
     )
@@ -49,6 +51,7 @@ object Call {
     val MethodFullName          = new overflowdb.PropertyKey[String]("METHOD_FULL_NAME")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val Signature               = new overflowdb.PropertyKey[String]("SIGNATURE")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
@@ -150,6 +153,7 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase {
   def methodFullName: String
   def name: String
   def order: scala.Int
+  def possibleTypes: IndexedSeq[String]
   def signature: String
   def typeFullName: String
 
@@ -171,6 +175,7 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   override def methodFullName: String                      = get().methodFullName
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def signature: String                           = get().signature
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
@@ -827,8 +832,9 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case 8  => "methodFullName"
       case 9  => "name"
       case 10 => "order"
-      case 11 => "signature"
-      case 12 => "typeFullName"
+      case 11 => "possibleTypes"
+      case 12 => "signature"
+      case 13 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -844,12 +850,13 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case 8  => methodFullName
       case 9  => name
       case 10 => order
-      case 11 => signature
-      case 12 => typeFullName
+      case 11 => possibleTypes
+      case 12 => signature
+      case 13 => typeFullName
     }
 
   override def productPrefix = "Call"
-  override def productArity  = 13
+  override def productArity  = 14
 }
 
 class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with CallRepr with Expression with CallBase {
@@ -876,6 +883,8 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
   def name: String                                         = _name
   private var _order: scala.Int                            = Call.PropertyDefaults.Order
   def order: scala.Int                                     = _order
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _signature: String                           = Call.PropertyDefaults.Signature
   def signature: String                                    = _signature
   private var _typeFullName: String                        = Call.PropertyDefaults.TypeFullName
@@ -896,6 +905,7 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
     properties.put("METHOD_FULL_NAME", methodFullName)
     properties.put("NAME", name)
     properties.put("ORDER", order)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("SIGNATURE", signature)
     properties.put("TYPE_FULL_NAME", typeFullName)
 
@@ -917,6 +927,7 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
     if (!(("<empty>") == methodFullName)) { properties.put("METHOD_FULL_NAME", methodFullName) }
     if (!(("<empty>") == name)) { properties.put("NAME", name) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("") == signature)) { properties.put("SIGNATURE", signature) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
@@ -1165,8 +1176,9 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
       case 8  => "methodFullName"
       case 9  => "name"
       case 10 => "order"
-      case 11 => "signature"
-      case 12 => "typeFullName"
+      case 11 => "possibleTypes"
+      case 12 => "signature"
+      case 13 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -1182,12 +1194,13 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
       case 8  => methodFullName
       case 9  => name
       case 10 => order
-      case 11 => signature
-      case 12 => typeFullName
+      case 11 => possibleTypes
+      case 12 => signature
+      case 13 => typeFullName
     }
 
   override def productPrefix = "Call"
-  override def productArity  = 13
+  override def productArity  = 14
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[CallDb]
 
@@ -1203,6 +1216,7 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
       case "METHOD_FULL_NAME"            => this._methodFullName
       case "NAME"                        => this._name
       case "ORDER"                       => this._order
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "SIGNATURE"                   => this._signature
       case "TYPE_FULL_NAME"              => this._typeFullName
 
@@ -1239,8 +1253,26 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
       case "METHOD_FULL_NAME" => this._methodFullName = value.asInstanceOf[String]
       case "NAME"             => this._name = value.asInstanceOf[String]
       case "ORDER"            => this._order = value.asInstanceOf[scala.Int]
-      case "SIGNATURE"        => this._signature = value.asInstanceOf[String]
-      case "TYPE_FULL_NAME"   => this._typeFullName = value.asInstanceOf[String]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
+      case "SIGNATURE"      => this._signature = value.asInstanceOf[String]
+      case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
     }
@@ -1269,6 +1301,9 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
     this._methodFullName = newNode.asInstanceOf[NewCall].methodFullName
     this._name = newNode.asInstanceOf[NewCall].name
     this._order = newNode.asInstanceOf[NewCall].order
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewCall].possibleTypes != null) newNode.asInstanceOf[NewCall].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._signature = newNode.asInstanceOf[NewCall].signature
     this._typeFullName = newNode.asInstanceOf[NewCall].typeFullName
 

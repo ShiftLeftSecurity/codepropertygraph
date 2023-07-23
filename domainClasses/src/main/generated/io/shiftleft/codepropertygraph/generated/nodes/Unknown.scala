@@ -18,6 +18,7 @@ object Unknown {
     val LineNumber              = "LINE_NUMBER"
     val Order                   = "ORDER"
     val ParserTypeName          = "PARSER_TYPE_NAME"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
     val all: Set[String] = Set(
       ArgumentIndex,
@@ -29,6 +30,7 @@ object Unknown {
       LineNumber,
       Order,
       ParserTypeName,
+      PossibleTypes,
       TypeFullName
     )
     val allAsJava: java.util.Set[String] = all.asJava
@@ -44,6 +46,7 @@ object Unknown {
     val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val ParserTypeName          = new overflowdb.PropertyKey[String]("PARSER_TYPE_NAME")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
   }
@@ -124,6 +127,7 @@ trait UnknownBase extends AbstractNode with ExpressionBase {
   def lineNumber: Option[Integer]
   def order: scala.Int
   def parserTypeName: String
+  def possibleTypes: IndexedSeq[String]
   def typeFullName: String
 
 }
@@ -142,6 +146,7 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def lineNumber: Option[Integer]                 = get().lineNumber
   override def order: scala.Int                            = get().order
   override def parserTypeName: String                      = get().parserTypeName
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
@@ -658,7 +663,8 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case 7  => "lineNumber"
       case 8  => "order"
       case 9  => "parserTypeName"
-      case 10 => "typeFullName"
+      case 10 => "possibleTypes"
+      case 11 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -673,11 +679,12 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case 7  => lineNumber
       case 8  => order
       case 9  => parserTypeName
-      case 10 => typeFullName
+      case 10 => possibleTypes
+      case 11 => typeFullName
     }
 
   override def productPrefix = "Unknown"
-  override def productArity  = 11
+  override def productArity  = 12
 }
 
 class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Expression with UnknownBase {
@@ -702,6 +709,8 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
   def order: scala.Int                                     = _order
   private var _parserTypeName: String                      = Unknown.PropertyDefaults.ParserTypeName
   def parserTypeName: String                               = _parserTypeName
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _typeFullName: String                        = Unknown.PropertyDefaults.TypeFullName
   def typeFullName: String                                 = _typeFullName
 
@@ -719,6 +728,7 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("ORDER", order)
     properties.put("PARSER_TYPE_NAME", parserTypeName)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("TYPE_FULL_NAME", typeFullName)
 
     properties
@@ -738,6 +748,7 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
     if (!(("<empty>") == parserTypeName)) { properties.put("PARSER_TYPE_NAME", parserTypeName) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
     properties
@@ -931,7 +942,8 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case 7  => "lineNumber"
       case 8  => "order"
       case 9  => "parserTypeName"
-      case 10 => "typeFullName"
+      case 10 => "possibleTypes"
+      case 11 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -946,11 +958,12 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case 7  => lineNumber
       case 8  => order
       case 9  => parserTypeName
-      case 10 => typeFullName
+      case 10 => possibleTypes
+      case 11 => typeFullName
     }
 
   override def productPrefix = "Unknown"
-  override def productArity  = 11
+  override def productArity  = 12
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[UnknownDb]
 
@@ -965,6 +978,7 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case "LINE_NUMBER"                 => this._lineNumber
       case "ORDER"                       => this._order
       case "PARSER_TYPE_NAME"            => this._parserTypeName
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "TYPE_FULL_NAME"              => this._typeFullName
 
       case _ => null
@@ -999,7 +1013,25 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[Integer]
       case "ORDER"            => this._order = value.asInstanceOf[scala.Int]
       case "PARSER_TYPE_NAME" => this._parserTypeName = value.asInstanceOf[String]
-      case "TYPE_FULL_NAME"   => this._typeFullName = value.asInstanceOf[String]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
+      case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
     }
@@ -1027,6 +1059,9 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
     this._lineNumber = newNode.asInstanceOf[NewUnknown].lineNumber.orNull
     this._order = newNode.asInstanceOf[NewUnknown].order
     this._parserTypeName = newNode.asInstanceOf[NewUnknown].parserTypeName
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewUnknown].possibleTypes != null) newNode.asInstanceOf[NewUnknown].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._typeFullName = newNode.asInstanceOf[NewUnknown].typeFullName
 
   }

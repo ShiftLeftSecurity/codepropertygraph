@@ -427,6 +427,10 @@ class UnknownTraversalExtGen[NodeType <: Unknown](val traversal: Iterator[NodeTy
     overflowdb.traversal.filter.StringPropertyFilter.regexpNotMultiple(traversal)(_.parserTypeName, patterns)
   }
 
+  /** Traverse to possibleTypes property */
+  def possibleTypes: Iterator[String] =
+    traversal.flatMap(_.possibleTypes)
+
   /** Traverse to typeFullName property */
   def typeFullName: Iterator[String] =
     traversal.map(_.typeFullName)
