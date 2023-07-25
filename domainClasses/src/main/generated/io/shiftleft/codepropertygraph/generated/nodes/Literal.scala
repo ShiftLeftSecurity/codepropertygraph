@@ -16,9 +16,19 @@ object Literal {
     val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
     val LineNumber              = "LINE_NUMBER"
     val Order                   = "ORDER"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
-    val all: Set[String] =
-      Set(ArgumentIndex, ArgumentName, Code, ColumnNumber, DynamicTypeHintFullName, LineNumber, Order, TypeFullName)
+    val all: Set[String] = Set(
+      ArgumentIndex,
+      ArgumentName,
+      Code,
+      ColumnNumber,
+      DynamicTypeHintFullName,
+      LineNumber,
+      Order,
+      PossibleTypes,
+      TypeFullName
+    )
     val allAsJava: java.util.Set[String] = all.asJava
   }
 
@@ -30,6 +40,7 @@ object Literal {
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
     val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
   }
@@ -105,6 +116,7 @@ trait LiteralBase extends AbstractNode with ExpressionBase {
   def dynamicTypeHintFullName: IndexedSeq[String]
   def lineNumber: Option[Integer]
   def order: scala.Int
+  def possibleTypes: IndexedSeq[String]
   def typeFullName: String
 
 }
@@ -121,6 +133,7 @@ class Literal(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
   override def lineNumber: Option[Integer]                 = get().lineNumber
   override def order: scala.Int                            = get().order
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
@@ -633,7 +646,8 @@ class Literal(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case 5 => "dynamicTypeHintFullName"
       case 6 => "lineNumber"
       case 7 => "order"
-      case 8 => "typeFullName"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -646,11 +660,12 @@ class Literal(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case 5 => dynamicTypeHintFullName
       case 6 => lineNumber
       case 7 => order
-      case 8 => typeFullName
+      case 8 => possibleTypes
+      case 9 => typeFullName
     }
 
   override def productPrefix = "Literal"
-  override def productArity  = 9
+  override def productArity  = 10
 }
 
 class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Expression with LiteralBase {
@@ -671,6 +686,8 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
   def lineNumber: Option[Integer]                          = Option(_lineNumber)
   private var _order: scala.Int                            = Literal.PropertyDefaults.Order
   def order: scala.Int                                     = _order
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _typeFullName: String                        = Literal.PropertyDefaults.TypeFullName
   def typeFullName: String                                 = _typeFullName
 
@@ -686,6 +703,7 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
     }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("ORDER", order)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("TYPE_FULL_NAME", typeFullName)
 
     properties
@@ -703,6 +721,7 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
     }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
     properties
@@ -900,7 +919,8 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case 5 => "dynamicTypeHintFullName"
       case 6 => "lineNumber"
       case 7 => "order"
-      case 8 => "typeFullName"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -913,11 +933,12 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case 5 => dynamicTypeHintFullName
       case 6 => lineNumber
       case 7 => order
-      case 8 => typeFullName
+      case 8 => possibleTypes
+      case 9 => typeFullName
     }
 
   override def productPrefix = "Literal"
-  override def productArity  = 9
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[LiteralDb]
 
@@ -930,6 +951,7 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case "DYNAMIC_TYPE_HINT_FULL_NAME" => this._dynamicTypeHintFullName
       case "LINE_NUMBER"                 => this._lineNumber
       case "ORDER"                       => this._order
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "TYPE_FULL_NAME"              => this._typeFullName
 
       case _ => null
@@ -960,8 +982,26 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
-      case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
       case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -988,6 +1028,9 @@ class LiteralDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       else collection.immutable.ArraySeq.empty
     this._lineNumber = newNode.asInstanceOf[NewLiteral].lineNumber.orNull
     this._order = newNode.asInstanceOf[NewLiteral].order
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewLiteral].possibleTypes != null) newNode.asInstanceOf[NewLiteral].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._typeFullName = newNode.asInstanceOf[NewLiteral].typeFullName
 
   }

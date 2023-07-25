@@ -342,6 +342,10 @@ class LocalTraversalExtGen[NodeType <: Local](val traversal: Iterator[NodeType])
     traversal.filter { node => !vset.contains(node.order) }
   }
 
+  /** Traverse to possibleTypes property */
+  def possibleTypes: Iterator[String] =
+    traversal.flatMap(_.possibleTypes)
+
   /** Traverse to typeFullName property */
   def typeFullName: Iterator[String] =
     traversal.map(_.typeFullName)

@@ -15,8 +15,10 @@ object Member {
     val LineNumber              = "LINE_NUMBER"
     val Name                    = "NAME"
     val Order                   = "ORDER"
+    val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
-    val all: Set[String] = Set(Code, ColumnNumber, DynamicTypeHintFullName, LineNumber, Name, Order, TypeFullName)
+    val all: Set[String] =
+      Set(Code, ColumnNumber, DynamicTypeHintFullName, LineNumber, Name, Order, PossibleTypes, TypeFullName)
     val allAsJava: java.util.Set[String] = all.asJava
   }
 
@@ -27,6 +29,7 @@ object Member {
     val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
+    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
 
   }
@@ -76,6 +79,7 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase {
   def lineNumber: Option[Integer]
   def name: String
   def order: scala.Int
+  def possibleTypes: IndexedSeq[String]
   def typeFullName: String
 
 }
@@ -92,6 +96,7 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def lineNumber: Option[Integer]                 = get().lineNumber
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
+  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
@@ -174,7 +179,8 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case 4 => "lineNumber"
       case 5 => "name"
       case 6 => "order"
-      case 7 => "typeFullName"
+      case 7 => "possibleTypes"
+      case 8 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -186,11 +192,12 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case 4 => lineNumber
       case 5 => name
       case 6 => order
-      case 7 => typeFullName
+      case 7 => possibleTypes
+      case 8 => typeFullName
     }
 
   override def productPrefix = "Member"
-  override def productArity  = 8
+  override def productArity  = 9
 }
 
 class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with Declaration with MemberBase {
@@ -209,6 +216,8 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   def name: String                                         = _name
   private var _order: scala.Int                            = Member.PropertyDefaults.Order
   def order: scala.Int                                     = _order
+  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
+  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
   private var _typeFullName: String                        = Member.PropertyDefaults.TypeFullName
   def typeFullName: String                                 = _typeFullName
 
@@ -223,6 +232,7 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("NAME", name)
     properties.put("ORDER", order)
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     properties.put("TYPE_FULL_NAME", typeFullName)
 
     properties
@@ -239,6 +249,7 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!(("<empty>") == name)) { properties.put("NAME", name) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
+    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
     if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
 
     properties
@@ -287,7 +298,8 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
       case 4 => "lineNumber"
       case 5 => "name"
       case 6 => "order"
-      case 7 => "typeFullName"
+      case 7 => "possibleTypes"
+      case 8 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
@@ -299,11 +311,12 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
       case 4 => lineNumber
       case 5 => name
       case 6 => order
-      case 7 => typeFullName
+      case 7 => possibleTypes
+      case 8 => typeFullName
     }
 
   override def productPrefix = "Member"
-  override def productArity  = 8
+  override def productArity  = 9
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MemberDb]
 
@@ -315,6 +328,7 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
       case "LINE_NUMBER"                 => this._lineNumber
       case "NAME"                        => this._name
       case "ORDER"                       => this._order
+      case "POSSIBLE_TYPES"              => this._possibleTypes
       case "TYPE_FULL_NAME"              => this._typeFullName
 
       case _ => null
@@ -343,9 +357,27 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
-      case "NAME"           => this._name = value.asInstanceOf[String]
-      case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "NAME"        => this._name = value.asInstanceOf[String]
+      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
+      case "POSSIBLE_TYPES" =>
+        this._possibleTypes = value match {
+          case null                                             => collection.immutable.ArraySeq.empty
+          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
+          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
+          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
+          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
+          case jCollection: java.lang.Iterable[_] =>
+            if (jCollection.iterator.hasNext) {
+              collection.immutable.ArraySeq.unsafeWrapArray(
+                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
+              )
+            } else collection.immutable.ArraySeq.empty
+          case iter: Iterable[_] =>
+            if (iter.nonEmpty) {
+              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
+            } else collection.immutable.ArraySeq.empty
+        }
       case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -371,6 +403,9 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
     this._lineNumber = newNode.asInstanceOf[NewMember].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewMember].name
     this._order = newNode.asInstanceOf[NewMember].order
+    this._possibleTypes =
+      if (newNode.asInstanceOf[NewMember].possibleTypes != null) newNode.asInstanceOf[NewMember].possibleTypes
+      else collection.immutable.ArraySeq.empty
     this._typeFullName = newNode.asInstanceOf[NewMember].typeFullName
 
   }

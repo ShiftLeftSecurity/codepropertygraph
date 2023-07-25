@@ -155,22 +155,32 @@ object Hidden extends SchemaBase {
       .addProperty(
         name = "DYNAMIC_TYPE_HINT_FULL_NAME",
         valueType = ValueType.String,
-        comment = "Type hint for the dynamic type"
+        comment = "Type hint for the dynamic type. These are observed to be verifiable at runtime."
       )
       .asList()
       .protoId(1591)
 
-    callNode.addProperties(dynamicTypeHintFullName)
-    methodParameterIn.addProperties(dynamicTypeHintFullName)
-    methodReturn.addProperties(dynamicTypeHintFullName)
-    methodRef.addProperties(dynamicTypeHintFullName)
-    typeRef.addProperties(dynamicTypeHintFullName)
-    local.addProperties(dynamicTypeHintFullName)
-    block.addProperties(dynamicTypeHintFullName)
-    unknown.addProperties(dynamicTypeHintFullName)
-    literal.addProperties(dynamicTypeHintFullName)
-    identifier.addProperties(dynamicTypeHintFullName)
-    member.addProperties(dynamicTypeHintFullName)
+    val possibleTypes = builder
+      .addProperty(
+        name = "POSSIBLE_TYPES",
+        valueType = ValueType.String,
+        comment =
+          "Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are correct. This property is used to capture observations between node interactions during a 'may-analysis'."
+      )
+      .asList()
+      .protoId(1592)
+
+    callNode.addProperties(dynamicTypeHintFullName, possibleTypes)
+    methodParameterIn.addProperties(dynamicTypeHintFullName, possibleTypes)
+    methodReturn.addProperties(dynamicTypeHintFullName, possibleTypes)
+    methodRef.addProperties(dynamicTypeHintFullName, possibleTypes)
+    typeRef.addProperties(dynamicTypeHintFullName, possibleTypes)
+    local.addProperties(dynamicTypeHintFullName, possibleTypes)
+    block.addProperties(dynamicTypeHintFullName, possibleTypes)
+    unknown.addProperties(dynamicTypeHintFullName, possibleTypes)
+    literal.addProperties(dynamicTypeHintFullName, possibleTypes)
+    identifier.addProperties(dynamicTypeHintFullName, possibleTypes)
+    member.addProperties(dynamicTypeHintFullName, possibleTypes)
 
     /*
      * Declarative imports
