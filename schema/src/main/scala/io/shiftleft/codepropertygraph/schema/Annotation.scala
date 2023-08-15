@@ -94,6 +94,9 @@ object Annotation extends SchemaBase {
     literal
       .addOutEdge(edge = ast, inNode = annotation)
 
+    identifier
+      .addOutEdge(edge = ast, inNode = annotation)
+
     method
       .addOutEdge(edge = ast, inNode = annotation)
 
