@@ -103,6 +103,9 @@ object Annotation extends SchemaBase {
     methodParameterIn
       .addOutEdge(edge = ast, inNode = annotation)
 
+    methodRef
+      .addOutEdge(edge = ast, inNode = annotation)
+
     typeDecl
       .addOutEdge(edge = ast, inNode = annotation)
 
