@@ -111,5 +111,8 @@ object Annotation extends SchemaBase {
 
     member
       .addOutEdge(edge = ast, inNode = annotation)
+
+    unknown
+      .addOutEdge(edge = ast, inNode = annotation)
   }
 }

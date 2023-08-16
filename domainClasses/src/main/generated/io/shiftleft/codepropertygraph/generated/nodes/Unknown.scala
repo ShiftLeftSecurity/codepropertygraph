@@ -165,6 +165,10 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut
 
+  /** Traverse to ANNOTATION via AST OUT edge.
+    */
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
+
   /** Traverse to BLOCK via AST OUT edge.
     */
   def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = get()._blockViaAstOut
@@ -758,10 +762,11 @@ class UnknownDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
   def argumentOut: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](0)
   override def _argumentOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  def astOut: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = astOut.collectAll[Block]
-  def _callViaAstOut: overflowdb.traversal.Traversal[Call]   = astOut.collectAll[Call]
+  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
+  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation]             = astOut.collectAll[Annotation]
+  def _blockViaAstOut: overflowdb.traversal.Traversal[Block]                       = astOut.collectAll[Block]
+  def _callViaAstOut: overflowdb.traversal.Traversal[Call]                         = astOut.collectAll[Call]
   def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = astOut.collectAll[ControlStructure]
   def _fieldIdentifierViaAstOut: overflowdb.traversal.Traversal[FieldIdentifier]   = astOut.collectAll[FieldIdentifier]
   def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier]             = astOut.collectAll[Identifier]

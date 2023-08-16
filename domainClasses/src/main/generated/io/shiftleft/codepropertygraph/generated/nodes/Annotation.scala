@@ -154,6 +154,10 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
     */
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
+  /** Traverse to UNKNOWN via AST IN edge.
+    */
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
 
@@ -279,6 +283,7 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     astIn.collectAll[MethodParameterIn]
   def _methodRefViaAstIn: overflowdb.traversal.Traversal[MethodRef] = astIn.collectAll[MethodRef]
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl]   = astIn.collectAll[TypeDecl]
+  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown]     = astIn.collectAll[Unknown]
 
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
   override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
