@@ -27,3 +27,7 @@ jobs:
       run: sbt scalafmtCheck Test/scalafmtCheck
     - run: echo "Previous step failed because code is not formatted. Run 'sbt scalafmt'"
       if: ${{ failure() }}
+    - name: Check domain classes
+      run: sbt generateDomainClassesCheck
+    - run: echo "Previous step failed because latest domain classes are not committed. Run 'sbt generateDomainClasses' (should be triggered automatically by `sbt compile`, so maybe you just forgot to commit?)"
+      if: ${{ failure() }}
