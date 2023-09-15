@@ -1,70 +1,125 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import com.google.protobuf.GeneratedMessageV3
+import flatgraph.*
+import flatgraph.misc.ConversionException
+import flatgraph.misc.Conversions.toShortSafely
 import io.shiftleft.codepropertygraph.generated.Cpg
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
-import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
-import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
+import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase.*
+import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct, PropertyValue}
+import io.shiftleft.utils.StringInterner
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.Config
 
 import java.io.InputStream
 import java.nio.file.{Files, Path}
-import java.util.{List => JList}
-import scala.collection.mutable.ArrayDeque
-import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success, Try, Using}
-
-// This class is used to temporarily store edges we have red from proto before we store them
-// in the CPG. As usual proto is very memory inefficiet when it comes to memory and saving a
-// few bytes adds up since we keep all graph edge in this intermediate representation before
-// we start adding the edges to the CPG.
-case class TmpEdge(dst: Long, src: Long, typ: Int, properties: List[Edge.Property]) {
-  def this(edge: Edge) = {
-    this(edge.getDst, edge.getSrc, edge.getTypeValue, List.from(edge.getPropertyList.asScala))
-  }
-}
+import scala.jdk.CollectionConverters.*
+import scala.util.{Try, Using}
 
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: Config = Config.withoutOverflow): Cpg =
+  def loadFromProtoZip(fileName: String, storagePath: Option[Path]): Cpg = {
     measureAndReport {
-      val builder = new ProtoToCpg(overflowDbConfig)
       Using.Manager { use =>
-        val edges = ArrayDeque.empty[TmpEdge]
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
-          val inputStream = use(Files.newInputStream(entry))
-          val cpgStruct   = getNextProtoCpgFromStream(inputStream)
-          builder.addNodes(cpgStruct.getNodeList)
-          cpgStruct.getEdgeList.asScala.foreach { edge =>
-            edges.append(new TmpEdge(edge))
+        def cpgProtos: Iterator[CpgStruct] = {
+          use(new ZipArchive(fileName)).entries.iterator.map { entry =>
+            val inputStream = use(Files.newInputStream(entry))
+            CpgStruct.parseFrom(inputStream)
           }
         }
-        // We remove the edges while iterating so that the GC can already collect them.
-        while (edges.nonEmpty) {
-          val edge = edges.removeHead()
-          builder.addEdge(edge.dst, edge.src, EdgeType.forNumber(edge.typ), edge.properties)
-        }
-      } match {
-        case Failure(exception) => throw exception
-        case Success(_)         => builder.build()
-      }
+        loadFromListOfProtos(() => cpgProtos, storagePath)
+      }.get
     }
-
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: Config): Cpg = {
-    val builder = new ProtoToCpg(overflowDbConfig)
-    cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
-    cpgs.foreach { cpg =>
-      cpg.getEdgeList.asScala.foreach { edge =>
-        builder.addEdge(edge.getDst, edge.getSrc, edge.getType, edge.getPropertyList.asScala)
-      }
-    }
-    builder.build()
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: Config): Cpg =
-    loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
+
+  /**
+   * @param protoCpgs is a function because we need to run two passes due to flatgraph-specific
+   *                  implementation details: one to add the nodes, and one to add edges and set node properties
+   */
+  def loadFromListOfProtos(protoCpgs: () => Iterator[CpgStruct], storagePath: Option[Path]): Cpg = {
+    // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
+    implicit val interner: StringInterner = StringInterner.makeStrongInterner()
+    val protoToGraphNodeMappings = new ProtoToGraphNodeMappings
+    val cpg = openOrCreateCpg(storagePath)
+
+    // first pass: add the raw nodes without any properties or edges
+    protoCpgs().foreach { cpgProto =>
+      addNodesRaw(nodesIter(cpgProto), cpg.graph, protoToGraphNodeMappings)
+    }
+
+    // second pass: set node properties and add edges
+    val diffGraph = Cpg.newDiffGraphBuilder
+    protoCpgs().foreach { protoCpg =>
+      nodesIter(protoCpg).foreach { protoNode =>
+        val protoNodeId = protoNode.getKey
+        lazy val gNode = protoToGraphNodeMappings
+          .findGNode(protoNode)
+          .getOrElse(throw new ConversionException(s"node with proto node id=$protoNodeId not found in graph"))
+        protoNode.getPropertyList.iterator().asScala.foreach { protoProperty =>
+          diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
+        }
+      }
+
+      protoCpg.getEdgeList.iterator().asScala.foreach { protoEdge =>
+        List(protoEdge.getSrc, protoEdge.getDst).map(protoToGraphNodeMappings.findGNode) match {
+          case List(Some(srcNode), Some(dstNode)) =>
+            diffGraph.addEdge(srcNode, dstNode, protoEdge.getType.name(), extractEdgePropertyValue(protoEdge))
+          case _ => // at least one of the nodes doesn't exist in the cpg, most likely because it was filtered out - ignore
+        }
+      }
+    }
+
+    DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+    cpg
+  }
+
+  def loadFromListOfProtos(cpgs: java.util.List[CpgStruct], storagePath: Option[Path]): Cpg =
+    loadFromListOfProtos(() => cpgs.asScala.iterator, storagePath)
+
+  private def openOrCreateCpg(storagePath: Option[Path]): Cpg = {
+    storagePath match {
+      case Some(storagePath) => Cpg.withStorage(storagePath)
+      case None              => Cpg.empty
+    }
+  }
+
+  private def nodesIter(protoCpg: CpgStruct): Iterator[CpgStruct.Node] =
+    protoCpg.getNodeList.iterator().asScala
+
+  private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph, protoToGraphNodeMappings: ProtoToGraphNodeMappings): Unit = {
+    val diffGraph = Cpg.newDiffGraphBuilder
+    protoNodes.filterNot(protoToGraphNodeMappings.contains).foreach { protoNode =>
+      val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
+      diffGraph.addNode(newNode)
+      protoToGraphNodeMappings.add(protoNode, newNode)
+    }
+    DiffGraphApplier.applyDiff(graph, diffGraph)
+  }
+
+  private def extractPropertyValue(value: PropertyValue)(implicit interner: StringInterner): Any = {
+    value.getValueCase match {
+      case INT_VALUE     => value.getIntValue
+      case BOOL_VALUE    => value.getBoolValue
+      case STRING_VALUE  => interner.intern(value.getStringValue)
+      case STRING_LIST   => value.getStringList.getValuesList.asScala.map(interner.intern).toList
+      case VALUE_NOT_SET => null
+      case _             => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+    }
+  }
+
+  /** flatgraph only supports 0..1 edge properties */
+  private def extractEdgePropertyValue(protoEdge: CpgStruct.Edge)(implicit interner: StringInterner): Any = {
+    val protoProperties = protoEdge.getPropertyList.asScala
+    if (protoProperties.isEmpty)
+      null
+    else if (protoProperties.size == 1)
+      extractPropertyValue(protoProperties.head.getValue)
+    else
+      throw new IllegalArgumentException(
+        s"flatgraph only supports zero or one edge properties, but the given edge has ${protoProperties.size} properties: $protoProperties"
+      )
+  }
 
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
     loadOverlays(fileName, CpgOverlay.parseFrom)
@@ -88,9 +143,6 @@ object ProtoCpgLoader {
     else
       file1Split(0).toInt < file2Split(0).toInt
   }
-
-  private def getNextProtoCpgFromStream(inputStream: InputStream) =
-    CpgStruct.parseFrom(inputStream)
 
   private def measureAndReport[A](f: => A): A = {
     val start  = System.currentTimeMillis()

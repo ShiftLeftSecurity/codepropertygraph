@@ -1,2 +1,0 @@
-package io.shiftleft.codepropertygraph.generated
-package object traversal extends NodeTraversalImplicits

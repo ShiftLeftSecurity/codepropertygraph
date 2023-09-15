@@ -22,9 +22,8 @@ object IOUtils {
     * of this class are not safe for use by multiple concurrent threads.' (copied from:
     * [[java.nio.charset.CharsetDecoder]])
     *
-    * As we are using it in a [[io.shiftleft.passes.ForkJoinParallelCpgPass]] or
-    * [[io.shiftleft.passes.ConcurrentWriterCpgPass]] a it needs to be thread-safe. Hence, we make sure to create a new
-    * instance everytime.
+    * As we are using it in a [[io.shiftleft.passes.ForkJoinParallelCpgPass]] it needs to be thread-safe. Hence, we make
+    * sure to create a new instance everytime.
     */
   private def createDecoder(): CharsetDecoder =
     Codec.UTF8.decoder

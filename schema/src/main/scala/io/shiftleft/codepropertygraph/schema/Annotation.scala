@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema._
+import flatgraph.schema._
 
 object Annotation extends SchemaBase {
   def docIndex: Int = 20

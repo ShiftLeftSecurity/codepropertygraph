@@ -1,8 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.193"
-val overflowdbCodegenVersion = "2.112"
+val flatgraphVersion = "0.0.74"
 
 inThisBuild(
   List(
@@ -53,7 +52,7 @@ lazy val schema            = Projects.schema
 lazy val domainClasses     = Projects.domainClasses
 lazy val protoBindings     = Projects.protoBindings
 lazy val codepropertygraph = Projects.codepropertygraph
-lazy val schema2json       = Projects.schema2json
+// lazy val schema2json       = Projects.schema2json
 
 ThisBuild / scalacOptions ++= Seq(
   "-release", "8",

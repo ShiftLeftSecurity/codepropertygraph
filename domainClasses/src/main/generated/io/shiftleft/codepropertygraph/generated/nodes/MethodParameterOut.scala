@@ -1,41 +1,52 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.Language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+
+trait MethodParameterOutEMT
+    extends AnyRef
+    with CfgNodeEMT
+    with DeclarationEMT
+    with HasEvaluationStrategyEMT
+    with HasIndexEMT
+    with HasIsVariadicEMT
+    with HasTypeFullNameEMT
+
+trait MethodParameterOutBase
+    extends AbstractNode
+    with CfgNodeBase
+    with DeclarationBase
+    with StaticType[MethodParameterOutEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    val res = new java.util.HashMap[String, Any]()
+    res.put("CODE", this.code)
+    this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
+    res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
+    res.put("INDEX", this.index)
+    res.put("IS_VARIADIC", this.isVariadic)
+    this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    res.put("NAME", this.name)
+    res.put("ORDER", this.order)
+    res.put("TYPE_FULL_NAME", this.typeFullName)
+    res
+  }
+}
 
 object MethodParameterOut {
-  def apply(graph: Graph, id: Long) = new MethodParameterOut(graph, id)
-
   val Label = "METHOD_PARAMETER_OUT"
-
   object PropertyNames {
-    val Code               = "CODE"
-    val ColumnNumber       = "COLUMN_NUMBER"
-    val EvaluationStrategy = "EVALUATION_STRATEGY"
-    val Index              = "INDEX"
-    val IsVariadic         = "IS_VARIADIC"
-    val LineNumber         = "LINE_NUMBER"
-    val Name               = "NAME"
-    val Order              = "ORDER"
-    val TypeFullName       = "TYPE_FULL_NAME"
-    val all: Set[String] =
-      Set(Code, ColumnNumber, EvaluationStrategy, Index, IsVariadic, LineNumber, Name, Order, TypeFullName)
-    val allAsJava: java.util.Set[String] = all.asJava
+    val Code               = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
+    val ColumnNumber       = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
+    val EvaluationStrategy = io.shiftleft.codepropertygraph.generated.PropertyNames.EVALUATION_STRATEGY
+    val Index              = io.shiftleft.codepropertygraph.generated.PropertyNames.INDEX
+    val IsVariadic         = io.shiftleft.codepropertygraph.generated.PropertyNames.IS_VARIADIC
+    val LineNumber         = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
+    val Name               = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
+    val Order              = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+    val TypeFullName       = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
   }
-
-  object Properties {
-    val Code               = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber       = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val EvaluationStrategy = new overflowdb.PropertyKey[String]("EVALUATION_STRATEGY")
-    val Index              = new overflowdb.PropertyKey[scala.Int]("INDEX")
-    val IsVariadic         = new overflowdb.PropertyKey[Boolean]("IS_VARIADIC")
-    val LineNumber         = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
-    val Name               = new overflowdb.PropertyKey[String]("NAME")
-    val Order              = new overflowdb.PropertyKey[scala.Int]("ORDER")
-    val TypeFullName       = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
-
-  }
-
   object PropertyDefaults {
     val Code               = "<empty>"
     val EvaluationStrategy = "<empty>"
@@ -45,445 +56,1376 @@ object MethodParameterOut {
     val Order              = -1: Int
     val TypeFullName       = "<empty>"
   }
-
-  val layoutInformation = new NodeLayoutInformation(
-    Label,
-    PropertyNames.allAsJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
-    ).asJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ParameterLink.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation
-    ).asJava
-  )
-
-  object Edges {
-    val Out: Array[String] = Array("EVAL_TYPE", "REACHING_DEF", "TAGGED_BY")
-    val In: Array[String]  = Array("AST", "CFG", "PARAMETER_LINK", "REACHING_DEF")
-  }
-
-  val factory = new NodeFactory[MethodParameterOutDb] {
-    override val forLabel = MethodParameterOut.Label
-
-    override def createNode(ref: NodeRef[MethodParameterOutDb]) =
-      new MethodParameterOutDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = MethodParameterOut(graph, id)
-  }
 }
 
-trait MethodParameterOutBase extends AbstractNode with AstNodeBase with CfgNodeBase with DeclarationBase {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def code: String
-  def columnNumber: Option[scala.Int]
-  def evaluationStrategy: String
-  def index: scala.Int
-  def isVariadic: Boolean
-  def lineNumber: Option[scala.Int]
-  def name: String
-  def order: scala.Int
-  def typeFullName: String
-
-}
-
-class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[MethodParameterOutDb](graph_4762, id_4762)
+class MethodParameterOut(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 28.toShort, seq_4762)
     with MethodParameterOutBase
-    with StoredNode
-    with AstNode
-    with CfgNode
-    with Declaration {
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def evaluationStrategy: String      = get().evaluationStrategy
-  override def index: scala.Int                = get().index
-  override def isVariadic: Boolean             = get().isVariadic
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def name: String                    = get().name
-  override def order: scala.Int                = get().order
-  override def typeFullName: String            = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "CODE"                => MethodParameterOut.PropertyDefaults.Code
-      case "EVALUATION_STRATEGY" => MethodParameterOut.PropertyDefaults.EvaluationStrategy
-      case "INDEX"               => MethodParameterOut.PropertyDefaults.Index
-      case "IS_VARIADIC"         => MethodParameterOut.PropertyDefaults.IsVariadic
-      case "NAME"                => MethodParameterOut.PropertyDefaults.Name
-      case "ORDER"               => MethodParameterOut.PropertyDefaults.Order
-      case "TYPE_FULL_NAME"      => MethodParameterOut.PropertyDefaults.TypeFullName
-      case _                     => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  def evalTypeOut: Iterator[Type] = get().evalTypeOut
-  override def _evalTypeOut       = get()._evalTypeOut
-
-  /** Traverse to parameter type Traverse to TYPE via EVAL_TYPE OUT edge.
-    */
-  /** Traverse to parameter type */
-  @overflowdb.traversal.help.Doc(info = """Traverse to parameter type""")
-  def typ: overflowdb.traversal.Traversal[Type] = get().typ
-
-  def reachingDefOut: Iterator[Expression] = get().reachingDefOut
-  override def _reachingDefOut             = get()._reachingDefOut
-
-  /** Traverse to CALL via REACHING_DEF OUT edge.
-    */
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefOut
-
-  /** Traverse to IDENTIFIER via REACHING_DEF OUT edge.
-    */
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefOut
-
-  /** Traverse to LITERAL via REACHING_DEF OUT edge.
-    */
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefOut
-
-  /** Traverse to METHOD_REF via REACHING_DEF OUT edge.
-    */
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefOut
-
-  /** Traverse to RETURN via REACHING_DEF OUT edge.
-    */
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefOut
-
-  /** Traverse to TYPE_REF via REACHING_DEF OUT edge.
-    */
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
-
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
-
-  /** Traverse to TAG via TAGGED_BY OUT edge.
-    */
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
-
-  def astIn: Iterator[Method] = get().astIn
-  override def _astIn         = get()._astIn
-
-  /** Traverse to METHOD via AST IN edge.
-    */
-  def method: Method = get().method
-
-  def cfgIn: Iterator[CfgNode] = get().cfgIn
-  override def _cfgIn          = get()._cfgIn
-
-  def parameterLinkIn: Iterator[MethodParameterIn] = get().parameterLinkIn
-  override def _parameterLinkIn                    = get()._parameterLinkIn
-
-  /** Traverse to METHOD_PARAMETER_IN via PARAMETER_LINK IN edge.
-    */
-  def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = get().asInput
-
-  def reachingDefIn: Iterator[CfgNode] = get().reachingDefIn
-  override def _reachingDefIn          = get()._reachingDefIn
-
-  /** Traverse to BLOCK via REACHING_DEF IN edge.
-    */
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefIn
-
-  /** Traverse to CALL via REACHING_DEF IN edge.
-    */
-  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefIn
-
-  /** Traverse to CONTROL_STRUCTURE via REACHING_DEF IN edge.
-    */
-  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaReachingDefIn
-
-  /** Traverse to IDENTIFIER via REACHING_DEF IN edge.
-    */
-  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefIn
-
-  /** Traverse to LITERAL via REACHING_DEF IN edge.
-    */
-  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefIn
-
-  /** Traverse to METHOD via REACHING_DEF IN edge.
-    */
-  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = get()._methodViaReachingDefIn
-
-  /** Traverse to METHOD_PARAMETER_IN via REACHING_DEF IN edge.
-    */
-  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    get()._methodParameterInViaReachingDefIn
-
-  /** Traverse to METHOD_REF via REACHING_DEF IN edge.
-    */
-  def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefIn
-
-  /** Traverse to RETURN via REACHING_DEF IN edge.
-    */
-  def _returnViaReachingDefIn: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefIn
-
-  /** Traverse to TYPE_REF via REACHING_DEF IN edge.
-    */
-  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefIn
-
-  /** Traverse to UNKNOWN via REACHING_DEF IN edge.
-    */
-  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaReachingDefIn
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    MethodParameterOut.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "evaluationStrategy"
-      case 4 => "index"
-      case 5 => "isVariadic"
-      case 6 => "lineNumber"
-      case 7 => "name"
-      case 8 => "order"
-      case 9 => "typeFullName"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => evaluationStrategy
-      case 4 => index
-      case 5 => isVariadic
-      case 6 => lineNumber
-      case 7 => name
-      case 8 => order
-      case 9 => typeFullName
-    }
-
-  override def productPrefix = "MethodParameterOut"
-  override def productArity  = 10
-}
-
-class MethodParameterOutDb(ref: NodeRef[NodeDb])
-    extends NodeDb(ref)
-    with StoredNode
-    with AstNode
     with CfgNode
     with Declaration
-    with MethodParameterOutBase {
-
-  override def layoutInformation: NodeLayoutInformation = MethodParameterOut.layoutInformation
-
-  private var _code: String                  = MethodParameterOut.PropertyDefaults.Code
-  def code: String                           = _code
-  private var _columnNumber: Integer         = null
-  def columnNumber: Option[scala.Int]        = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _evaluationStrategy: String    = MethodParameterOut.PropertyDefaults.EvaluationStrategy
-  def evaluationStrategy: String             = _evaluationStrategy
-  private var _index: Integer                = MethodParameterOut.PropertyDefaults.Index
-  def index: scala.Int                       = _index
-  private var _isVariadic: java.lang.Boolean = MethodParameterOut.PropertyDefaults.IsVariadic
-  def isVariadic: Boolean                    = _isVariadic
-  private var _lineNumber: Integer           = null
-  def lineNumber: Option[scala.Int]          = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _name: String                  = MethodParameterOut.PropertyDefaults.Name
-  def name: String                           = _name
-  private var _order: Integer                = MethodParameterOut.PropertyDefaults.Order
-  def order: scala.Int                       = _order
-  private var _typeFullName: String          = MethodParameterOut.PropertyDefaults.TypeFullName
-  def typeFullName: String                   = _typeFullName
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    properties.put("CODE", code)
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    properties.put("EVALUATION_STRATEGY", evaluationStrategy)
-    properties.put("INDEX", index)
-    properties.put("IS_VARIADIC", isVariadic)
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    properties.put("NAME", name)
-    properties.put("ORDER", order)
-    properties.put("TYPE_FULL_NAME", typeFullName)
-
-    properties
-  }
-
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    if (!(("<empty>") == code)) { properties.put("CODE", code) }
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    if (!(("<empty>") == evaluationStrategy)) { properties.put("EVALUATION_STRATEGY", evaluationStrategy) }
-    if (!((-1: Int) == index)) { properties.put("INDEX", index) }
-    if (!((false) == isVariadic)) { properties.put("IS_VARIADIC", isVariadic) }
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    if (!(("<empty>") == name)) { properties.put("NAME", name) }
-    if (!((-1: Int) == order)) { properties.put("ORDER", order) }
-    if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
-
-    properties
-  }
-
-  import overflowdb.traversal._
-  def evalTypeOut: Iterator[Type]               = createAdjacentNodeScalaIteratorByOffSet[Type](0)
-  override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def typ: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
-
-  def reachingDefOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
-  override def _reachingDefOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef]   = reachingDefOut.collectAll[MethodRef]
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]         = reachingDefOut.collectAll[Return]
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]       = reachingDefOut.collectAll[TypeRef]
-
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
-
-  def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](3)
-  override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def method: Method = try { astIn.collectAll[Method].next() }
-  catch {
-    case e: java.util.NoSuchElementException =>
-      throw new overflowdb.SchemaViolationException(
-        "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this METHOD_PARAMETER_OUT node with id=" + id,
-        e
-      )
-  }
-
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-
-  def parameterLinkIn: Iterator[MethodParameterIn] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterIn](5)
-  override def _parameterLinkIn                    = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = parameterLinkIn.collectAll[MethodParameterIn]
-
-  def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = reachingDefIn.collectAll[Block]
-  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call]   = reachingDefIn.collectAll[Call]
-  def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
-    reachingDefIn.collectAll[ControlStructure]
-  def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = reachingDefIn.collectAll[Identifier]
-  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal]       = reachingDefIn.collectAll[Literal]
-  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method]         = reachingDefIn.collectAll[Method]
-  def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    reachingDefIn.collectAll[MethodParameterIn]
-  def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = reachingDefIn.collectAll[MethodRef]
-  def _returnViaReachingDefIn: overflowdb.traversal.Traversal[Return]       = reachingDefIn.collectAll[Return]
-  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef]     = reachingDefIn.collectAll[TypeRef]
-  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown]     = reachingDefIn.collectAll[Unknown]
-
-  override def label: String = {
-    MethodParameterOut.Label
-  }
+    with StaticType[MethodParameterOutEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "evaluationStrategy"
-      case 4 => "index"
-      case 5 => "isVariadic"
-      case 6 => "lineNumber"
-      case 7 => "name"
-      case 8 => "order"
-      case 9 => "typeFullName"
+      case 0 => "code"
+      case 1 => "columnNumber"
+      case 2 => "evaluationStrategy"
+      case 3 => "index"
+      case 4 => "isVariadic"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
+      case 8 => "typeFullName"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => evaluationStrategy
-      case 4 => index
-      case 5 => isVariadic
-      case 6 => lineNumber
-      case 7 => name
-      case 8 => order
-      case 9 => typeFullName
+      case 0 => this.code
+      case 1 => this.columnNumber
+      case 2 => this.evaluationStrategy
+      case 3 => this.index
+      case 4 => this.isVariadic
+      case 5 => this.lineNumber
+      case 6 => this.name
+      case 7 => this.order
+      case 8 => this.typeFullName
+      case _ => null
     }
 
   override def productPrefix = "MethodParameterOut"
-  override def productArity  = 10
+  override def productArity  = 9
 
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodParameterOutDb]
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodParameterOut]
+}
 
-  override def property(key: String): Any = {
-    key match {
-      case "CODE"                => this._code
-      case "COLUMN_NUMBER"       => this._columnNumber
-      case "EVALUATION_STRATEGY" => this._evaluationStrategy
-      case "INDEX"               => this._index
-      case "IS_VARIADIC"         => this._isVariadic
-      case "LINE_NUMBER"         => this._lineNumber
-      case "NAME"                => this._name
-      case "ORDER"               => this._order
-      case "TYPE_FULL_NAME"      => this._typeFullName
+object NewMethodParameterOut {
+  def apply(): NewMethodParameterOut = new NewMethodParameterOut
+  private val outNeighbors: Map[String, Set[String]] = Map(
+    "ALIAS_OF" -> Set("TYPE"),
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS" -> Set("BINDING"),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CAPTURE"     -> Set("CLOSURE_BINDING"),
+    "CAPTURED_BY" -> Set("CLOSURE_BINDING"),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "EVAL_TYPE"     -> Set("TYPE"),
+    "IMPORTS"       -> Set("DEPENDENCY"),
+    "INHERITS_FROM" -> Set("TYPE"),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "TAGGED_BY" -> Set("TAG")
+  )
+  private val inNeighbors: Map[String, Set[String]] = Map(
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BINDING",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "CLOSURE_BINDING",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    )
+  )
+}
+class NewMethodParameterOut
+    extends NewNode(28.toShort)
+    with MethodParameterOutBase
+    with AstNodeNew
+    with CfgNodeNew
+    with DeclarationNew {
+  override type StoredNodeType = MethodParameterOut
+  override def label: String = "METHOD_PARAMETER_OUT"
 
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewMethodParameterOut.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewMethodParameterOut.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+
+  var code: String                                 = "<empty>": String
+  var columnNumber: Option[Int]                    = None
+  var evaluationStrategy: String                   = "<empty>": String
+  var index: Int                                   = -1: Int
+  var isVariadic: Boolean                          = false: Boolean
+  var lineNumber: Option[Int]                      = None
+  var name: String                                 = "<empty>": String
+  var order: Int                                   = -1: Int
+  var typeFullName: String                         = "<empty>": String
+  def code(value: String): this.type               = { this.code = value; this }
+  def columnNumber(value: Int): this.type          = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type  = { this.columnNumber = value; this }
+  def evaluationStrategy(value: String): this.type = { this.evaluationStrategy = value; this }
+  def index(value: Int): this.type                 = { this.index = value; this }
+  def isVariadic(value: Boolean): this.type        = { this.isVariadic = value; this }
+  def lineNumber(value: Int): this.type            = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type    = { this.lineNumber = value; this }
+  def name(value: String): this.type               = { this.name = value; this }
+  def order(value: Int): this.type                 = { this.order = value; this }
+  def typeFullName(value: String): this.type       = { this.typeFullName = value; this }
+  override def flattenProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.insertProperty(this, 10, Iterator(this.code))
+    if (columnNumber.nonEmpty) interface.insertProperty(this, 11, this.columnNumber)
+    interface.insertProperty(this, 19, Iterator(this.evaluationStrategy))
+    interface.insertProperty(this, 26, Iterator(this.index))
+    interface.insertProperty(this, 30, Iterator(this.isVariadic))
+    if (lineNumber.nonEmpty) interface.insertProperty(this, 34, this.lineNumber)
+    interface.insertProperty(this, 39, Iterator(this.name))
+    interface.insertProperty(this, 43, Iterator(this.order))
+    interface.insertProperty(this, 52, Iterator(this.typeFullName))
+  }
+
+  override def copy(): this.type = {
+    val newInstance = new NewMethodParameterOut
+    newInstance.code = this.code
+    newInstance.columnNumber = this.columnNumber
+    newInstance.evaluationStrategy = this.evaluationStrategy
+    newInstance.index = this.index
+    newInstance.isVariadic = this.isVariadic
+    newInstance.lineNumber = this.lineNumber
+    newInstance.name = this.name
+    newInstance.order = this.order
+    newInstance.typeFullName = this.typeFullName
+    newInstance.asInstanceOf[this.type]
+  }
+
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "code"
+      case 1 => "columnNumber"
+      case 2 => "evaluationStrategy"
+      case 3 => "index"
+      case 4 => "isVariadic"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
+      case 8 => "typeFullName"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.code
+      case 1 => this.columnNumber
+      case 2 => this.evaluationStrategy
+      case 3 => this.index
+      case 4 => this.isVariadic
+      case 5 => this.lineNumber
+      case 6 => this.name
+      case 7 => this.order
+      case 8 => this.typeFullName
       case _ => null
     }
-  }
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "CODE"                => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"       => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "EVALUATION_STRATEGY" => this._evaluationStrategy = value.asInstanceOf[String]
-      case "INDEX"               => this._index = value.asInstanceOf[scala.Int]
-      case "IS_VARIADIC"         => this._isVariadic = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER"         => this._lineNumber = value.asInstanceOf[scala.Int]
-      case "NAME"                => this._name = value.asInstanceOf[String]
-      case "ORDER"               => this._order = value.asInstanceOf[scala.Int]
-      case "TYPE_FULL_NAME"      => this._typeFullName = value.asInstanceOf[String]
-
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
-    }
-  }
-
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
-
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._code = newNode.asInstanceOf[NewMethodParameterOut].code
-    this._columnNumber = newNode.asInstanceOf[NewMethodParameterOut].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._evaluationStrategy = newNode.asInstanceOf[NewMethodParameterOut].evaluationStrategy
-    this._index = newNode.asInstanceOf[NewMethodParameterOut].index
-    this._isVariadic = newNode.asInstanceOf[NewMethodParameterOut].isVariadic
-    this._lineNumber = newNode.asInstanceOf[NewMethodParameterOut].lineNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._name = newNode.asInstanceOf[NewMethodParameterOut].name
-    this._order = newNode.asInstanceOf[NewMethodParameterOut].order
-    this._typeFullName = newNode.asInstanceOf[NewMethodParameterOut].typeFullName
-
-  }
-
+  override def productPrefix                = "NewMethodParameterOut"
+  override def productArity                 = 9
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodParameterOut]
 }

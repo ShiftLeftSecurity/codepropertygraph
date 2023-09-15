@@ -1,9 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.EdgeType.Cardinality
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{Constant, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.EdgeType.Cardinality
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{Constant, SchemaBuilder, SchemaInfo}
 
 object CallGraph extends SchemaBase {
 
