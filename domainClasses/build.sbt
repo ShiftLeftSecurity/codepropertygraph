@@ -1,6 +1,11 @@
 name := "codepropertygraph-domain-classes"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
+val flatGraphVersion = "0.0.0+56-ef024eee"
+
+libraryDependencies ++= Seq(
+  "io.joern" %% "joern-generated" % flatGraphVersion,
+  "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
+)
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 generatedSrcDir := (Compile/sourceDirectory).value / "generated"
