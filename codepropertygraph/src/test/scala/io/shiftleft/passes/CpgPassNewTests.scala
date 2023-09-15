@@ -1,21 +1,22 @@
 package io.shiftleft.passes
 
 import better.files.File
+import flatgraph.SchemaViolationException
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewFile
+import io.shiftleft.codepropertygraph.generated.Language.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import java.nio.file.Files
-import scala.jdk.CollectionConverters._
 
 class CpgPassNewTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
-    def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
+    def apply(f: (Cpg, CpgPassBase) => Unit): Unit = {
       val cpg = Cpg.empty
-      class MyPass(cpg: Cpg) extends SimpleCpgPass(cpg, "MyPass", keyPool) {
+      class MyPass(cpg: Cpg) extends SimpleCpgPass(cpg, "MyPass") {
         override def run(builder: DiffGraphBuilder): Unit = {
           val builder2 = Cpg.newDiffGraphBuilder
           builder.addNode(NewFile().name("foo"))
@@ -29,12 +30,12 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
   }
 
   "SimpleCpgPass" should {
-    "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
+    "allow creating and applying result of pass" in Fixture { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V().asScala.map(_.label).toSet shouldBe Set("FILE")
+      cpg.all.label.toSet shouldBe Set("FILE")
     }
 
-    "produce a serialized CPG file" in Fixture() { (_, pass) =>
+    "produce a serialized CPG file" in Fixture { (_, pass) =>
       File.usingTemporaryFile("pass", ".zip") { file =>
         file.delete()
         val filename      = file.path.toString
@@ -44,11 +45,6 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
         file.exists shouldBe true
         Files.size(file.path) should not be 0
       }
-    }
-
-    "take into account KeyPool for createAndApply" in Fixture(Some(new IntervalKeyPool(100, 120))) { (cpg, pass) =>
-      pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
     }
 
     "fail for schema violations" in {
@@ -65,7 +61,7 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
       }
 
       // the above DiffGraph is not schema conform, applying it must throw an exception
-      intercept[Exception] {
+      intercept[SchemaViolationException] {
         pass.createAndApply()
       }
     }

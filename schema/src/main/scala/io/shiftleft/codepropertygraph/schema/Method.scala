@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object Method extends SchemaBase {
 
@@ -76,6 +76,7 @@ object Method extends SchemaBase {
       .addProperties(astParentType, astParentFullName)
       .addProperties(offset, offsetEnd)
       .extendz(declaration)
+      .primaryKey(name)
 
     val isVariadic = builder
       .addProperty(
@@ -101,6 +102,7 @@ object Method extends SchemaBase {
       .protoId(34)
       .addProperties(typeFullName, isVariadic, index)
       .extendz(declaration)
+      .primaryKey(name)
 
     val methodParameterOut: NodeType = builder
       .addNodeType(

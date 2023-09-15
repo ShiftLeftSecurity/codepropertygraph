@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema._
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema._
 
 object TagsAndLocation extends SchemaBase {
 
@@ -85,6 +85,7 @@ object TagsAndLocation extends SchemaBase {
       .addNodeType(name = "TAG", comment = "This node represents a tag.")
       .protoId(24)
       .addProperties(name, value)
+      .primaryKey(name)
 
     val location: NodeType = builder
       .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")

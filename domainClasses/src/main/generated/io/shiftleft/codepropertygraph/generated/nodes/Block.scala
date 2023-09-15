@@ -1,1068 +1,1421 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.Language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+
+trait BlockEMT
+    extends AnyRef
+    with ExpressionEMT
+    with HasDynamicTypeHintFullNameEMT
+    with HasPossibleTypesEMT
+    with HasTypeFullNameEMT
+
+trait BlockBase extends AbstractNode with ExpressionBase with StaticType[BlockEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    val res = new java.util.HashMap[String, Any]()
+    res.put("ARGUMENT_INDEX", this.argumentIndex)
+    this.argumentName.foreach { p => res.put("ARGUMENT_NAME", p) }
+    res.put("CODE", this.code)
+    this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
+    val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
+    if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
+    this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    res.put("ORDER", this.order)
+    val tmpPossibleTypes = this.possibleTypes;
+    if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
+    res.put("TYPE_FULL_NAME", this.typeFullName)
+    res
+  }
+}
 
 object Block {
-  def apply(graph: Graph, id: Long) = new Block(graph, id)
-
   val Label = "BLOCK"
-
   object PropertyNames {
-    val ArgumentIndex           = "ARGUMENT_INDEX"
-    val ArgumentName            = "ARGUMENT_NAME"
-    val Code                    = "CODE"
-    val ColumnNumber            = "COLUMN_NUMBER"
-    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
-    val LineNumber              = "LINE_NUMBER"
-    val Order                   = "ORDER"
-    val PossibleTypes           = "POSSIBLE_TYPES"
-    val TypeFullName            = "TYPE_FULL_NAME"
-    val all: Set[String] = Set(
-      ArgumentIndex,
-      ArgumentName,
-      Code,
-      ColumnNumber,
-      DynamicTypeHintFullName,
-      LineNumber,
-      Order,
-      PossibleTypes,
-      TypeFullName
-    )
-    val allAsJava: java.util.Set[String] = all.asJava
+    val ArgumentIndex           = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_INDEX
+    val ArgumentName            = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_NAME
+    val Code                    = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
+    val ColumnNumber            = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
+    val DynamicTypeHintFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.DYNAMIC_TYPE_HINT_FULL_NAME
+    val LineNumber              = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
+    val Order                   = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+    val PossibleTypes           = io.shiftleft.codepropertygraph.generated.PropertyNames.POSSIBLE_TYPES
+    val TypeFullName            = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
   }
-
-  object Properties {
-    val ArgumentIndex           = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
-    val ArgumentName            = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
-    val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
-    val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
-    val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
-    val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
-
-  }
-
   object PropertyDefaults {
     val ArgumentIndex = -1: Int
     val Code          = "<empty>"
     val Order         = -1: Int
     val TypeFullName  = "<empty>"
   }
-
-  val layoutInformation = new NodeLayoutInformation(
-    Label,
-    PropertyNames.allAsJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cdg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
-    ).asJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.Argument.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cdg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Cfg.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Condition.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Dominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.PostDominate.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Receiver.layoutInformation
-    ).asJava
-  )
-
-  object Edges {
-    val Out: Array[String] =
-      Array("ARGUMENT", "AST", "CDG", "CFG", "DOMINATE", "EVAL_TYPE", "POST_DOMINATE", "REACHING_DEF", "TAGGED_BY")
-    val In: Array[String] = Array(
-      "ARGUMENT",
-      "AST",
-      "CDG",
-      "CFG",
-      "CONDITION",
-      "CONTAINS",
-      "DOMINATE",
-      "POST_DOMINATE",
-      "REACHING_DEF",
-      "RECEIVER"
-    )
-  }
-
-  val factory = new NodeFactory[BlockDb] {
-    override val forLabel = Block.Label
-
-    override def createNode(ref: NodeRef[BlockDb]) =
-      new BlockDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = Block(graph, id)
-  }
 }
 
-trait BlockBase extends AbstractNode with ExpressionBase {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def argumentIndex: scala.Int
-  def argumentName: Option[String]
-  def code: String
-  def columnNumber: Option[scala.Int]
-  def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[scala.Int]
-  def order: scala.Int
-  def possibleTypes: IndexedSeq[String]
-  def typeFullName: String
-
-}
-
-class Block(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[BlockDb](graph_4762, id_4762)
+class Block(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 6.toShort, seq_4762)
     with BlockBase
-    with StoredNode
-    with Expression {
-  override def argumentIndex: scala.Int                    = get().argumentIndex
-  override def argumentName: Option[String]                = get().argumentName
-  override def code: String                                = get().code
-  override def columnNumber: Option[scala.Int]             = get().columnNumber
-  override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[scala.Int]               = get().lineNumber
-  override def order: scala.Int                            = get().order
-  override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
-  override def typeFullName: String                        = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "ARGUMENT_INDEX" => Block.PropertyDefaults.ArgumentIndex
-      case "CODE"           => Block.PropertyDefaults.Code
-      case "ORDER"          => Block.PropertyDefaults.Order
-      case "TYPE_FULL_NAME" => Block.PropertyDefaults.TypeFullName
-      case _                => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  def argumentOut: Iterator[TemplateDom] = get().argumentOut
-  override def _argumentOut              = get()._argumentOut
-
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
-
-  /** Traverse to BLOCK via AST OUT edge.
-    */
-  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = get()._blockViaAstOut
-
-  /** Traverse to CALL via AST OUT edge.
-    */
-  def _callViaAstOut: overflowdb.traversal.Traversal[Call] = get()._callViaAstOut
-
-  /** Traverse to CONTROL_STRUCTURE via AST OUT edge.
-    */
-  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstOut
-
-  /** Traverse to IDENTIFIER via AST OUT edge.
-    */
-  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaAstOut
-
-  /** Traverse to IMPORT via AST OUT edge.
-    */
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
-
-  /** Traverse to JUMP_TARGET via AST OUT edge.
-    */
-  def _jumpTargetViaAstOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaAstOut
-
-  /** Traverse to LITERAL via AST OUT edge.
-    */
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
-
-  /** Traverse to locals of this block. Traverse to LOCAL via AST OUT edge.
-    */
-  /** Traverse to locals of this block. */
-  @overflowdb.traversal.help.Doc(info = """Traverse to locals of this block.""")
-  def local: overflowdb.traversal.Traversal[Local] = get().local
-
-  /** Traverse to METHOD_REF via AST OUT edge.
-    */
-  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaAstOut
-
-  /** Traverse to RETURN via AST OUT edge.
-    */
-  def _returnViaAstOut: overflowdb.traversal.Traversal[Return] = get()._returnViaAstOut
-
-  /** Traverse to TYPE_REF via AST OUT edge.
-    */
-  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaAstOut
-
-  /** Traverse to UNKNOWN via AST OUT edge.
-    */
-  def _unknownViaAstOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstOut
-
-  def cdgOut: Iterator[CfgNode] = get().cdgOut
-  override def _cdgOut          = get()._cdgOut
-
-  /** Traverse to BLOCK via CDG OUT edge.
-    */
-  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgOut
-
-  /** Traverse to CALL via CDG OUT edge.
-    */
-  def _callViaCdgOut: overflowdb.traversal.Traversal[Call] = get()._callViaCdgOut
-
-  /** Traverse to CONTROL_STRUCTURE via CDG OUT edge.
-    */
-  def _controlStructureViaCdgOut: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgOut
-
-  /** Traverse to FIELD_IDENTIFIER via CDG OUT edge.
-    */
-  def _fieldIdentifierViaCdgOut: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgOut
-
-  /** Traverse to IDENTIFIER via CDG OUT edge.
-    */
-  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgOut
-
-  /** Traverse to JUMP_TARGET via CDG OUT edge.
-    */
-  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgOut
-
-  /** Traverse to LITERAL via CDG OUT edge.
-    */
-  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgOut
-
-  /** Traverse to METHOD_REF via CDG OUT edge.
-    */
-  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgOut
-
-  /** Traverse to METHOD_RETURN via CDG OUT edge.
-    */
-  def _methodReturnViaCdgOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaCdgOut
-
-  /** Traverse to RETURN via CDG OUT edge.
-    */
-  def _returnViaCdgOut: overflowdb.traversal.Traversal[Return] = get()._returnViaCdgOut
-
-  /** Traverse to TYPE_REF via CDG OUT edge.
-    */
-  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgOut
-
-  /** Traverse to UNKNOWN via CDG OUT edge.
-    */
-  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgOut
-
-  def cfgOut: Iterator[CfgNode] = get().cfgOut
-  override def _cfgOut          = get()._cfgOut
-
-  /** Traverse to CFG_NODE via CFG OUT edge.
-    */
-  def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = get()._cfgNodeViaCfgOut
-
-  def dominateOut: Iterator[CfgNode] = get().dominateOut
-  override def _dominateOut          = get()._dominateOut
-
-  /** Traverse to BLOCK via DOMINATE OUT edge.
-    */
-  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateOut
-
-  /** Traverse to CALL via DOMINATE OUT edge.
-    */
-  def _callViaDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaDominateOut
-
-  /** Traverse to CONTROL_STRUCTURE via DOMINATE OUT edge.
-    */
-  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaDominateOut
-
-  /** Traverse to FIELD_IDENTIFIER via DOMINATE OUT edge.
-    */
-  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaDominateOut
-
-  /** Traverse to IDENTIFIER via DOMINATE OUT edge.
-    */
-  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaDominateOut
-
-  /** Traverse to JUMP_TARGET via DOMINATE OUT edge.
-    */
-  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateOut
-
-  /** Traverse to LITERAL via DOMINATE OUT edge.
-    */
-  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateOut
-
-  /** Traverse to METHOD_REF via DOMINATE OUT edge.
-    */
-  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateOut
-
-  /** Traverse to METHOD_RETURN via DOMINATE OUT edge.
-    */
-  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaDominateOut
-
-  /** Traverse to RETURN via DOMINATE OUT edge.
-    */
-  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateOut
-
-  /** Traverse to TYPE_REF via DOMINATE OUT edge.
-    */
-  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateOut
-
-  /** Traverse to UNKNOWN via DOMINATE OUT edge.
-    */
-  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateOut
-
-  def evalTypeOut: Iterator[Type] = get().evalTypeOut
-  override def _evalTypeOut       = get()._evalTypeOut
-
-  /** Traverse to TYPE via EVAL_TYPE OUT edge.
-    */
-  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = get()._typeViaEvalTypeOut
-
-  def postDominateOut: Iterator[CfgNode] = get().postDominateOut
-  override def _postDominateOut          = get()._postDominateOut
-
-  /** Traverse to BLOCK via POST_DOMINATE OUT edge.
-    */
-  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateOut
-
-  /** Traverse to CALL via POST_DOMINATE OUT edge.
-    */
-  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateOut
-
-  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE OUT edge.
-    */
-  def _controlStructureViaPostDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaPostDominateOut
-
-  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE OUT edge.
-    */
-  def _fieldIdentifierViaPostDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaPostDominateOut
-
-  /** Traverse to IDENTIFIER via POST_DOMINATE OUT edge.
-    */
-  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateOut
-
-  /** Traverse to JUMP_TARGET via POST_DOMINATE OUT edge.
-    */
-  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateOut
-
-  /** Traverse to LITERAL via POST_DOMINATE OUT edge.
-    */
-  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateOut
-
-  /** Traverse to METHOD via POST_DOMINATE OUT edge.
-    */
-  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method] = get()._methodViaPostDominateOut
-
-  /** Traverse to METHOD_REF via POST_DOMINATE OUT edge.
-    */
-  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateOut
-
-  /** Traverse to RETURN via POST_DOMINATE OUT edge.
-    */
-  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateOut
-
-  /** Traverse to TYPE_REF via POST_DOMINATE OUT edge.
-    */
-  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateOut
-
-  /** Traverse to UNKNOWN via POST_DOMINATE OUT edge.
-    */
-  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateOut
-
-  def reachingDefOut: Iterator[CfgNode] = get().reachingDefOut
-  override def _reachingDefOut          = get()._reachingDefOut
-
-  /** Traverse to BLOCK via REACHING_DEF OUT edge.
-    */
-  def _blockViaReachingDefOut: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefOut
-
-  /** Traverse to CALL via REACHING_DEF OUT edge.
-    */
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefOut
-
-  /** Traverse to IDENTIFIER via REACHING_DEF OUT edge.
-    */
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefOut
-
-  /** Traverse to LITERAL via REACHING_DEF OUT edge.
-    */
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefOut
-
-  /** Traverse to METHOD_PARAMETER_OUT via REACHING_DEF OUT edge.
-    */
-  def _methodParameterOutViaReachingDefOut: overflowdb.traversal.Traversal[MethodParameterOut] =
-    get()._methodParameterOutViaReachingDefOut
-
-  /** Traverse to METHOD_REF via REACHING_DEF OUT edge.
-    */
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefOut
-
-  /** Traverse to RETURN via REACHING_DEF OUT edge.
-    */
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefOut
-
-  /** Traverse to TYPE_REF via REACHING_DEF OUT edge.
-    */
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
-
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
-
-  /** Traverse to TAG via TAGGED_BY OUT edge.
-    */
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
-
-  def argumentIn: Iterator[Expression] = get().argumentIn
-  override def _argumentIn             = get()._argumentIn
-
-  /** Traverse to CALL via ARGUMENT IN edge.
-    */
-  def _callViaArgumentIn: Option[Call] = get()._callViaArgumentIn
-
-  /** Traverse to RETURN via ARGUMENT IN edge.
-    */
-  def _returnViaArgumentIn: Option[Return] = get()._returnViaArgumentIn
-
-  def astIn: Iterator[CfgNode] = get().astIn
-  override def _astIn          = get()._astIn
-
-  /** Traverse to BLOCK via AST IN edge.
-    */
-  def _blockViaAstIn: Block = get()._blockViaAstIn
-
-  /** Traverse to CALL via AST IN edge.
-    */
-  def _callViaAstIn: overflowdb.traversal.Traversal[Call] = get()._callViaAstIn
-
-  /** Traverse to CONTROL_STRUCTURE via AST IN edge.
-    */
-  def _controlStructureViaAstIn: Option[ControlStructure] = get()._controlStructureViaAstIn
-
-  /** Traverse to METHOD via AST IN edge.
-    */
-  def _methodViaAstIn: Method = get()._methodViaAstIn
-
-  /** Traverse to RETURN via AST IN edge.
-    */
-  def _returnViaAstIn: overflowdb.traversal.Traversal[Return] = get()._returnViaAstIn
-
-  /** Traverse to UNKNOWN via AST IN edge.
-    */
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
-
-  def cdgIn: Iterator[CfgNode] = get().cdgIn
-  override def _cdgIn          = get()._cdgIn
-
-  /** Traverse to BLOCK via CDG IN edge.
-    */
-  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block] = get()._blockViaCdgIn
-
-  /** Traverse to CALL via CDG IN edge.
-    */
-  def _callViaCdgIn: overflowdb.traversal.Traversal[Call] = get()._callViaCdgIn
-
-  /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
-    */
-  def _controlStructureViaCdgIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaCdgIn
-
-  /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
-    */
-  def _fieldIdentifierViaCdgIn: overflowdb.traversal.Traversal[FieldIdentifier] = get()._fieldIdentifierViaCdgIn
-
-  /** Traverse to IDENTIFIER via CDG IN edge.
-    */
-  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaCdgIn
-
-  /** Traverse to JUMP_TARGET via CDG IN edge.
-    */
-  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaCdgIn
-
-  /** Traverse to LITERAL via CDG IN edge.
-    */
-  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaCdgIn
-
-  /** Traverse to METHOD_REF via CDG IN edge.
-    */
-  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCdgIn
-
-  /** Traverse to TYPE_REF via CDG IN edge.
-    */
-  def _typeRefViaCdgIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCdgIn
-
-  /** Traverse to UNKNOWN via CDG IN edge.
-    */
-  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgIn
-
-  def cfgIn: Iterator[CfgNode] = get().cfgIn
-  override def _cfgIn          = get()._cfgIn
-
-  def conditionIn: Iterator[ControlStructure] = get().conditionIn
-  override def _conditionIn                   = get()._conditionIn
-
-  /** Traverse to CONTROL_STRUCTURE via CONDITION IN edge.
-    */
-  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaConditionIn
-
-  def containsIn: Iterator[Method] = get().containsIn
-  override def _containsIn         = get()._containsIn
-
-  /** Traverse to METHOD via CONTAINS IN edge.
-    */
-  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
-
-  def dominateIn: Iterator[CfgNode] = get().dominateIn
-  override def _dominateIn          = get()._dominateIn
-
-  /** Traverse to BLOCK via DOMINATE IN edge.
-    */
-  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaDominateIn
-
-  /** Traverse to CALL via DOMINATE IN edge.
-    */
-  def _callViaDominateIn: overflowdb.traversal.Traversal[Call] = get()._callViaDominateIn
-
-  /** Traverse to CONTROL_STRUCTURE via DOMINATE IN edge.
-    */
-  def _controlStructureViaDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaDominateIn
-
-  /** Traverse to FIELD_IDENTIFIER via DOMINATE IN edge.
-    */
-  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaDominateIn
-
-  /** Traverse to IDENTIFIER via DOMINATE IN edge.
-    */
-  def _identifierViaDominateIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaDominateIn
-
-  /** Traverse to JUMP_TARGET via DOMINATE IN edge.
-    */
-  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaDominateIn
-
-  /** Traverse to LITERAL via DOMINATE IN edge.
-    */
-  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaDominateIn
-
-  /** Traverse to METHOD via DOMINATE IN edge.
-    */
-  def _methodViaDominateIn: overflowdb.traversal.Traversal[Method] = get()._methodViaDominateIn
-
-  /** Traverse to METHOD_REF via DOMINATE IN edge.
-    */
-  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaDominateIn
-
-  /** Traverse to RETURN via DOMINATE IN edge.
-    */
-  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaDominateIn
-
-  /** Traverse to TYPE_REF via DOMINATE IN edge.
-    */
-  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaDominateIn
-
-  /** Traverse to UNKNOWN via DOMINATE IN edge.
-    */
-  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateIn
-
-  def postDominateIn: Iterator[CfgNode] = get().postDominateIn
-  override def _postDominateIn          = get()._postDominateIn
-
-  /** Traverse to BLOCK via POST_DOMINATE IN edge.
-    */
-  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block] = get()._blockViaPostDominateIn
-
-  /** Traverse to CALL via POST_DOMINATE IN edge.
-    */
-  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call] = get()._callViaPostDominateIn
-
-  /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
-    */
-  def _controlStructureViaPostDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    get()._controlStructureViaPostDominateIn
-
-  /** Traverse to FIELD_IDENTIFIER via POST_DOMINATE IN edge.
-    */
-  def _fieldIdentifierViaPostDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    get()._fieldIdentifierViaPostDominateIn
-
-  /** Traverse to IDENTIFIER via POST_DOMINATE IN edge.
-    */
-  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaPostDominateIn
-
-  /** Traverse to JUMP_TARGET via POST_DOMINATE IN edge.
-    */
-  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = get()._jumpTargetViaPostDominateIn
-
-  /** Traverse to LITERAL via POST_DOMINATE IN edge.
-    */
-  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaPostDominateIn
-
-  /** Traverse to METHOD_REF via POST_DOMINATE IN edge.
-    */
-  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaPostDominateIn
-
-  /** Traverse to METHOD_RETURN via POST_DOMINATE IN edge.
-    */
-  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
-    get()._methodReturnViaPostDominateIn
-
-  /** Traverse to RETURN via POST_DOMINATE IN edge.
-    */
-  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return] = get()._returnViaPostDominateIn
-
-  /** Traverse to TYPE_REF via POST_DOMINATE IN edge.
-    */
-  def _typeRefViaPostDominateIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaPostDominateIn
-
-  /** Traverse to UNKNOWN via POST_DOMINATE IN edge.
-    */
-  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateIn
-
-  def reachingDefIn: Iterator[Expression] = get().reachingDefIn
-  override def _reachingDefIn             = get()._reachingDefIn
-
-  /** Traverse to BLOCK via REACHING_DEF IN edge.
-    */
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefIn
-
-  def receiverIn: Iterator[Call] = get().receiverIn
-  override def _receiverIn       = get()._receiverIn
-
-  /** Traverse to CALL via RECEIVER IN edge.
-    */
-  def _callViaReceiverIn: Option[Call] = get()._callViaReceiverIn
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    Block.Label
-  }
+    with Expression
+    with StaticType[BlockEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "argumentIndex"
-      case 2 => "argumentName"
-      case 3 => "code"
-      case 4 => "columnNumber"
-      case 5 => "dynamicTypeHintFullName"
-      case 6 => "lineNumber"
-      case 7 => "order"
-      case 8 => "possibleTypes"
-      case 9 => "typeFullName"
+      case 0 => "argumentIndex"
+      case 1 => "argumentName"
+      case 2 => "code"
+      case 3 => "columnNumber"
+      case 4 => "dynamicTypeHintFullName"
+      case 5 => "lineNumber"
+      case 6 => "order"
+      case 7 => "possibleTypes"
+      case 8 => "typeFullName"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => argumentIndex
-      case 2 => argumentName
-      case 3 => code
-      case 4 => columnNumber
-      case 5 => dynamicTypeHintFullName
-      case 6 => lineNumber
-      case 7 => order
-      case 8 => possibleTypes
-      case 9 => typeFullName
-    }
-
-  override def productPrefix = "Block"
-  override def productArity  = 10
-}
-
-class BlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Expression with BlockBase {
-
-  override def layoutInformation: NodeLayoutInformation = Block.layoutInformation
-
-  private var _argumentIndex: Integer                      = Block.PropertyDefaults.ArgumentIndex
-  def argumentIndex: scala.Int                             = _argumentIndex
-  private var _argumentName: String                        = null
-  def argumentName: Option[String]                         = Option(_argumentName).asInstanceOf[Option[String]]
-  private var _code: String                                = Block.PropertyDefaults.Code
-  def code: String                                         = _code
-  private var _columnNumber: Integer                       = null
-  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
-  private var _lineNumber: Integer                         = null
-  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer                              = Block.PropertyDefaults.Order
-  def order: scala.Int                                     = _order
-  private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
-  def possibleTypes: IndexedSeq[String]                    = _possibleTypes
-  private var _typeFullName: String                        = Block.PropertyDefaults.TypeFullName
-  def typeFullName: String                                 = _typeFullName
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    properties.put("ARGUMENT_INDEX", argumentIndex)
-    argumentName.map { value => properties.put("ARGUMENT_NAME", value) }
-    properties.put("CODE", code)
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
-      properties.put("DYNAMIC_TYPE_HINT_FULL_NAME", dynamicTypeHintFullName)
-    }
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    properties.put("ORDER", order)
-    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
-    properties.put("TYPE_FULL_NAME", typeFullName)
-
-    properties
-  }
-
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    if (!((-1: Int) == argumentIndex)) { properties.put("ARGUMENT_INDEX", argumentIndex) }
-    argumentName.map { value => properties.put("ARGUMENT_NAME", value) }
-    if (!(("<empty>") == code)) { properties.put("CODE", code) }
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
-      properties.put("DYNAMIC_TYPE_HINT_FULL_NAME", dynamicTypeHintFullName)
-    }
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    if (!((-1: Int) == order)) { properties.put("ORDER", order) }
-    if (this._possibleTypes != null && this._possibleTypes.nonEmpty) { properties.put("POSSIBLE_TYPES", possibleTypes) }
-    if (!(("<empty>") == typeFullName)) { properties.put("TYPE_FULL_NAME", typeFullName) }
-
-    properties
-  }
-
-  import overflowdb.traversal._
-  def argumentOut: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](0)
-  override def _argumentOut              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-
-  def astOut: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _blockViaAstOut: overflowdb.traversal.Traversal[Block] = astOut.collectAll[Block]
-  def _callViaAstOut: overflowdb.traversal.Traversal[Call]   = astOut.collectAll[Call]
-  def _controlStructureViaAstOut: overflowdb.traversal.Traversal[ControlStructure] = astOut.collectAll[ControlStructure]
-  def _identifierViaAstOut: overflowdb.traversal.Traversal[Identifier]             = astOut.collectAll[Identifier]
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import]                     = astOut.collectAll[Import]
-  def _jumpTargetViaAstOut: overflowdb.traversal.Traversal[JumpTarget]             = astOut.collectAll[JumpTarget]
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal]                   = astOut.collectAll[Literal]
-  def local: overflowdb.traversal.Traversal[Local]                                 = astOut.collectAll[Local]
-  def _methodRefViaAstOut: overflowdb.traversal.Traversal[MethodRef]               = astOut.collectAll[MethodRef]
-  def _returnViaAstOut: overflowdb.traversal.Traversal[Return]                     = astOut.collectAll[Return]
-  def _typeRefViaAstOut: overflowdb.traversal.Traversal[TypeRef]                   = astOut.collectAll[TypeRef]
-  def _unknownViaAstOut: overflowdb.traversal.Traversal[Unknown]                   = astOut.collectAll[Unknown]
-
-  def cdgOut: Iterator[CfgNode]                              = createAdjacentNodeScalaIteratorByOffSet[CfgNode](2)
-  override def _cdgOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _blockViaCdgOut: overflowdb.traversal.Traversal[Block] = cdgOut.collectAll[Block]
-  def _callViaCdgOut: overflowdb.traversal.Traversal[Call]   = cdgOut.collectAll[Call]
-  def _controlStructureViaCdgOut: overflowdb.traversal.Traversal[ControlStructure] = cdgOut.collectAll[ControlStructure]
-  def _fieldIdentifierViaCdgOut: overflowdb.traversal.Traversal[FieldIdentifier]   = cdgOut.collectAll[FieldIdentifier]
-  def _identifierViaCdgOut: overflowdb.traversal.Traversal[Identifier]             = cdgOut.collectAll[Identifier]
-  def _jumpTargetViaCdgOut: overflowdb.traversal.Traversal[JumpTarget]             = cdgOut.collectAll[JumpTarget]
-  def _literalViaCdgOut: overflowdb.traversal.Traversal[Literal]                   = cdgOut.collectAll[Literal]
-  def _methodRefViaCdgOut: overflowdb.traversal.Traversal[MethodRef]               = cdgOut.collectAll[MethodRef]
-  def _methodReturnViaCdgOut: overflowdb.traversal.Traversal[MethodReturn]         = cdgOut.collectAll[MethodReturn]
-  def _returnViaCdgOut: overflowdb.traversal.Traversal[Return]                     = cdgOut.collectAll[Return]
-  def _typeRefViaCdgOut: overflowdb.traversal.Traversal[TypeRef]                   = cdgOut.collectAll[TypeRef]
-  def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown]                   = cdgOut.collectAll[Unknown]
-
-  def cfgOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
-  override def _cfgOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = cfgOut.collectAll[CfgNode]
-
-  def dominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
-  override def _dominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-  def _blockViaDominateOut: overflowdb.traversal.Traversal[Block] = dominateOut.collectAll[Block]
-  def _callViaDominateOut: overflowdb.traversal.Traversal[Call]   = dominateOut.collectAll[Call]
-  def _controlStructureViaDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    dominateOut.collectAll[ControlStructure]
-  def _fieldIdentifierViaDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    dominateOut.collectAll[FieldIdentifier]
-  def _identifierViaDominateOut: overflowdb.traversal.Traversal[Identifier]     = dominateOut.collectAll[Identifier]
-  def _jumpTargetViaDominateOut: overflowdb.traversal.Traversal[JumpTarget]     = dominateOut.collectAll[JumpTarget]
-  def _literalViaDominateOut: overflowdb.traversal.Traversal[Literal]           = dominateOut.collectAll[Literal]
-  def _methodRefViaDominateOut: overflowdb.traversal.Traversal[MethodRef]       = dominateOut.collectAll[MethodRef]
-  def _methodReturnViaDominateOut: overflowdb.traversal.Traversal[MethodReturn] = dominateOut.collectAll[MethodReturn]
-  def _returnViaDominateOut: overflowdb.traversal.Traversal[Return]             = dominateOut.collectAll[Return]
-  def _typeRefViaDominateOut: overflowdb.traversal.Traversal[TypeRef]           = dominateOut.collectAll[TypeRef]
-  def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown]           = dominateOut.collectAll[Unknown]
-
-  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](5)
-  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
-
-  def postDominateOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _postDominateOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
-  def _blockViaPostDominateOut: overflowdb.traversal.Traversal[Block] = postDominateOut.collectAll[Block]
-  def _callViaPostDominateOut: overflowdb.traversal.Traversal[Call]   = postDominateOut.collectAll[Call]
-  def _controlStructureViaPostDominateOut: overflowdb.traversal.Traversal[ControlStructure] =
-    postDominateOut.collectAll[ControlStructure]
-  def _fieldIdentifierViaPostDominateOut: overflowdb.traversal.Traversal[FieldIdentifier] =
-    postDominateOut.collectAll[FieldIdentifier]
-  def _identifierViaPostDominateOut: overflowdb.traversal.Traversal[Identifier] = postDominateOut.collectAll[Identifier]
-  def _jumpTargetViaPostDominateOut: overflowdb.traversal.Traversal[JumpTarget] = postDominateOut.collectAll[JumpTarget]
-  def _literalViaPostDominateOut: overflowdb.traversal.Traversal[Literal]       = postDominateOut.collectAll[Literal]
-  def _methodViaPostDominateOut: overflowdb.traversal.Traversal[Method]         = postDominateOut.collectAll[Method]
-  def _methodRefViaPostDominateOut: overflowdb.traversal.Traversal[MethodRef]   = postDominateOut.collectAll[MethodRef]
-  def _returnViaPostDominateOut: overflowdb.traversal.Traversal[Return]         = postDominateOut.collectAll[Return]
-  def _typeRefViaPostDominateOut: overflowdb.traversal.Traversal[TypeRef]       = postDominateOut.collectAll[TypeRef]
-  def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown]       = postDominateOut.collectAll[Unknown]
-
-  def reachingDefOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](7)
-  override def _reachingDefOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
-  def _blockViaReachingDefOut: overflowdb.traversal.Traversal[Block]           = reachingDefOut.collectAll[Block]
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
-  def _methodParameterOutViaReachingDefOut: overflowdb.traversal.Traversal[MethodParameterOut] =
-    reachingDefOut.collectAll[MethodParameterOut]
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = reachingDefOut.collectAll[MethodRef]
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]       = reachingDefOut.collectAll[Return]
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]     = reachingDefOut.collectAll[TypeRef]
-
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](8)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
-
-  def argumentIn: Iterator[Expression]     = createAdjacentNodeScalaIteratorByOffSet[Expression](9)
-  override def _argumentIn                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
-  def _callViaArgumentIn: Option[Call]     = argumentIn.collectAll[Call].nextOption()
-  def _returnViaArgumentIn: Option[Return] = argumentIn.collectAll[Return].nextOption()
-
-  def astIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](10)
-  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](10)
-  def _blockViaAstIn: Block = try { astIn.collectAll[Block].next() }
-  catch {
-    case e: java.util.NoSuchElementException =>
-      throw new overflowdb.SchemaViolationException(
-        "IN edge with label AST to an adjacent BLOCK is mandatory, but not defined for this BLOCK node with id=" + id,
-        e
-      )
-  }
-  def _callViaAstIn: overflowdb.traversal.Traversal[Call] = astIn.collectAll[Call]
-  def _controlStructureViaAstIn: Option[ControlStructure] = astIn.collectAll[ControlStructure].nextOption()
-  def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
-  catch {
-    case e: java.util.NoSuchElementException =>
-      throw new overflowdb.SchemaViolationException(
-        "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this BLOCK node with id=" + id,
-        e
-      )
-  }
-  def _returnViaAstIn: overflowdb.traversal.Traversal[Return]   = astIn.collectAll[Return]
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
-
-  def cdgIn: Iterator[CfgNode]                              = createAdjacentNodeScalaIteratorByOffSet[CfgNode](11)
-  override def _cdgIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](11)
-  def _blockViaCdgIn: overflowdb.traversal.Traversal[Block] = cdgIn.collectAll[Block]
-  def _callViaCdgIn: overflowdb.traversal.Traversal[Call]   = cdgIn.collectAll[Call]
-  def _controlStructureViaCdgIn: overflowdb.traversal.Traversal[ControlStructure] = cdgIn.collectAll[ControlStructure]
-  def _fieldIdentifierViaCdgIn: overflowdb.traversal.Traversal[FieldIdentifier]   = cdgIn.collectAll[FieldIdentifier]
-  def _identifierViaCdgIn: overflowdb.traversal.Traversal[Identifier]             = cdgIn.collectAll[Identifier]
-  def _jumpTargetViaCdgIn: overflowdb.traversal.Traversal[JumpTarget]             = cdgIn.collectAll[JumpTarget]
-  def _literalViaCdgIn: overflowdb.traversal.Traversal[Literal]                   = cdgIn.collectAll[Literal]
-  def _methodRefViaCdgIn: overflowdb.traversal.Traversal[MethodRef]               = cdgIn.collectAll[MethodRef]
-  def _typeRefViaCdgIn: overflowdb.traversal.Traversal[TypeRef]                   = cdgIn.collectAll[TypeRef]
-  def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown]                   = cdgIn.collectAll[Unknown]
-
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](12)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](12)
-
-  def conditionIn: Iterator[ControlStructure] = createAdjacentNodeScalaIteratorByOffSet[ControlStructure](13)
-  override def _conditionIn                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](13)
-  def _controlStructureViaConditionIn: overflowdb.traversal.Traversal[ControlStructure] =
-    conditionIn.collectAll[ControlStructure]
-
-  def containsIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](14)
-  override def _containsIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](14)
-  def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = containsIn.collectAll[Method]
-
-  def dominateIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](15)
-  override def _dominateIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](15)
-  def _blockViaDominateIn: overflowdb.traversal.Traversal[Block] = dominateIn.collectAll[Block]
-  def _callViaDominateIn: overflowdb.traversal.Traversal[Call]   = dominateIn.collectAll[Call]
-  def _controlStructureViaDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    dominateIn.collectAll[ControlStructure]
-  def _fieldIdentifierViaDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    dominateIn.collectAll[FieldIdentifier]
-  def _identifierViaDominateIn: overflowdb.traversal.Traversal[Identifier] = dominateIn.collectAll[Identifier]
-  def _jumpTargetViaDominateIn: overflowdb.traversal.Traversal[JumpTarget] = dominateIn.collectAll[JumpTarget]
-  def _literalViaDominateIn: overflowdb.traversal.Traversal[Literal]       = dominateIn.collectAll[Literal]
-  def _methodViaDominateIn: overflowdb.traversal.Traversal[Method]         = dominateIn.collectAll[Method]
-  def _methodRefViaDominateIn: overflowdb.traversal.Traversal[MethodRef]   = dominateIn.collectAll[MethodRef]
-  def _returnViaDominateIn: overflowdb.traversal.Traversal[Return]         = dominateIn.collectAll[Return]
-  def _typeRefViaDominateIn: overflowdb.traversal.Traversal[TypeRef]       = dominateIn.collectAll[TypeRef]
-  def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown]       = dominateIn.collectAll[Unknown]
-
-  def postDominateIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](16)
-  override def _postDominateIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](16)
-  def _blockViaPostDominateIn: overflowdb.traversal.Traversal[Block] = postDominateIn.collectAll[Block]
-  def _callViaPostDominateIn: overflowdb.traversal.Traversal[Call]   = postDominateIn.collectAll[Call]
-  def _controlStructureViaPostDominateIn: overflowdb.traversal.Traversal[ControlStructure] =
-    postDominateIn.collectAll[ControlStructure]
-  def _fieldIdentifierViaPostDominateIn: overflowdb.traversal.Traversal[FieldIdentifier] =
-    postDominateIn.collectAll[FieldIdentifier]
-  def _identifierViaPostDominateIn: overflowdb.traversal.Traversal[Identifier] = postDominateIn.collectAll[Identifier]
-  def _jumpTargetViaPostDominateIn: overflowdb.traversal.Traversal[JumpTarget] = postDominateIn.collectAll[JumpTarget]
-  def _literalViaPostDominateIn: overflowdb.traversal.Traversal[Literal]       = postDominateIn.collectAll[Literal]
-  def _methodRefViaPostDominateIn: overflowdb.traversal.Traversal[MethodRef]   = postDominateIn.collectAll[MethodRef]
-  def _methodReturnViaPostDominateIn: overflowdb.traversal.Traversal[MethodReturn] =
-    postDominateIn.collectAll[MethodReturn]
-  def _returnViaPostDominateIn: overflowdb.traversal.Traversal[Return]   = postDominateIn.collectAll[Return]
-  def _typeRefViaPostDominateIn: overflowdb.traversal.Traversal[TypeRef] = postDominateIn.collectAll[TypeRef]
-  def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = postDominateIn.collectAll[Unknown]
-
-  def reachingDefIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](17)
-  override def _reachingDefIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](17)
-  def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = reachingDefIn.collectAll[Block]
-
-  def receiverIn: Iterator[Call]       = createAdjacentNodeScalaIteratorByOffSet[Call](18)
-  override def _receiverIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](18)
-  def _callViaReceiverIn: Option[Call] = receiverIn.collectAll[Call].nextOption()
-
-  override def label: String = {
-    Block.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "argumentIndex"
-      case 2 => "argumentName"
-      case 3 => "code"
-      case 4 => "columnNumber"
-      case 5 => "dynamicTypeHintFullName"
-      case 6 => "lineNumber"
-      case 7 => "order"
-      case 8 => "possibleTypes"
-      case 9 => "typeFullName"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => argumentIndex
-      case 2 => argumentName
-      case 3 => code
-      case 4 => columnNumber
-      case 5 => dynamicTypeHintFullName
-      case 6 => lineNumber
-      case 7 => order
-      case 8 => possibleTypes
-      case 9 => typeFullName
-    }
-
-  override def productPrefix = "Block"
-  override def productArity  = 10
-
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[BlockDb]
-
-  override def property(key: String): Any = {
-    key match {
-      case "ARGUMENT_INDEX"              => this._argumentIndex
-      case "ARGUMENT_NAME"               => this._argumentName
-      case "CODE"                        => this._code
-      case "COLUMN_NUMBER"               => this._columnNumber
-      case "DYNAMIC_TYPE_HINT_FULL_NAME" => this._dynamicTypeHintFullName
-      case "LINE_NUMBER"                 => this._lineNumber
-      case "ORDER"                       => this._order
-      case "POSSIBLE_TYPES"              => this._possibleTypes
-      case "TYPE_FULL_NAME"              => this._typeFullName
-
+      case 0 => this.argumentIndex
+      case 1 => this.argumentName
+      case 2 => this.code
+      case 3 => this.columnNumber
+      case 4 => this.dynamicTypeHintFullName
+      case 5 => this.lineNumber
+      case 6 => this.order
+      case 7 => this.possibleTypes
+      case 8 => this.typeFullName
       case _ => null
     }
+
+  override def productPrefix = "Block"
+  override def productArity  = 9
+
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Block]
+}
+
+object NewBlock {
+  def apply(): NewBlock = new NewBlock
+  private val outNeighbors: Map[String, Set[String]] = Map(
+    "ALIAS_OF" -> Set("TYPE"),
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS" -> Set("BINDING"),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CAPTURE"     -> Set("CLOSURE_BINDING"),
+    "CAPTURED_BY" -> Set("CLOSURE_BINDING"),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "EVAL_TYPE"     -> Set("TYPE"),
+    "IMPORTS"       -> Set("DEPENDENCY"),
+    "INHERITS_FROM" -> Set("TYPE"),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "TAGGED_BY" -> Set("TAG")
+  )
+  private val inNeighbors: Map[String, Set[String]] = Map(
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BINDING",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "CLOSURE_BINDING",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    )
+  )
+}
+class NewBlock extends NewNode(6.toShort) with BlockBase with ExpressionNew {
+  override type StoredNodeType = Block
+  override def label: String = "BLOCK"
+
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewBlock.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewBlock.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
-      case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
-      case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
-        this._dynamicTypeHintFullName = value match {
-          case null                                             => collection.immutable.ArraySeq.empty
-          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
-          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
-          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
-          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
-          case jCollection: java.lang.Iterable[_] =>
-            if (jCollection.iterator.hasNext) {
-              collection.immutable.ArraySeq.unsafeWrapArray(
-                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
-              )
-            } else collection.immutable.ArraySeq.empty
-          case iter: Iterable[_] =>
-            if (iter.nonEmpty) {
-              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
-            } else collection.immutable.ArraySeq.empty
-        }
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
-      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
-      case "POSSIBLE_TYPES" =>
-        this._possibleTypes = value match {
-          case null                                             => collection.immutable.ArraySeq.empty
-          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
-          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
-          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
-          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
-          case jCollection: java.lang.Iterable[_] =>
-            if (jCollection.iterator.hasNext) {
-              collection.immutable.ArraySeq.unsafeWrapArray(
-                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
-              )
-            } else collection.immutable.ArraySeq.empty
-          case iter: Iterable[_] =>
-            if (iter.nonEmpty) {
-              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
-            } else collection.immutable.ArraySeq.empty
-        }
-      case "TYPE_FULL_NAME" => this._typeFullName = value.asInstanceOf[String]
-
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
-    }
+  var argumentIndex: Int                             = -1: Int
+  var argumentName: Option[String]                   = None
+  var code: String                                   = "<empty>": String
+  var columnNumber: Option[Int]                      = None
+  var dynamicTypeHintFullName: IndexedSeq[String]    = ArraySeq.empty
+  var lineNumber: Option[Int]                        = None
+  var order: Int                                     = -1: Int
+  var possibleTypes: IndexedSeq[String]              = ArraySeq.empty
+  var typeFullName: String                           = "<empty>": String
+  def argumentIndex(value: Int): this.type           = { this.argumentIndex = value; this }
+  def argumentName(value: Option[String]): this.type = { this.argumentName = value; this }
+  def argumentName(value: String): this.type         = { this.argumentName = Option(value); this }
+  def code(value: String): this.type                 = { this.code = value; this }
+  def columnNumber(value: Int): this.type            = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type    = { this.columnNumber = value; this }
+  def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
+    this.dynamicTypeHintFullName = value.iterator.to(ArraySeq); this
+  }
+  def lineNumber(value: Int): this.type                     = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type             = { this.lineNumber = value; this }
+  def order(value: Int): this.type                          = { this.order = value; this }
+  def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
+  def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
+  override def flattenProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.insertProperty(this, 1, Iterator(this.argumentIndex))
+    if (argumentName.nonEmpty) interface.insertProperty(this, 2, this.argumentName)
+    interface.insertProperty(this, 10, Iterator(this.code))
+    if (columnNumber.nonEmpty) interface.insertProperty(this, 11, this.columnNumber)
+    if (dynamicTypeHintFullName.nonEmpty) interface.insertProperty(this, 18, this.dynamicTypeHintFullName)
+    if (lineNumber.nonEmpty) interface.insertProperty(this, 34, this.lineNumber)
+    interface.insertProperty(this, 43, Iterator(this.order))
+    if (possibleTypes.nonEmpty) interface.insertProperty(this, 47, this.possibleTypes)
+    interface.insertProperty(this, 52, Iterator(this.typeFullName))
   }
 
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
-
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._argumentIndex = newNode.asInstanceOf[NewBlock].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewBlock].argumentName match {
-      case None => null; case Some(value) => value
-    }
-    this._code = newNode.asInstanceOf[NewBlock].code
-    this._columnNumber = newNode.asInstanceOf[NewBlock].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._dynamicTypeHintFullName =
-      if (newNode.asInstanceOf[NewBlock].dynamicTypeHintFullName != null)
-        newNode.asInstanceOf[NewBlock].dynamicTypeHintFullName
-      else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewBlock].lineNumber match { case None => null; case Some(value) => value }
-    this._order = newNode.asInstanceOf[NewBlock].order
-    this._possibleTypes =
-      if (newNode.asInstanceOf[NewBlock].possibleTypes != null) newNode.asInstanceOf[NewBlock].possibleTypes
-      else collection.immutable.ArraySeq.empty
-    this._typeFullName = newNode.asInstanceOf[NewBlock].typeFullName
-
+  override def copy(): this.type = {
+    val newInstance = new NewBlock
+    newInstance.argumentIndex = this.argumentIndex
+    newInstance.argumentName = this.argumentName
+    newInstance.code = this.code
+    newInstance.columnNumber = this.columnNumber
+    newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
+    newInstance.lineNumber = this.lineNumber
+    newInstance.order = this.order
+    newInstance.possibleTypes = this.possibleTypes
+    newInstance.typeFullName = this.typeFullName
+    newInstance.asInstanceOf[this.type]
   }
 
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "argumentIndex"
+      case 1 => "argumentName"
+      case 2 => "code"
+      case 3 => "columnNumber"
+      case 4 => "dynamicTypeHintFullName"
+      case 5 => "lineNumber"
+      case 6 => "order"
+      case 7 => "possibleTypes"
+      case 8 => "typeFullName"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.argumentIndex
+      case 1 => this.argumentName
+      case 2 => this.code
+      case 3 => this.columnNumber
+      case 4 => this.dynamicTypeHintFullName
+      case 5 => this.lineNumber
+      case 6 => this.order
+      case 7 => this.possibleTypes
+      case 8 => this.typeFullName
+      case _ => null
+    }
+
+  override def productPrefix                = "NewBlock"
+  override def productArity                 = 9
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewBlock]
 }

@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.EdgeType.Cardinality
-import overflowdb.schema._
+import flatgraph.schema.EdgeType.Cardinality
+import flatgraph.schema._
 
 object Shortcuts extends SchemaBase {
 

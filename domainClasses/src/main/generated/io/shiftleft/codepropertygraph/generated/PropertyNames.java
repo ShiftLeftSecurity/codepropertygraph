@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -240,6 +237,10 @@ public static final String POSSIBLE_TYPES = "POSSIBLE_TYPES";
 /** The path to the root directory of the source/binary this CPG is generated from. */
 public static final String ROOT = "ROOT";
 
+/** ID from a different context, e.g. if the graph was imported from a different format,
+we can use this to preserve the link to the original */
+public static final String SECONDARY_ID = "SECONDARY_ID";
+
 /** The method signature encodes the types of parameters in a string.
 The string SHOULD be human readable and suitable for differentiating methods
 with different parameter types sufficiently to allow for resolving of
@@ -271,7 +272,6 @@ public static final String VARIABLE = "VARIABLE";
 /** A version, given as a string. Used, for example, in the META_DATA node to
 indicate which version of the CPG spec this CPG conforms to */
 public static final String VERSION = "VERSION";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(ALIAS_TYPE_FULL_NAME);
@@ -323,6 +323,7 @@ add(PACKAGE_NAME);
 add(PARSER_TYPE_NAME);
 add(POSSIBLE_TYPES);
 add(ROOT);
+add(SECONDARY_ID);
 add(SIGNATURE);
 add(SYMBOL);
 add(TYPE_DECL_FULL_NAME);

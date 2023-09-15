@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -315,7 +312,6 @@ public static final String TYPE_REF = "TYPE_REF";
 which no suitable AST node is specified in the CPG specification may be
 included using a node of type `UNKNOWN`. */
 public static final String UNKNOWN = "UNKNOWN";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(ANNOTATION);

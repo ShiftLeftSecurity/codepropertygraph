@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object Configuration extends SchemaBase {
 

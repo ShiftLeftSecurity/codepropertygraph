@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.{Cardinality, ValueType}
-import overflowdb.schema._
+import flatgraph.schema.Property.{Cardinality, ValueType}
+import flatgraph.schema._
 
 object Finding extends SchemaBase {
 

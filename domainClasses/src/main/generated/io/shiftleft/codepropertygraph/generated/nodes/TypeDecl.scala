@@ -1,65 +1,64 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.Language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+
+trait TypeDeclEMT
+    extends AnyRef
+    with AstNodeEMT
+    with HasAliasTypeFullNameEMT
+    with HasAstParentFullNameEMT
+    with HasAstParentTypeEMT
+    with HasFilenameEMT
+    with HasFullNameEMT
+    with HasInheritsFromTypeFullNameEMT
+    with HasIsExternalEMT
+    with HasNameEMT
+    with HasOffsetEMT
+    with HasOffsetEndEMT
+
+trait TypeDeclBase extends AbstractNode with AstNodeBase with StaticType[TypeDeclEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    val res = new java.util.HashMap[String, Any]()
+    this.aliasTypeFullName.foreach { p => res.put("ALIAS_TYPE_FULL_NAME", p) }
+    res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
+    res.put("AST_PARENT_TYPE", this.astParentType)
+    res.put("CODE", this.code)
+    this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
+    res.put("FILENAME", this.filename)
+    res.put("FULL_NAME", this.fullName)
+    val tmpInheritsFromTypeFullName = this.inheritsFromTypeFullName;
+    if (tmpInheritsFromTypeFullName.nonEmpty) res.put("INHERITS_FROM_TYPE_FULL_NAME", tmpInheritsFromTypeFullName)
+    res.put("IS_EXTERNAL", this.isExternal)
+    this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    res.put("NAME", this.name)
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
+    res.put("ORDER", this.order)
+    res
+  }
+}
 
 object TypeDecl {
-  def apply(graph: Graph, id: Long) = new TypeDecl(graph, id)
-
   val Label = "TYPE_DECL"
-
   object PropertyNames {
-    val AliasTypeFullName        = "ALIAS_TYPE_FULL_NAME"
-    val AstParentFullName        = "AST_PARENT_FULL_NAME"
-    val AstParentType            = "AST_PARENT_TYPE"
-    val Code                     = "CODE"
-    val ColumnNumber             = "COLUMN_NUMBER"
-    val Filename                 = "FILENAME"
-    val FullName                 = "FULL_NAME"
-    val InheritsFromTypeFullName = "INHERITS_FROM_TYPE_FULL_NAME"
-    val IsExternal               = "IS_EXTERNAL"
-    val LineNumber               = "LINE_NUMBER"
-    val Name                     = "NAME"
-    val Offset                   = "OFFSET"
-    val OffsetEnd                = "OFFSET_END"
-    val Order                    = "ORDER"
-    val all: Set[String] = Set(
-      AliasTypeFullName,
-      AstParentFullName,
-      AstParentType,
-      Code,
-      ColumnNumber,
-      Filename,
-      FullName,
-      InheritsFromTypeFullName,
-      IsExternal,
-      LineNumber,
-      Name,
-      Offset,
-      OffsetEnd,
-      Order
-    )
-    val allAsJava: java.util.Set[String] = all.asJava
+    val AliasTypeFullName        = io.shiftleft.codepropertygraph.generated.PropertyNames.ALIAS_TYPE_FULL_NAME
+    val AstParentFullName        = io.shiftleft.codepropertygraph.generated.PropertyNames.AST_PARENT_FULL_NAME
+    val AstParentType            = io.shiftleft.codepropertygraph.generated.PropertyNames.AST_PARENT_TYPE
+    val Code                     = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
+    val ColumnNumber             = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
+    val Filename                 = io.shiftleft.codepropertygraph.generated.PropertyNames.FILENAME
+    val FullName                 = io.shiftleft.codepropertygraph.generated.PropertyNames.FULL_NAME
+    val InheritsFromTypeFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.INHERITS_FROM_TYPE_FULL_NAME
+    val IsExternal               = io.shiftleft.codepropertygraph.generated.PropertyNames.IS_EXTERNAL
+    val LineNumber               = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
+    val Name                     = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
+    val Offset                   = io.shiftleft.codepropertygraph.generated.PropertyNames.OFFSET
+    val OffsetEnd                = io.shiftleft.codepropertygraph.generated.PropertyNames.OFFSET_END
+    val Order                    = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
   }
-
-  object Properties {
-    val AliasTypeFullName        = new overflowdb.PropertyKey[String]("ALIAS_TYPE_FULL_NAME")
-    val AstParentFullName        = new overflowdb.PropertyKey[String]("AST_PARENT_FULL_NAME")
-    val AstParentType            = new overflowdb.PropertyKey[String]("AST_PARENT_TYPE")
-    val Code                     = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber             = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val Filename                 = new overflowdb.PropertyKey[String]("FILENAME")
-    val FullName                 = new overflowdb.PropertyKey[String]("FULL_NAME")
-    val InheritsFromTypeFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("INHERITS_FROM_TYPE_FULL_NAME")
-    val IsExternal               = new overflowdb.PropertyKey[Boolean]("IS_EXTERNAL")
-    val LineNumber               = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
-    val Name                     = new overflowdb.PropertyKey[String]("NAME")
-    val Offset                   = new overflowdb.PropertyKey[scala.Int]("OFFSET")
-    val OffsetEnd                = new overflowdb.PropertyKey[scala.Int]("OFFSET_END")
-    val Order                    = new overflowdb.PropertyKey[scala.Int]("ORDER")
-
-  }
-
   object PropertyDefaults {
     val AstParentFullName = "<empty>"
     val AstParentType     = "<empty>"
@@ -70,523 +69,1415 @@ object TypeDecl {
     val Name              = "<empty>"
     val Order             = -1: Int
   }
-
-  val layoutInformation = new NodeLayoutInformation(
-    Label,
-    PropertyNames.allAsJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.AliasOf.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Binds.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.InheritsFrom.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.TaggedBy.layoutInformation
-    ).asJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Contains.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.Ref.layoutInformation
-    ).asJava
-  )
-
-  object Edges {
-    val Out: Array[String] = Array("ALIAS_OF", "AST", "BINDS", "CONTAINS", "INHERITS_FROM", "SOURCE_FILE", "TAGGED_BY")
-    val In: Array[String]  = Array("AST", "CONTAINS", "REF")
-  }
-
-  val factory = new NodeFactory[TypeDeclDb] {
-    override val forLabel = TypeDecl.Label
-
-    override def createNode(ref: NodeRef[TypeDeclDb]) =
-      new TypeDeclDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = TypeDecl(graph, id)
-  }
 }
 
-trait TypeDeclBase extends AbstractNode with AstNodeBase {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def aliasTypeFullName: Option[String]
-  def astParentFullName: String
-  def astParentType: String
-  def code: String
-  def columnNumber: Option[scala.Int]
-  def filename: String
-  def fullName: String
-  def inheritsFromTypeFullName: IndexedSeq[String]
-  def isExternal: Boolean
-  def lineNumber: Option[scala.Int]
-  def name: String
-  def offset: Option[scala.Int]
-  def offsetEnd: Option[scala.Int]
-  def order: scala.Int
-
-}
-
-class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[TypeDeclDb](graph_4762, id_4762)
+class TypeDecl(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 40.toShort, seq_4762)
     with TypeDeclBase
-    with StoredNode
-    with AstNode {
-  override def aliasTypeFullName: Option[String]            = get().aliasTypeFullName
-  override def astParentFullName: String                    = get().astParentFullName
-  override def astParentType: String                        = get().astParentType
-  override def code: String                                 = get().code
-  override def columnNumber: Option[scala.Int]              = get().columnNumber
-  override def filename: String                             = get().filename
-  override def fullName: String                             = get().fullName
-  override def inheritsFromTypeFullName: IndexedSeq[String] = get().inheritsFromTypeFullName
-  override def isExternal: Boolean                          = get().isExternal
-  override def lineNumber: Option[scala.Int]                = get().lineNumber
-  override def name: String                                 = get().name
-  override def offset: Option[scala.Int]                    = get().offset
-  override def offsetEnd: Option[scala.Int]                 = get().offsetEnd
-  override def order: scala.Int                             = get().order
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "AST_PARENT_FULL_NAME" => TypeDecl.PropertyDefaults.AstParentFullName
-      case "AST_PARENT_TYPE"      => TypeDecl.PropertyDefaults.AstParentType
-      case "CODE"                 => TypeDecl.PropertyDefaults.Code
-      case "FILENAME"             => TypeDecl.PropertyDefaults.Filename
-      case "FULL_NAME"            => TypeDecl.PropertyDefaults.FullName
-      case "IS_EXTERNAL"          => TypeDecl.PropertyDefaults.IsExternal
-      case "NAME"                 => TypeDecl.PropertyDefaults.Name
-      case "ORDER"                => TypeDecl.PropertyDefaults.Order
-      case _                      => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  def aliasOfOut: Iterator[Type] = get().aliasOfOut
-  override def _aliasOfOut       = get()._aliasOfOut
-
-  /** Traverse to TYPE via ALIAS_OF OUT edge.
-    */
-  def aliasedType: overflowdb.traversal.Traversal[Type] = get().aliasedType
-
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
-
-  /** Traverse to ANNOTATION via AST OUT edge.
-    */
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
-
-  /** Traverse to IMPORT via AST OUT edge.
-    */
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
-
-  /** Traverse to MEMBER via AST OUT edge.
-    */
-  def _memberViaAstOut: overflowdb.traversal.Traversal[Member] = get()._memberViaAstOut
-
-  /** Traverse to METHOD via AST OUT edge.
-    */
-  def _methodViaAstOut: overflowdb.traversal.Traversal[Method] = get()._methodViaAstOut
-
-  /** Traverse to MODIFIER via AST OUT edge.
-    */
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
-
-  /** Traverse to TYPE_DECL via AST OUT edge.
-    */
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstOut
-
-  /** Traverse to TYPE_PARAMETER via AST OUT edge.
-    */
-  def _typeParameterViaAstOut: overflowdb.traversal.Traversal[TypeParameter] = get()._typeParameterViaAstOut
-
-  def bindsOut: Iterator[Binding] = get().bindsOut
-  override def _bindsOut          = get()._bindsOut
-
-  /** Traverse to BINDING via BINDS OUT edge.
-    */
-  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = get()._bindingViaBindsOut
-
-  def containsOut: Iterator[Method] = get().containsOut
-  override def _containsOut         = get()._containsOut
-
-  /** Traverse to METHOD via CONTAINS OUT edge.
-    */
-  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
-
-  def inheritsFromOut: Iterator[Type] = get().inheritsFromOut
-  override def _inheritsFromOut       = get()._inheritsFromOut
-
-  /** Traverse to TYPE via INHERITS_FROM OUT edge.
-    */
-  def _typeViaInheritsFromOut: overflowdb.traversal.Traversal[Type] = get()._typeViaInheritsFromOut
-
-  def sourceFileOut: Iterator[File] = get().sourceFileOut
-  override def _sourceFileOut       = get()._sourceFileOut
-
-  /** Traverse to FILE via SOURCE_FILE OUT edge.
-    */
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
-
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
-
-  /** Traverse to TAG via TAGGED_BY OUT edge.
-    */
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
-
-  def astIn: Iterator[AstNode] = get().astIn
-  override def _astIn          = get()._astIn
-
-  /** Traverse to METHOD via AST IN edge.
-    */
-  def _methodViaAstIn: Option[Method] = get()._methodViaAstIn
-
-  /** Traverse to NAMESPACE_BLOCK via AST IN edge.
-    */
-  def namespaceBlock: Option[NamespaceBlock] = get().namespaceBlock
-
-  /** Traverse to TYPE_DECL via AST IN edge.
-    */
-  def _typeDeclViaAstIn: Option[TypeDecl] = get()._typeDeclViaAstIn
-
-  def containsIn: Iterator[File] = get().containsIn
-  override def _containsIn       = get()._containsIn
-
-  /** Traverse to FILE via CONTAINS IN edge.
-    */
-  def _fileViaContainsIn: overflowdb.traversal.Traversal[File] = get()._fileViaContainsIn
-
-  def refIn: Iterator[Type] = get().refIn
-  override def _refIn       = get()._refIn
-
-  /** Traverse to TYPE via REF IN edge.
-    */
-  def _typeViaRefIn: overflowdb.traversal.Traversal[Type] = get()._typeViaRefIn
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    TypeDecl.Label
-  }
+    with AstNode
+    with StaticType[TypeDeclEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0  => "id"
-      case 1  => "aliasTypeFullName"
-      case 2  => "astParentFullName"
-      case 3  => "astParentType"
-      case 4  => "code"
-      case 5  => "columnNumber"
-      case 6  => "filename"
-      case 7  => "fullName"
-      case 8  => "inheritsFromTypeFullName"
-      case 9  => "isExternal"
-      case 10 => "lineNumber"
-      case 11 => "name"
-      case 12 => "offset"
-      case 13 => "offsetEnd"
-      case 14 => "order"
+      case 0  => "aliasTypeFullName"
+      case 1  => "astParentFullName"
+      case 2  => "astParentType"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "filename"
+      case 6  => "fullName"
+      case 7  => "inheritsFromTypeFullName"
+      case 8  => "isExternal"
+      case 9  => "lineNumber"
+      case 10 => "name"
+      case 11 => "offset"
+      case 12 => "offsetEnd"
+      case 13 => "order"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0  => id
-      case 1  => aliasTypeFullName
-      case 2  => astParentFullName
-      case 3  => astParentType
-      case 4  => code
-      case 5  => columnNumber
-      case 6  => filename
-      case 7  => fullName
-      case 8  => inheritsFromTypeFullName
-      case 9  => isExternal
-      case 10 => lineNumber
-      case 11 => name
-      case 12 => offset
-      case 13 => offsetEnd
-      case 14 => order
+      case 0  => this.aliasTypeFullName
+      case 1  => this.astParentFullName
+      case 2  => this.astParentType
+      case 3  => this.code
+      case 4  => this.columnNumber
+      case 5  => this.filename
+      case 6  => this.fullName
+      case 7  => this.inheritsFromTypeFullName
+      case 8  => this.isExternal
+      case 9  => this.lineNumber
+      case 10 => this.name
+      case 11 => this.offset
+      case 12 => this.offsetEnd
+      case 13 => this.order
+      case _  => null
     }
 
   override def productPrefix = "TypeDecl"
-  override def productArity  = 15
+  override def productArity  = 14
+
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[TypeDecl]
 }
 
-class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with TypeDeclBase {
+object NewTypeDecl {
+  def apply(): NewTypeDecl = new NewTypeDecl
+  private val outNeighbors: Map[String, Set[String]] = Map(
+    "ALIAS_OF" -> Set("TYPE"),
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS" -> Set("BINDING"),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CAPTURE"     -> Set("CLOSURE_BINDING"),
+    "CAPTURED_BY" -> Set("CLOSURE_BINDING"),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "EVAL_TYPE"     -> Set("TYPE"),
+    "IMPORTS"       -> Set("DEPENDENCY"),
+    "INHERITS_FROM" -> Set("TYPE"),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "TAGGED_BY" -> Set("TAG")
+  )
+  private val inNeighbors: Map[String, Set[String]] = Map(
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BINDING",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "CLOSURE_BINDING",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    )
+  )
+}
+class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew {
+  override type StoredNodeType = TypeDecl
+  override def label: String = "TYPE_DECL"
 
-  override def layoutInformation: NodeLayoutInformation = TypeDecl.layoutInformation
-
-  private var _aliasTypeFullName: String                    = null
-  def aliasTypeFullName: Option[String]                     = Option(_aliasTypeFullName).asInstanceOf[Option[String]]
-  private var _astParentFullName: String                    = TypeDecl.PropertyDefaults.AstParentFullName
-  def astParentFullName: String                             = _astParentFullName
-  private var _astParentType: String                        = TypeDecl.PropertyDefaults.AstParentType
-  def astParentType: String                                 = _astParentType
-  private var _code: String                                 = TypeDecl.PropertyDefaults.Code
-  def code: String                                          = _code
-  private var _columnNumber: Integer                        = null
-  def columnNumber: Option[scala.Int]                       = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _filename: String                             = TypeDecl.PropertyDefaults.Filename
-  def filename: String                                      = _filename
-  private var _fullName: String                             = TypeDecl.PropertyDefaults.FullName
-  def fullName: String                                      = _fullName
-  private var _inheritsFromTypeFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  def inheritsFromTypeFullName: IndexedSeq[String]          = _inheritsFromTypeFullName
-  private var _isExternal: java.lang.Boolean                = TypeDecl.PropertyDefaults.IsExternal
-  def isExternal: Boolean                                   = _isExternal
-  private var _lineNumber: Integer                          = null
-  def lineNumber: Option[scala.Int]                         = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _name: String                                 = TypeDecl.PropertyDefaults.Name
-  def name: String                                          = _name
-  private var _offset: Integer                              = null
-  def offset: Option[scala.Int]                             = Option(_offset).asInstanceOf[Option[scala.Int]]
-  private var _offsetEnd: Integer                           = null
-  def offsetEnd: Option[scala.Int]                          = Option(_offsetEnd).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer                               = TypeDecl.PropertyDefaults.Order
-  def order: scala.Int                                      = _order
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    aliasTypeFullName.map { value => properties.put("ALIAS_TYPE_FULL_NAME", value) }
-    properties.put("AST_PARENT_FULL_NAME", astParentFullName)
-    properties.put("AST_PARENT_TYPE", astParentType)
-    properties.put("CODE", code)
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    properties.put("FILENAME", filename)
-    properties.put("FULL_NAME", fullName)
-    if (this._inheritsFromTypeFullName != null && this._inheritsFromTypeFullName.nonEmpty) {
-      properties.put("INHERITS_FROM_TYPE_FULL_NAME", inheritsFromTypeFullName)
-    }
-    properties.put("IS_EXTERNAL", isExternal)
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    properties.put("NAME", name)
-    offset.map { value => properties.put("OFFSET", value) }
-    offsetEnd.map { value => properties.put("OFFSET_END", value) }
-    properties.put("ORDER", order)
-
-    properties
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewTypeDecl.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewTypeDecl.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    aliasTypeFullName.map { value => properties.put("ALIAS_TYPE_FULL_NAME", value) }
-    if (!(("<empty>") == astParentFullName)) { properties.put("AST_PARENT_FULL_NAME", astParentFullName) }
-    if (!(("<empty>") == astParentType)) { properties.put("AST_PARENT_TYPE", astParentType) }
-    if (!(("<empty>") == code)) { properties.put("CODE", code) }
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    if (!(("<empty>") == filename)) { properties.put("FILENAME", filename) }
-    if (!(("<empty>") == fullName)) { properties.put("FULL_NAME", fullName) }
-    if (this._inheritsFromTypeFullName != null && this._inheritsFromTypeFullName.nonEmpty) {
-      properties.put("INHERITS_FROM_TYPE_FULL_NAME", inheritsFromTypeFullName)
-    }
-    if (!((false) == isExternal)) { properties.put("IS_EXTERNAL", isExternal) }
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    if (!(("<empty>") == name)) { properties.put("NAME", name) }
-    offset.map { value => properties.put("OFFSET", value) }
-    offsetEnd.map { value => properties.put("OFFSET_END", value) }
-    if (!((-1: Int) == order)) { properties.put("ORDER", order) }
-
-    properties
+  var aliasTypeFullName: Option[String]                   = None
+  var astParentFullName: String                           = "<empty>": String
+  var astParentType: String                               = "<empty>": String
+  var code: String                                        = "<empty>": String
+  var columnNumber: Option[Int]                           = None
+  var filename: String                                    = "<empty>": String
+  var fullName: String                                    = "<empty>": String
+  var inheritsFromTypeFullName: IndexedSeq[String]        = ArraySeq.empty
+  var isExternal: Boolean                                 = false: Boolean
+  var lineNumber: Option[Int]                             = None
+  var name: String                                        = "<empty>": String
+  var offset: Option[Int]                                 = None
+  var offsetEnd: Option[Int]                              = None
+  var order: Int                                          = -1: Int
+  def aliasTypeFullName(value: Option[String]): this.type = { this.aliasTypeFullName = value; this }
+  def aliasTypeFullName(value: String): this.type         = { this.aliasTypeFullName = Option(value); this }
+  def astParentFullName(value: String): this.type         = { this.astParentFullName = value; this }
+  def astParentType(value: String): this.type             = { this.astParentType = value; this }
+  def code(value: String): this.type                      = { this.code = value; this }
+  def columnNumber(value: Int): this.type                 = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type         = { this.columnNumber = value; this }
+  def filename(value: String): this.type                  = { this.filename = value; this }
+  def fullName(value: String): this.type                  = { this.fullName = value; this }
+  def inheritsFromTypeFullName(value: IterableOnce[String]): this.type = {
+    this.inheritsFromTypeFullName = value.iterator.to(ArraySeq); this
+  }
+  def isExternal(value: Boolean): this.type     = { this.isExternal = value; this }
+  def lineNumber(value: Int): this.type         = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type = { this.lineNumber = value; this }
+  def name(value: String): this.type            = { this.name = value; this }
+  def offset(value: Int): this.type             = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type     = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type          = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type  = { this.offsetEnd = value; this }
+  def order(value: Int): this.type              = { this.order = value; this }
+  override def flattenProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    if (aliasTypeFullName.nonEmpty) interface.insertProperty(this, 0, this.aliasTypeFullName)
+    interface.insertProperty(this, 3, Iterator(this.astParentFullName))
+    interface.insertProperty(this, 4, Iterator(this.astParentType))
+    interface.insertProperty(this, 10, Iterator(this.code))
+    if (columnNumber.nonEmpty) interface.insertProperty(this, 11, this.columnNumber)
+    interface.insertProperty(this, 21, Iterator(this.filename))
+    interface.insertProperty(this, 22, Iterator(this.fullName))
+    if (inheritsFromTypeFullName.nonEmpty) interface.insertProperty(this, 27, this.inheritsFromTypeFullName)
+    interface.insertProperty(this, 29, Iterator(this.isExternal))
+    if (lineNumber.nonEmpty) interface.insertProperty(this, 34, this.lineNumber)
+    interface.insertProperty(this, 39, Iterator(this.name))
+    if (offset.nonEmpty) interface.insertProperty(this, 41, this.offset)
+    if (offsetEnd.nonEmpty) interface.insertProperty(this, 42, this.offsetEnd)
+    interface.insertProperty(this, 43, Iterator(this.order))
   }
 
-  import overflowdb.traversal._
-  def aliasOfOut: Iterator[Type]                        = createAdjacentNodeScalaIteratorByOffSet[Type](0)
-  override def _aliasOfOut                              = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def aliasedType: overflowdb.traversal.Traversal[Type] = aliasOfOut.collectAll[Type]
-
-  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
-  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation]       = astOut.collectAll[Annotation]
-  def _importViaAstOut: overflowdb.traversal.Traversal[Import]               = astOut.collectAll[Import]
-  def _memberViaAstOut: overflowdb.traversal.Traversal[Member]               = astOut.collectAll[Member]
-  def _methodViaAstOut: overflowdb.traversal.Traversal[Method]               = astOut.collectAll[Method]
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]           = astOut.collectAll[Modifier]
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl]           = astOut.collectAll[TypeDecl]
-  def _typeParameterViaAstOut: overflowdb.traversal.Traversal[TypeParameter] = astOut.collectAll[TypeParameter]
-
-  def bindsOut: Iterator[Binding] = createAdjacentNodeScalaIteratorByOffSet[Binding](2)
-  override def _bindsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = bindsOut.collectAll[Binding]
-
-  def containsOut: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](3)
-  override def _containsOut         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
-  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = containsOut.collectAll[Method]
-
-  def inheritsFromOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](4)
-  override def _inheritsFromOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
-  def _typeViaInheritsFromOut: overflowdb.traversal.Traversal[Type] = inheritsFromOut.collectAll[Type]
-
-  def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](5)
-  override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
-
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](6)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
-
-  def astIn: Iterator[AstNode]               = createAdjacentNodeScalaIteratorByOffSet[AstNode](7)
-  override def _astIn                        = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
-  def _methodViaAstIn: Option[Method]        = astIn.collectAll[Method].nextOption()
-  def namespaceBlock: Option[NamespaceBlock] = astIn.collectAll[NamespaceBlock].nextOption()
-  def _typeDeclViaAstIn: Option[TypeDecl]    = astIn.collectAll[TypeDecl].nextOption()
-
-  def containsIn: Iterator[File]                               = createAdjacentNodeScalaIteratorByOffSet[File](8)
-  override def _containsIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
-  def _fileViaContainsIn: overflowdb.traversal.Traversal[File] = containsIn.collectAll[File]
-
-  def refIn: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](9)
-  override def _refIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
-  def _typeViaRefIn: overflowdb.traversal.Traversal[Type] = refIn.collectAll[Type]
-
-  override def label: String = {
-    TypeDecl.Label
+  override def copy(): this.type = {
+    val newInstance = new NewTypeDecl
+    newInstance.aliasTypeFullName = this.aliasTypeFullName
+    newInstance.astParentFullName = this.astParentFullName
+    newInstance.astParentType = this.astParentType
+    newInstance.code = this.code
+    newInstance.columnNumber = this.columnNumber
+    newInstance.filename = this.filename
+    newInstance.fullName = this.fullName
+    newInstance.inheritsFromTypeFullName = this.inheritsFromTypeFullName
+    newInstance.isExternal = this.isExternal
+    newInstance.lineNumber = this.lineNumber
+    newInstance.name = this.name
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
+    newInstance.order = this.order
+    newInstance.asInstanceOf[this.type]
   }
 
   override def productElementName(n: Int): String =
     n match {
-      case 0  => "id"
-      case 1  => "aliasTypeFullName"
-      case 2  => "astParentFullName"
-      case 3  => "astParentType"
-      case 4  => "code"
-      case 5  => "columnNumber"
-      case 6  => "filename"
-      case 7  => "fullName"
-      case 8  => "inheritsFromTypeFullName"
-      case 9  => "isExternal"
-      case 10 => "lineNumber"
-      case 11 => "name"
-      case 12 => "offset"
-      case 13 => "offsetEnd"
-      case 14 => "order"
+      case 0  => "aliasTypeFullName"
+      case 1  => "astParentFullName"
+      case 2  => "astParentType"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "filename"
+      case 6  => "fullName"
+      case 7  => "inheritsFromTypeFullName"
+      case 8  => "isExternal"
+      case 9  => "lineNumber"
+      case 10 => "name"
+      case 11 => "offset"
+      case 12 => "offsetEnd"
+      case 13 => "order"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0  => id
-      case 1  => aliasTypeFullName
-      case 2  => astParentFullName
-      case 3  => astParentType
-      case 4  => code
-      case 5  => columnNumber
-      case 6  => filename
-      case 7  => fullName
-      case 8  => inheritsFromTypeFullName
-      case 9  => isExternal
-      case 10 => lineNumber
-      case 11 => name
-      case 12 => offset
-      case 13 => offsetEnd
-      case 14 => order
+      case 0  => this.aliasTypeFullName
+      case 1  => this.astParentFullName
+      case 2  => this.astParentType
+      case 3  => this.code
+      case 4  => this.columnNumber
+      case 5  => this.filename
+      case 6  => this.fullName
+      case 7  => this.inheritsFromTypeFullName
+      case 8  => this.isExternal
+      case 9  => this.lineNumber
+      case 10 => this.name
+      case 11 => this.offset
+      case 12 => this.offsetEnd
+      case 13 => this.order
+      case _  => null
     }
 
-  override def productPrefix = "TypeDecl"
-  override def productArity  = 15
-
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[TypeDeclDb]
-
-  override def property(key: String): Any = {
-    key match {
-      case "ALIAS_TYPE_FULL_NAME"         => this._aliasTypeFullName
-      case "AST_PARENT_FULL_NAME"         => this._astParentFullName
-      case "AST_PARENT_TYPE"              => this._astParentType
-      case "CODE"                         => this._code
-      case "COLUMN_NUMBER"                => this._columnNumber
-      case "FILENAME"                     => this._filename
-      case "FULL_NAME"                    => this._fullName
-      case "INHERITS_FROM_TYPE_FULL_NAME" => this._inheritsFromTypeFullName
-      case "IS_EXTERNAL"                  => this._isExternal
-      case "LINE_NUMBER"                  => this._lineNumber
-      case "NAME"                         => this._name
-      case "OFFSET"                       => this._offset
-      case "OFFSET_END"                   => this._offsetEnd
-      case "ORDER"                        => this._order
-
-      case _ => null
-    }
-  }
-
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "ALIAS_TYPE_FULL_NAME" => this._aliasTypeFullName = value.asInstanceOf[String]
-      case "AST_PARENT_FULL_NAME" => this._astParentFullName = value.asInstanceOf[String]
-      case "AST_PARENT_TYPE"      => this._astParentType = value.asInstanceOf[String]
-      case "CODE"                 => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "FILENAME"             => this._filename = value.asInstanceOf[String]
-      case "FULL_NAME"            => this._fullName = value.asInstanceOf[String]
-      case "INHERITS_FROM_TYPE_FULL_NAME" =>
-        this._inheritsFromTypeFullName = value match {
-          case null                                             => collection.immutable.ArraySeq.empty
-          case singleValue: String                              => collection.immutable.ArraySeq(singleValue)
-          case coll: IterableOnce[Any] if coll.iterator.isEmpty => collection.immutable.ArraySeq.empty
-          case arr: Array[_] if arr.isEmpty                     => collection.immutable.ArraySeq.empty
-          case arr: Array[_] => collection.immutable.ArraySeq.unsafeWrapArray(arr).asInstanceOf[IndexedSeq[String]]
-          case jCollection: java.lang.Iterable[_] =>
-            if (jCollection.iterator.hasNext) {
-              collection.immutable.ArraySeq.unsafeWrapArray(
-                jCollection.asInstanceOf[java.util.Collection[String]].iterator.asScala.toArray
-              )
-            } else collection.immutable.ArraySeq.empty
-          case iter: Iterable[_] =>
-            if (iter.nonEmpty) {
-              collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
-            } else collection.immutable.ArraySeq.empty
-        }
-      case "IS_EXTERNAL" => this._isExternal = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
-      case "NAME"        => this._name = value.asInstanceOf[String]
-      case "OFFSET"      => this._offset = value.asInstanceOf[scala.Int]
-      case "OFFSET_END"  => this._offsetEnd = value.asInstanceOf[scala.Int]
-      case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
-
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
-    }
-  }
-
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
-
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._aliasTypeFullName = newNode.asInstanceOf[NewTypeDecl].aliasTypeFullName match {
-      case None => null; case Some(value) => value
-    }
-    this._astParentFullName = newNode.asInstanceOf[NewTypeDecl].astParentFullName
-    this._astParentType = newNode.asInstanceOf[NewTypeDecl].astParentType
-    this._code = newNode.asInstanceOf[NewTypeDecl].code
-    this._columnNumber = newNode.asInstanceOf[NewTypeDecl].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._filename = newNode.asInstanceOf[NewTypeDecl].filename
-    this._fullName = newNode.asInstanceOf[NewTypeDecl].fullName
-    this._inheritsFromTypeFullName =
-      if (newNode.asInstanceOf[NewTypeDecl].inheritsFromTypeFullName != null)
-        newNode.asInstanceOf[NewTypeDecl].inheritsFromTypeFullName
-      else collection.immutable.ArraySeq.empty
-    this._isExternal = newNode.asInstanceOf[NewTypeDecl].isExternal
-    this._lineNumber = newNode.asInstanceOf[NewTypeDecl].lineNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._name = newNode.asInstanceOf[NewTypeDecl].name
-    this._offset = newNode.asInstanceOf[NewTypeDecl].offset match { case None => null; case Some(value) => value }
-    this._offsetEnd = newNode.asInstanceOf[NewTypeDecl].offsetEnd match { case None => null; case Some(value) => value }
-    this._order = newNode.asInstanceOf[NewTypeDecl].order
-
-    graph.indexManager.putIfIndexed("FULL_NAME", newNode.asInstanceOf[NewTypeDecl].fullName, this.ref)
-  }
-
+  override def productPrefix                = "NewTypeDecl"
+  override def productArity                 = 14
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewTypeDecl]
 }
