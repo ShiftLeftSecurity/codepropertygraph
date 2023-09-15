@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,7 +45,6 @@ public static final String MATCH = "MATCH";
 
 /** Represents a yield expression */
 public static final String YIELD = "YIELD";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(BREAK);

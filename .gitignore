@@ -14,7 +14,7 @@ project/.bloop
 .project
 *.class
 /.classpath
-/project/project/
+/project/project/target
 /project/target/
 /target
 /foo.c

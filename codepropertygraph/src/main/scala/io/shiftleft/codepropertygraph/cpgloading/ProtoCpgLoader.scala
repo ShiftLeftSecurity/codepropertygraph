@@ -6,7 +6,6 @@ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.slf4j.{Logger, LoggerFactory}
-import overflowdb.Config
 
 import java.io.InputStream
 import java.nio.file.{Files, Path}
@@ -14,6 +13,7 @@ import java.util.{List => JList}
 import scala.collection.mutable.ArrayDeque
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
+import scala.jdk.CollectionConverters.*
 
 // This class is used to temporarily store edges we have red from proto before we store them
 // in the CPG. As usual proto is very memory inefficiet when it comes to memory and saving a
@@ -28,9 +28,9 @@ case class TmpEdge(dst: Long, src: Long, typ: Int, properties: List[Edge.Propert
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, overflowDbConfig: Config = Config.withoutOverflow): Cpg =
+  def loadFromProtoZip(fileName: String, storagePath: Option[Path]): Cpg =
     measureAndReport {
-      val builder = new ProtoToCpg(overflowDbConfig)
+      val builder = new ProtoToCpg(storagePath)
       Using.Manager { use =>
         val edges = ArrayDeque.empty[TmpEdge]
         use(new ZipArchive(fileName)).entries.foreach { entry =>
@@ -44,7 +44,11 @@ object ProtoCpgLoader {
         // We remove the edges while iterating so that the GC can already collect them.
         while (edges.nonEmpty) {
           val edge = edges.removeHead()
-          builder.addEdge(edge.dst, edge.src, EdgeType.forNumber(edge.typ), edge.properties)
+          if (edge.properties.size > 1) {
+            throw new IllegalArgumentException(s"flatgraph only supports zero or one edge properties, but the given edge has ${edge.properties.size}; details: $edge")
+          } else {
+            builder.addEdge(edge.dst, edge.src, EdgeType.forNumber(edge.typ), edge.properties.headOption)
+          }
         }
       } match {
         case Failure(exception) => throw exception
@@ -52,22 +56,26 @@ object ProtoCpgLoader {
       }
     }
 
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], overflowDbConfig: Config): Cpg = {
-    val builder = new ProtoToCpg(overflowDbConfig)
+  def loadFromListOfProtos(cpgs: Seq[CpgStruct], storagePath: Option[Path]): Cpg = {
+    val builder = new ProtoToCpg(storagePath)
     cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
     cpgs.foreach { cpg =>
       cpg.getEdgeList.asScala.foreach { edge =>
-        builder.addEdge(edge.getDst, edge.getSrc, edge.getType, edge.getPropertyList.asScala)
+        if (edge.getPropertyCount > 1) {
+          throw new IllegalArgumentException(s"flatgraph only supports zero or one edge properties, but the given edge has ${edge.getPropertyCount}; details: $edge")
+        } else {
+          builder.addEdge(edge.getDst, edge.getSrc, edge.getType, edge.getPropertyList.asScala.headOption)
+        }
       }
     }
     builder.build()
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], overflowDbConfig: Config): Cpg =
-    loadFromListOfProtos(cpgs.asScala.toSeq, overflowDbConfig)
+   def loadFromListOfProtos(cpgs: JList[CpgStruct], storagePath: Option[Path]): Cpg =
+     loadFromListOfProtos(cpgs.asScala.toSeq, storagePath)
 
-  def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
-    loadOverlays(fileName, CpgOverlay.parseFrom)
+   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
+     loadOverlays(fileName, CpgOverlay.parseFrom)
 
   private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
     Using(new ZipArchive(fileName)) { zip =>

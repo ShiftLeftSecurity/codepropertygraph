@@ -3,8 +3,8 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization
 import org.json4s.{Formats, NoTypeHints}
-import overflowdb.schema.Property.Cardinality
-import overflowdb.schema.{AbstractNodeType, NodeBaseType, NodeType, Property, SchemaInfo}
+import flatgraph.schema.Property.Cardinality
+import flatgraph.schema.{AbstractNodeType, NodeBaseType, NodeType, Property, SchemaInfo}
 
 object Schema2Json extends App {
 

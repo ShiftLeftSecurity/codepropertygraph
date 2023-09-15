@@ -1,6 +1,8 @@
 package io.shiftleft.passes
+
+import flatgraph.DiffGraphApplier
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
 
@@ -36,11 +38,7 @@ object ConcurrentWriterCpgPass {
   private val writerQueueCapacity   = 4
   private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
-abstract class ConcurrentWriterCpgPass[T <: AnyRef](
-  cpg: Cpg,
-  @nowarn outName: String = "",
-  keyPool: Option[KeyPool] = None
-) extends NewStyleCpgPassBase[T] {
+abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends NewStyleCpgPassBase[T] {
 
   @volatile var nDiffT = -1
 
@@ -66,7 +64,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
     val parts = generateParts()
     nParts = parts.size
     val partIter        = parts.iterator
-    val completionQueue = mutable.ArrayDeque[Future[overflowdb.BatchedUpdate.DiffGraph]]()
+    val completionQueue = mutable.ArrayDeque[Future[DiffGraphBuilder]]()
     val writer          = new Writer(MDC.getCopyOfContextMap())
     val writerThread    = new Thread(writer)
     writerThread.setName("Writer")
@@ -91,9 +89,9 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
             // todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             // if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
-              val builder = new DiffGraphBuilder
+              val builder = Cpg.newDiffGraphBuilder
               runOnPart(builder, next.asInstanceOf[T])
-              builder.build()
+              builder
             })
           } else if (completionQueue.nonEmpty) {
             val future = completionQueue.removeHead()
@@ -130,7 +128,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
   private class Writer(mdc: java.util.Map[String, String]) extends Runnable {
 
     val queue =
-      new LinkedBlockingQueue[Option[overflowdb.BatchedUpdate.DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
+      new LinkedBlockingQueue[Option[DiffGraphBuilder]](ConcurrentWriterCpgPass.writerQueueCapacity)
 
     @volatile var raisedException: Exception = null
 
@@ -147,9 +145,11 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              nDiffT += overflowdb.BatchedUpdate
-                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
-                .transitiveModifications()
+              // TODO how about `nDiffT` which seems to count the number of modifications..
+              //              nDiffT += overflowdb.BatchedUpdate
+//                .applyDiff(cpg.graph, diffGraph, null)
+//                .transitiveModifications()
+              DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
               index += 1
           }
         }

@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -270,7 +267,6 @@ public static final String VARIABLE = "VARIABLE";
 /** A version, given as a string. Used, for example, in the META_DATA node to
 indicate which version of the CPG spec this CPG conforms to */
 public static final String VERSION = "VERSION";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(ALIAS_TYPE_FULL_NAME);
