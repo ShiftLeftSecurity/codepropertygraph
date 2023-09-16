@@ -6,6 +6,7 @@ dependsOn(Projects.domainClasses)
 libraryDependencies ++= Seq(
   // "io.shiftleft"          %% "overflowdb-traversal" % Versions.overflowdb,
   // "io.shiftleft"          %% "overflowdb-formats"   % Versions.overflowdb,
+  "com.google.protobuf"    % "protobuf-java"        % "3.18.0", // TODO drop after protoBindings are back
   "net.sf.trove4j"         % "core"                 % "3.1.0",
   "com.github.scopt"      %% "scopt"                % "4.0.1",
   "com.github.pathikrit"  %% "better-files"         % "3.9.2",
