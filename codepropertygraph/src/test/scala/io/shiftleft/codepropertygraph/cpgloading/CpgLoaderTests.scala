@@ -29,7 +29,8 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     "allow loading of CPG from bin.zip file" in {
       zipFile.exists shouldBe true
       val cpg = CpgLoader.load(zipFile.pathAsString)
-      cpg.graph.nodes.hasNext shouldBe true
+//      cpg.graph.nodes.hasNext shouldBe true
+      ???
     }
 
     "throw an appropriate exception if the provided filename that refers to a non-existing file" in {
@@ -41,9 +42,10 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       *     follows.
       */
     "allow disabling the overflowdb backend" in {
-      val config = new CpgLoaderConfig(overflowDbConfig = new Config())
-      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
-      cpg.graph.nodes.hasNext shouldBe true
+//      val config = new CpgLoaderConfig(overflowDbConfig = new Config())
+//      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
+//      cpg.graph.nodes.hasNext shouldBe true
+      ???
     }
 
     /** By default, indexes will be created for the CPG in order to increase performance of traversals. The downside is
@@ -54,16 +56,17 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     "allow late creation of indexes" in {
       // Do not create indexes on load
       val config = new CpgLoaderConfig(createIndexes = false)
-      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
-
-      // ... execute lots of operations on the graph
-      cpg.graph.addNode("METHOD")
-      // ...
-
-      cpg.graph.indexManager.getIndexedNodeProperties.size shouldBe 0
-      // Now create indexes
-      CpgLoader.createIndexes(cpg)
-      cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array("FULL_NAME")
+      ???
+//      val cpg    = CpgLoader.load(zipFile.pathAsString, config)
+//
+//      // ... execute lots of operations on the graph
+//      cpg.graph.addNode("METHOD")
+//      // ...
+//
+//      cpg.graph.indexManager.getIndexedNodeProperties.size shouldBe 0
+//      // Now create indexes
+//      CpgLoader.createIndexes(cpg)
+//      cpg.graph.indexManager.getIndexedNodeProperties.toArray shouldBe Array("FULL_NAME")
     }
 
   }
