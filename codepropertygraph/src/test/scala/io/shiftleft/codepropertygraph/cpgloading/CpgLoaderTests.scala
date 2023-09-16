@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import overflowdb.Config
+//import overflowdb.Config
 
 /** Specification of the CPGLoader. The loader allows CPGs to be loaded from the CPG protobuf file format (based on
   * Google protocol buffers). An optional `CpgLoaderConfig` can be passed to the loader to influence the loading
@@ -14,7 +14,8 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
   var zipFile: better.files.File = _
 
   override def beforeAll(): Unit = {
-    zipFile = TestProtoCpg.createTestProtoCpg
+//    zipFile = TestProtoCpg.createTestProtoCpg
+    ???
   }
 
   override def afterAll(): Unit = {

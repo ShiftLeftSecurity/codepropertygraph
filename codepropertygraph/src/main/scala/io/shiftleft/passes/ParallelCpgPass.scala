@@ -1,4 +1,5 @@
 package io.shiftleft.passes
+import io.joern.odb2.DiffGraphApplier
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
@@ -66,7 +67,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
     val parts = generateParts()
     nParts = parts.size
     val partIter        = parts.iterator
-    val completionQueue = mutable.ArrayDeque[Future[overflowdb.BatchedUpdate.DiffGraph]]()
+    val completionQueue = mutable.ArrayDeque[Future[DiffGraphBuilder]]()
     val writer          = new Writer(MDC.getCopyOfContextMap())
     val writerThread    = new Thread(writer)
     writerThread.setName("Writer")
@@ -93,7 +94,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
             completionQueue.append(Future.apply {
               val builder = new DiffGraphBuilder
               runOnPart(builder, next.asInstanceOf[T])
-              builder.build()
+              builder
             })
           } else if (completionQueue.nonEmpty) {
             val future = completionQueue.removeHead()
@@ -130,7 +131,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
   private class Writer(mdc: java.util.Map[String, String]) extends Runnable {
 
     val queue =
-      new LinkedBlockingQueue[Option[overflowdb.BatchedUpdate.DiffGraph]](ConcurrentWriterCpgPass.writerQueueCapacity)
+      new LinkedBlockingQueue[Option[DiffGraphBuilder]](ConcurrentWriterCpgPass.writerQueueCapacity)
 
     @volatile var raisedException: Exception = null
 
@@ -147,9 +148,12 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              nDiffT += overflowdb.BatchedUpdate
-                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
-                .transitiveModifications()
+              // TODO how about keyPool?
+              // TODO how about `nDiffT` which seems to count the number of modifications..
+              //              nDiffT += overflowdb.BatchedUpdate
+//                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
+//                .transitiveModifications()
+              DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
               index += 1
           }
         }
