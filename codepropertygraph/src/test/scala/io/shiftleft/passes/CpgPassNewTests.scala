@@ -3,7 +3,7 @@ package io.shiftleft.passes
 import better.files.File
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.nodes.NewFile
+import io.shiftleft.codepropertygraph.generated.v2.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -31,7 +31,8 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
   "SimpleCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V().asScala.map(_.label).toSet shouldBe Set("FILE")
+//      cpg.graph.V().asScala.map(_.label).toSet shouldBe Set("FILE")
+      ???
     }
 
     "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
@@ -48,7 +49,8 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
 
     "take into account KeyPool for createAndApply" in Fixture(Some(new IntervalKeyPool(100, 120))) { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
+//      cpg.graph.V.asScala.map(_.id()).toSet shouldBe Set(100, 101)
+      ???
     }
 
     "fail for schema violations" in {
@@ -57,10 +59,11 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
         override def run(dst: DiffGraphBuilder): Unit = {
           val file1 = NewFile().name("foo")
           val file2 = NewFile().name("bar")
-          dst
-            .addNode(file1)
-            .addNode(file2)
-            .addEdge(file1, file2, "illegal_edge_label")
+//          dst
+//            .addNode(file1)
+//            .addNode(file2)
+//            .addEdge(file1, file2, "illegal_edge_label")
+          ???
         }
       }
 
