@@ -5,7 +5,9 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 /** A pool of long integers that serve as node ids. Using the method `next`, the pool provides the next id in a
   * thread-safe manner.
   */
-trait KeyPool extends overflowdb.BatchedUpdate.KeyPool {}
+trait KeyPool {
+  def next(): Long
+}
 
 /** A key pool that returns the integers of the interval [first, last] in a thread-safe manner.
   */
@@ -13,7 +15,7 @@ class IntervalKeyPool(val first: Long, val last: Long) extends KeyPool {
 
   /** Get next number in interval or raise if number is larger than `last`
     */
-  def next: Long = {
+  def next(): Long = {
     if (!valid) {
       throw new IllegalStateException("Call to `next` on invalidated IntervalKeyPool.")
     }
@@ -53,7 +55,7 @@ class SequenceKeyPool(seq: Seq[Long]) extends KeyPool {
   val seqLen: Int = seq.size
   var cur         = new AtomicInteger(-1)
 
-  override def next: Long = {
+  override def next(): Long = {
     val i = cur.incrementAndGet()
     if (i >= seqLen) {
       throw new RuntimeException("Pool exhausted")

@@ -4,7 +4,6 @@ import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import org.slf4j.{Logger, LoggerFactory, MDC}
-import overflowdb.BatchedUpdate
 
 import java.util.function.{BiConsumer, Supplier}
 import scala.annotation.nowarn
@@ -19,11 +18,11 @@ import scala.util.{Failure, Success, Try}
 abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
     extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
 
-  def run(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit
+  def run(builder: io.joern.odb2.DiffGraphBuilder): Unit
 
   final override def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
 
-  final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
+  final override def runOnPart(builder: io.joern.odb2.DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
 }
 
@@ -73,11 +72,14 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
       val diffGraph = new DiffGraphBuilder
       nParts = runWithBuilder(diffGraph)
       nanosBuilt = System.nanoTime()
-      nDiff = diffGraph.size()
+      nDiff = diffGraph.size
 
-      nDiffT = overflowdb.BatchedUpdate
-        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
-        .transitiveModifications()
+      // TODO how about keyPool?
+      // TODO how about `nDiffT` which seems to count the number of modifications..
+//      nDiffT = overflowdb.BatchedUpdate
+//        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
+//        .transitiveModifications()
+      io.joern.odb2.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
 
     } catch {
       case exc: Exception =>
@@ -111,7 +113,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
   * hierarchy.
   */
 abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
-  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
+  type DiffGraphBuilder = io.joern.odb2.DiffGraphBuilder
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
   // setup large data structures, acquire external resources
@@ -123,7 +125,7 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
-  override def runWithBuilder(externalBuilder: BatchedUpdate.DiffGraphBuilder): Int = {
+  override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
     try {
       init()
       val parts  = generateParts()
@@ -180,19 +182,19 @@ trait CpgPassBase {
     * 1), where nParts is either the number of parallel parts, or the number of iterarator elements in case of legacy
     * passes. Includes init() and finish() logic.
     */
-  def runWithBuilder(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int
+  def runWithBuilder(builder: io.joern.odb2.DiffGraphBuilder): Int
 
   /** Wraps runWithBuilder with logging, and swallows raised exceptions. Use with caution -- API is unstable. A return
     * value of -1 indicates failure, otherwise the return value of runWithBuilder is passed through.
     */
-  def runWithBuilderLogged(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Int = {
+  def runWithBuilderLogged(builder: io.joern.odb2.DiffGraphBuilder): Int = {
     baseLogger.info(s"Start of pass: $name")
     val nanoStart = System.nanoTime()
-    val size0     = builder.size()
+    val size0     = builder.size
     Try(runWithBuilder(builder)) match {
       case Success(nParts) =>
         baseLogger.info(
-          f"Pass ${name} completed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms.  ${builder.size() - size0}%d changes generated from ${nParts}%d parts."
+          f"Pass ${name} completed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms.  ${builder.size - size0}%d changes generated from ${nParts}%d parts."
         )
         nParts
       case Failure(exception) =>
