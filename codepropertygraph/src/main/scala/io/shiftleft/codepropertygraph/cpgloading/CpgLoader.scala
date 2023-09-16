@@ -1,8 +1,10 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+// TODO implement once we have proto support
+
 import better.files.File
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.codepropertygraph.generated.PropertyNames
+// import io.shiftleft.codepropertygraph.generated.PropertyNames
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Try
@@ -18,8 +20,8 @@ object CpgLoader {
     * @param config
     *   loader configuration
     */
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig()): Cpg =
-    new CpgLoader().load(filename, config)
+  def load(filename: String/*, config: CpgLoaderConfig = CpgLoaderConfig()*/): Cpg =
+    new CpgLoader().load(filename/*, config*/)
 
   /** Load Code Property Graph from an overflow DB file
     *
@@ -32,9 +34,9 @@ object CpgLoader {
     * val odbConfig = Config.withDefaults().withStorageLocation(config.spPath) val config =
     * CpgLoaderConfig().withOverflowConfig(odbConfig) CpgLoader.loadFromOverflowDb(config)
     */
-  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
-    new CpgLoader().loadFromOverflowDb(config)
-  }
+//  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
+//    new CpgLoader().loadFromOverflowDb(config)
+//  }
 
   /** Create any indexes necessary for quick access.
     *
@@ -70,22 +72,23 @@ private class CpgLoader {
 
   import CpgLoader.logger
 
-  def load(filename: String, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow): Cpg = {
+  def load(filename: String/*, config: CpgLoaderConfig = CpgLoaderConfig.withoutOverflow*/): Cpg = {
     logger.debug("Loading " + filename)
 
     val cpg =
-      ProtoCpgLoader.loadFromProtoZip(filename, config.overflowDbConfig)
-    if (config.createIndexes) { createIndexes(cpg) }
+      ProtoCpgLoader.loadFromProtoZip(filename/*, config.overflowDbConfig*/)
+//    if (config.createIndexes) { createIndexes(cpg) }
     cpg
   }
 
-  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
-    val cpg = Cpg.withConfig(config.overflowDbConfig)
-    if (config.createIndexes) { createIndexes(cpg) }
-    cpg
-  }
+//  def loadFromOverflowDb(config: CpgLoaderConfig = CpgLoaderConfig()): Cpg = {
+//    val cpg = Cpg.withConfig(config.overflowDbConfig)
+//    if (config.createIndexes) { createIndexes(cpg) }
+//    cpg
+//  }
 
   def createIndexes(cpg: Cpg): Unit =
-    cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
+    ???
+//    cpg.graph.indexManager.createNodePropertyIndex(PropertyNames.FULL_NAME)
 
 }
