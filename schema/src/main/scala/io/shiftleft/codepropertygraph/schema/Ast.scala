@@ -155,7 +155,7 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .protoId(27)
-      .addProperties(typeFullName, name)
+      .addProperties(typeFullName, name).primaryKey(name)
 
     val canonicalName = builder
       .addProperty(
@@ -301,7 +301,7 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .protoId(30)
-      .starterName("ret")
+      .starterName("ret").primaryKey(code)
 
     val controlStructureType = builder
       .addProperty(

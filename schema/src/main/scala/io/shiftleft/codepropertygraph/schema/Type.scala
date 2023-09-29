@@ -155,7 +155,7 @@ object Type extends SchemaBase {
       )
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
-      .starterName("typ")
+      .starterName("typ").primaryKey(name)
 
     // edges
 
@@ -197,7 +197,7 @@ object Type extends SchemaBase {
         stepNameIn = "aliasTypeDecl",
         stepNameInDoc = "Direct alias type declarations."
       )
-      .addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "typeDecl")
+      .addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "typeDecl").primaryKey(name)
 
     typeArgument
       .addOutEdge(edge = bindsTo, inNode = typeParameter)

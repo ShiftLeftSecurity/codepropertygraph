@@ -200,9 +200,9 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Method, i.e. with label METHOD")
   def method: Iterator[nodes.Method] = overflowdb.traversal.InitialTraversal.from[nodes.Method](wrapper.graph, "METHOD")
 
-  @overflowdb.traversal.help.Doc(info = "Shorthand for method.code")
+  @overflowdb.traversal.help.Doc(info = "Shorthand for method.name")
   def method(key: String): Iterator[nodes.Method] =
-    new io.shiftleft.codepropertygraph.generated.traversal.MethodTraversalExtGen(method).code(key)
+    new io.shiftleft.codepropertygraph.generated.traversal.MethodTraversalExtGen(method).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type MethodParameterIn, i.e. with label METHOD_PARAMETER_IN")
   def methodParameterIn: Iterator[nodes.MethodParameterIn] =
@@ -211,10 +211,6 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type MethodParameterOut, i.e. with label METHOD_PARAMETER_OUT")
   def methodParameterOut: Iterator[nodes.MethodParameterOut] =
     overflowdb.traversal.InitialTraversal.from[nodes.MethodParameterOut](wrapper.graph, "METHOD_PARAMETER_OUT")
-
-  @overflowdb.traversal.help.Doc(info = "All nodes of type MethodRef, i.e. with label METHOD_REF")
-  def methodRef: Iterator[nodes.MethodRef] =
-    overflowdb.traversal.InitialTraversal.from[nodes.MethodRef](wrapper.graph, "METHOD_REF")
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type MethodReturn, i.e. with label METHOD_RETURN")
   def methodReturn: Iterator[nodes.MethodReturn] =
@@ -228,15 +224,31 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   def namespace: Iterator[nodes.Namespace] =
     overflowdb.traversal.InitialTraversal.from[nodes.Namespace](wrapper.graph, "NAMESPACE")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for namespace.name")
+  def namespace(key: String): Iterator[nodes.Namespace] =
+    new io.shiftleft.codepropertygraph.generated.traversal.NamespaceTraversalExtGen(namespace).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type NamespaceBlock, i.e. with label NAMESPACE_BLOCK")
   def namespaceBlock: Iterator[nodes.NamespaceBlock] =
     overflowdb.traversal.InitialTraversal.from[nodes.NamespaceBlock](wrapper.graph, "NAMESPACE_BLOCK")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for namespaceBlock.name")
+  def namespaceBlock(key: String): Iterator[nodes.NamespaceBlock] =
+    new io.shiftleft.codepropertygraph.generated.traversal.NamespaceBlockTraversalExtGen(namespaceBlock).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type Return, i.e. with label RETURN")
   def ret: Iterator[nodes.Return] = overflowdb.traversal.InitialTraversal.from[nodes.Return](wrapper.graph, "RETURN")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for ret.code")
+  def ret(key: String): Iterator[nodes.Return] =
+    new io.shiftleft.codepropertygraph.generated.traversal.ReturnTraversalExtGen(ret).code(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type Tag, i.e. with label TAG")
   def tag: Iterator[nodes.Tag] = overflowdb.traversal.InitialTraversal.from[nodes.Tag](wrapper.graph, "TAG")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for tag.name")
+  def tag(key: String): Iterator[nodes.Tag] =
+    new io.shiftleft.codepropertygraph.generated.traversal.TagTraversalExtGen(tag).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type TagNodePair, i.e. with label TAG_NODE_PAIR")
   def tagNodePair: Iterator[nodes.TagNodePair] =
@@ -249,6 +261,10 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Type, i.e. with label TYPE")
   def typ: Iterator[nodes.Type] = overflowdb.traversal.InitialTraversal.from[nodes.Type](wrapper.graph, "TYPE")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for typ.name")
+  def typ(key: String): Iterator[nodes.Type] =
+    new io.shiftleft.codepropertygraph.generated.traversal.TypeTraversalExtGen(typ).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type TypeArgument, i.e. with label TYPE_ARGUMENT")
   def typeArgument: Iterator[nodes.TypeArgument] =
     overflowdb.traversal.InitialTraversal.from[nodes.TypeArgument](wrapper.graph, "TYPE_ARGUMENT")
@@ -256,6 +272,10 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type TypeDecl, i.e. with label TYPE_DECL")
   def typeDecl: Iterator[nodes.TypeDecl] =
     overflowdb.traversal.InitialTraversal.from[nodes.TypeDecl](wrapper.graph, "TYPE_DECL")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for typeDecl.name")
+  def typeDecl(key: String): Iterator[nodes.TypeDecl] =
+    new io.shiftleft.codepropertygraph.generated.traversal.TypeDeclTraversalExtGen(typeDecl).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type TypeParameter, i.e. with label TYPE_PARAMETER")
   def typeParameter: Iterator[nodes.TypeParameter] =
@@ -383,6 +403,10 @@ class GeneratedHiddenNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Comment, i.e. with label COMMENT")
   def comment: Iterator[nodes.Comment] =
     overflowdb.traversal.InitialTraversal.from[nodes.Comment](wrapper.graph, "COMMENT")
+
+  @overflowdb.traversal.help.Doc(info = "All nodes of type MethodRef, i.e. with label METHOD_REF")
+  def methodRef: Iterator[nodes.MethodRef] =
+    overflowdb.traversal.InitialTraversal.from[nodes.MethodRef](wrapper.graph, "METHOD_REF")
 }
 
 /** Domain-specific version of diffgraph builder. This is to allow schema checking before diffgraph application in the

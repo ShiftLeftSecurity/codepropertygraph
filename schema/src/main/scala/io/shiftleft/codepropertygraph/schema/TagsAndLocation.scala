@@ -84,7 +84,7 @@ object TagsAndLocation extends SchemaBase {
     val tag: NodeType = builder
       .addNodeType(name = "TAG", comment = "This node represents a tag.")
       .protoId(24)
-      .addProperties(name, value)
+      .addProperties(name, value).primaryKey(name)
 
     val location: NodeType = builder
       .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")
