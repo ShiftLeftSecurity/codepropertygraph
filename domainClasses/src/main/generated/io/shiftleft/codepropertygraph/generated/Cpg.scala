@@ -100,17 +100,21 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Call, i.e. with label CALL")
   def call: Iterator[nodes.Call] = overflowdb.traversal.InitialTraversal.from[nodes.Call](wrapper.graph, "CALL")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for call.name")
+  def call(key: String): Iterator[nodes.Call] =
+    new io.shiftleft.codepropertygraph.generated.traversal.CallTraversalExtGen(call).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type ClosureBinding, i.e. with label CLOSURE_BINDING")
   def closureBinding: Iterator[nodes.ClosureBinding] =
     overflowdb.traversal.InitialTraversal.from[nodes.ClosureBinding](wrapper.graph, "CLOSURE_BINDING")
 
-  @overflowdb.traversal.help.Doc(info = "All nodes of type Comment, i.e. with label COMMENT")
-  def comment: Iterator[nodes.Comment] =
-    overflowdb.traversal.InitialTraversal.from[nodes.Comment](wrapper.graph, "COMMENT")
-
   @overflowdb.traversal.help.Doc(info = "All nodes of type ConfigFile, i.e. with label CONFIG_FILE")
   def configFile: Iterator[nodes.ConfigFile] =
     overflowdb.traversal.InitialTraversal.from[nodes.ConfigFile](wrapper.graph, "CONFIG_FILE")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for configFile.name")
+  def configFile(key: String): Iterator[nodes.ConfigFile] =
+    new io.shiftleft.codepropertygraph.generated.traversal.ConfigFileTraversalExtGen(configFile).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type ControlStructure, i.e. with label CONTROL_STRUCTURE")
   def controlStructure: Iterator[nodes.ControlStructure] =
@@ -120,12 +124,20 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   def dependency: Iterator[nodes.Dependency] =
     overflowdb.traversal.InitialTraversal.from[nodes.Dependency](wrapper.graph, "DEPENDENCY")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for dependency.name")
+  def dependency(key: String): Iterator[nodes.Dependency] =
+    new io.shiftleft.codepropertygraph.generated.traversal.DependencyTraversalExtGen(dependency).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type FieldIdentifier, i.e. with label FIELD_IDENTIFIER")
   def fieldIdentifier: Iterator[nodes.FieldIdentifier] =
     overflowdb.traversal.InitialTraversal.from[nodes.FieldIdentifier](wrapper.graph, "FIELD_IDENTIFIER")
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type File, i.e. with label FILE")
   def file: Iterator[nodes.File] = overflowdb.traversal.InitialTraversal.from[nodes.File](wrapper.graph, "FILE")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for file.name")
+  def file(key: String): Iterator[nodes.File] =
+    new io.shiftleft.codepropertygraph.generated.traversal.FileTraversalExtGen(file).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type Finding, i.e. with label FINDING")
   def finding: Iterator[nodes.Finding] =
@@ -134,6 +146,10 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Identifier, i.e. with label IDENTIFIER")
   def identifier: Iterator[nodes.Identifier] =
     overflowdb.traversal.InitialTraversal.from[nodes.Identifier](wrapper.graph, "IDENTIFIER")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for identifier.name")
+  def identifier(key: String): Iterator[nodes.Identifier] =
+    new io.shiftleft.codepropertygraph.generated.traversal.IdentifierTraversalExtGen(identifier).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type Import, i.e. with label IMPORT")
   def imports: Iterator[nodes.Import] =
@@ -155,8 +171,16 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   def literal: Iterator[nodes.Literal] =
     overflowdb.traversal.InitialTraversal.from[nodes.Literal](wrapper.graph, "LITERAL")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for literal.code")
+  def literal(key: String): Iterator[nodes.Literal] =
+    new io.shiftleft.codepropertygraph.generated.traversal.LiteralTraversalExtGen(literal).code(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type Local, i.e. with label LOCAL")
   def local: Iterator[nodes.Local] = overflowdb.traversal.InitialTraversal.from[nodes.Local](wrapper.graph, "LOCAL")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for local.name")
+  def local(key: String): Iterator[nodes.Local] =
+    new io.shiftleft.codepropertygraph.generated.traversal.LocalTraversalExtGen(local).name(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type Location, i.e. with label LOCATION")
   def location: Iterator[nodes.Location] =
@@ -165,12 +189,20 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
   @overflowdb.traversal.help.Doc(info = "All nodes of type Member, i.e. with label MEMBER")
   def member: Iterator[nodes.Member] = overflowdb.traversal.InitialTraversal.from[nodes.Member](wrapper.graph, "MEMBER")
 
+  @overflowdb.traversal.help.Doc(info = "Shorthand for member.name")
+  def member(key: String): Iterator[nodes.Member] =
+    new io.shiftleft.codepropertygraph.generated.traversal.MemberTraversalExtGen(member).name(key)
+
   @overflowdb.traversal.help.Doc(info = "All nodes of type MetaData, i.e. with label META_DATA")
   def metaData: Iterator[nodes.MetaData] =
     overflowdb.traversal.InitialTraversal.from[nodes.MetaData](wrapper.graph, "META_DATA")
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type Method, i.e. with label METHOD")
   def method: Iterator[nodes.Method] = overflowdb.traversal.InitialTraversal.from[nodes.Method](wrapper.graph, "METHOD")
+
+  @overflowdb.traversal.help.Doc(info = "Shorthand for method.code")
+  def method(key: String): Iterator[nodes.Method] =
+    new io.shiftleft.codepropertygraph.generated.traversal.MethodTraversalExtGen(method).code(key)
 
   @overflowdb.traversal.help.Doc(info = "All nodes of type MethodParameterIn, i.e. with label METHOD_PARAMETER_IN")
   def methodParameterIn: Iterator[nodes.MethodParameterIn] =
@@ -344,6 +376,13 @@ class GeneratedNodeStarterExt(val wrapper: Cpg) extends AnyVal {
     )
     .asScala
     .asInstanceOf[Iterator[nodes.Expression]]
+}
+
+class GeneratedHiddenNodeStarterExt(val wrapper: Cpg) extends AnyVal {
+  import scala.jdk.CollectionConverters.IteratorHasAsScala
+  @overflowdb.traversal.help.Doc(info = "All nodes of type Comment, i.e. with label COMMENT")
+  def comment: Iterator[nodes.Comment] =
+    overflowdb.traversal.InitialTraversal.from[nodes.Comment](wrapper.graph, "COMMENT")
 }
 
 /** Domain-specific version of diffgraph builder. This is to allow schema checking before diffgraph application in the

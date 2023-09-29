@@ -71,6 +71,7 @@ object Method extends SchemaBase {
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
       .addProperties(astParentType, astParentFullName)
       .extendz(declaration)
+      .primaryKey(code)
 
     val isVariadic = builder
       .addProperty(

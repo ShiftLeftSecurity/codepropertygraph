@@ -114,6 +114,7 @@ object FileSystem extends SchemaBase {
       )
       .protoId(38)
       .addProperties(name, hash)
+      .primaryKey(name)
 
   }
 

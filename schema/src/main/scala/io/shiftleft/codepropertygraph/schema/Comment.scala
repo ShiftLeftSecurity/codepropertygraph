@@ -21,6 +21,7 @@ object Comment extends SchemaBase {
       .protoId(511)
       .addProperties(filename)
       .extendz(astNode)
+      .hiddenStarter(true)
 
     comment.addOutEdge(edge = sourceFile, inNode = comment, stepNameOut = "file")
     file.addOutEdge(edge = ast, inNode = comment, stepNameOut = "comment")

@@ -107,6 +107,7 @@ object Type extends SchemaBase {
       .protoId(46)
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .addProperties(astParentType, astParentFullName)
+      .primaryKey(name)
 
     val typeParameter: NodeType = builder
       .addNodeType(
@@ -144,6 +145,7 @@ object Type extends SchemaBase {
       .protoId(9)
       .addProperties(typeFullName)
       .extendz(declaration)
+      .primaryKey(name)
 
     val tpe: NodeType = builder
       .addNodeType(

@@ -40,7 +40,7 @@ object Ast extends SchemaBase {
 
   class Schema(
     builder: SchemaBuilder,
-    base: Base.Schema,
+    val base: Base.Schema,
     namespaces: Namespace.Schema,
     methodSchema: Method.Schema,
     typeSchema: Type.Schema,
@@ -130,6 +130,7 @@ object Ast extends SchemaBase {
       )
       .protoId(8)
       .addProperties(typeFullName)
+      .primaryKey(code)
 
     val local: NodeType = builder
       .addNodeType(
@@ -143,6 +144,7 @@ object Ast extends SchemaBase {
       .protoId(23)
       .addProperties(typeFullName)
       .extendz(declaration, astNode)
+      .primaryKey(name)
 
     val identifier: NodeType = builder
       .addNodeType(
@@ -283,6 +285,7 @@ object Ast extends SchemaBase {
       )
       .protoId(333)
       .addProperties(typeFullName)
+      .hiddenStarter(true)
 
     val typeRef: NodeType = builder
       .addNodeType(name = "TYPE_REF", comment = "Reference to a type/class")
@@ -551,6 +554,7 @@ object Ast extends SchemaBase {
       .protoId(15)
       .extendz(callRepr)
       .addProperties(typeFullName)
+      .primaryKey(name)
 
     val expression = builder
       .addNodeBaseType(
@@ -569,7 +573,7 @@ object Ast extends SchemaBase {
       .extendz(astNode)
 
     fieldIdentifier.extendz(expression)
-    identifier.extendz(expression)
+    identifier.extendz(expression).primaryKey(name)
     literal.extendz(expression)
     block.extendz(expression)
     controlStructure.extendz(expression)

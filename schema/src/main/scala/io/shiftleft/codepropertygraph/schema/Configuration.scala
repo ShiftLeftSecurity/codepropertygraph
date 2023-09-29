@@ -34,5 +34,6 @@ object Configuration extends SchemaBase {
       )
       .protoId(50)
       .addProperties(name, content)
+      .primaryKey(base.name)
   }
 }

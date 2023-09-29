@@ -146,6 +146,7 @@ object Hidden extends SchemaBase {
       .addNodeType(name = "DEPENDENCY", comment = "This node represents a dependency")
       .protoId(35)
       .addProperties(version, name, dependencyGroupId)
+      .primaryKey(name)
 
     /*
      * Type hints
