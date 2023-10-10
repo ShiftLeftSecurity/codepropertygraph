@@ -9,6 +9,8 @@ object Member {
   val Label = "MEMBER"
 
   object PropertyNames {
+    val AstParentFullName       = "AST_PARENT_FULL_NAME"
+    val AstParentType           = "AST_PARENT_TYPE"
     val Code                    = "CODE"
     val ColumnNumber            = "COLUMN_NUMBER"
     val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
@@ -17,12 +19,24 @@ object Member {
     val Order                   = "ORDER"
     val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
-    val all: Set[String] =
-      Set(Code, ColumnNumber, DynamicTypeHintFullName, LineNumber, Name, Order, PossibleTypes, TypeFullName)
+    val all: Set[String] = Set(
+      AstParentFullName,
+      AstParentType,
+      Code,
+      ColumnNumber,
+      DynamicTypeHintFullName,
+      LineNumber,
+      Name,
+      Order,
+      PossibleTypes,
+      TypeFullName
+    )
     val allAsJava: java.util.Set[String] = all.asJava
   }
 
   object Properties {
+    val AstParentFullName       = new overflowdb.PropertyKey[String]("AST_PARENT_FULL_NAME")
+    val AstParentType           = new overflowdb.PropertyKey[String]("AST_PARENT_TYPE")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
     val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
@@ -35,10 +49,12 @@ object Member {
   }
 
   object PropertyDefaults {
-    val Code         = "<empty>"
-    val Name         = "<empty>"
-    val Order        = -1: Int
-    val TypeFullName = "<empty>"
+    val AstParentFullName = "<empty>"
+    val AstParentType     = "<empty>"
+    val Code              = "<empty>"
+    val Name              = "<empty>"
+    val Order             = -1: Int
+    val TypeFullName      = "<empty>"
   }
 
   val layoutInformation = new NodeLayoutInformation(
@@ -73,6 +89,8 @@ object Member {
 trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
+  def astParentFullName: String
+  def astParentType: String
   def code: String
   def columnNumber: Option[Integer]
   def dynamicTypeHintFullName: IndexedSeq[String]
@@ -90,6 +108,8 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     with StoredNode
     with AstNode
     with Declaration {
+  override def astParentFullName: String                   = get().astParentFullName
+  override def astParentType: String                       = get().astParentType
   override def code: String                                = get().code
   override def columnNumber: Option[Integer]               = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
@@ -100,11 +120,13 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def typeFullName: String                        = get().typeFullName
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
-      case "CODE"           => Member.PropertyDefaults.Code
-      case "NAME"           => Member.PropertyDefaults.Name
-      case "ORDER"          => Member.PropertyDefaults.Order
-      case "TYPE_FULL_NAME" => Member.PropertyDefaults.TypeFullName
-      case _                => super.propertyDefaultValue(propertyKey)
+      case "AST_PARENT_FULL_NAME" => Member.PropertyDefaults.AstParentFullName
+      case "AST_PARENT_TYPE"      => Member.PropertyDefaults.AstParentType
+      case "CODE"                 => Member.PropertyDefaults.Code
+      case "NAME"                 => Member.PropertyDefaults.Name
+      case "ORDER"                => Member.PropertyDefaults.Order
+      case "TYPE_FULL_NAME"       => Member.PropertyDefaults.TypeFullName
+      case _                      => super.propertyDefaultValue(propertyKey)
     }
 
   def astOut: Iterator[AstNode] = get().astOut
@@ -172,38 +194,46 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "dynamicTypeHintFullName"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
-      case 7 => "possibleTypes"
-      case 8 => "typeFullName"
+      case 0  => "id"
+      case 1  => "astParentFullName"
+      case 2  => "astParentType"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "lineNumber"
+      case 7  => "name"
+      case 8  => "order"
+      case 9  => "possibleTypes"
+      case 10 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => dynamicTypeHintFullName
-      case 4 => lineNumber
-      case 5 => name
-      case 6 => order
-      case 7 => possibleTypes
-      case 8 => typeFullName
+      case 0  => id
+      case 1  => astParentFullName
+      case 2  => astParentType
+      case 3  => code
+      case 4  => columnNumber
+      case 5  => dynamicTypeHintFullName
+      case 6  => lineNumber
+      case 7  => name
+      case 8  => order
+      case 9  => possibleTypes
+      case 10 => typeFullName
     }
 
   override def productPrefix = "Member"
-  override def productArity  = 9
+  override def productArity  = 11
 }
 
 class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with Declaration with MemberBase {
 
   override def layoutInformation: NodeLayoutInformation = Member.layoutInformation
 
+  private var _astParentFullName: String                   = Member.PropertyDefaults.AstParentFullName
+  def astParentFullName: String                            = _astParentFullName
+  private var _astParentType: String                       = Member.PropertyDefaults.AstParentType
+  def astParentType: String                                = _astParentType
   private var _code: String                                = Member.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
@@ -224,6 +254,8 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
     val properties = new java.util.HashMap[String, Any]
+    properties.put("AST_PARENT_FULL_NAME", astParentFullName)
+    properties.put("AST_PARENT_TYPE", astParentType)
     properties.put("CODE", code)
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
     if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
@@ -241,6 +273,8 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   /** faster than the default implementation */
   override def propertiesMapForStorage: java.util.Map[String, Any] = {
     val properties = new java.util.HashMap[String, Any]
+    if (!(("<empty>") == astParentFullName)) { properties.put("AST_PARENT_FULL_NAME", astParentFullName) }
+    if (!(("<empty>") == astParentType)) { properties.put("AST_PARENT_TYPE", astParentType) }
     if (!(("<empty>") == code)) { properties.put("CODE", code) }
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
     if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
@@ -291,37 +325,43 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "dynamicTypeHintFullName"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
-      case 7 => "possibleTypes"
-      case 8 => "typeFullName"
+      case 0  => "id"
+      case 1  => "astParentFullName"
+      case 2  => "astParentType"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "lineNumber"
+      case 7  => "name"
+      case 8  => "order"
+      case 9  => "possibleTypes"
+      case 10 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => dynamicTypeHintFullName
-      case 4 => lineNumber
-      case 5 => name
-      case 6 => order
-      case 7 => possibleTypes
-      case 8 => typeFullName
+      case 0  => id
+      case 1  => astParentFullName
+      case 2  => astParentType
+      case 3  => code
+      case 4  => columnNumber
+      case 5  => dynamicTypeHintFullName
+      case 6  => lineNumber
+      case 7  => name
+      case 8  => order
+      case 9  => possibleTypes
+      case 10 => typeFullName
     }
 
   override def productPrefix = "Member"
-  override def productArity  = 9
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MemberDb]
 
   override def property(key: String): Any = {
     key match {
+      case "AST_PARENT_FULL_NAME"        => this._astParentFullName
+      case "AST_PARENT_TYPE"             => this._astParentType
       case "CODE"                        => this._code
       case "COLUMN_NUMBER"               => this._columnNumber
       case "DYNAMIC_TYPE_HINT_FULL_NAME" => this._dynamicTypeHintFullName
@@ -337,8 +377,10 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
 
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
-      case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
+      case "AST_PARENT_FULL_NAME" => this._astParentFullName = value.asInstanceOf[String]
+      case "AST_PARENT_TYPE"      => this._astParentType = value.asInstanceOf[String]
+      case "CODE"                 => this._code = value.asInstanceOf[String]
+      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[Integer]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -394,6 +436,8 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
+    this._astParentFullName = newNode.asInstanceOf[NewMember].astParentFullName
+    this._astParentType = newNode.asInstanceOf[NewMember].astParentType
     this._code = newNode.asInstanceOf[NewMember].code
     this._columnNumber = newNode.asInstanceOf[NewMember].columnNumber.orNull
     this._dynamicTypeHintFullName =

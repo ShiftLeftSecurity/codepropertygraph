@@ -24984,11 +24984,15 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
+  var astParentType: String                       = "<empty>"
+  var astParentFullName: String                   = "<empty>"
 
   override def label: String = "MEMBER"
 
   override def copy: this.type = {
     val newInstance = new NewMember
+    newInstance.astParentFullName = this.astParentFullName
+    newInstance.astParentType = this.astParentType
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
@@ -24998,6 +25002,16 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
     newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
+  }
+
+  def astParentFullName(value: String): this.type = {
+    this.astParentFullName = value
+    this
+  }
+
+  def astParentType(value: String): this.type = {
+    this.astParentType = value
+    this
   }
 
   def code(value: String): this.type = {
@@ -25046,6 +25060,8 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
 
   override def properties: Map[String, Any] = {
     var res = Map[String, Any]()
+    if (!(("<empty>") == astParentFullName)) { res += "AST_PARENT_FULL_NAME" -> astParentFullName }
+    if (!(("<empty>") == astParentType)) { res += "AST_PARENT_TYPE" -> astParentType }
     if (!(("<empty>") == code)) { res += "CODE" -> code }
     columnNumber.map { value => res += "COLUMN_NUMBER" -> value }
     if (dynamicTypeHintFullName != null && dynamicTypeHintFullName.nonEmpty) {
@@ -25077,6 +25093,8 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
       case 5 => this.dynamicTypeHintFullName
       case 6 => this.columnNumber
       case 7 => this.code
+      case 8 => this.astParentType
+      case 9 => this.astParentFullName
       case _ => null
     }
 
@@ -25090,11 +25108,13 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
       case 5 => "dynamicTypeHintFullName"
       case 6 => "columnNumber"
       case 7 => "code"
+      case 8 => "astParentType"
+      case 9 => "astParentFullName"
       case _ => ""
     }
 
   override def productPrefix = "NewMember"
-  override def productArity  = 8
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMember]
 }
