@@ -20,6 +20,124 @@ class MemberTraversalExtGen[NodeType <: Member](val traversal: Iterator[NodeType
   def typ: Iterator[Type] =
     traversal.flatMap(_.typ)
 
+  /** Traverse to astParentFullName property */
+  def astParentFullName: Iterator[String] =
+    traversal.map(_.astParentFullName)
+
+  /** Traverse to nodes where the astParentFullName matches the regular expression `value`
+    */
+  def astParentFullName(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      astParentFullNameExact(pattern)
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter.regexp(traversal)(_.astParentFullName, pattern)
+    }
+  }
+
+  /** Traverse to nodes where the astParentFullName matches at least one of the regular expressions in `values`
+    */
+  def astParentFullName(patterns: String*): Iterator[NodeType] =
+    overflowdb.traversal.filter.StringPropertyFilter.regexpMultiple(traversal)(_.astParentFullName, patterns)
+
+  /** Traverse to nodes where astParentFullName matches `value` exactly.
+    */
+  def astParentFullNameExact(value: String): Iterator[NodeType] = {
+    val fastResult = traversal match {
+      case init: overflowdb.traversal.InitialTraversal[NodeType] =>
+        init.getByIndex("AST_PARENT_FULL_NAME", value).getOrElse(null)
+      case _ => null
+    }
+    if (fastResult != null) fastResult
+    else traversal.filter { node => node.astParentFullName == value }
+  }
+
+  /** Traverse to nodes where astParentFullName matches one of the elements in `values` exactly.
+    */
+  def astParentFullNameExact(values: String*): Iterator[NodeType] = {
+    if (values.size == 1)
+      astParentFullNameExact(values.head)
+    else
+      overflowdb.traversal.filter.StringPropertyFilter.exactMultiple[NodeType, String](
+        traversal,
+        node => Some(node.astParentFullName),
+        values,
+        "AST_PARENT_FULL_NAME"
+      )
+  }
+
+  /** Traverse to nodes where astParentFullName does not match the regular expression `value`.
+    */
+  def astParentFullNameNot(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      traversal.filter { node => node.astParentFullName != pattern }
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter.regexpNot(traversal)(_.astParentFullName, pattern)
+    }
+  }
+
+  /** Traverse to nodes where astParentFullName does not match any of the regular expressions in `values`.
+    */
+  def astParentFullNameNot(patterns: String*): Iterator[NodeType] = {
+    overflowdb.traversal.filter.StringPropertyFilter.regexpNotMultiple(traversal)(_.astParentFullName, patterns)
+  }
+
+  /** Traverse to astParentType property */
+  def astParentType: Iterator[String] =
+    traversal.map(_.astParentType)
+
+  /** Traverse to nodes where the astParentType matches the regular expression `value`
+    */
+  def astParentType(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      astParentTypeExact(pattern)
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter.regexp(traversal)(_.astParentType, pattern)
+    }
+  }
+
+  /** Traverse to nodes where the astParentType matches at least one of the regular expressions in `values`
+    */
+  def astParentType(patterns: String*): Iterator[NodeType] =
+    overflowdb.traversal.filter.StringPropertyFilter.regexpMultiple(traversal)(_.astParentType, patterns)
+
+  /** Traverse to nodes where astParentType matches `value` exactly.
+    */
+  def astParentTypeExact(value: String): Iterator[NodeType] = {
+    val fastResult = traversal match {
+      case init: overflowdb.traversal.InitialTraversal[NodeType] =>
+        init.getByIndex("AST_PARENT_TYPE", value).getOrElse(null)
+      case _ => null
+    }
+    if (fastResult != null) fastResult
+    else traversal.filter { node => node.astParentType == value }
+  }
+
+  /** Traverse to nodes where astParentType matches one of the elements in `values` exactly.
+    */
+  def astParentTypeExact(values: String*): Iterator[NodeType] = {
+    if (values.size == 1)
+      astParentTypeExact(values.head)
+    else
+      overflowdb.traversal.filter.StringPropertyFilter
+        .exactMultiple[NodeType, String](traversal, node => Some(node.astParentType), values, "AST_PARENT_TYPE")
+  }
+
+  /** Traverse to nodes where astParentType does not match the regular expression `value`.
+    */
+  def astParentTypeNot(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      traversal.filter { node => node.astParentType != pattern }
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter.regexpNot(traversal)(_.astParentType, pattern)
+    }
+  }
+
+  /** Traverse to nodes where astParentType does not match any of the regular expressions in `values`.
+    */
+  def astParentTypeNot(patterns: String*): Iterator[NodeType] = {
+    overflowdb.traversal.filter.StringPropertyFilter.regexpNotMultiple(traversal)(_.astParentType, patterns)
+  }
+
   /** Traverse to code property */
   def code: Iterator[String] =
     traversal.map(_.code)
