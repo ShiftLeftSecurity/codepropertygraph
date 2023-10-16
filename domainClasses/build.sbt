@@ -1,6 +1,6 @@
 name := "codepropertygraph-domain-classes"
 
-val flatGraphVersion = "0.0.0+56-ef024eee"
+val flatGraphVersion = "0.0.0+101-98144f45"
 
 libraryDependencies ++= Seq(
   "io.joern" %% "joern-generated" % flatGraphVersion,
