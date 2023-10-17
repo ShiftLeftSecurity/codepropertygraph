@@ -121,6 +121,8 @@ object FileSystem extends SchemaBase {
         valueType = ValueType.Int,
         comment = """
             |Start offset into the CONTENT property of the corresponding FILE node.
+            |The offset is measure in characters so parts of the content can easily
+            |be accessed via `content.substring(offset, offsetEnd)`.
             |E.g. for METHOD nodes this start offset points to the start of the methods
             |source code in the string holding the source code of the entire file.
         """.stripMargin
@@ -133,6 +135,8 @@ object FileSystem extends SchemaBase {
         valueType = ValueType.Int,
         comment = """
           |End offset (exclusive) into the CONTENT property of the corresponding FILE node.
+          |The end offset is measure in characters so parts of the content can easily
+          |be accessed via `content.substring(offset, offsetEnd)`.
           |E.g. for METHOD nodes this end offset points to the first code position which is
           |not part of the method.
         """.stripMargin
