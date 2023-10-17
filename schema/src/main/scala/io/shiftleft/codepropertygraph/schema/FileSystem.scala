@@ -119,38 +119,35 @@ object FileSystem extends SchemaBase {
       .addProperty(
         name = "FILE_CONTENT",
         valueType = ValueType.String,
-        comment =
-        """
+        comment = """
           |This optional field is used to hold the content of text files like source code files.
-        """.stripMargin,
-        )
-    .protoId(3811)
+        """.stripMargin
+      )
+      .protoId(3811)
 
-    val fileContentOffset = builder
+    val offset = builder
       .addProperty(
-        name = "FILE_CONTENT_OFFSET",
+        name = "OFFSET",
         valueType = ValueType.Int,
-        comment =
-          """
+        comment = """
             |Start offset into the FILE_CONTENT property of the corresponding file.
             |E.g. for METHOD nodes this start offset points to the start of the methods
             |source code in the string holding the source code of the entire file.
-        """.stripMargin,
+        """.stripMargin
       )
       .protoId(3812)
 
-    val fileContentOffsetEnd = builder
+    val offsetEnd = builder
       .addProperty(
-        name = "FILE_CONTENT_OFFSET_END",
+        name = "OFFSET_END",
         valueType = ValueType.Int,
-        comment =
-        """
+        comment = """
           |End offset (exclusive) into the FILE_CONTENT property of the corresponding file.
           |E.g. for METHOD nodes this end offset points to the first code position which is
           |not part of the method.
-        """.stripMargin,
+        """.stripMargin
       )
-  .protoId(3813)
+      .protoId(3813)
 
   }
 
