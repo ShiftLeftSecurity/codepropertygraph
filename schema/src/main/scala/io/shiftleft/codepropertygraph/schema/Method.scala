@@ -60,6 +60,9 @@ object Method extends SchemaBase {
             |`LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
             |the name of the source file is specified in `FILENAME`. An optional hash value
             |MAY be calculated over the function contents and included in the `HASH` field.
+            |The optional `FILE_CONTENT_OFFSET` and `FILE_CONTENT_OFFSET_END` specify the start
+            |and exclusive end position of the code belonging to a method within the corresponding
+            |`FILE` nodes `FILE_CONTENT` property.
             |
             |Finally, the fully qualified name of the program constructs that the method
             |is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
@@ -70,6 +73,7 @@ object Method extends SchemaBase {
       .protoId(1)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
       .addProperties(astParentType, astParentFullName)
+      .addProperties(fileContentOffset, fileContentOffsetEnd)
       .extendz(declaration)
 
     val isVariadic = builder
