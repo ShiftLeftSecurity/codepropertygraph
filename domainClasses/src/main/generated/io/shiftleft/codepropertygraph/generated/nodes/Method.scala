@@ -21,6 +21,8 @@ object Method {
     val LineNumber        = "LINE_NUMBER"
     val LineNumberEnd     = "LINE_NUMBER_END"
     val Name              = "NAME"
+    val Offset            = "OFFSET"
+    val OffsetEnd         = "OFFSET_END"
     val Order             = "ORDER"
     val Signature         = "SIGNATURE"
     val all: Set[String] = Set(
@@ -36,6 +38,8 @@ object Method {
       LineNumber,
       LineNumberEnd,
       Name,
+      Offset,
+      OffsetEnd,
       Order,
       Signature
     )
@@ -55,6 +59,8 @@ object Method {
     val LineNumber        = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val LineNumberEnd     = new overflowdb.PropertyKey[Integer]("LINE_NUMBER_END")
     val Name              = new overflowdb.PropertyKey[String]("NAME")
+    val Offset            = new overflowdb.PropertyKey[Integer]("OFFSET")
+    val OffsetEnd         = new overflowdb.PropertyKey[Integer]("OFFSET_END")
     val Order             = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val Signature         = new overflowdb.PropertyKey[String]("SIGNATURE")
 
@@ -124,6 +130,8 @@ trait MethodBase extends AbstractNode with AstNodeBase with CfgNodeBase with Dec
   def lineNumber: Option[Integer]
   def lineNumberEnd: Option[Integer]
   def name: String
+  def offset: Option[Integer]
+  def offsetEnd: Option[Integer]
   def order: scala.Int
   def signature: String
 
@@ -148,6 +156,8 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def lineNumber: Option[Integer]      = get().lineNumber
   override def lineNumberEnd: Option[Integer]   = get().lineNumberEnd
   override def name: String                     = get().name
+  override def offset: Option[Integer]          = get().offset
+  override def offsetEnd: Option[Integer]       = get().offsetEnd
   override def order: scala.Int                 = get().order
   override def signature: String                = get().signature
   override def propertyDefaultValue(propertyKey: String) =
@@ -501,8 +511,10 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case 10 => "lineNumber"
       case 11 => "lineNumberEnd"
       case 12 => "name"
-      case 13 => "order"
-      case 14 => "signature"
+      case 13 => "offset"
+      case 14 => "offsetEnd"
+      case 15 => "order"
+      case 16 => "signature"
     }
 
   override def productElement(n: Int): Any =
@@ -520,12 +532,14 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case 10 => lineNumber
       case 11 => lineNumberEnd
       case 12 => name
-      case 13 => order
-      case 14 => signature
+      case 13 => offset
+      case 14 => offsetEnd
+      case 15 => order
+      case 16 => signature
     }
 
   override def productPrefix = "Method"
-  override def productArity  = 15
+  override def productArity  = 17
 }
 
 class MethodDb(ref: NodeRef[NodeDb])
@@ -562,6 +576,10 @@ class MethodDb(ref: NodeRef[NodeDb])
   def lineNumberEnd: Option[Integer]     = Option(_lineNumberEnd)
   private var _name: String              = Method.PropertyDefaults.Name
   def name: String                       = _name
+  private var _offset: Integer           = null
+  def offset: Option[Integer]            = Option(_offset)
+  private var _offsetEnd: Integer        = null
+  def offsetEnd: Option[Integer]         = Option(_offsetEnd)
   private var _order: scala.Int          = Method.PropertyDefaults.Order
   def order: scala.Int                   = _order
   private var _signature: String         = Method.PropertyDefaults.Signature
@@ -582,6 +600,8 @@ class MethodDb(ref: NodeRef[NodeDb])
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     lineNumberEnd.map { value => properties.put("LINE_NUMBER_END", value) }
     properties.put("NAME", name)
+    offset.map { value => properties.put("OFFSET", value) }
+    offsetEnd.map { value => properties.put("OFFSET_END", value) }
     properties.put("ORDER", order)
     properties.put("SIGNATURE", signature)
 
@@ -603,6 +623,8 @@ class MethodDb(ref: NodeRef[NodeDb])
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     lineNumberEnd.map { value => properties.put("LINE_NUMBER_END", value) }
     if (!(("<empty>") == name)) { properties.put("NAME", name) }
+    offset.map { value => properties.put("OFFSET", value) }
+    offsetEnd.map { value => properties.put("OFFSET_END", value) }
     if (!((-1: Int) == order)) { properties.put("ORDER", order) }
     if (!(("") == signature)) { properties.put("SIGNATURE", signature) }
 
@@ -753,8 +775,10 @@ class MethodDb(ref: NodeRef[NodeDb])
       case 10 => "lineNumber"
       case 11 => "lineNumberEnd"
       case 12 => "name"
-      case 13 => "order"
-      case 14 => "signature"
+      case 13 => "offset"
+      case 14 => "offsetEnd"
+      case 15 => "order"
+      case 16 => "signature"
     }
 
   override def productElement(n: Int): Any =
@@ -772,12 +796,14 @@ class MethodDb(ref: NodeRef[NodeDb])
       case 10 => lineNumber
       case 11 => lineNumberEnd
       case 12 => name
-      case 13 => order
-      case 14 => signature
+      case 13 => offset
+      case 14 => offsetEnd
+      case 15 => order
+      case 16 => signature
     }
 
   override def productPrefix = "Method"
-  override def productArity  = 15
+  override def productArity  = 17
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodDb]
 
@@ -795,6 +821,8 @@ class MethodDb(ref: NodeRef[NodeDb])
       case "LINE_NUMBER"          => this._lineNumber
       case "LINE_NUMBER_END"      => this._lineNumberEnd
       case "NAME"                 => this._name
+      case "OFFSET"               => this._offset
+      case "OFFSET_END"           => this._offsetEnd
       case "ORDER"                => this._order
       case "SIGNATURE"            => this._signature
 
@@ -816,6 +844,8 @@ class MethodDb(ref: NodeRef[NodeDb])
       case "LINE_NUMBER"          => this._lineNumber = value.asInstanceOf[Integer]
       case "LINE_NUMBER_END"      => this._lineNumberEnd = value.asInstanceOf[Integer]
       case "NAME"                 => this._name = value.asInstanceOf[String]
+      case "OFFSET"               => this._offset = value.asInstanceOf[Integer]
+      case "OFFSET_END"           => this._offsetEnd = value.asInstanceOf[Integer]
       case "ORDER"                => this._order = value.asInstanceOf[scala.Int]
       case "SIGNATURE"            => this._signature = value.asInstanceOf[String]
 
@@ -845,6 +875,8 @@ class MethodDb(ref: NodeRef[NodeDb])
     this._lineNumber = newNode.asInstanceOf[NewMethod].lineNumber.orNull
     this._lineNumberEnd = newNode.asInstanceOf[NewMethod].lineNumberEnd.orNull
     this._name = newNode.asInstanceOf[NewMethod].name
+    this._offset = newNode.asInstanceOf[NewMethod].offset.orNull
+    this._offsetEnd = newNode.asInstanceOf[NewMethod].offsetEnd.orNull
     this._order = newNode.asInstanceOf[NewMethod].order
     this._signature = newNode.asInstanceOf[NewMethod].signature
 

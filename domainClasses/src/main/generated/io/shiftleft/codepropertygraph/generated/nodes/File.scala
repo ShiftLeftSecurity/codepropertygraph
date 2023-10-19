@@ -11,17 +11,19 @@ object File {
   object PropertyNames {
     val Code                             = "CODE"
     val ColumnNumber                     = "COLUMN_NUMBER"
+    val Content                          = "CONTENT"
     val Hash                             = "HASH"
     val LineNumber                       = "LINE_NUMBER"
     val Name                             = "NAME"
     val Order                            = "ORDER"
-    val all: Set[String]                 = Set(Code, ColumnNumber, Hash, LineNumber, Name, Order)
+    val all: Set[String]                 = Set(Code, ColumnNumber, Content, Hash, LineNumber, Name, Order)
     val allAsJava: java.util.Set[String] = all.asJava
   }
 
   object Properties {
     val Code         = new overflowdb.PropertyKey[String]("CODE")
     val ColumnNumber = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val Content      = new overflowdb.PropertyKey[String]("CONTENT")
     val Hash         = new overflowdb.PropertyKey[String]("HASH")
     val LineNumber   = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name         = new overflowdb.PropertyKey[String]("NAME")
@@ -30,9 +32,10 @@ object File {
   }
 
   object PropertyDefaults {
-    val Code  = "<empty>"
-    val Name  = "<empty>"
-    val Order = -1: Int
+    val Code    = "<empty>"
+    val Content = "<empty>"
+    val Name    = "<empty>"
+    val Order   = -1: Int
   }
 
   val layoutInformation = new NodeLayoutInformation(
@@ -66,6 +69,7 @@ trait FileBase extends AbstractNode with AstNodeBase {
 
   def code: String
   def columnNumber: Option[Integer]
+  def content: String
   def hash: Option[String]
   def lineNumber: Option[Integer]
   def name: String
@@ -80,16 +84,18 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     with AstNode {
   override def code: String                  = get().code
   override def columnNumber: Option[Integer] = get().columnNumber
+  override def content: String               = get().content
   override def hash: Option[String]          = get().hash
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
   override def propertyDefaultValue(propertyKey: String) =
     propertyKey match {
-      case "CODE"  => File.PropertyDefaults.Code
-      case "NAME"  => File.PropertyDefaults.Name
-      case "ORDER" => File.PropertyDefaults.Order
-      case _       => super.propertyDefaultValue(propertyKey)
+      case "CODE"    => File.PropertyDefaults.Code
+      case "CONTENT" => File.PropertyDefaults.Content
+      case "NAME"    => File.PropertyDefaults.Name
+      case "ORDER"   => File.PropertyDefaults.Order
+      case _         => super.propertyDefaultValue(propertyKey)
     }
 
   def astOut: Iterator[AstNode] = get().astOut
@@ -165,10 +171,11 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case 0 => "id"
       case 1 => "code"
       case 2 => "columnNumber"
-      case 3 => "hash"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
+      case 3 => "content"
+      case 4 => "hash"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
     }
 
   override def productElement(n: Int): Any =
@@ -176,14 +183,15 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case 0 => id
       case 1 => code
       case 2 => columnNumber
-      case 3 => hash
-      case 4 => lineNumber
-      case 5 => name
-      case 6 => order
+      case 3 => content
+      case 4 => hash
+      case 5 => lineNumber
+      case 6 => name
+      case 7 => order
     }
 
   override def productPrefix = "File"
-  override def productArity  = 7
+  override def productArity  = 8
 }
 
 class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with FileBase {
@@ -194,6 +202,8 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
   def code: String                   = _code
   private var _columnNumber: Integer = null
   def columnNumber: Option[Integer]  = Option(_columnNumber)
+  private var _content: String       = File.PropertyDefaults.Content
+  def content: String                = _content
   private var _hash: String          = null
   def hash: Option[String]           = Option(_hash)
   private var _lineNumber: Integer   = null
@@ -208,6 +218,7 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
     val properties = new java.util.HashMap[String, Any]
     properties.put("CODE", code)
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
+    properties.put("CONTENT", content)
     hash.map { value => properties.put("HASH", value) }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     properties.put("NAME", name)
@@ -221,6 +232,7 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
     val properties = new java.util.HashMap[String, Any]
     if (!(("<empty>") == code)) { properties.put("CODE", code) }
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
+    if (!(("<empty>") == content)) { properties.put("CONTENT", content) }
     hash.map { value => properties.put("HASH", value) }
     lineNumber.map { value => properties.put("LINE_NUMBER", value) }
     if (!(("<empty>") == name)) { properties.put("NAME", name) }
@@ -261,10 +273,11 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
       case 0 => "id"
       case 1 => "code"
       case 2 => "columnNumber"
-      case 3 => "hash"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
+      case 3 => "content"
+      case 4 => "hash"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
     }
 
   override def productElement(n: Int): Any =
@@ -272,14 +285,15 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
       case 0 => id
       case 1 => code
       case 2 => columnNumber
-      case 3 => hash
-      case 4 => lineNumber
-      case 5 => name
-      case 6 => order
+      case 3 => content
+      case 4 => hash
+      case 5 => lineNumber
+      case 6 => name
+      case 7 => order
     }
 
   override def productPrefix = "File"
-  override def productArity  = 7
+  override def productArity  = 8
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[FileDb]
 
@@ -287,6 +301,7 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
     key match {
       case "CODE"          => this._code
       case "COLUMN_NUMBER" => this._columnNumber
+      case "CONTENT"       => this._content
       case "HASH"          => this._hash
       case "LINE_NUMBER"   => this._lineNumber
       case "NAME"          => this._name
@@ -300,6 +315,7 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
     key match {
       case "CODE"          => this._code = value.asInstanceOf[String]
       case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
+      case "CONTENT"       => this._content = value.asInstanceOf[String]
       case "HASH"          => this._hash = value.asInstanceOf[String]
       case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[Integer]
       case "NAME"          => this._name = value.asInstanceOf[String]
@@ -321,6 +337,7 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewFile].code
     this._columnNumber = newNode.asInstanceOf[NewFile].columnNumber.orNull
+    this._content = newNode.asInstanceOf[NewFile].content
     this._hash = newNode.asInstanceOf[NewFile].hash.orNull
     this._lineNumber = newNode.asInstanceOf[NewFile].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewFile].name
