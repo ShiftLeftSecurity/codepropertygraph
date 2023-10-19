@@ -15127,6 +15127,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   var name: String                  = "<empty>"
   var lineNumber: Option[Integer]   = None
   var hash: Option[String]          = None
+  var content: String               = "<empty>"
   var columnNumber: Option[Integer] = None
   var code: String                  = "<empty>"
 
@@ -15136,6 +15137,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
     val newInstance = new NewFile
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
+    newInstance.content = this.content
     newInstance.hash = this.hash
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
@@ -15154,6 +15156,11 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   }
 
   def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
+
+  def content(value: String): this.type = {
+    this.content = value
+    this
+  }
 
   def hash(value: String): this.type = {
     this.hash = Option(value)
@@ -15183,6 +15190,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
     var res = Map[String, Any]()
     if (!(("<empty>") == code)) { res += "CODE" -> code }
     columnNumber.map { value => res += "COLUMN_NUMBER" -> value }
+    if (!(("<empty>") == content)) { res += "CONTENT" -> content }
     hash.map { value => res += "HASH" -> value }
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
@@ -15204,8 +15212,9 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
       case 1 => this.name
       case 2 => this.lineNumber
       case 3 => this.hash
-      case 4 => this.columnNumber
-      case 5 => this.code
+      case 4 => this.content
+      case 5 => this.columnNumber
+      case 6 => this.code
       case _ => null
     }
 
@@ -15215,13 +15224,14 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
       case 1 => "name"
       case 2 => "lineNumber"
       case 3 => "hash"
-      case 4 => "columnNumber"
-      case 5 => "code"
+      case 4 => "content"
+      case 5 => "columnNumber"
+      case 6 => "code"
       case _ => ""
     }
 
   override def productPrefix = "NewFile"
-  override def productArity  = 6
+  override def productArity  = 7
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewFile]
 }
@@ -26463,6 +26473,8 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
 
   var signature: String                = ""
   var order: scala.Int                 = -1: Int
+  var offsetEnd: Option[Integer]       = None
+  var offset: Option[Integer]          = None
   var name: String                     = "<empty>"
   var lineNumberEnd: Option[Integer]   = None
   var lineNumber: Option[Integer]      = None
@@ -26492,6 +26504,8 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
     newInstance.lineNumber = this.lineNumber
     newInstance.lineNumberEnd = this.lineNumberEnd
     newInstance.name = this.name
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.signature = this.signature
     newInstance.asInstanceOf[this.type]
@@ -26567,6 +26581,20 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
     this
   }
 
+  def offset(value: Integer): this.type = {
+    this.offset = Option(value)
+    this
+  }
+
+  def offset(value: Option[Integer]): this.type = offset(value.orNull)
+
+  def offsetEnd(value: Integer): this.type = {
+    this.offsetEnd = Option(value)
+    this
+  }
+
+  def offsetEnd(value: Option[Integer]): this.type = offsetEnd(value.orNull)
+
   def order(value: scala.Int): this.type = {
     this.order = value
     this
@@ -26591,6 +26619,8 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
     lineNumber.map { value => res += "LINE_NUMBER" -> value }
     lineNumberEnd.map { value => res += "LINE_NUMBER_END" -> value }
     if (!(("<empty>") == name)) { res += "NAME" -> name }
+    offset.map { value => res += "OFFSET" -> value }
+    offsetEnd.map { value => res += "OFFSET_END" -> value }
     if (!((-1: Int) == order)) { res += "ORDER" -> order }
     if (!(("") == signature)) { res += "SIGNATURE" -> signature }
     res
@@ -26608,18 +26638,20 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
     n match {
       case 0  => this.signature
       case 1  => this.order
-      case 2  => this.name
-      case 3  => this.lineNumberEnd
-      case 4  => this.lineNumber
-      case 5  => this.isExternal
-      case 6  => this.hash
-      case 7  => this.fullName
-      case 8  => this.filename
-      case 9  => this.columnNumberEnd
-      case 10 => this.columnNumber
-      case 11 => this.code
-      case 12 => this.astParentType
-      case 13 => this.astParentFullName
+      case 2  => this.offsetEnd
+      case 3  => this.offset
+      case 4  => this.name
+      case 5  => this.lineNumberEnd
+      case 6  => this.lineNumber
+      case 7  => this.isExternal
+      case 8  => this.hash
+      case 9  => this.fullName
+      case 10 => this.filename
+      case 11 => this.columnNumberEnd
+      case 12 => this.columnNumber
+      case 13 => this.code
+      case 14 => this.astParentType
+      case 15 => this.astParentFullName
       case _  => null
     }
 
@@ -26627,23 +26659,25 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
     n match {
       case 0  => "signature"
       case 1  => "order"
-      case 2  => "name"
-      case 3  => "lineNumberEnd"
-      case 4  => "lineNumber"
-      case 5  => "isExternal"
-      case 6  => "hash"
-      case 7  => "fullName"
-      case 8  => "filename"
-      case 9  => "columnNumberEnd"
-      case 10 => "columnNumber"
-      case 11 => "code"
-      case 12 => "astParentType"
-      case 13 => "astParentFullName"
+      case 2  => "offsetEnd"
+      case 3  => "offset"
+      case 4  => "name"
+      case 5  => "lineNumberEnd"
+      case 6  => "lineNumber"
+      case 7  => "isExternal"
+      case 8  => "hash"
+      case 9  => "fullName"
+      case 10 => "filename"
+      case 11 => "columnNumberEnd"
+      case 12 => "columnNumber"
+      case 13 => "code"
+      case 14 => "astParentType"
+      case 15 => "astParentFullName"
       case _  => ""
     }
 
   override def productPrefix = "NewMethod"
-  override def productArity  = 14
+  override def productArity  = 16
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethod]
 }

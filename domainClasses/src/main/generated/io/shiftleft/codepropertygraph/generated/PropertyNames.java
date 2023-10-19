@@ -202,6 +202,20 @@ public static final String NAME = "NAME";
 
 public static final String NODE_LABEL = "NODE_LABEL";
 
+/** Start offset into the CONTENT property of the corresponding FILE node.
+The offset is measure in characters so parts of the content can easily
+be accessed via `content.substring(offset, offsetEnd)`.
+E.g. for METHOD nodes this start offset points to the start of the methods
+source code in the string holding the source code of the entire file. */
+public static final String OFFSET = "OFFSET";
+
+/** End offset (exclusive) into the CONTENT property of the corresponding FILE node.
+The end offset is measure in characters so parts of the content can easily
+be accessed via `content.substring(offset, offsetEnd)`.
+E.g. for METHOD nodes this end offset points to the first code position which is
+not part of the method. */
+public static final String OFFSET_END = "OFFSET_END";
+
 /** This integer indicates the position of the node among
 its siblings in the AST. The left-most child has an
 order of 0. */
@@ -300,6 +314,8 @@ add(METHOD_SHORT_NAME);
 add(MODIFIER_TYPE);
 add(NAME);
 add(NODE_LABEL);
+add(OFFSET);
+add(OFFSET_END);
 add(ORDER);
 add(OVERLAYS);
 add(PACKAGE_NAME);

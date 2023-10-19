@@ -643,6 +643,102 @@ class MethodTraversalExtGen[NodeType <: Method](val traversal: Iterator[NodeType
     overflowdb.traversal.filter.StringPropertyFilter.regexpNotMultiple(traversal)(_.name, patterns)
   }
 
+  /** Traverse to offset property */
+  def offset: Iterator[Integer] =
+    traversal.flatMap(_.offset)
+
+  /** Traverse to nodes where the offset equals the given `value`
+    */
+  def offset(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offset.isDefined && node.offset.get == value }
+
+  /** Traverse to nodes where the offset equals at least one of the given `values`
+    */
+  def offset(values: Integer*): Iterator[NodeType] = {
+    val vset = values.toSet
+    traversal.filter { node => node.offset.isDefined && vset.contains(node.offset.get) }
+  }
+
+  /** Traverse to nodes where the offset is greater than the given `value`
+    */
+  def offsetGt(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offset.isDefined && node.offset.get > value }
+
+  /** Traverse to nodes where the offset is greater than or equal the given `value`
+    */
+  def offsetGte(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offset.isDefined && node.offset.get >= value }
+
+  /** Traverse to nodes where the offset is less than the given `value`
+    */
+  def offsetLt(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offset.isDefined && node.offset.get < value }
+
+  /** Traverse to nodes where the offset is less than or equal the given `value`
+    */
+  def offsetLte(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offset.isDefined && node.offset.get <= value }
+
+  /** Traverse to nodes where offset is not equal to the given `value`.
+    */
+  def offsetNot(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => !node.offset.isDefined || node.offset.get != value }
+
+  /** Traverse to nodes where offset is not equal to any of the given `values`.
+    */
+  def offsetNot(values: Integer*): Iterator[NodeType] = {
+    val vset = values.toSet
+    traversal.filter { node => !node.offset.isDefined || !vset.contains(node.offset.get) }
+  }
+
+  /** Traverse to offsetEnd property */
+  def offsetEnd: Iterator[Integer] =
+    traversal.flatMap(_.offsetEnd)
+
+  /** Traverse to nodes where the offsetEnd equals the given `value`
+    */
+  def offsetEnd(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offsetEnd.isDefined && node.offsetEnd.get == value }
+
+  /** Traverse to nodes where the offsetEnd equals at least one of the given `values`
+    */
+  def offsetEnd(values: Integer*): Iterator[NodeType] = {
+    val vset = values.toSet
+    traversal.filter { node => node.offsetEnd.isDefined && vset.contains(node.offsetEnd.get) }
+  }
+
+  /** Traverse to nodes where the offsetEnd is greater than the given `value`
+    */
+  def offsetEndGt(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offsetEnd.isDefined && node.offsetEnd.get > value }
+
+  /** Traverse to nodes where the offsetEnd is greater than or equal the given `value`
+    */
+  def offsetEndGte(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offsetEnd.isDefined && node.offsetEnd.get >= value }
+
+  /** Traverse to nodes where the offsetEnd is less than the given `value`
+    */
+  def offsetEndLt(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offsetEnd.isDefined && node.offsetEnd.get < value }
+
+  /** Traverse to nodes where the offsetEnd is less than or equal the given `value`
+    */
+  def offsetEndLte(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => node.offsetEnd.isDefined && node.offsetEnd.get <= value }
+
+  /** Traverse to nodes where offsetEnd is not equal to the given `value`.
+    */
+  def offsetEndNot(value: Integer): Iterator[NodeType] =
+    traversal.filter { node => !node.offsetEnd.isDefined || node.offsetEnd.get != value }
+
+  /** Traverse to nodes where offsetEnd is not equal to any of the given `values`.
+    */
+  def offsetEndNot(values: Integer*): Iterator[NodeType] = {
+    val vset = values.toSet
+    traversal.filter { node => !node.offsetEnd.isDefined || !vset.contains(node.offsetEnd.get) }
+  }
+
   /** Traverse to order property */
   def order: Iterator[scala.Int] =
     traversal.map(_.order)
