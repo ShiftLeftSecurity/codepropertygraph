@@ -9602,7 +9602,7 @@ object NewClosureBinding {
 
   private val outNeighbors: Map[String, Set[String]] = Map("REF" -> Set("LOCAL", "METHOD_PARAMETER_IN"))
   private val inNeighbors: Map[String, Set[String]] =
-    Map("CAPTURE" -> Set("METHOD_REF", "TYPE_REF"), "CAPTURED_BY" -> Set("LOCAL"))
+    Map("CAPTURE" -> Set("METHOD_REF", "TYPE_REF"), "CAPTURED_BY" -> Set("LOCAL", "METHOD_PARAMETER_IN"))
 
 }
 
@@ -27940,11 +27940,13 @@ class NewMethodParameterIn
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
+  var closureBindingId: Option[String]            = None
 
   override def label: String = "METHOD_PARAMETER_IN"
 
   override def copy: this.type = {
     val newInstance = new NewMethodParameterIn
+    newInstance.closureBindingId = this.closureBindingId
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
@@ -27958,6 +27960,13 @@ class NewMethodParameterIn
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
+
+  def closureBindingId(value: String): this.type = {
+    this.closureBindingId = Option(value)
+    this
+  }
+
+  def closureBindingId(value: Option[String]): this.type = closureBindingId(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -28020,6 +28029,7 @@ class NewMethodParameterIn
 
   override def properties: Map[String, Any] = {
     var res = Map[String, Any]()
+    closureBindingId.map { value => res += "CLOSURE_BINDING_ID" -> value }
     if (!(("<empty>") == code)) { res += "CODE" -> code }
     columnNumber.map { value => res += "COLUMN_NUMBER" -> value }
     if (dynamicTypeHintFullName != null && dynamicTypeHintFullName.nonEmpty) {
@@ -28057,6 +28067,7 @@ class NewMethodParameterIn
       case 8  => this.dynamicTypeHintFullName
       case 9  => this.columnNumber
       case 10 => this.code
+      case 11 => this.closureBindingId
       case _  => null
     }
 
@@ -28073,11 +28084,12 @@ class NewMethodParameterIn
       case 8  => "dynamicTypeHintFullName"
       case 9  => "columnNumber"
       case 10 => "code"
+      case 11 => "closureBindingId"
       case _  => ""
     }
 
   override def productPrefix = "NewMethodParameterIn"
-  override def productArity  = 11
+  override def productArity  = 12
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodParameterIn]
 }

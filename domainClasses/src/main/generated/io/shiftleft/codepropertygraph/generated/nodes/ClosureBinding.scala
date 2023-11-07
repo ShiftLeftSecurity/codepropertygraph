@@ -96,12 +96,17 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
 
-  def capturedByIn: Iterator[Local] = get().capturedByIn
-  override def _capturedByIn        = get()._capturedByIn
+  def capturedByIn: Iterator[AstNode] = get().capturedByIn
+  override def _capturedByIn          = get()._capturedByIn
 
   /** Traverse to LOCAL via CAPTURED_BY IN edge.
     */
   def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = get()._localViaCapturedByIn
+
+  /** Traverse to METHOD_PARAMETER_IN via CAPTURED_BY IN edge.
+    */
+  def _methodParameterInViaCapturedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    get()._methodParameterInViaCapturedByIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -189,9 +194,11 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = captureIn.collectAll[MethodRef]
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef]     = captureIn.collectAll[TypeRef]
 
-  def capturedByIn: Iterator[Local] = createAdjacentNodeScalaIteratorByOffSet[Local](2)
-  override def _capturedByIn        = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def capturedByIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
+  override def _capturedByIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = capturedByIn.collectAll[Local]
+  def _methodParameterInViaCapturedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
+    capturedByIn.collectAll[MethodParameterIn]
 
   override def label: String = {
     ClosureBinding.Label
