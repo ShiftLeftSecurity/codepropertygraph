@@ -129,7 +129,13 @@ object MetaData extends SchemaBase {
         value = "RUBYSRC",
         valueType = ValueType.String,
         comment = "Source-based frontend for Ruby"
-      ).protoId(17)
+      ).protoId(17),
+      Constant(
+        name = "SWIFTSRC",
+        value = "SWIFTSRC",
+        valueType = ValueType.String,
+        comment = "Source-based frontend for Swift"
+      ).protoId(18)
     )
   }
 }
