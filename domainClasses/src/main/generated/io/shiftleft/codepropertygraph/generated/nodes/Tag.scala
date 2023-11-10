@@ -159,6 +159,10 @@ class Tag(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/iss
     */
   def _templateDomViaTaggedByIn: overflowdb.traversal.Traversal[TemplateDom] = get()._templateDomViaTaggedByIn
 
+  /** Traverse to TYPE_DECL via TAGGED_BY IN edge.
+    */
+  def _typeDeclViaTaggedByIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaTaggedByIn
+
   /** Traverse to TYPE_REF via TAGGED_BY IN edge.
     */
   def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaTaggedByIn
@@ -258,6 +262,7 @@ class TagDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with TagBa
   def _returnViaTaggedByIn: overflowdb.traversal.Traversal[Return]             = taggedByIn.collectAll[Return]
   def _tagViaTaggedByIn: overflowdb.traversal.Traversal[Tag]                   = taggedByIn.collectAll[Tag]
   def _templateDomViaTaggedByIn: overflowdb.traversal.Traversal[TemplateDom]   = taggedByIn.collectAll[TemplateDom]
+  def _typeDeclViaTaggedByIn: overflowdb.traversal.Traversal[TypeDecl]         = taggedByIn.collectAll[TypeDecl]
   def _typeRefViaTaggedByIn: overflowdb.traversal.Traversal[TypeRef]           = taggedByIn.collectAll[TypeRef]
   def _unknownViaTaggedByIn: overflowdb.traversal.Traversal[Unknown]           = taggedByIn.collectAll[Unknown]
 

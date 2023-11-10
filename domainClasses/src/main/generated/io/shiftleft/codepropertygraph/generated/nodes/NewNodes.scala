@@ -37601,6 +37601,7 @@ object NewTag {
       "RETURN",
       "TAG",
       "TEMPLATE_DOM",
+      "TYPE_DECL",
       "TYPE_REF",
       "UNKNOWN"
     )
