@@ -133,7 +133,8 @@ object TagsAndLocation extends SchemaBase {
       jumpTarget,
       file,
       methodParameterOut,
-      tag
+      tag,
+      typeDecl
     ).foreach(_.addOutEdge(edge = taggedBy, inNode = tag))
   }
 
