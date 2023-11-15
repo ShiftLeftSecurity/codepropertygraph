@@ -231,7 +231,15 @@ object Ast extends SchemaBase {
       Constant(name = "FINAL", value = "FINAL", valueType = ValueType.String, comment = "The final modifier")
         .protoId(10),
       Constant(name = "READONLY", value = "READONLY", valueType = ValueType.String, comment = "The readonly modifier")
-        .protoId(11)
+        .protoId(11),
+      Constant(
+        name = "MODULE",
+        value = "MODULE",
+        valueType = ValueType.String,
+        comment =
+          "Indicate that a method defines a module in the sense e.g. a python module does with the creation of a module object"
+      )
+        .protoId(12)
     )
 
     val modifier: NodeType = builder
