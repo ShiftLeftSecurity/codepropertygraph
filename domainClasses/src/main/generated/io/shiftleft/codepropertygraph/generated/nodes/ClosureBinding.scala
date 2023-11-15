@@ -79,11 +79,11 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
 
   /** Traverse to LOCAL via REF OUT edge.
     */
-  def _localViaRefOut: Local = get()._localViaRefOut
+  def _localViaRefOut: Option[Local] = get()._localViaRefOut
 
   /** Traverse to METHOD_PARAMETER_IN via REF OUT edge.
     */
-  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaRefOut
+  def _methodParameterInViaRefOut: Option[MethodParameterIn] = get()._methodParameterInViaRefOut
 
   def captureIn: Iterator[Expression] = get().captureIn
   override def _captureIn             = get()._captureIn
@@ -176,18 +176,10 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   }
 
   import overflowdb.traversal._
-  def refOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _refOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _localViaRefOut: Local = try { refOut.collectAll[Local].next() }
-  catch {
-    case e: java.util.NoSuchElementException =>
-      throw new overflowdb.SchemaViolationException(
-        "OUT edge with label REF to an adjacent LOCAL is mandatory, but not defined for this CLOSURE_BINDING node with id=" + id,
-        e
-      )
-  }
-  def _methodParameterInViaRefOut: overflowdb.traversal.Traversal[MethodParameterIn] =
-    refOut.collectAll[MethodParameterIn]
+  def refOut: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _refOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def _localViaRefOut: Option[Local]                         = refOut.collectAll[Local].nextOption()
+  def _methodParameterInViaRefOut: Option[MethodParameterIn] = refOut.collectAll[MethodParameterIn].nextOption()
 
   def captureIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
   override def _captureIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
