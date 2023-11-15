@@ -9,6 +9,7 @@ object MethodParameterIn {
   val Label = "METHOD_PARAMETER_IN"
 
   object PropertyNames {
+    val ClosureBindingId        = "CLOSURE_BINDING_ID"
     val Code                    = "CODE"
     val ColumnNumber            = "COLUMN_NUMBER"
     val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
@@ -21,6 +22,7 @@ object MethodParameterIn {
     val PossibleTypes           = "POSSIBLE_TYPES"
     val TypeFullName            = "TYPE_FULL_NAME"
     val all: Set[String] = Set(
+      ClosureBindingId,
       Code,
       ColumnNumber,
       DynamicTypeHintFullName,
@@ -37,6 +39,7 @@ object MethodParameterIn {
   }
 
   object Properties {
+    val ClosureBindingId        = new overflowdb.PropertyKey[String]("CLOSURE_BINDING_ID")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
     val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
@@ -66,6 +69,7 @@ object MethodParameterIn {
     PropertyNames.allAsJava,
     List(
       io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
+      io.shiftleft.codepropertygraph.generated.edges.CapturedBy.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.EvalType.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ParameterLink.layoutInformation,
       io.shiftleft.codepropertygraph.generated.edges.ReachingDef.layoutInformation,
@@ -80,7 +84,7 @@ object MethodParameterIn {
   )
 
   object Edges {
-    val Out: Array[String] = Array("AST", "EVAL_TYPE", "PARAMETER_LINK", "REACHING_DEF", "TAGGED_BY")
+    val Out: Array[String] = Array("AST", "CAPTURED_BY", "EVAL_TYPE", "PARAMETER_LINK", "REACHING_DEF", "TAGGED_BY")
     val In: Array[String]  = Array("AST", "CFG", "REACHING_DEF", "REF")
   }
 
@@ -97,6 +101,7 @@ object MethodParameterIn {
 trait MethodParameterInBase extends AbstractNode with AstNodeBase with CfgNodeBase with DeclarationBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
+  def closureBindingId: Option[String]
   def code: String
   def columnNumber: Option[Integer]
   def dynamicTypeHintFullName: IndexedSeq[String]
@@ -118,6 +123,7 @@ class MethodParameterIn(graph_4762: Graph, id_4762: Long /*cf https://github.com
     with AstNode
     with CfgNode
     with Declaration {
+  override def closureBindingId: Option[String]            = get().closureBindingId
   override def code: String                                = get().code
   override def columnNumber: Option[Integer]               = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
@@ -151,6 +157,14 @@ class MethodParameterIn(graph_4762: Graph, id_4762: Long /*cf https://github.com
   /** Traverse to UNKNOWN via AST OUT edge.
     */
   def _unknownViaAstOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstOut
+
+  def capturedByOut: Iterator[ClosureBinding] = get().capturedByOut
+  override def _capturedByOut                 = get()._capturedByOut
+
+  /** Traverse to CLOSURE_BINDING via CAPTURED_BY OUT edge.
+    */
+  def _closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
+    get()._closureBindingViaCapturedByOut
 
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
@@ -260,37 +274,39 @@ class MethodParameterIn(graph_4762: Graph, id_4762: Long /*cf https://github.com
   override def productElementName(n: Int): String =
     n match {
       case 0  => "id"
-      case 1  => "code"
-      case 2  => "columnNumber"
-      case 3  => "dynamicTypeHintFullName"
-      case 4  => "evaluationStrategy"
-      case 5  => "index"
-      case 6  => "isVariadic"
-      case 7  => "lineNumber"
-      case 8  => "name"
-      case 9  => "order"
-      case 10 => "possibleTypes"
-      case 11 => "typeFullName"
+      case 1  => "closureBindingId"
+      case 2  => "code"
+      case 3  => "columnNumber"
+      case 4  => "dynamicTypeHintFullName"
+      case 5  => "evaluationStrategy"
+      case 6  => "index"
+      case 7  => "isVariadic"
+      case 8  => "lineNumber"
+      case 9  => "name"
+      case 10 => "order"
+      case 11 => "possibleTypes"
+      case 12 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0  => id
-      case 1  => code
-      case 2  => columnNumber
-      case 3  => dynamicTypeHintFullName
-      case 4  => evaluationStrategy
-      case 5  => index
-      case 6  => isVariadic
-      case 7  => lineNumber
-      case 8  => name
-      case 9  => order
-      case 10 => possibleTypes
-      case 11 => typeFullName
+      case 1  => closureBindingId
+      case 2  => code
+      case 3  => columnNumber
+      case 4  => dynamicTypeHintFullName
+      case 5  => evaluationStrategy
+      case 6  => index
+      case 7  => isVariadic
+      case 8  => lineNumber
+      case 9  => name
+      case 10 => order
+      case 11 => possibleTypes
+      case 12 => typeFullName
     }
 
   override def productPrefix = "MethodParameterIn"
-  override def productArity  = 12
+  override def productArity  = 13
 }
 
 class MethodParameterInDb(ref: NodeRef[NodeDb])
@@ -303,6 +319,8 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
 
   override def layoutInformation: NodeLayoutInformation = MethodParameterIn.layoutInformation
 
+  private var _closureBindingId: String                    = null
+  def closureBindingId: Option[String]                     = Option(_closureBindingId)
   private var _code: String                                = MethodParameterIn.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
@@ -329,6 +347,7 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
     val properties = new java.util.HashMap[String, Any]
+    closureBindingId.map { value => properties.put("CLOSURE_BINDING_ID", value) }
     properties.put("CODE", code)
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
     if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
@@ -349,6 +368,7 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   /** faster than the default implementation */
   override def propertiesMapForStorage: java.util.Map[String, Any] = {
     val properties = new java.util.HashMap[String, Any]
+    closureBindingId.map { value => properties.put("CLOSURE_BINDING_ID", value) }
     if (!(("<empty>") == code)) { properties.put("CODE", code) }
     columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
     if (this._dynamicTypeHintFullName != null && this._dynamicTypeHintFullName.nonEmpty) {
@@ -372,8 +392,13 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
   def _unknownViaAstOut: overflowdb.traversal.Traversal[Unknown]       = astOut.collectAll[Unknown]
 
-  def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](1)
-  override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def capturedByOut: Iterator[ClosureBinding] = createAdjacentNodeScalaIteratorByOffSet[ClosureBinding](1)
+  override def _capturedByOut                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def _closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
+    capturedByOut.collectAll[ClosureBinding]
+
+  def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](2)
+  override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
   def typ: Type = try { evalTypeOut.collectAll[Type].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -383,12 +408,12 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
       )
   }
 
-  def parameterLinkOut: Iterator[MethodParameterOut] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterOut](2)
-  override def _parameterLinkOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def parameterLinkOut: Iterator[MethodParameterOut] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterOut](3)
+  override def _parameterLinkOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
   def asOutput: overflowdb.traversal.Traversal[MethodParameterOut] = parameterLinkOut.collectAll[MethodParameterOut]
 
-  def reachingDefOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
-  override def _reachingDefOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def reachingDefOut: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
+  override def _reachingDefOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
   def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
   def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
   def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
@@ -398,12 +423,12 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]       = reachingDefOut.collectAll[Return]
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]     = reachingDefOut.collectAll[TypeRef]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](4)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](5)
+  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](5)
-  override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+  def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](6)
+  override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
   def method: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -413,15 +438,15 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
       )
   }
 
-  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
-  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+  def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](7)
+  override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
 
-  def reachingDefIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](7)
-  override def _reachingDefIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
+  def reachingDefIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](8)
+  override def _reachingDefIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
   def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = reachingDefIn.collectAll[Method]
 
-  def refIn: Iterator[StoredNode] = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
-  override def _refIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](8)
+  def refIn: Iterator[StoredNode] = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
+  override def _refIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](9)
   def _closureBindingViaRefIn: overflowdb.traversal.Traversal[ClosureBinding] = refIn.collectAll[ClosureBinding]
   def referencingIdentifiers: overflowdb.traversal.Traversal[Identifier]      = refIn.collectAll[Identifier]
 
@@ -432,42 +457,45 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   override def productElementName(n: Int): String =
     n match {
       case 0  => "id"
-      case 1  => "code"
-      case 2  => "columnNumber"
-      case 3  => "dynamicTypeHintFullName"
-      case 4  => "evaluationStrategy"
-      case 5  => "index"
-      case 6  => "isVariadic"
-      case 7  => "lineNumber"
-      case 8  => "name"
-      case 9  => "order"
-      case 10 => "possibleTypes"
-      case 11 => "typeFullName"
+      case 1  => "closureBindingId"
+      case 2  => "code"
+      case 3  => "columnNumber"
+      case 4  => "dynamicTypeHintFullName"
+      case 5  => "evaluationStrategy"
+      case 6  => "index"
+      case 7  => "isVariadic"
+      case 8  => "lineNumber"
+      case 9  => "name"
+      case 10 => "order"
+      case 11 => "possibleTypes"
+      case 12 => "typeFullName"
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0  => id
-      case 1  => code
-      case 2  => columnNumber
-      case 3  => dynamicTypeHintFullName
-      case 4  => evaluationStrategy
-      case 5  => index
-      case 6  => isVariadic
-      case 7  => lineNumber
-      case 8  => name
-      case 9  => order
-      case 10 => possibleTypes
-      case 11 => typeFullName
+      case 1  => closureBindingId
+      case 2  => code
+      case 3  => columnNumber
+      case 4  => dynamicTypeHintFullName
+      case 5  => evaluationStrategy
+      case 6  => index
+      case 7  => isVariadic
+      case 8  => lineNumber
+      case 9  => name
+      case 10 => order
+      case 11 => possibleTypes
+      case 12 => typeFullName
     }
 
   override def productPrefix = "MethodParameterIn"
-  override def productArity  = 12
+  override def productArity  = 13
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodParameterInDb]
 
   override def property(key: String): Any = {
     key match {
+      case "CLOSURE_BINDING_ID"          => this._closureBindingId
       case "CODE"                        => this._code
       case "COLUMN_NUMBER"               => this._columnNumber
       case "DYNAMIC_TYPE_HINT_FULL_NAME" => this._dynamicTypeHintFullName
@@ -486,8 +514,9 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
 
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
-      case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
+      case "CLOSURE_BINDING_ID" => this._closureBindingId = value.asInstanceOf[String]
+      case "CODE"               => this._code = value.asInstanceOf[String]
+      case "COLUMN_NUMBER"      => this._columnNumber = value.asInstanceOf[Integer]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -546,6 +575,7 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
+    this._closureBindingId = newNode.asInstanceOf[NewMethodParameterIn].closureBindingId.orNull
     this._code = newNode.asInstanceOf[NewMethodParameterIn].code
     this._columnNumber = newNode.asInstanceOf[NewMethodParameterIn].columnNumber.orNull
     this._dynamicTypeHintFullName =

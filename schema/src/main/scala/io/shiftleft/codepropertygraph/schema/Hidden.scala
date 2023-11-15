@@ -81,6 +81,7 @@ object Hidden extends SchemaBase {
 
     // node types
     local.addProperties(closureBindingId)
+    methodParameterIn.addProperties(closureBindingId)
 
     val closureBinding: NodeType = builder
       .addNodeType(
@@ -99,14 +100,15 @@ object Hidden extends SchemaBase {
 
     // node relations
     local.addOutEdge(edge = capturedBy, inNode = closureBinding)
+    methodParameterIn.addOutEdge(edge = capturedBy, inNode = closureBinding)
 
     methodRef.addOutEdge(edge = capture, inNode = closureBinding)
 
     typeRef.addOutEdge(edge = capture, inNode = closureBinding)
 
     closureBinding
-      .addOutEdge(edge = ref, inNode = local, cardinalityOut = EdgeType.Cardinality.One)
-      .addOutEdge(edge = ref, inNode = methodParameterIn)
+      .addOutEdge(edge = ref, inNode = local, cardinalityOut = EdgeType.Cardinality.ZeroOrOne)
+      .addOutEdge(edge = ref, inNode = methodParameterIn, cardinalityOut = EdgeType.Cardinality.ZeroOrOne)
 
     /* TemplateDOM
      */

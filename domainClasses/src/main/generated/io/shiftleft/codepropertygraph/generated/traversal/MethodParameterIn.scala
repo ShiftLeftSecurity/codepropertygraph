@@ -35,6 +35,61 @@ class MethodParameterInTraversalExtGen[NodeType <: MethodParameterIn](val traver
   def typ: Iterator[Type] =
     traversal.map(_.typ)
 
+  /** Traverse to closureBindingId property */
+  def closureBindingId: Iterator[String] =
+    traversal.flatMap(_.closureBindingId)
+
+  /** Traverse to nodes where the closureBindingId matches the regular expression `value`
+    */
+  def closureBindingId(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      traversal.filter { node => node.closureBindingId.isDefined && node.closureBindingId.get == pattern }
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter
+        .regexp(traversal.filter(_.closureBindingId.isDefined))(_.closureBindingId.get, pattern)
+    }
+  }
+
+  /** Traverse to nodes where the closureBindingId matches at least one of the regular expressions in `values`
+    */
+  def closureBindingId(patterns: String*): Iterator[NodeType] = {
+    overflowdb.traversal.filter.StringPropertyFilter
+      .regexpMultiple(traversal.filter(_.closureBindingId.isDefined))(_.closureBindingId.get, patterns)
+  }
+
+  /** Traverse to nodes where closureBindingId matches `value` exactly.
+    */
+  def closureBindingIdExact(value: String): Iterator[NodeType] =
+    traversal.filter { node => node.closureBindingId.contains(value) }
+
+  /** Traverse to nodes where closureBindingId matches one of the elements in `values` exactly.
+    */
+  def closureBindingIdExact(values: String*): Iterator[NodeType] = {
+    if (values.size == 1)
+      closureBindingIdExact(values.head)
+    else
+      overflowdb.traversal.filter.StringPropertyFilter
+        .exactMultiple[NodeType, String](traversal, _.closureBindingId, values, "CLOSURE_BINDING_ID")
+  }
+
+  /** Traverse to nodes where closureBindingId does not match the regular expression `value`.
+    */
+  def closureBindingIdNot(pattern: String): Iterator[NodeType] = {
+    if (!Misc.isRegex(pattern)) {
+      traversal.filter { node => node.closureBindingId.isEmpty || node.closureBindingId.get != pattern }
+    } else {
+      overflowdb.traversal.filter.StringPropertyFilter
+        .regexpNot(traversal.filter(_.closureBindingId.isDefined))(_.closureBindingId.get, pattern)
+    }
+  }
+
+  /** Traverse to nodes where closureBindingId does not match any of the regular expressions in `values`.
+    */
+  def closureBindingIdNot(patterns: String*): Iterator[NodeType] = {
+    overflowdb.traversal.filter.StringPropertyFilter
+      .regexpNotMultiple(traversal.filter(_.closureBindingId.isDefined))(_.closureBindingId.get, patterns)
+  }
+
   /** Traverse to code property */
   def code: Iterator[String] =
     traversal.map(_.code)
