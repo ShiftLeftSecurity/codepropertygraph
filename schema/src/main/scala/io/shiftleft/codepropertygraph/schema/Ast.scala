@@ -47,11 +47,11 @@ object Ast extends SchemaBase {
     fs: FileSystem.Schema
   ) {
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
-    import methodSchema._
-    import base._
-    import namespaces._
-    import typeSchema._
-    import fs._
+    import base.*
+    import fs.*
+    import methodSchema.*
+    import namespaces.*
+    import typeSchema.*
 
     // Base types
 
@@ -239,7 +239,14 @@ object Ast extends SchemaBase {
         comment =
           "Indicate that a method defines a module in the sense e.g. a python module does with the creation of a module object"
       )
-        .protoId(12)
+        .protoId(12),
+      Constant(
+        name = "LAMBDA",
+        value = "LAMBDA",
+        valueType = ValueType.String,
+        comment = "Indicate that a method is an anonymous function, lambda, or closure"
+      )
+        .protoId(13)
     )
 
     val modifier: NodeType = builder

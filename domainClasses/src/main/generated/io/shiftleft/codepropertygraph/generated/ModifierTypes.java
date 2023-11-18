@@ -44,6 +44,9 @@ public static final String READONLY = "READONLY";
 /** Indicate that a method defines a module in the sense e.g. a python module does with the creation of a module object */
 public static final String MODULE = "MODULE";
 
+/** Indicate that a method is an anonymous function, lambda, or closure */
+public static final String LAMBDA = "LAMBDA";
+
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(STATIC);
@@ -58,6 +61,7 @@ add(INTERNAL);
 add(FINAL);
 add(READONLY);
 add(MODULE);
+add(LAMBDA);
 }};
 
 }
