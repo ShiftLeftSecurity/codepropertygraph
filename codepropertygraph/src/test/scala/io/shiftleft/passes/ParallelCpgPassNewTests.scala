@@ -1,16 +1,15 @@
 package io.shiftleft.passes
 
 import better.files.File
+import flatgraph.SchemaViolationException
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
 import io.shiftleft.codepropertygraph.generated.v2.nodes.{NewCall, NewFile}
-//import io.shiftleft.codepropertygraph.generated.v2.Properties
+import io.shiftleft.codepropertygraph.generated.v2.Language.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-//import overflowdb.traversal._
 
 import java.nio.file.Files
-import scala.jdk.CollectionConverters._
 
 class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
 
@@ -32,8 +31,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
   "ConcurrentWriterCpgPass" should {
     "allow creating and applying result of pass" in Fixture { (cpg, pass) =>
       pass.createAndApply()
-//      cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
-      ???
+      cpg.all.map(_.propertiesMap.get("NAME")).toSetMutable shouldBe Set("foo", "bar")
     }
 
     "produce a serialized inverse CPG" in Fixture { (_, pass) =>
@@ -61,17 +59,16 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
               // schema violation
               val file1 = NewFile().name("foo")
               val file2 = NewFile().name("bar")
-              ???
-//              diffGraph
-//                .addNode(file1)
-//                .addNode(file2)
-//                .addEdge(file1, file2, "illegal_edge_label")
+              diffGraph
+                .addNode(file1)
+                .addNode(file2)
+                .addEdge(file1, file2, "illegal_edge_label")
 
           }
       }
 
       // the above DiffGraph (part "b") is not schema conform, applying it must throw an exception
-      intercept[Exception] {
+      intercept[SchemaViolationException] {
         pass.createAndApply()
       }
     }
@@ -87,16 +84,13 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
         override def runOnPart(diffGraph: DiffGraphBuilder, part: String): Unit =
           part match {
             case "a" =>
-              ???
-//              diffGraph.addEdge(call1, call2, "AST")
+              diffGraph.addEdge(call1, call2, "AST")
             case "b" =>
-              ???
-//              diffGraph.addEdge(call2, call3, "AST")
+              diffGraph.addEdge(call2, call3, "AST")
           }
       }
       pass.createAndApply()
-      ???
-//      cpg.graph.nodeCount() shouldBe 3
+      cpg.all.size shouldBe 3
     }
   }
 
