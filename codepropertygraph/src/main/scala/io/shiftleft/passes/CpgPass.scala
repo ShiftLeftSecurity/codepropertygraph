@@ -14,9 +14,7 @@ import scala.util.{Failure, Success, Try}
  *
  * Base class of a program which receives a CPG as input for the purpose of modifying it.
  * */
-
-abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends ForkJoinParallelCpgPass[AnyRef](cpg, outName, keyPool) {
+abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelCpgPass[AnyRef](cpg, outName) {
 
   def run(builder: flatgraph.DiffGraphBuilder): Unit
 
@@ -28,8 +26,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
   override def isParallel: Boolean = false
 }
 
-@deprecated abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
-    extends CpgPass(cpg, outName, keyPool)
+@deprecated abstract class SimpleCpgPass(cpg: Cpg, outName: String = "") extends CpgPass(cpg, outName)
 
 /* ForkJoinParallelCpgPass is a possible replacement for CpgPass and ParallelCpgPass.
  *
@@ -53,11 +50,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](
-  cpg: Cpg,
-  @nowarn outName: String = "",
-  keyPool: Option[KeyPool] = None
-) extends NewStyleCpgPassBase[T] {
+abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends NewStyleCpgPassBase[T] {
 
   override def createApplySerializeAndStore(
     serializedCpg: SerializedCpg,
@@ -76,10 +69,9 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size
 
-      // TODO how about keyPool?
       // TODO how about `nDiffT` which seems to count the number of modifications..
 //      nDiffT = overflowdb.BatchedUpdate
-//        .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
+//        .applyDiff(cpg.graph, diffGraph, null)
 //        .transitiveModifications()
       flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
 

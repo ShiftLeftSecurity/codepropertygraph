@@ -38,11 +38,7 @@ object ConcurrentWriterCpgPass {
   private val writerQueueCapacity   = 4
   private val producerQueueCapacity = 2 + 4 * Runtime.getRuntime().availableProcessors()
 }
-abstract class ConcurrentWriterCpgPass[T <: AnyRef](
-  cpg: Cpg,
-  @nowarn outName: String = "",
-  keyPool: Option[KeyPool] = None
-) extends NewStyleCpgPassBase[T] {
+abstract class ConcurrentWriterCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends NewStyleCpgPassBase[T] {
 
   @volatile var nDiffT = -1
 
@@ -149,10 +145,9 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
               baseLogger.debug("Shutting down WriterThread")
               terminate = true
             case Some(diffGraph) =>
-              // TODO how about keyPool?
               // TODO how about `nDiffT` which seems to count the number of modifications..
               //              nDiffT += overflowdb.BatchedUpdate
-//                .applyDiff(cpg.graph, diffGraph, keyPool.getOrElse(null), null)
+//                .applyDiff(cpg.graph, diffGraph, null)
 //                .transitiveModifications()
               DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
               index += 1
