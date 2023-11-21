@@ -1,7 +1,8 @@
 package io.shiftleft.passes
-import io.joern.odb2.DiffGraphApplier
+
+import flatgraph.DiffGraphApplier
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.v2.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
 
@@ -92,7 +93,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
             // todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             // if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
-              val builder = new DiffGraphBuilder
+              val builder = Cpg.newDiffGraphBuilder
               runOnPart(builder, next.asInstanceOf[T])
               builder
             })

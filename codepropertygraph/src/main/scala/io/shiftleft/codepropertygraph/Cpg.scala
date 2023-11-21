@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph
 
-import io.joern.odb2.Graph
+import flatgraph.Graph
 import io.shiftleft.codepropertygraph.generated
 // import overflowdb.traversal.help.DocSearchPackages
 
