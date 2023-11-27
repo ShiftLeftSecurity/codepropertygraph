@@ -1,7 +1,7 @@
 name := "codepropertygraph-domain-classes"
 
 // val flatgraphVersion = "0.0.0+105-7d66a0b1"
-val flatgraphVersion = "0.0.2-SNAPSHOT" // so it get's overridden in joern
+val flatgraphVersion = "0.0.4-SNAPSHOT" // so it get's overridden in joern
 
 libraryDependencies ++= Seq(
   "io.joern" %% "joern-generated" % flatgraphVersion,
