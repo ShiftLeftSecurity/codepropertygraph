@@ -480,7 +480,9 @@ object Ast extends SchemaBase {
         edge = ast,
         inNode = local,
         stepNameIn = "definingBlock",
-        stepNameInDoc = "The block in which local is declared."
+        stepNameInDoc = "The block in which local is declared.",
+        stepNameOut = "local",
+        stepNameOutDoc = "Traverse to locals of this block."
       )
       .addOutEdge(edge = ast, inNode = unknown)
       .addOutEdge(edge = ast, inNode = jumpTarget)
@@ -609,14 +611,7 @@ object Ast extends SchemaBase {
     unknown.addOutEdge(edge = ast, inNode = callNode)
     controlStructure.addOutEdge(edge = condition, inNode = callNode)
 
-    block
-      .addOutEdge(edge = ast, inNode = callNode)
-      .addOutEdge(
-        edge = ast,
-        inNode = local,
-        stepNameOut = "local",
-        stepNameOutDoc = "Traverse to locals of this block."
-      )
+    block.addOutEdge(edge = ast, inNode = callNode)
 
     // To refactor
 
