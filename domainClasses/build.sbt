@@ -1,23 +1,16 @@
 name := "codepropertygraph-domain-classes"
 
-val flatgraphVersion = "0.0.6"
-//val flatgraphVersion = "0.0.4-SNAPSHOT" // so it get's overridden in joern
+libraryDependencies += "io.joern.flatgraph" %% "core" % Versions.flatgraph
 
-libraryDependencies ++= Seq(
-  "io.joern" %% "joern-generated" % flatgraphVersion,
-  // "io.shiftleft" %% "overflowdb-traversal" % Versions.overflowdb
-)
-
-// lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
-// generatedSrcDir := (Compile/sourceDirectory).value / "generated"
-// Compile/unmanagedSourceDirectories += generatedSrcDir.value
-// Compile/compile := (Compile/compile).dependsOn(Projects.schema/Compile/generateDomainClasses).value
+lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
+generatedSrcDir := (Compile/sourceDirectory).value / "generated"
+Compile/unmanagedSourceDirectories += generatedSrcDir.value
+Compile/compile := (Compile/compile).dependsOn(Projects.schema/Compile/generateDomainClasses).value
 
 /* generated sources occasionally have some warnings..
  * we're trying to minimise them on a best effort basis, but don't want
- * to fail the build because of them
- */
-// Compile / scalacOptions --= Seq("-Wconf:cat=deprecation:w,any:e", "-Wunused", "-Ywarn-unused")
+ * to fail the build because of them */
+Compile / scalacOptions --= Seq("-Wconf:cat=deprecation:w,any:e", "-Wunused", "-Ywarn-unused")
 
 // TODO uncomment, or rather find a better way to delete the generated files on `sbt clean`...
 // this is just a temporarily commented out to fix the release build...

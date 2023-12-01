@@ -1,8 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.181"
-val overflowdbCodegenVersion = "2.105"
+val flatgraphVersion = "0.0.8+6-36036a2b"
 
 inThisBuild(
   List(
@@ -49,7 +48,7 @@ ThisBuild / libraryDependencies ++= Seq(
 name           := "codepropertygraph"
 publish / skip := true
 
-// lazy val schema            = Projects.schema
+lazy val schema            = Projects.schema
 lazy val domainClasses     = Projects.domainClasses
 // lazy val protoBindings     = Projects.protoBindings
 lazy val codepropertygraph = Projects.codepropertygraph
