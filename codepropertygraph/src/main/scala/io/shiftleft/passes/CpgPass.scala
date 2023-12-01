@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 
 import com.google.protobuf.GeneratedMessageV3
-import io.shiftleft.codepropertygraph.generated.v2.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.SerializedCpg
 import org.slf4j.{Logger, LoggerFactory, MDC}
 

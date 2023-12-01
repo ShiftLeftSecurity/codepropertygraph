@@ -1,6 +1,8 @@
 name := "codepropertygraph-schema"
 
-// libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % Versions.overflowdbCodegen
+scalaVersion := "2.12.18" // since we consume it from an sbt plugin
+
+libraryDependencies += "io.joern.flatgraph" %% "domain-classes-generator" % Versions.flatgraph
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 enablePlugins(FlatgraphCodegenSbtPlugin)
