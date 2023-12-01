@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{Schema, SchemaBuilder}
+import flatgraph.schema.{Schema, SchemaBuilder}
 
 class CpgSchema(builder: SchemaBuilder) {
 

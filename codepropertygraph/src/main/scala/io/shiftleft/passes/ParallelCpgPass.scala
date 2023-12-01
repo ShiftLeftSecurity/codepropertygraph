@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import flatgraph.DiffGraphApplier
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.generated.v2.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
 

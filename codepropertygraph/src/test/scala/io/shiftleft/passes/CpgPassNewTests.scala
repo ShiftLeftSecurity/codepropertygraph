@@ -3,9 +3,9 @@ package io.shiftleft.passes
 import better.files.File
 import flatgraph.SchemaViolationException
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.generated.v2.Cpg
-import io.shiftleft.codepropertygraph.generated.v2.nodes.NewFile
-import io.shiftleft.codepropertygraph.generated.v2.Language.*
+import io.shiftleft.codepropertygraph.generated.Cpg
+import io.shiftleft.codepropertygraph.generated.nodes.NewFile
+import io.shiftleft.codepropertygraph.generated.Language.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

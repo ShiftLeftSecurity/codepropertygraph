@@ -31,12 +31,12 @@ object Cpg {
   def withStorage(path: String): Cpg =
     // TODO discuss with bernhard - currently that's done via 'Serialization/Deserialization' in flatgraph
     ???
-    // new Cpg(generated.v2.Cpg.withStorage(path).graph)
+    // new Cpg(generated.Cpg.withStorage(path).graph)
 
   // def withConfig(config: overflowdb.Config): Cpg =
     // Cpg(Cpg.withConfig(config).graph)
 
   def emptyGraph: Graph =
-    generated.v2.Cpg.empty.graph
+    generated.Cpg.empty.graph
 
 }

@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Hidden extends SchemaBase {
   override def docIndex: Int = -1
