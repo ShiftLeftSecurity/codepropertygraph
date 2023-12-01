@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val flatgraphVersion = "0.0.8+12-6f08161b"
+val flatgraphVersion = "0.0.8+14-c35d931e"
 
 inThisBuild(
   List(
@@ -50,7 +50,7 @@ publish / skip := true
 
 lazy val schema            = Projects.schema
 lazy val domainClasses     = Projects.domainClasses
-// lazy val protoBindings     = Projects.protoBindings
+lazy val protoBindings     = Projects.protoBindings
 lazy val codepropertygraph = Projects.codepropertygraph
 // lazy val schema2json       = Projects.schema2json
 
