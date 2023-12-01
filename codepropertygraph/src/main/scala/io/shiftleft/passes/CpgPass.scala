@@ -25,6 +25,8 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
   final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
+
+  override def isParallel: Boolean = false
 }
 
 @deprecated abstract class SimpleCpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] = None)
@@ -120,6 +122,8 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
   def finish(): Unit = {}
   // main function: add desired changes to builder
   def runOnPart(builder: DiffGraphBuilder, part: T): Unit
+  // Override this to disable parallelism of passes. Useful for debugging.
+  def isParallel: Boolean = true
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
@@ -133,25 +137,30 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
         case 1 =>
           runOnPart(externalBuilder, parts(0).asInstanceOf[T])
         case _ =>
-          externalBuilder.absorb(
-            java.util.Arrays
-              .stream(parts)
-              .parallel()
-              .collect(
-                new Supplier[DiffGraphBuilder] {
-                  override def get(): DiffGraphBuilder =
-                    new DiffGraphBuilder
-                },
-                new BiConsumer[DiffGraphBuilder, AnyRef] {
-                  override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
-                    runOnPart(builder, part.asInstanceOf[T])
-                },
-                new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
-                  override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
-                    leftBuilder.absorb(rightBuilder)
-                }
-              )
+          val stream =
+            if (!isParallel)
+              java.util.Arrays
+                .stream(parts)
+                .sequential()
+            else
+              java.util.Arrays
+                .stream(parts)
+                .parallel()
+          val diff = stream.collect(
+            new Supplier[DiffGraphBuilder] {
+              override def get(): DiffGraphBuilder =
+                new DiffGraphBuilder
+            },
+            new BiConsumer[DiffGraphBuilder, AnyRef] {
+              override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
+                runOnPart(builder, part.asInstanceOf[T])
+            },
+            new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
+              override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
+                leftBuilder.absorb(rightBuilder)
+            }
           )
+          externalBuilder.absorb(diff)
       }
       nParts
     } finally {
