@@ -6,10 +6,10 @@ object Cpg {
 
   /** Instantiate a new graph with storage. If the file already exists, this will deserialize the given file into
     * memory. `Graph.close` will serialise graph to that given file (and override whatever was there before), unless you
-    * specify `deserializeOnClose = false`.
+    * specify `persistOnClose = false`.
     */
-  def withStorage(storagePath: java.nio.file.Path, deserializeOnClose: Boolean = true): Cpg = {
-    val graph = flatgraph.Graph.withStorage(GraphSchema, storagePath, deserializeOnClose)
+  def withStorage(storagePath: java.nio.file.Path, persistOnClose: Boolean = true): Cpg = {
+    val graph = flatgraph.Graph.withStorage(GraphSchema, storagePath, persistOnClose)
     new Cpg(graph)
   }
 

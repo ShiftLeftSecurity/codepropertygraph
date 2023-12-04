@@ -1,7 +1,6 @@
 name := "codepropertygraph"
 
-// dependsOn(Projects.protoBindings, Projects.domainClasses)
-dependsOn(Projects.domainClasses)
+dependsOn(Projects.protoBindings, Projects.domainClasses)
 
 libraryDependencies ++= Seq(
   "com.google.protobuf"    % "protobuf-java"        % "3.18.0", // TODO drop after protoBindings are back

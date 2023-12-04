@@ -13,12 +13,12 @@ object Cpg {
 
   /** Syntactic sugar for `new Cpg(graph)`. Usage: `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
     */
-  def apply(implicit graph: Graph) = new Cpg(graph)
+  def apply(implicit graph: Graph) = generated.Cpg(graph)
 
   /** Create an empty code property graph
     */
-  def emptyCpg: Cpg =
-    new Cpg(emptyGraph)
+  def emptyCpg: generated.Cpg =
+    generated.Cpg(emptyGraph)
 
   /** Instantiate cpg with storage. If the storage file already exists, it will load (a subset of) the data into memory.
     * Otherwise it will create an empty cpg. In either case, configuring storage means that OverflowDb will be stored to
@@ -28,13 +28,8 @@ object Cpg {
     * @param path
     *   to the storage file, e.g. /home/user1/overflowdb.bin
     */
-  def withStorage(path: String): Cpg =
-    // TODO discuss with bernhard - currently that's done via 'Serialization/Deserialization' in flatgraph
-    ???
-    // new Cpg(generated.Cpg.withStorage(path).graph)
-
-  // def withConfig(config: overflowdb.Config): Cpg =
-    // Cpg(Cpg.withConfig(config).graph)
+  def withStorage(path: String, deserializeOnClose: Boolean = true): generated.Cpg =
+    generated.Cpg.withStorage(java.nio.file.Paths.get(path), deserializeOnClose)
 
   def emptyGraph: Graph =
     generated.Cpg.empty.graph
