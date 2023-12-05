@@ -19,17 +19,18 @@ object CpgLoader {
   def load(filename: String): Cpg =
     load(Paths.get(filename))
 
-  /** Load a Code Property Graph - it detects the format as either flatgraph, overflowdb or proto. 
-   * A flatgraph storage is opened straight away without conversion. 
-   * Note: OverflowDb and proto formats are first converted to flatgraph, and therefor we create a new flatgraph 
+  /** Load a Code Property Graph - it detects the format as either flatgraph, overflowdb or proto.
+   * A flatgraph storage is opened straight away without conversion.
+   * Note: OverflowDb and proto formats are first converted to flatgraph, and therefor we create a new flatgraph
    * storage path, which can be obtained via `cpg.graph.storagePathMaybe` */
   def load(path: Path): Cpg = {
     val absolutePath = path.toAbsolutePath
     if (!Files.exists(absolutePath)) {
       throw new FileNotFoundException(s"given input file $absolutePath does not exist")
     } else if (isProtoFormat(absolutePath)) {
-      logger.debug(s"Loading $absolutePath as proto cpg")
-      ProtoCpgLoader.loadFromProtoZip(absolutePath.toString)
+      val flatgraphStoragePath = absolutePath.resolveSibling("cpg.fg")
+      logger.debug(s"Converting $path from proto cpg into new flatgraph storage: $flatgraphStoragePath")
+      ProtoCpgLoader.loadFromProtoZip(absolutePath.toString, Option(flatgraphStoragePath))
     } else if (isOverflowDbFormat(absolutePath)) {
       loadFromOverflowDb(absolutePath)
     } else {
@@ -44,7 +45,7 @@ object CpgLoader {
   /** Determine whether the CPG is a proto CPG */
   def isProtoFormat(filename: String): Boolean =
     isProtoFormat(Paths.get(filename))
-    
+
   def isOverflowDbFormat(path: Path): Boolean =
     probeFirstBytes(path, "H:2")
 
@@ -65,7 +66,7 @@ object CpgLoader {
   @deprecated("use `isProtoCpg` instead")
   def isLegacyCpg(path: Path): Boolean =
     isProtoFormat(path)
-    
+
   private def probeFirstBytes(path: Path, probeFor: String): Boolean = {
     Using(Files.newInputStream(path)) { is =>
       val buffer = new Array[Byte](probeFor.size)
