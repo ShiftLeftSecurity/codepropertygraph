@@ -1,14 +1,11 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-// TODO implement once we have proto support
-
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.codepropertygraph.Cpg
-// import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
-// import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
-// import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
+ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
+ import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
+ import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
 import org.slf4j.{Logger, LoggerFactory}
-//import overflowdb.Config
 
 import java.io.InputStream
 import java.nio.file.{Files, Path}
@@ -30,7 +27,7 @@ import scala.util.{Failure, Success, Try, Using}
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String/*, overflowDbConfig: Config = Config.withoutOverflow*/): Cpg =
+  def loadFromProtoZip(fileName: String): Cpg =
     measureAndReport {
       ???
 //      val builder = new ProtoToCpg(overflowDbConfig)

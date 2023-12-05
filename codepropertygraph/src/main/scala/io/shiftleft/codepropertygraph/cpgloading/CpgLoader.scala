@@ -1,76 +1,77 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import better.files.File
-import io.shiftleft.codepropertygraph.generated.{Cpg, PropertyNames}
+import io.shiftleft.codepropertygraph.generated.Cpg
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.nio.file.Path
-import scala.util.Try
+import java.io.FileNotFoundException
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path, Paths}
+import scala.util.Using
 
 object CpgLoader {
-
-  private val logger: Logger = LoggerFactory.getLogger(classOf[CpgLoader])
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   /** Load a Code Property Graph
-    *
-    * @param filename
-    *   name of file that stores the code property graph
-    * @param config
-    *   loader configuration
-    */
+   *
+   * @param filename
+   *   name of file that stores the code property graph
+   */
   def load(filename: String): Cpg =
-    new CpgLoader().load(filename)
+    load(Paths.get(filename))
 
-  /** Load Code Property Graph from an overflow DB file
-    *
-    * @param config
-    *   loader config
-    *
-    * This methods loads the CPG from an existing overflow DB file, specified in config.overflowDbConfig. In particular,
-    * this config specifies the filename. For example, to load the database at "foo.db", you can issue the following:
-    *
-    * val odbConfig = Config.withDefaults().withStorageLocation(config.spPath) val config =
-    * CpgLoaderConfig().withOverflowConfig(odbConfig) CpgLoader.loadFromOverflowDb(config)
-    */
-  // TODO
-//  def loadFromOverflowDb(storage: Path): Cpg = {
-//    new CpgLoader().loadFromOverflowDb(config)
-//  }
+  /** Load a Code Property Graph - it detects the format as either flatgraph, overflowdb or proto. 
+   * A flatgraph storage is opened straight away without conversion. 
+   * Note: OverflowDb and proto formats are first converted to flatgraph, and therefor we create a new flatgraph 
+   * storage path, which can be obtained via `cpg.graph.storagePathMaybe` */
+  def load(path: Path): Cpg = {
+    val absolutePath = path.toAbsolutePath
+    if (!Files.exists(absolutePath)) {
+      throw new FileNotFoundException(s"given input file $absolutePath does not exist")
+    } else if (isProtoFormat(absolutePath)) {
+      logger.debug(s"Loading $absolutePath as proto cpg")
+      ProtoCpgLoader.loadFromProtoZip(absolutePath.toString)
+    } else if (isOverflowDbFormat(absolutePath)) {
+      loadFromOverflowDb(absolutePath)
+    } else {
+      Cpg.withStorage(absolutePath)
+    }
+  }
 
-  /** Determine whether the CPG is a legacy (proto) CPG
-    *
-    * @param filename
-    *   name of the file to probe
-    */
+  /** Determine whether the CPG is a legacy (proto) CPG */
+  def isProtoFormat(path: Path): Boolean =
+    probeFirstBytes(path, "PK")
+
+  /** Determine whether the CPG is a proto CPG */
+  def isProtoFormat(filename: String): Boolean =
+    isProtoFormat(Paths.get(filename))
+    
+  def isOverflowDbFormat(path: Path): Boolean =
+    probeFirstBytes(path, "H:2")
+
+  /** Load Code Property Graph from an overflow DB file, by first converting it into a flatgraph binary */
+  def loadFromOverflowDb(path: Path): Cpg = {
+    val flatgraphStoragePath = path.resolveSibling("cpg.fg")
+    logger.debug(s"Converting $path from overflowdb to new flatgraph storage: $flatgraphStoragePath")
+    flatgraph.convert.Convert(overflowDbFile = path, outputFile = flatgraphStoragePath)
+    Cpg.withStorage(flatgraphStoragePath)
+  }
+
+  /** Determine whether the CPG is a legacy (proto) CPG */
+  @deprecated("use `isProtoCpg` instead")
   def isLegacyCpg(filename: String): Boolean =
-    isLegacyCpg(File(filename))
+    isLegacyCpg(Paths.get(filename))
 
-  /** Determine whether the CPG is a legacy (proto) CPG
-    *
-    * @param file
-    *   file to probe
-    */
-  def isLegacyCpg(file: File): Boolean = {
-    val bytes = file.bytes
-    Try {
-      bytes.next() == 'P' && bytes.next() == 'K'
+  /** Determine whether the CPG is a legacy (proto) CPG */
+  @deprecated("use `isProtoCpg` instead")
+  def isLegacyCpg(path: Path): Boolean =
+    isProtoFormat(path)
+    
+  private def probeFirstBytes(path: Path, probeFor: String): Boolean = {
+    Using(Files.newInputStream(path)) { is =>
+      val buffer = new Array[Byte](probeFor.size)
+      is.read(buffer)
+      new String(buffer, StandardCharsets.UTF_8) == probeFor
     }.getOrElse(false)
   }
-
-}
-
-private class CpgLoader {
-
-  import CpgLoader.logger
-
-  def load(filename: String): Cpg = {
-    logger.debug("Loading " + filename)
-
-    val cpg = ProtoCpgLoader.loadFromProtoZip(filename)
-    cpg
-  }
-
-  def loadFromFlatgraph(path: Path): Cpg =
-    Cpg.withStorage(path)
 
 }
