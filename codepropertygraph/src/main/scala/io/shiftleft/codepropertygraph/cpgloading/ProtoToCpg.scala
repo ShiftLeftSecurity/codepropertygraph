@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import flatgraph.misc.Misc.toShortSafely
 import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
@@ -33,6 +34,7 @@ class ProtoToCpg(storagePath: Option[Path]) {
   import ProtoToCpg._
   private val nodeFilter = new NodeFilter
   private val graphBuilder = Cpg.newDiffGraphBuilder
+  private val schema = io.shiftleft.codepropertygraph.generated.GraphSchema
   // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
 
@@ -52,9 +54,12 @@ class ProtoToCpg(storagePath: Option[Path]) {
       if (node.getKey() == -1) {
         throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
       }
-      // TODO try to use FreeSchema for this - if that doesn't work we may have to generate a string based API...
-      ???
-//      graphBuilder.addNode()
+      val nodeKind = schema.nodeKindByLabel(node.getType.name())
+      // TODO store node key -> object mapping in some internal temp map for future lookup by proto key
+      val dnode = flatgraph.GenericDNode(nodeKind.toShortSafely)
+      graphBuilder.addNode(dnode)
+      // TODO how do i set properties for a dnode? `graphBuilder.setNodeProperty()` is only for GNodes
+      // looking at GraphTests it looks like we have to do this in two rounds, but double check with Bernhard
 //      odbGraph.+(node.getType.name, node.getKey, properties: _*)
     } catch {
       case e: Exception =>
