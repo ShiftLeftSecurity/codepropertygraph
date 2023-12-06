@@ -54,10 +54,23 @@ class ProtoToCpg(storagePath: Option[Path]) {
       if (node.getKey() == -1) {
         throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
       }
+
+      // dummy code - TODO implement differently, using the new 'odb-convert-lib'
       val nodeKind = schema.nodeKindByLabel(node.getType.name())
+      // val newNodeFactory = schema.getNewNodeFactory(nodeKind)
+      // val dnode = newNodeFactory.create()  // no properties
+      // buffer.add(dnode) // correlation between proto.Node and dnode is the order in the iterator
+      // // ... later on, second pass
+      // val propertyKind = schema.getPropertyKindByName(...)
+      // graphBuilder.setNodeProperty(dnode.storedRef.get, propertyKind, value)
+
+
+
+
       // TODO store node key -> object mapping in some internal temp map for future lookup by proto key
       val dnode = flatgraph.GenericDNode(nodeKind.toShortSafely)
       graphBuilder.addNode(dnode)
+      ???
       // TODO how do i set properties for a dnode? `graphBuilder.setNodeProperty()` is only for GNodes
       // looking at GraphTests it looks like we have to do this in two rounds, but double check with Bernhard
 //      odbGraph.+(node.getType.name, node.getKey, properties: _*)
