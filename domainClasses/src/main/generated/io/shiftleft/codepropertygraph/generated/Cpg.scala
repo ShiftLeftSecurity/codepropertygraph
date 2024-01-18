@@ -149,6 +149,9 @@ any information we may have about the types of arguments and return value.""")
   @flatgraph.help.Doc(info = """A source code comment""")
   def comment: Iterator[nodes.Comment] = wrappedCpg.graph._nodes(9).asInstanceOf[Iterator[nodes.Comment]]
 
+  /** Shorthand for comment.code */
+  def comment(code: String): Iterator[nodes.Comment] = comment.code(code)
+
   /** This node type represent a configuration file, where `NAME` is the name of the file and `content` is its content.
     * The exact representation of the name is left undefined and can be chosen as required by consumers of the
     * corresponding configuration files.
@@ -184,6 +187,9 @@ for construction of the control flow layer.""")
   /** This node represents a dependency */
   @flatgraph.help.Doc(info = """This node represents a dependency""")
   def dependency: Iterator[nodes.Dependency] = wrappedCpg.graph._nodes(12).asInstanceOf[Iterator[nodes.Dependency]]
+
+  /** Shorthand for dependency.name */
+  def dependency(name: String): Iterator[nodes.Dependency] = dependency.name(name)
 
   /** This node represents the field accessed in a field access, e.g., in `a.b`, it represents `b`. The field name as it
     * occurs in the code is stored in the `CODE` field. This may mean that the `CODE` field holds an expression. The
@@ -238,6 +244,9 @@ frontend is assumed to fill out the `FILENAME` field wherever possible,
 allowing File nodes to be created automatically upon first loading the CPG.""")
   def file: Iterator[nodes.File] = wrappedCpg.graph._nodes(14).asInstanceOf[Iterator[nodes.File]]
 
+  /** Shorthand for file.name */
+  def file(name: String): Iterator[nodes.File] = file.name(name)
+
   /** Finding nodes may be used to store analysis results in the graph that are to be exposed to an end-user, e.g.,
     * information about potential vulnerabilities or dangerous programming practices. A Finding node may contain an
     * abitrary list of key value pairs that characterize the finding, as well as a list of nodes that serve as evidence
@@ -258,6 +267,9 @@ serve as evidence for the finding.""")
 It holds the identifier's name in the `NAME` field and its fully-qualified type
 name in `TYPE_FULL_NAME`.""")
   def identifier: Iterator[nodes.Identifier] = wrappedCpg.graph._nodes(16).asInstanceOf[Iterator[nodes.Identifier]]
+
+  /** Shorthand for identifier.name */
+  def identifier(name: String): Iterator[nodes.Identifier] = identifier.name(name)
 
   /** Declarative import as it is found in statically typed languages like Java. This kind of node is not supposed to be
     * used for imports in dynamically typed languages like Javascript.
@@ -302,6 +314,9 @@ The `TYPE_FULL_NAME` field stores the literal's fully-qualified type name,
 e.g., `java.lang.Integer`.""")
   def literal: Iterator[nodes.Literal] = wrappedCpg.graph._nodes(21).asInstanceOf[Iterator[nodes.Literal]]
 
+  /** Shorthand for literal.code */
+  def literal(code: String): Iterator[nodes.Literal] = literal.code(code)
+
   /** This node represents a local variable. Its fully qualified type name is stored in the `TYPE_FULL_NAME` field and
     * its name in the `NAME` field. The `CODE` field contains the entire local variable declaration without
     * initialization, e.g., for `int x = 10;`, it contains `int x`.
@@ -311,6 +326,9 @@ in the `TYPE_FULL_NAME` field and its name in the `NAME` field. The `CODE` field
 contains the entire local variable declaration without initialization, e.g., for
 `int x = 10;`, it contains `int x`.""")
   def local: Iterator[nodes.Local] = wrappedCpg.graph._nodes(22).asInstanceOf[Iterator[nodes.Local]]
+
+  /** Shorthand for local.name */
+  def local(name: String): Iterator[nodes.Local] = local.name(name)
 
   /** A location node summarizes a source code location. */
   @flatgraph.help.Doc(info = """A location node summarizes a source code location.""")
@@ -323,6 +341,9 @@ contains the entire local variable declaration without initialization, e.g., for
  type declaration `class Foo{ int i ; }`, it represents the declaration of the
  variable `i`.""")
   def member: Iterator[nodes.Member] = wrappedCpg.graph._nodes(24).asInstanceOf[Iterator[nodes.Member]]
+
+  /** Shorthand for member.name */
+  def member(name: String): Iterator[nodes.Member] = member.name(name)
 
   /** This node contains the CPG meta data. Exactly one node of this type MUST exist per CPG. The `HASH` property MAY
     * contain a hash value calculated over the source files this CPG was generated from. The `VERSION` MUST be set to
@@ -387,6 +408,9 @@ and its type is indicated in the `AST_PARENT_TYPE` field to be one of
 `METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.""")
   def method: Iterator[nodes.Method] = wrappedCpg.graph._nodes(26).asInstanceOf[Iterator[nodes.Method]]
 
+  /** Shorthand for method.name */
+  def method(name: String): Iterator[nodes.Method] = method.name(name)
+
   /** This node represents a formal input parameter. The field `NAME` contains its name, while the field
     * `TYPE_FULL_NAME` contains the fully qualified type name.
     */
@@ -394,6 +418,9 @@ and its type is indicated in the `AST_PARENT_TYPE` field to be one of
 name, while the field `TYPE_FULL_NAME` contains the fully qualified type name.""")
   def methodParameterIn: Iterator[nodes.MethodParameterIn] =
     wrappedCpg.graph._nodes(27).asInstanceOf[Iterator[nodes.MethodParameterIn]]
+
+  /** Shorthand for methodParameterIn.name */
+  def methodParameterIn(name: String): Iterator[nodes.MethodParameterIn] = methodParameterIn.name(name)
 
   /** This node represents a formal output parameter. Corresponding output parameters for input parameters MUST NOT be
     * created by the frontend as they are automatically created upon first loading the CPG.
@@ -449,6 +476,9 @@ they are generated from NAMESPACE_BLOCK nodes automatically upon
 first loading of the CPG.""")
   def namespace: Iterator[nodes.Namespace] = wrappedCpg.graph._nodes(32).asInstanceOf[Iterator[nodes.Namespace]]
 
+  /** Shorthand for namespace.name */
+  def namespace(name: String): Iterator[nodes.Namespace] = namespace.name(name)
+
   /** A reference to a namespace. We borrow the concept of a "namespace block" from C++, that is, a namespace block is a
     * block of code that has been placed in the same namespace by a programmer. This block may be introduced via a
     * `package` statement in Java or a `namespace{ }` statement in C++.
@@ -478,6 +508,9 @@ that the right hand side is a sub namespace of the left hand side, e.g.,
   def namespaceBlock: Iterator[nodes.NamespaceBlock] =
     wrappedCpg.graph._nodes(33).asInstanceOf[Iterator[nodes.NamespaceBlock]]
 
+  /** Shorthand for namespaceBlock.name */
+  def namespaceBlock(name: String): Iterator[nodes.NamespaceBlock] = namespaceBlock.name(name)
+
   /** This node represents a return instruction, e.g., `return x`. Note that it does NOT represent a formal return
     * parameter as formal return parameters are represented via `METHOD_RETURN` nodes.
     */
@@ -485,6 +518,9 @@ that the right hand side is a sub namespace of the left hand side, e.g.,
 NOT represent a formal return parameter as formal return parameters are
 represented via `METHOD_RETURN` nodes.""")
   def ret: Iterator[nodes.Return] = wrappedCpg.graph._nodes(34).asInstanceOf[Iterator[nodes.Return]]
+
+  /** Shorthand for ret.code */
+  def ret(code: String): Iterator[nodes.Return] = ret.code(code)
 
   /** This node represents a tag. */
   @flatgraph.help.Doc(info = """This node represents a tag.""")
@@ -503,6 +539,9 @@ represented via `METHOD_RETURN` nodes.""")
   @flatgraph.help.Doc(info = """This node represents a type instance, that is, a concrete instantiation
 of a type declaration.""")
   def typ: Iterator[nodes.Type] = wrappedCpg.graph._nodes(38).asInstanceOf[Iterator[nodes.Type]]
+
+  /** Shorthand for typ.name */
+  def typ(name: String): Iterator[nodes.Type] = typ.name(name)
 
   /** An (actual) type argument as used to instantiate a parametrized type, in the same way an (actual) arguments
     * provides concrete values for a parameter at method call sites. As it true for arguments, the method is not
@@ -570,6 +609,9 @@ is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
 and its type is indicated in the `AST_PARENT_TYPE` field to be one of
 `METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.""")
   def typeDecl: Iterator[nodes.TypeDecl] = wrappedCpg.graph._nodes(40).asInstanceOf[Iterator[nodes.TypeDecl]]
+
+  /** Shorthand for typeDecl.name */
+  def typeDecl(name: String): Iterator[nodes.TypeDecl] = typeDecl.name(name)
 
   /** This node represents a formal type parameter, that is, the type parameter as given in a type-parametrized method
     * or type declaration. Examples for languages that support type parameters are Java (via Generics) and C++ (via

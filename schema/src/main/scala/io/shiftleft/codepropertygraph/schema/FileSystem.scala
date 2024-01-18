@@ -106,6 +106,7 @@ object FileSystem extends SchemaBase {
       )
       .protoId(38)
       .addProperties(name, hash, content)
+      .primaryKey(name)
 
     val offset = builder
       .addProperty(

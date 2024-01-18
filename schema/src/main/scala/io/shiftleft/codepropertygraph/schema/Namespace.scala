@@ -43,6 +43,7 @@ object Namespace extends SchemaBase {
       )
       .protoId(41)
       .addProperties(name, fullName, filename)
+      .primaryKey(name)
 
     val namespace: NodeType = builder
       .addNodeType(
@@ -58,6 +59,7 @@ object Namespace extends SchemaBase {
       )
       .protoId(40)
       .addProperties(name)
+      .primaryKey(name)
 
     namespaceBlock.addOutEdge(edge = sourceFile, inNode = file, stepNameIn = "namespaceBlock")
 

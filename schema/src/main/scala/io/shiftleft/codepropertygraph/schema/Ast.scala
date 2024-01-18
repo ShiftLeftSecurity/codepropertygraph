@@ -130,6 +130,7 @@ object Ast extends SchemaBase {
       )
       .protoId(8)
       .addProperties(typeFullName)
+      .primaryKey(code)
 
     val local: NodeType = builder
       .addNodeType(
@@ -143,6 +144,7 @@ object Ast extends SchemaBase {
       .protoId(23)
       .addProperties(typeFullName)
       .extendz(declaration, astNode)
+      .primaryKey(name)
 
     val identifier: NodeType = builder
       .addNodeType(
@@ -154,6 +156,7 @@ object Ast extends SchemaBase {
       )
       .protoId(27)
       .addProperties(typeFullName, name)
+      .primaryKey(name)
 
     val canonicalName = builder
       .addProperty(
@@ -314,6 +317,7 @@ object Ast extends SchemaBase {
       )
       .protoId(30)
       .starterName("ret")
+      .primaryKey(code)
 
     val controlStructureType = builder
       .addProperty(
