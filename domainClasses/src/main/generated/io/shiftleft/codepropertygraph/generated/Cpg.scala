@@ -135,6 +135,9 @@ which contains the method's (short-) name and `SIGNATURE`, which contains
 any information we may have about the types of arguments and return value.""")
   def call: Iterator[nodes.Call] = wrappedCpg.graph._nodes(7).asInstanceOf[Iterator[nodes.Call]]
 
+  /** Shorthand for call.name */
+  def call(name: String): Iterator[nodes.Call] = call.name(name)
+
   /** Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method */
   @flatgraph.help.Doc(
     info = """Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method"""

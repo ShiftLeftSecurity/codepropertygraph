@@ -568,6 +568,7 @@ object Ast extends SchemaBase {
       .protoId(15)
       .extendz(callRepr)
       .addProperties(typeFullName)
+      .primaryKey(name)
 
     val expression = builder
       .addNodeBaseType(
