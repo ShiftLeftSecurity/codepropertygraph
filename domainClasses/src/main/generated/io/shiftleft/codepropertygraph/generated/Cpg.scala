@@ -526,6 +526,9 @@ represented via `METHOD_RETURN` nodes.""")
   @flatgraph.help.Doc(info = """This node represents a tag.""")
   def tag: Iterator[nodes.Tag] = wrappedCpg.graph._nodes(35).asInstanceOf[Iterator[nodes.Tag]]
 
+  /** Shorthand for tag.name */
+  def tag(name: String): Iterator[nodes.Tag] = tag.name(name)
+
   /** This node contains an arbitrary node and an associated tag node. */
   @flatgraph.help.Doc(info = """This node contains an arbitrary node and an associated tag node.""")
   def tagNodePair: Iterator[nodes.TagNodePair] = wrappedCpg.graph._nodes(36).asInstanceOf[Iterator[nodes.TagNodePair]]
