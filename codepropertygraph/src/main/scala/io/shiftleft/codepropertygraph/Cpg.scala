@@ -8,8 +8,6 @@ import io.shiftleft.codepropertygraph.generated
   * remove this class and move remove the `generated` part from the generated package
   */
 object Cpg {
-  // implicit val docSearchPackages: DocSearchPackages =
-    // DocSearchPackages("io.shiftleft", "io.joern")
 
   /** Syntactic sugar for `new Cpg(graph)`. Usage: `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
     */

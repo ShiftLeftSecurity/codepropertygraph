@@ -1,5 +1,7 @@
 package io.shiftleft.codepropertygraph
 
+import flatgraph.help.DocSearchPackages
+import io.shiftleft.codepropertygraph.generated
 import io.shiftleft.codepropertygraph.generated.nodes.*
 import io.shiftleft.codepropertygraph.generated.Language.*
 import org.scalatest.matchers.should.Matchers
@@ -8,6 +10,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class StepsTest extends AnyWordSpec with Matchers {
 
   ".help step" should {
+    given DocSearchPackages = generated.Cpg.defaultDocSearchPackage
 
     "show domain overview" in {
       val domainStartersHelp = Cpg.emptyCpg.help
