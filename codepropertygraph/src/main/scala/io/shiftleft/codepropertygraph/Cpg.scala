@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph
 
 import flatgraph.Graph
+import flatgraph.help.DocSearchPackages
 import io.shiftleft.codepropertygraph.generated
 // import overflowdb.traversal.help.DocSearchPackages
 
@@ -8,6 +9,7 @@ import io.shiftleft.codepropertygraph.generated
   * remove this class and move remove the `generated` part from the generated package
   */
 object Cpg {
+  val defaultDocSearchPackage: DocSearchPackages = generated.Cpg.defaultDocSearchPackage
 
   /** Syntactic sugar for `new Cpg(graph)`. Usage: `Cpg(graph)` or simply `Cpg` if you have an `implicit Graph` in scope
     */
