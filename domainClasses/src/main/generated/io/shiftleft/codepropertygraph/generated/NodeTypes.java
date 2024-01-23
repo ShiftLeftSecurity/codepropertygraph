@@ -191,6 +191,7 @@ Line and column number information is specified in the optional fields
 `LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
 the name of the source file is specified in `FILENAME`. An optional hash value
 MAY be calculated over the function contents and included in the `HASH` field.
+
 The optional `OFFSET` and `OFFSET_END` specify the start
 and exclusive end position of the code belonging to a method within the corresponding
 `FILE` nodes `CONTENT` property.
@@ -297,6 +298,10 @@ Base types can be specified via the `INHERITS_FROM_TYPE_FULL_NAME` list, where
 each entry contains the fully-qualified name of a base type. If the type is
 known to be an alias of another type (as for example introduced via the C
 `typedef` statement), the name of the alias is stored in `ALIAS_TYPE_FULL_NAME`.
+
+The optional `OFFSET` and `OFFSET_END` specify the start
+and exclusive end position of the code belonging to a `TYPE_DECL` within the corresponding
+`FILE` nodes `CONTENT` property.
 
 Finally, the fully qualified name of the program constructs that the type declaration
 is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field

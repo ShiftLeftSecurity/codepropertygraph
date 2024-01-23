@@ -60,6 +60,7 @@ object Method extends SchemaBase {
             |`LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
             |the name of the source file is specified in `FILENAME`. An optional hash value
             |MAY be calculated over the function contents and included in the `HASH` field.
+            |
             |The optional `OFFSET` and `OFFSET_END` specify the start
             |and exclusive end position of the code belonging to a method within the corresponding
             |`FILE` nodes `CONTENT` property.
