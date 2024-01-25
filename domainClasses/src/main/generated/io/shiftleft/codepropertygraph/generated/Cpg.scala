@@ -1,17 +1,18 @@
 package io.shiftleft.codepropertygraph.generated
 import flatgraph.DiffGraphBuilder
+import flatgraph.help.DocSearchPackages
+import flatgraph.help.Table.AvailableWidthProvider
 import Language.*
 
 object Cpg {
-  val defaultDocSearchPackage =
-    flatgraph.help.DocSearchPackages.default.withAdditionalPackage(getClass.getPackage.getName)
+  val defaultDocSearchPackage = DocSearchPackages.default.withAdditionalPackage(getClass.getPackage.getName)
 
   @scala.annotation.implicitNotFound("""If you're using flatgraph purely without a schema and associated generated domain classes, you can
     |start with `given DocSearchPackages = DocSearchPackages.default`.
     |If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
     |If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
     |""".stripMargin)
-  def help(implicit searchPackageNames: flatgraph.help.DocSearchPackages) =
+  def help(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
     flatgraph.help.TraversalHelp(searchPackageNames).forTraversalSources(verbose = false)
 
   @scala.annotation.implicitNotFound("""If you're using flatgraph purely without a schema and associated generated domain classes, you can
@@ -19,7 +20,7 @@ object Cpg {
     |If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
     |If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
     |""".stripMargin)
-  def helpVerbose(implicit searchPackageNames: flatgraph.help.DocSearchPackages) =
+  def helpVerbose(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
     flatgraph.help.TraversalHelp(searchPackageNames).forTraversalSources(verbose = true)
 
   def empty: Cpg = new Cpg(new flatgraph.Graph(GraphSchema))
@@ -39,10 +40,10 @@ object Cpg {
 class Cpg(private val _graph: flatgraph.Graph = new flatgraph.Graph(GraphSchema)) extends AutoCloseable {
   def graph: flatgraph.Graph = _graph
 
-  def help(implicit searchPackageNames: flatgraph.help.DocSearchPackages) =
-    Cpg.help(searchPackageNames)
-  def helpVerbose(implicit searchPackageNames: flatgraph.help.DocSearchPackages) =
-    Cpg.helpVerbose(searchPackageNames)
+  def help(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
+    Cpg.help
+  def helpVerbose(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
+    Cpg.helpVerbose
 
   override def close(): Unit =
     _graph.close()

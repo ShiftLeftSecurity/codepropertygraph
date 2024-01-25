@@ -1,6 +1,7 @@
 package io.shiftleft.codepropertygraph
 
 import flatgraph.help.DocSearchPackages
+import flatgraph.help.Table.{AvailableWidthProvider, ConstantWidth}
 import io.shiftleft.codepropertygraph.generated
 import io.shiftleft.codepropertygraph.generated.nodes.*
 import io.shiftleft.codepropertygraph.generated.Language.*
@@ -10,6 +11,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class StepsTest extends AnyWordSpec with Matchers {
 
   ".help step" should {
+    given AvailableWidthProvider = ConstantWidth(120)
     given DocSearchPackages = generated.Cpg.defaultDocSearchPackage
 
     "show domain overview" in {
@@ -24,7 +26,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
       val methodStepsHelpVerbose = Cpg.emptyCpg.method.helpVerbose
       methodStepsHelpVerbose should include("implemented in")
-      methodStepsHelpVerbose should include("flatgraph.traversal.NodeLanguage")
+      methodStepsHelpVerbose should include("flatgraph.traversal.NodeSteps")
     }
 
     "provide generic help" when {
