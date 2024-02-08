@@ -1,8 +1,9 @@
 package io.shiftleft.codepropertygraph.generated
 
 import java.nio.file.{Path, Paths}
-import overflowdb.traversal.help.{DocSearchPackages, TraversalHelp}
 import overflowdb.{Config, Graph}
+import overflowdb.traversal.help.{DocSearchPackages, TraversalHelp}
+import overflowdb.traversal.help.Table.AvailableWidthProvider
 import scala.jdk.javaapi.CollectionConverters.asJava
 
 object Cpg {
@@ -56,7 +57,7 @@ object Cpg {
 class Cpg(private val _graph: Graph = Cpg.emptyGraph) extends AutoCloseable {
   def graph: Graph = _graph
 
-  def help(implicit searchPackageNames: DocSearchPackages): String =
+  def help(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider): String =
     new TraversalHelp(searchPackageNames).forTraversalSources
 
   override def close(): Unit =
