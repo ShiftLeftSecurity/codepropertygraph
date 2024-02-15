@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import flatgraph.misc.Misc.toShortSafely
+import flatgraph.misc.Conversions.toShortSafely
 import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}

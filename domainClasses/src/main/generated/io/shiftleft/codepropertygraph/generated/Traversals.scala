@@ -5,7 +5,6 @@ object Lang extends ConcreteStoredConversions
 
 object Accessors {
   import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
-  import flatgraph.misc.Misc
 
   /* accessors for concrete stored nodes start */
   final class Traversal_Property_ALIAS_TYPE_FULL_NAME[
@@ -20,10 +19,10 @@ object Accessors {
     /** Traverse to nodes where the aliasTypeFullName matches the regular expression `value`
       */
     def aliasTypeFullName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         aliasTypeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.aliasTypeFullName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -33,7 +32,7 @@ object Accessors {
     /** Traverse to nodes where the aliasTypeFullName matches at least one of the regular expressions in `values`
       */
     def aliasTypeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.aliasTypeFullName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -67,10 +66,10 @@ object Accessors {
     /** Traverse to nodes where aliasTypeFullName does not match the regular expression `value`.
       */
     def aliasTypeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.aliasTypeFullName.isEmpty || node.aliasTypeFullName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.aliasTypeFullName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -80,7 +79,7 @@ object Accessors {
     /** Traverse to nodes where aliasTypeFullName does not match any of the regular expressions in `values`.
       */
     def aliasTypeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.aliasTypeFullName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -141,10 +140,10 @@ object Accessors {
     /** Traverse to nodes where the argumentName matches the regular expression `value`
       */
     def argumentName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         argumentNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.argumentName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -154,7 +153,7 @@ object Accessors {
     /** Traverse to nodes where the argumentName matches at least one of the regular expressions in `values`
       */
     def argumentName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.argumentName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -188,10 +187,10 @@ object Accessors {
     /** Traverse to nodes where argumentName does not match the regular expression `value`.
       */
     def argumentNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.argumentName.isEmpty || node.argumentName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.argumentName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -201,7 +200,7 @@ object Accessors {
     /** Traverse to nodes where argumentName does not match any of the regular expressions in `values`.
       */
     def argumentNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.argumentName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -220,17 +219,17 @@ object Accessors {
     /** Traverse to nodes where the astParentFullName matches the regular expression `value`
       */
     def astParentFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentFullName).matches }
       }
 
     /** Traverse to nodes where the astParentFullName matches at least one of the regular expressions in `values`
       */
     def astParentFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentFullName).matches } }
     }
 
@@ -257,10 +256,10 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match the regular expression `value`.
       */
     def astParentFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentFullName).matches }
       }
     }
@@ -268,7 +267,7 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match any of the regular expressions in `values`.
       */
     def astParentFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentFullName).matches }.isEmpty }
     }
 
@@ -285,17 +284,17 @@ object Accessors {
     /** Traverse to nodes where the astParentType matches the regular expression `value`
       */
     def astParentType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentType).matches }
       }
 
     /** Traverse to nodes where the astParentType matches at least one of the regular expressions in `values`
       */
     def astParentType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentType).matches } }
     }
 
@@ -322,10 +321,10 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match the regular expression `value`.
       */
     def astParentTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentType).matches }
       }
     }
@@ -333,7 +332,7 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match any of the regular expressions in `values`.
       */
     def astParentTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentType).matches }.isEmpty }
     }
 
@@ -350,17 +349,17 @@ object Accessors {
     /** Traverse to nodes where the canonicalName matches the regular expression `value`
       */
     def canonicalName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         canonicalNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.canonicalName).matches }
       }
 
     /** Traverse to nodes where the canonicalName matches at least one of the regular expressions in `values`
       */
     def canonicalName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.canonicalName).matches } }
     }
 
@@ -387,10 +386,10 @@ object Accessors {
     /** Traverse to nodes where canonicalName does not match the regular expression `value`.
       */
     def canonicalNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.canonicalName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.canonicalName).matches }
       }
     }
@@ -398,7 +397,7 @@ object Accessors {
     /** Traverse to nodes where canonicalName does not match any of the regular expressions in `values`.
       */
     def canonicalNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.canonicalName).matches }.isEmpty }
     }
 
@@ -414,17 +413,17 @@ object Accessors {
     /** Traverse to nodes where the className matches the regular expression `value`
       */
     def className(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         classNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.className).matches }
       }
 
     /** Traverse to nodes where the className matches at least one of the regular expressions in `values`
       */
     def className(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.className).matches } }
     }
 
@@ -451,10 +450,10 @@ object Accessors {
     /** Traverse to nodes where className does not match the regular expression `value`.
       */
     def classNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.className != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.className).matches }
       }
     }
@@ -462,7 +461,7 @@ object Accessors {
     /** Traverse to nodes where className does not match any of the regular expressions in `values`.
       */
     def classNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.className).matches }.isEmpty }
     }
 
@@ -479,17 +478,17 @@ object Accessors {
     /** Traverse to nodes where the classShortName matches the regular expression `value`
       */
     def classShortName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         classShortNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.classShortName).matches }
       }
 
     /** Traverse to nodes where the classShortName matches at least one of the regular expressions in `values`
       */
     def classShortName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.classShortName).matches } }
     }
 
@@ -516,10 +515,10 @@ object Accessors {
     /** Traverse to nodes where classShortName does not match the regular expression `value`.
       */
     def classShortNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.classShortName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.classShortName).matches }
       }
     }
@@ -527,7 +526,7 @@ object Accessors {
     /** Traverse to nodes where classShortName does not match any of the regular expressions in `values`.
       */
     def classShortNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.classShortName).matches }.isEmpty }
     }
 
@@ -544,10 +543,10 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches the regular expression `value`
       */
     def closureBindingId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureBindingIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -557,7 +556,7 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches at least one of the regular expressions in `values`
       */
     def closureBindingId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -591,10 +590,10 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match the regular expression `value`.
       */
     def closureBindingIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureBindingId.isEmpty || node.closureBindingId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -604,7 +603,7 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match any of the regular expressions in `values`.
       */
     def closureBindingIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -623,10 +622,10 @@ object Accessors {
     /** Traverse to nodes where the closureOriginalName matches the regular expression `value`
       */
     def closureOriginalName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureOriginalNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureOriginalName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -636,7 +635,7 @@ object Accessors {
     /** Traverse to nodes where the closureOriginalName matches at least one of the regular expressions in `values`
       */
     def closureOriginalName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureOriginalName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -670,10 +669,10 @@ object Accessors {
     /** Traverse to nodes where closureOriginalName does not match the regular expression `value`.
       */
     def closureOriginalNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureOriginalName.isEmpty || node.closureOriginalName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureOriginalName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -683,7 +682,7 @@ object Accessors {
     /** Traverse to nodes where closureOriginalName does not match any of the regular expressions in `values`.
       */
     def closureOriginalNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureOriginalName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -701,17 +700,17 @@ object Accessors {
     /** Traverse to nodes where the code matches the regular expression `value`
       */
     def code(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         codeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.code).matches }
       }
 
     /** Traverse to nodes where the code matches at least one of the regular expressions in `values`
       */
     def code(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.code).matches } }
     }
 
@@ -738,10 +737,10 @@ object Accessors {
     /** Traverse to nodes where code does not match the regular expression `value`.
       */
     def codeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.code != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.code).matches }
       }
     }
@@ -749,7 +748,7 @@ object Accessors {
     /** Traverse to nodes where code does not match any of the regular expressions in `values`.
       */
     def codeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.code).matches }.isEmpty }
     }
 
@@ -874,17 +873,17 @@ object Accessors {
     /** Traverse to nodes where the containedRef matches the regular expression `value`
       */
     def containedRef(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         containedRefExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.containedRef).matches }
       }
 
     /** Traverse to nodes where the containedRef matches at least one of the regular expressions in `values`
       */
     def containedRef(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.containedRef).matches } }
     }
 
@@ -911,10 +910,10 @@ object Accessors {
     /** Traverse to nodes where containedRef does not match the regular expression `value`.
       */
     def containedRefNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.containedRef != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.containedRef).matches }
       }
     }
@@ -922,7 +921,7 @@ object Accessors {
     /** Traverse to nodes where containedRef does not match any of the regular expressions in `values`.
       */
     def containedRefNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.containedRef).matches }.isEmpty }
     }
 
@@ -938,17 +937,17 @@ object Accessors {
     /** Traverse to nodes where the content matches the regular expression `value`
       */
     def content(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         contentExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.content).matches }
       }
 
     /** Traverse to nodes where the content matches at least one of the regular expressions in `values`
       */
     def content(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.content).matches } }
     }
 
@@ -975,10 +974,10 @@ object Accessors {
     /** Traverse to nodes where content does not match the regular expression `value`.
       */
     def contentNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.content != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.content).matches }
       }
     }
@@ -986,7 +985,7 @@ object Accessors {
     /** Traverse to nodes where content does not match any of the regular expressions in `values`.
       */
     def contentNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.content).matches }.isEmpty }
     }
 
@@ -1003,17 +1002,17 @@ object Accessors {
     /** Traverse to nodes where the controlStructureType matches the regular expression `value`
       */
     def controlStructureType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         controlStructureTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.controlStructureType).matches }
       }
 
     /** Traverse to nodes where the controlStructureType matches at least one of the regular expressions in `values`
       */
     def controlStructureType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.controlStructureType).matches } }
     }
 
@@ -1040,10 +1039,10 @@ object Accessors {
     /** Traverse to nodes where controlStructureType does not match the regular expression `value`.
       */
     def controlStructureTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.controlStructureType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.controlStructureType).matches }
       }
     }
@@ -1051,7 +1050,7 @@ object Accessors {
     /** Traverse to nodes where controlStructureType does not match any of the regular expressions in `values`.
       */
     def controlStructureTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.controlStructureType).matches }.isEmpty }
     }
 
@@ -1068,10 +1067,10 @@ object Accessors {
     /** Traverse to nodes where the dependencyGroupId matches the regular expression `value`
       */
     def dependencyGroupId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         dependencyGroupIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.dependencyGroupId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1081,7 +1080,7 @@ object Accessors {
     /** Traverse to nodes where the dependencyGroupId matches at least one of the regular expressions in `values`
       */
     def dependencyGroupId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.dependencyGroupId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1115,10 +1114,10 @@ object Accessors {
     /** Traverse to nodes where dependencyGroupId does not match the regular expression `value`.
       */
     def dependencyGroupIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.dependencyGroupId.isEmpty || node.dependencyGroupId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.dependencyGroupId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1128,7 +1127,7 @@ object Accessors {
     /** Traverse to nodes where dependencyGroupId does not match any of the regular expressions in `values`.
       */
     def dependencyGroupIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.dependencyGroupId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1147,17 +1146,17 @@ object Accessors {
     /** Traverse to nodes where the dispatchType matches the regular expression `value`
       */
     def dispatchType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         dispatchTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.dispatchType).matches }
       }
 
     /** Traverse to nodes where the dispatchType matches at least one of the regular expressions in `values`
       */
     def dispatchType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.dispatchType).matches } }
     }
 
@@ -1184,10 +1183,10 @@ object Accessors {
     /** Traverse to nodes where dispatchType does not match the regular expression `value`.
       */
     def dispatchTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.dispatchType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.dispatchType).matches }
       }
     }
@@ -1195,7 +1194,7 @@ object Accessors {
     /** Traverse to nodes where dispatchType does not match any of the regular expressions in `values`.
       */
     def dispatchTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.dispatchType).matches }.isEmpty }
     }
 
@@ -1222,17 +1221,17 @@ object Accessors {
     /** Traverse to nodes where the evaluationStrategy matches the regular expression `value`
       */
     def evaluationStrategy(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         evaluationStrategyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.evaluationStrategy).matches }
       }
 
     /** Traverse to nodes where the evaluationStrategy matches at least one of the regular expressions in `values`
       */
     def evaluationStrategy(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.evaluationStrategy).matches } }
     }
 
@@ -1259,10 +1258,10 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match the regular expression `value`.
       */
     def evaluationStrategyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.evaluationStrategy != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.evaluationStrategy).matches }
       }
     }
@@ -1270,7 +1269,7 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match any of the regular expressions in `values`.
       */
     def evaluationStrategyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.evaluationStrategy).matches }.isEmpty }
     }
 
@@ -1301,17 +1300,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -1338,10 +1337,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -1349,7 +1348,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -1365,17 +1364,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -1402,10 +1401,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -1413,7 +1412,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -1429,10 +1428,10 @@ object Accessors {
     /** Traverse to nodes where the hash matches the regular expression `value`
       */
     def hash(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         hashExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1442,7 +1441,7 @@ object Accessors {
     /** Traverse to nodes where the hash matches at least one of the regular expressions in `values`
       */
     def hash(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1476,10 +1475,10 @@ object Accessors {
     /** Traverse to nodes where hash does not match the regular expression `value`.
       */
     def hashNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.hash.isEmpty || node.hash.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1489,7 +1488,7 @@ object Accessors {
     /** Traverse to nodes where hash does not match any of the regular expressions in `values`.
       */
     def hashNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1508,10 +1507,10 @@ object Accessors {
     /** Traverse to nodes where the importedAs matches the regular expression `value`
       */
     def importedAs(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         importedAsExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.importedAs; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1521,7 +1520,7 @@ object Accessors {
     /** Traverse to nodes where the importedAs matches at least one of the regular expressions in `values`
       */
     def importedAs(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.importedAs; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1555,10 +1554,10 @@ object Accessors {
     /** Traverse to nodes where importedAs does not match the regular expression `value`.
       */
     def importedAsNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.importedAs.isEmpty || node.importedAs.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.importedAs; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1568,7 +1567,7 @@ object Accessors {
     /** Traverse to nodes where importedAs does not match any of the regular expressions in `values`.
       */
     def importedAsNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.importedAs; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1587,10 +1586,10 @@ object Accessors {
     /** Traverse to nodes where the importedEntity matches the regular expression `value`
       */
     def importedEntity(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         importedEntityExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.importedEntity; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1600,7 +1599,7 @@ object Accessors {
     /** Traverse to nodes where the importedEntity matches at least one of the regular expressions in `values`
       */
     def importedEntity(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.importedEntity; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1634,10 +1633,10 @@ object Accessors {
     /** Traverse to nodes where importedEntity does not match the regular expression `value`.
       */
     def importedEntityNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.importedEntity.isEmpty || node.importedEntity.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.importedEntity; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -1647,7 +1646,7 @@ object Accessors {
     /** Traverse to nodes where importedEntity does not match any of the regular expressions in `values`.
       */
     def importedEntityNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.importedEntity; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -1776,17 +1775,17 @@ object Accessors {
     /** Traverse to nodes where the key matches the regular expression `value`
       */
     def key(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         keyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.key).matches }
       }
 
     /** Traverse to nodes where the key matches at least one of the regular expressions in `values`
       */
     def key(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.key).matches } }
     }
 
@@ -1813,10 +1812,10 @@ object Accessors {
     /** Traverse to nodes where key does not match the regular expression `value`.
       */
     def keyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.key != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.key).matches }
       }
     }
@@ -1824,7 +1823,7 @@ object Accessors {
     /** Traverse to nodes where key does not match any of the regular expressions in `values`.
       */
     def keyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.key).matches }.isEmpty }
     }
 
@@ -1840,17 +1839,17 @@ object Accessors {
     /** Traverse to nodes where the language matches the regular expression `value`
       */
     def language(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         languageExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.language).matches }
       }
 
     /** Traverse to nodes where the language matches at least one of the regular expressions in `values`
       */
     def language(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.language).matches } }
     }
 
@@ -1877,10 +1876,10 @@ object Accessors {
     /** Traverse to nodes where language does not match the regular expression `value`.
       */
     def languageNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.language != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.language).matches }
       }
     }
@@ -1888,7 +1887,7 @@ object Accessors {
     /** Traverse to nodes where language does not match any of the regular expressions in `values`.
       */
     def languageNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.language).matches }.isEmpty }
     }
 
@@ -2013,17 +2012,17 @@ object Accessors {
     /** Traverse to nodes where the methodFullName matches the regular expression `value`
       */
     def methodFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodFullName).matches }
       }
 
     /** Traverse to nodes where the methodFullName matches at least one of the regular expressions in `values`
       */
     def methodFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodFullName).matches } }
     }
 
@@ -2050,10 +2049,10 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match the regular expression `value`.
       */
     def methodFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodFullName).matches }
       }
     }
@@ -2061,7 +2060,7 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match any of the regular expressions in `values`.
       */
     def methodFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodFullName).matches }.isEmpty }
     }
 
@@ -2078,17 +2077,17 @@ object Accessors {
     /** Traverse to nodes where the methodShortName matches the regular expression `value`
       */
     def methodShortName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodShortNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodShortName).matches }
       }
 
     /** Traverse to nodes where the methodShortName matches at least one of the regular expressions in `values`
       */
     def methodShortName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodShortName).matches } }
     }
 
@@ -2115,10 +2114,10 @@ object Accessors {
     /** Traverse to nodes where methodShortName does not match the regular expression `value`.
       */
     def methodShortNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodShortName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodShortName).matches }
       }
     }
@@ -2126,7 +2125,7 @@ object Accessors {
     /** Traverse to nodes where methodShortName does not match any of the regular expressions in `values`.
       */
     def methodShortNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodShortName).matches }.isEmpty }
     }
 
@@ -2143,17 +2142,17 @@ object Accessors {
     /** Traverse to nodes where the modifierType matches the regular expression `value`
       */
     def modifierType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         modifierTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.modifierType).matches }
       }
 
     /** Traverse to nodes where the modifierType matches at least one of the regular expressions in `values`
       */
     def modifierType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.modifierType).matches } }
     }
 
@@ -2180,10 +2179,10 @@ object Accessors {
     /** Traverse to nodes where modifierType does not match the regular expression `value`.
       */
     def modifierTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.modifierType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.modifierType).matches }
       }
     }
@@ -2191,7 +2190,7 @@ object Accessors {
     /** Traverse to nodes where modifierType does not match any of the regular expressions in `values`.
       */
     def modifierTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.modifierType).matches }.isEmpty }
     }
 
@@ -2207,17 +2206,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -2244,10 +2243,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -2255,7 +2254,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -2271,17 +2270,17 @@ object Accessors {
     /** Traverse to nodes where the nodeLabel matches the regular expression `value`
       */
     def nodeLabel(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nodeLabelExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.nodeLabel).matches }
       }
 
     /** Traverse to nodes where the nodeLabel matches at least one of the regular expressions in `values`
       */
     def nodeLabel(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.nodeLabel).matches } }
     }
 
@@ -2308,10 +2307,10 @@ object Accessors {
     /** Traverse to nodes where nodeLabel does not match the regular expression `value`.
       */
     def nodeLabelNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.nodeLabel != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.nodeLabel).matches }
       }
     }
@@ -2319,7 +2318,7 @@ object Accessors {
     /** Traverse to nodes where nodeLabel does not match any of the regular expressions in `values`.
       */
     def nodeLabelNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.nodeLabel).matches }.isEmpty }
     }
 
@@ -2492,17 +2491,17 @@ object Accessors {
     /** Traverse to nodes where the packageName matches the regular expression `value`
       */
     def packageName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         packageNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.packageName).matches }
       }
 
     /** Traverse to nodes where the packageName matches at least one of the regular expressions in `values`
       */
     def packageName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.packageName).matches } }
     }
 
@@ -2529,10 +2528,10 @@ object Accessors {
     /** Traverse to nodes where packageName does not match the regular expression `value`.
       */
     def packageNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.packageName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.packageName).matches }
       }
     }
@@ -2540,7 +2539,7 @@ object Accessors {
     /** Traverse to nodes where packageName does not match any of the regular expressions in `values`.
       */
     def packageNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.packageName).matches }.isEmpty }
     }
 
@@ -2557,17 +2556,17 @@ object Accessors {
     /** Traverse to nodes where the parserTypeName matches the regular expression `value`
       */
     def parserTypeName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         parserTypeNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.parserTypeName).matches }
       }
 
     /** Traverse to nodes where the parserTypeName matches at least one of the regular expressions in `values`
       */
     def parserTypeName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.parserTypeName).matches } }
     }
 
@@ -2594,10 +2593,10 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
       */
     def parserTypeNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.parserTypeName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.parserTypeName).matches }
       }
     }
@@ -2605,7 +2604,7 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match any of the regular expressions in `values`.
       */
     def parserTypeNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.parserTypeName).matches }.isEmpty }
     }
 
@@ -2631,17 +2630,17 @@ object Accessors {
     /** Traverse to nodes where the root matches the regular expression `value`
       */
     def root(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         rootExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.root).matches }
       }
 
     /** Traverse to nodes where the root matches at least one of the regular expressions in `values`
       */
     def root(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.root).matches } }
     }
 
@@ -2668,10 +2667,10 @@ object Accessors {
     /** Traverse to nodes where root does not match the regular expression `value`.
       */
     def rootNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.root != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.root).matches }
       }
     }
@@ -2679,7 +2678,7 @@ object Accessors {
     /** Traverse to nodes where root does not match any of the regular expressions in `values`.
       */
     def rootNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.root).matches }.isEmpty }
     }
 
@@ -2695,17 +2694,17 @@ object Accessors {
     /** Traverse to nodes where the signature matches the regular expression `value`
       */
     def signature(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         signatureExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.signature).matches }
       }
 
     /** Traverse to nodes where the signature matches at least one of the regular expressions in `values`
       */
     def signature(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.signature).matches } }
     }
 
@@ -2732,10 +2731,10 @@ object Accessors {
     /** Traverse to nodes where signature does not match the regular expression `value`.
       */
     def signatureNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.signature != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.signature).matches }
       }
     }
@@ -2743,7 +2742,7 @@ object Accessors {
     /** Traverse to nodes where signature does not match any of the regular expressions in `values`.
       */
     def signatureNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.signature).matches }.isEmpty }
     }
 
@@ -2759,17 +2758,17 @@ object Accessors {
     /** Traverse to nodes where the symbol matches the regular expression `value`
       */
     def symbol(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         symbolExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.symbol).matches }
       }
 
     /** Traverse to nodes where the symbol matches at least one of the regular expressions in `values`
       */
     def symbol(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.symbol).matches } }
     }
 
@@ -2796,10 +2795,10 @@ object Accessors {
     /** Traverse to nodes where symbol does not match the regular expression `value`.
       */
     def symbolNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.symbol != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.symbol).matches }
       }
     }
@@ -2807,7 +2806,7 @@ object Accessors {
     /** Traverse to nodes where symbol does not match any of the regular expressions in `values`.
       */
     def symbolNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.symbol).matches }.isEmpty }
     }
 
@@ -2824,17 +2823,17 @@ object Accessors {
     /** Traverse to nodes where the typeDeclFullName matches the regular expression `value`
       */
     def typeDeclFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeDeclFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeDeclFullName).matches }
       }
 
     /** Traverse to nodes where the typeDeclFullName matches at least one of the regular expressions in `values`
       */
     def typeDeclFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeDeclFullName).matches } }
     }
 
@@ -2861,10 +2860,10 @@ object Accessors {
     /** Traverse to nodes where typeDeclFullName does not match the regular expression `value`.
       */
     def typeDeclFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeDeclFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeDeclFullName).matches }
       }
     }
@@ -2872,7 +2871,7 @@ object Accessors {
     /** Traverse to nodes where typeDeclFullName does not match any of the regular expressions in `values`.
       */
     def typeDeclFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeDeclFullName).matches }.isEmpty }
     }
 
@@ -2889,17 +2888,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -2926,10 +2925,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -2937,7 +2936,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -2953,17 +2952,17 @@ object Accessors {
     /** Traverse to nodes where the value matches the regular expression `value`
       */
     def value(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         valueExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.value).matches }
       }
 
     /** Traverse to nodes where the value matches at least one of the regular expressions in `values`
       */
     def value(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.value).matches } }
     }
 
@@ -2990,10 +2989,10 @@ object Accessors {
     /** Traverse to nodes where value does not match the regular expression `value`.
       */
     def valueNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.value != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.value).matches }
       }
     }
@@ -3001,7 +3000,7 @@ object Accessors {
     /** Traverse to nodes where value does not match any of the regular expressions in `values`.
       */
     def valueNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.value).matches }.isEmpty }
     }
 
@@ -3017,17 +3016,17 @@ object Accessors {
     /** Traverse to nodes where the version matches the regular expression `value`
       */
     def version(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         versionExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.version).matches }
       }
 
     /** Traverse to nodes where the version matches at least one of the regular expressions in `values`
       */
     def version(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.version).matches } }
     }
 
@@ -3054,10 +3053,10 @@ object Accessors {
     /** Traverse to nodes where version does not match the regular expression `value`.
       */
     def versionNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.version != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.version).matches }
       }
     }
@@ -3065,7 +3064,7 @@ object Accessors {
     /** Traverse to nodes where version does not match any of the regular expressions in `values`.
       */
     def versionNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.version).matches }.isEmpty }
     }
 
@@ -3083,17 +3082,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -3120,10 +3119,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -3131,7 +3130,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -3142,17 +3141,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -3179,10 +3178,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -3190,7 +3189,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -3206,17 +3205,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -3243,10 +3242,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -3254,7 +3253,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -3276,17 +3275,17 @@ object Accessors {
     /** Traverse to nodes where the methodFullName matches the regular expression `value`
       */
     def methodFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodFullName).matches }
       }
 
     /** Traverse to nodes where the methodFullName matches at least one of the regular expressions in `values`
       */
     def methodFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodFullName).matches } }
     }
 
@@ -3313,10 +3312,10 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match the regular expression `value`.
       */
     def methodFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodFullName).matches }
       }
     }
@@ -3324,7 +3323,7 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match any of the regular expressions in `values`.
       */
     def methodFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodFullName).matches }.isEmpty }
     }
 
@@ -3335,17 +3334,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -3372,10 +3371,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -3383,7 +3382,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -3394,17 +3393,17 @@ object Accessors {
     /** Traverse to nodes where the signature matches the regular expression `value`
       */
     def signature(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         signatureExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.signature).matches }
       }
 
     /** Traverse to nodes where the signature matches at least one of the regular expressions in `values`
       */
     def signature(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.signature).matches } }
     }
 
@@ -3431,10 +3430,10 @@ object Accessors {
     /** Traverse to nodes where signature does not match the regular expression `value`.
       */
     def signatureNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.signature != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.signature).matches }
       }
     }
@@ -3442,7 +3441,7 @@ object Accessors {
     /** Traverse to nodes where signature does not match any of the regular expressions in `values`.
       */
     def signatureNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.signature).matches }.isEmpty }
     }
 
@@ -3464,17 +3463,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -3501,10 +3500,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -3512,7 +3511,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -3526,17 +3525,17 @@ object Accessors {
     /** Traverse to nodes where the dispatchType matches the regular expression `value`
       */
     def dispatchType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         dispatchTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.dispatchType).matches }
       }
 
     /** Traverse to nodes where the dispatchType matches at least one of the regular expressions in `values`
       */
     def dispatchType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.dispatchType).matches } }
     }
 
@@ -3563,10 +3562,10 @@ object Accessors {
     /** Traverse to nodes where dispatchType does not match the regular expression `value`.
       */
     def dispatchTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.dispatchType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.dispatchType).matches }
       }
     }
@@ -3574,7 +3573,7 @@ object Accessors {
     /** Traverse to nodes where dispatchType does not match any of the regular expressions in `values`.
       */
     def dispatchTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.dispatchType).matches }.isEmpty }
     }
 
@@ -3589,17 +3588,17 @@ object Accessors {
     /** Traverse to nodes where the methodFullName matches the regular expression `value`
       */
     def methodFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodFullName).matches }
       }
 
     /** Traverse to nodes where the methodFullName matches at least one of the regular expressions in `values`
       */
     def methodFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodFullName).matches } }
     }
 
@@ -3626,10 +3625,10 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match the regular expression `value`.
       */
     def methodFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodFullName).matches }
       }
     }
@@ -3637,7 +3636,7 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match any of the regular expressions in `values`.
       */
     def methodFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodFullName).matches }.isEmpty }
     }
 
@@ -3652,17 +3651,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -3689,10 +3688,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -3700,7 +3699,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -3715,10 +3714,10 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches the regular expression `value`
       */
     def closureBindingId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureBindingIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -3728,7 +3727,7 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches at least one of the regular expressions in `values`
       */
     def closureBindingId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -3762,10 +3761,10 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match the regular expression `value`.
       */
     def closureBindingIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureBindingId.isEmpty || node.closureBindingId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -3775,7 +3774,7 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match any of the regular expressions in `values`.
       */
     def closureBindingIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -3788,10 +3787,10 @@ object Accessors {
     /** Traverse to nodes where the closureOriginalName matches the regular expression `value`
       */
     def closureOriginalName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureOriginalNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureOriginalName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -3801,7 +3800,7 @@ object Accessors {
     /** Traverse to nodes where the closureOriginalName matches at least one of the regular expressions in `values`
       */
     def closureOriginalName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureOriginalName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -3835,10 +3834,10 @@ object Accessors {
     /** Traverse to nodes where closureOriginalName does not match the regular expression `value`.
       */
     def closureOriginalNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureOriginalName.isEmpty || node.closureOriginalName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureOriginalName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -3848,7 +3847,7 @@ object Accessors {
     /** Traverse to nodes where closureOriginalName does not match any of the regular expressions in `values`.
       */
     def closureOriginalNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureOriginalName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -3861,17 +3860,17 @@ object Accessors {
     /** Traverse to nodes where the evaluationStrategy matches the regular expression `value`
       */
     def evaluationStrategy(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         evaluationStrategyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.evaluationStrategy).matches }
       }
 
     /** Traverse to nodes where the evaluationStrategy matches at least one of the regular expressions in `values`
       */
     def evaluationStrategy(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.evaluationStrategy).matches } }
     }
 
@@ -3898,10 +3897,10 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match the regular expression `value`.
       */
     def evaluationStrategyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.evaluationStrategy != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.evaluationStrategy).matches }
       }
     }
@@ -3909,7 +3908,7 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match any of the regular expressions in `values`.
       */
     def evaluationStrategyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.evaluationStrategy).matches }.isEmpty }
     }
 
@@ -3923,17 +3922,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -3960,10 +3959,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -3971,7 +3970,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -3986,17 +3985,17 @@ object Accessors {
     /** Traverse to nodes where the content matches the regular expression `value`
       */
     def content(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         contentExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.content).matches }
       }
 
     /** Traverse to nodes where the content matches at least one of the regular expressions in `values`
       */
     def content(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.content).matches } }
     }
 
@@ -4023,10 +4022,10 @@ object Accessors {
     /** Traverse to nodes where content does not match the regular expression `value`.
       */
     def contentNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.content != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.content).matches }
       }
     }
@@ -4034,7 +4033,7 @@ object Accessors {
     /** Traverse to nodes where content does not match any of the regular expressions in `values`.
       */
     def contentNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.content).matches }.isEmpty }
     }
 
@@ -4045,17 +4044,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -4082,10 +4081,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -4093,7 +4092,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -4108,17 +4107,17 @@ object Accessors {
     /** Traverse to nodes where the controlStructureType matches the regular expression `value`
       */
     def controlStructureType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         controlStructureTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.controlStructureType).matches }
       }
 
     /** Traverse to nodes where the controlStructureType matches at least one of the regular expressions in `values`
       */
     def controlStructureType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.controlStructureType).matches } }
     }
 
@@ -4145,10 +4144,10 @@ object Accessors {
     /** Traverse to nodes where controlStructureType does not match the regular expression `value`.
       */
     def controlStructureTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.controlStructureType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.controlStructureType).matches }
       }
     }
@@ -4156,7 +4155,7 @@ object Accessors {
     /** Traverse to nodes where controlStructureType does not match any of the regular expressions in `values`.
       */
     def controlStructureTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.controlStructureType).matches }.isEmpty }
     }
 
@@ -4167,17 +4166,17 @@ object Accessors {
     /** Traverse to nodes where the parserTypeName matches the regular expression `value`
       */
     def parserTypeName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         parserTypeNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.parserTypeName).matches }
       }
 
     /** Traverse to nodes where the parserTypeName matches at least one of the regular expressions in `values`
       */
     def parserTypeName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.parserTypeName).matches } }
     }
 
@@ -4204,10 +4203,10 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
       */
     def parserTypeNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.parserTypeName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.parserTypeName).matches }
       }
     }
@@ -4215,7 +4214,7 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match any of the regular expressions in `values`.
       */
     def parserTypeNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.parserTypeName).matches }.isEmpty }
     }
 
@@ -4230,10 +4229,10 @@ object Accessors {
     /** Traverse to nodes where the dependencyGroupId matches the regular expression `value`
       */
     def dependencyGroupId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         dependencyGroupIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.dependencyGroupId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4243,7 +4242,7 @@ object Accessors {
     /** Traverse to nodes where the dependencyGroupId matches at least one of the regular expressions in `values`
       */
     def dependencyGroupId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.dependencyGroupId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4277,10 +4276,10 @@ object Accessors {
     /** Traverse to nodes where dependencyGroupId does not match the regular expression `value`.
       */
     def dependencyGroupIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.dependencyGroupId.isEmpty || node.dependencyGroupId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.dependencyGroupId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4290,7 +4289,7 @@ object Accessors {
     /** Traverse to nodes where dependencyGroupId does not match any of the regular expressions in `values`.
       */
     def dependencyGroupIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.dependencyGroupId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4303,17 +4302,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -4340,10 +4339,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -4351,7 +4350,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -4362,17 +4361,17 @@ object Accessors {
     /** Traverse to nodes where the version matches the regular expression `value`
       */
     def version(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         versionExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.version).matches }
       }
 
     /** Traverse to nodes where the version matches at least one of the regular expressions in `values`
       */
     def version(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.version).matches } }
     }
 
@@ -4399,10 +4398,10 @@ object Accessors {
     /** Traverse to nodes where version does not match the regular expression `value`.
       */
     def versionNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.version != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.version).matches }
       }
     }
@@ -4410,7 +4409,7 @@ object Accessors {
     /** Traverse to nodes where version does not match any of the regular expressions in `values`.
       */
     def versionNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.version).matches }.isEmpty }
     }
 
@@ -4425,17 +4424,17 @@ object Accessors {
     /** Traverse to nodes where the canonicalName matches the regular expression `value`
       */
     def canonicalName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         canonicalNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.canonicalName).matches }
       }
 
     /** Traverse to nodes where the canonicalName matches at least one of the regular expressions in `values`
       */
     def canonicalName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.canonicalName).matches } }
     }
 
@@ -4462,10 +4461,10 @@ object Accessors {
     /** Traverse to nodes where canonicalName does not match the regular expression `value`.
       */
     def canonicalNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.canonicalName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.canonicalName).matches }
       }
     }
@@ -4473,7 +4472,7 @@ object Accessors {
     /** Traverse to nodes where canonicalName does not match any of the regular expressions in `values`.
       */
     def canonicalNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.canonicalName).matches }.isEmpty }
     }
 
@@ -4487,17 +4486,17 @@ object Accessors {
     /** Traverse to nodes where the content matches the regular expression `value`
       */
     def content(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         contentExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.content).matches }
       }
 
     /** Traverse to nodes where the content matches at least one of the regular expressions in `values`
       */
     def content(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.content).matches } }
     }
 
@@ -4524,10 +4523,10 @@ object Accessors {
     /** Traverse to nodes where content does not match the regular expression `value`.
       */
     def contentNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.content != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.content).matches }
       }
     }
@@ -4535,7 +4534,7 @@ object Accessors {
     /** Traverse to nodes where content does not match any of the regular expressions in `values`.
       */
     def contentNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.content).matches }.isEmpty }
     }
 
@@ -4546,10 +4545,10 @@ object Accessors {
     /** Traverse to nodes where the hash matches the regular expression `value`
       */
     def hash(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         hashExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4559,7 +4558,7 @@ object Accessors {
     /** Traverse to nodes where the hash matches at least one of the regular expressions in `values`
       */
     def hash(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4593,10 +4592,10 @@ object Accessors {
     /** Traverse to nodes where hash does not match the regular expression `value`.
       */
     def hashNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.hash.isEmpty || node.hash.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4606,7 +4605,7 @@ object Accessors {
     /** Traverse to nodes where hash does not match any of the regular expressions in `values`.
       */
     def hashNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4619,17 +4618,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -4656,10 +4655,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -4667,7 +4666,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -4687,17 +4686,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -4724,10 +4723,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -4735,7 +4734,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -4750,17 +4749,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -4787,10 +4786,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -4798,7 +4797,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -4821,10 +4820,10 @@ object Accessors {
     /** Traverse to nodes where the importedAs matches the regular expression `value`
       */
     def importedAs(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         importedAsExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.importedAs; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4834,7 +4833,7 @@ object Accessors {
     /** Traverse to nodes where the importedAs matches at least one of the regular expressions in `values`
       */
     def importedAs(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.importedAs; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4868,10 +4867,10 @@ object Accessors {
     /** Traverse to nodes where importedAs does not match the regular expression `value`.
       */
     def importedAsNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.importedAs.isEmpty || node.importedAs.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.importedAs; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4881,7 +4880,7 @@ object Accessors {
     /** Traverse to nodes where importedAs does not match any of the regular expressions in `values`.
       */
     def importedAsNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.importedAs; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4894,10 +4893,10 @@ object Accessors {
     /** Traverse to nodes where the importedEntity matches the regular expression `value`
       */
     def importedEntity(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         importedEntityExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.importedEntity; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4907,7 +4906,7 @@ object Accessors {
     /** Traverse to nodes where the importedEntity matches at least one of the regular expressions in `values`
       */
     def importedEntity(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.importedEntity; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4941,10 +4940,10 @@ object Accessors {
     /** Traverse to nodes where importedEntity does not match the regular expression `value`.
       */
     def importedEntityNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.importedEntity.isEmpty || node.importedEntity.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.importedEntity; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -4954,7 +4953,7 @@ object Accessors {
     /** Traverse to nodes where importedEntity does not match any of the regular expressions in `values`.
       */
     def importedEntityNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.importedEntity; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -4989,17 +4988,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -5026,10 +5025,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -5037,7 +5036,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -5048,17 +5047,17 @@ object Accessors {
     /** Traverse to nodes where the parserTypeName matches the regular expression `value`
       */
     def parserTypeName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         parserTypeNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.parserTypeName).matches }
       }
 
     /** Traverse to nodes where the parserTypeName matches at least one of the regular expressions in `values`
       */
     def parserTypeName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.parserTypeName).matches } }
     }
 
@@ -5085,10 +5084,10 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
       */
     def parserTypeNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.parserTypeName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.parserTypeName).matches }
       }
     }
@@ -5096,7 +5095,7 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match any of the regular expressions in `values`.
       */
     def parserTypeNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.parserTypeName).matches }.isEmpty }
     }
 
@@ -5147,17 +5146,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -5184,10 +5183,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -5195,7 +5194,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -5206,17 +5205,17 @@ object Accessors {
     /** Traverse to nodes where the parserTypeName matches the regular expression `value`
       */
     def parserTypeName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         parserTypeNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.parserTypeName).matches }
       }
 
     /** Traverse to nodes where the parserTypeName matches at least one of the regular expressions in `values`
       */
     def parserTypeName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.parserTypeName).matches } }
     }
 
@@ -5243,10 +5242,10 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
       */
     def parserTypeNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.parserTypeName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.parserTypeName).matches }
       }
     }
@@ -5254,7 +5253,7 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match any of the regular expressions in `values`.
       */
     def parserTypeNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.parserTypeName).matches }.isEmpty }
     }
 
@@ -5269,17 +5268,17 @@ object Accessors {
     /** Traverse to nodes where the key matches the regular expression `value`
       */
     def key(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         keyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.key).matches }
       }
 
     /** Traverse to nodes where the key matches at least one of the regular expressions in `values`
       */
     def key(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.key).matches } }
     }
 
@@ -5306,10 +5305,10 @@ object Accessors {
     /** Traverse to nodes where key does not match the regular expression `value`.
       */
     def keyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.key != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.key).matches }
       }
     }
@@ -5317,7 +5316,7 @@ object Accessors {
     /** Traverse to nodes where key does not match any of the regular expressions in `values`.
       */
     def keyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.key).matches }.isEmpty }
     }
 
@@ -5328,17 +5327,17 @@ object Accessors {
     /** Traverse to nodes where the value matches the regular expression `value`
       */
     def value(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         valueExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.value).matches }
       }
 
     /** Traverse to nodes where the value matches at least one of the regular expressions in `values`
       */
     def value(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.value).matches } }
     }
 
@@ -5365,10 +5364,10 @@ object Accessors {
     /** Traverse to nodes where value does not match the regular expression `value`.
       */
     def valueNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.value != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.value).matches }
       }
     }
@@ -5376,7 +5375,7 @@ object Accessors {
     /** Traverse to nodes where value does not match any of the regular expressions in `values`.
       */
     def valueNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.value).matches }.isEmpty }
     }
 
@@ -5398,17 +5397,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -5435,10 +5434,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -5446,7 +5445,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -5460,10 +5459,10 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches the regular expression `value`
       */
     def closureBindingId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureBindingIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -5473,7 +5472,7 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches at least one of the regular expressions in `values`
       */
     def closureBindingId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -5507,10 +5506,10 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match the regular expression `value`.
       */
     def closureBindingIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureBindingId.isEmpty || node.closureBindingId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -5520,7 +5519,7 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match any of the regular expressions in `values`.
       */
     def closureBindingIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -5541,17 +5540,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -5578,10 +5577,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -5589,7 +5588,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -5603,17 +5602,17 @@ object Accessors {
     /** Traverse to nodes where the className matches the regular expression `value`
       */
     def className(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         classNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.className).matches }
       }
 
     /** Traverse to nodes where the className matches at least one of the regular expressions in `values`
       */
     def className(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.className).matches } }
     }
 
@@ -5640,10 +5639,10 @@ object Accessors {
     /** Traverse to nodes where className does not match the regular expression `value`.
       */
     def classNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.className != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.className).matches }
       }
     }
@@ -5651,7 +5650,7 @@ object Accessors {
     /** Traverse to nodes where className does not match any of the regular expressions in `values`.
       */
     def classNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.className).matches }.isEmpty }
     }
 
@@ -5662,17 +5661,17 @@ object Accessors {
     /** Traverse to nodes where the classShortName matches the regular expression `value`
       */
     def classShortName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         classShortNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.classShortName).matches }
       }
 
     /** Traverse to nodes where the classShortName matches at least one of the regular expressions in `values`
       */
     def classShortName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.classShortName).matches } }
     }
 
@@ -5699,10 +5698,10 @@ object Accessors {
     /** Traverse to nodes where classShortName does not match the regular expression `value`.
       */
     def classShortNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.classShortName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.classShortName).matches }
       }
     }
@@ -5710,7 +5709,7 @@ object Accessors {
     /** Traverse to nodes where classShortName does not match any of the regular expressions in `values`.
       */
     def classShortNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.classShortName).matches }.isEmpty }
     }
 
@@ -5721,17 +5720,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -5758,10 +5757,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -5769,7 +5768,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -5828,17 +5827,17 @@ object Accessors {
     /** Traverse to nodes where the methodFullName matches the regular expression `value`
       */
     def methodFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodFullName).matches }
       }
 
     /** Traverse to nodes where the methodFullName matches at least one of the regular expressions in `values`
       */
     def methodFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodFullName).matches } }
     }
 
@@ -5865,10 +5864,10 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match the regular expression `value`.
       */
     def methodFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodFullName).matches }
       }
     }
@@ -5876,7 +5875,7 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match any of the regular expressions in `values`.
       */
     def methodFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodFullName).matches }.isEmpty }
     }
 
@@ -5887,17 +5886,17 @@ object Accessors {
     /** Traverse to nodes where the methodShortName matches the regular expression `value`
       */
     def methodShortName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodShortNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodShortName).matches }
       }
 
     /** Traverse to nodes where the methodShortName matches at least one of the regular expressions in `values`
       */
     def methodShortName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodShortName).matches } }
     }
 
@@ -5924,10 +5923,10 @@ object Accessors {
     /** Traverse to nodes where methodShortName does not match the regular expression `value`.
       */
     def methodShortNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodShortName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodShortName).matches }
       }
     }
@@ -5935,7 +5934,7 @@ object Accessors {
     /** Traverse to nodes where methodShortName does not match any of the regular expressions in `values`.
       */
     def methodShortNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodShortName).matches }.isEmpty }
     }
 
@@ -5946,17 +5945,17 @@ object Accessors {
     /** Traverse to nodes where the nodeLabel matches the regular expression `value`
       */
     def nodeLabel(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nodeLabelExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.nodeLabel).matches }
       }
 
     /** Traverse to nodes where the nodeLabel matches at least one of the regular expressions in `values`
       */
     def nodeLabel(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.nodeLabel).matches } }
     }
 
@@ -5983,10 +5982,10 @@ object Accessors {
     /** Traverse to nodes where nodeLabel does not match the regular expression `value`.
       */
     def nodeLabelNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.nodeLabel != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.nodeLabel).matches }
       }
     }
@@ -5994,7 +5993,7 @@ object Accessors {
     /** Traverse to nodes where nodeLabel does not match any of the regular expressions in `values`.
       */
     def nodeLabelNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.nodeLabel).matches }.isEmpty }
     }
 
@@ -6005,17 +6004,17 @@ object Accessors {
     /** Traverse to nodes where the packageName matches the regular expression `value`
       */
     def packageName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         packageNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.packageName).matches }
       }
 
     /** Traverse to nodes where the packageName matches at least one of the regular expressions in `values`
       */
     def packageName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.packageName).matches } }
     }
 
@@ -6042,10 +6041,10 @@ object Accessors {
     /** Traverse to nodes where packageName does not match the regular expression `value`.
       */
     def packageNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.packageName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.packageName).matches }
       }
     }
@@ -6053,7 +6052,7 @@ object Accessors {
     /** Traverse to nodes where packageName does not match any of the regular expressions in `values`.
       */
     def packageNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.packageName).matches }.isEmpty }
     }
 
@@ -6064,17 +6063,17 @@ object Accessors {
     /** Traverse to nodes where the symbol matches the regular expression `value`
       */
     def symbol(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         symbolExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.symbol).matches }
       }
 
     /** Traverse to nodes where the symbol matches at least one of the regular expressions in `values`
       */
     def symbol(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.symbol).matches } }
     }
 
@@ -6101,10 +6100,10 @@ object Accessors {
     /** Traverse to nodes where symbol does not match the regular expression `value`.
       */
     def symbolNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.symbol != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.symbol).matches }
       }
     }
@@ -6112,7 +6111,7 @@ object Accessors {
     /** Traverse to nodes where symbol does not match any of the regular expressions in `values`.
       */
     def symbolNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.symbol).matches }.isEmpty }
     }
 
@@ -6126,17 +6125,17 @@ object Accessors {
     /** Traverse to nodes where the astParentFullName matches the regular expression `value`
       */
     def astParentFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentFullName).matches }
       }
 
     /** Traverse to nodes where the astParentFullName matches at least one of the regular expressions in `values`
       */
     def astParentFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentFullName).matches } }
     }
 
@@ -6163,10 +6162,10 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match the regular expression `value`.
       */
     def astParentFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentFullName).matches }
       }
     }
@@ -6174,7 +6173,7 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match any of the regular expressions in `values`.
       */
     def astParentFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentFullName).matches }.isEmpty }
     }
 
@@ -6185,17 +6184,17 @@ object Accessors {
     /** Traverse to nodes where the astParentType matches the regular expression `value`
       */
     def astParentType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentType).matches }
       }
 
     /** Traverse to nodes where the astParentType matches at least one of the regular expressions in `values`
       */
     def astParentType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentType).matches } }
     }
 
@@ -6222,10 +6221,10 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match the regular expression `value`.
       */
     def astParentTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentType).matches }
       }
     }
@@ -6233,7 +6232,7 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match any of the regular expressions in `values`.
       */
     def astParentTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentType).matches }.isEmpty }
     }
 
@@ -6252,17 +6251,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -6289,10 +6288,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -6300,7 +6299,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -6314,10 +6313,10 @@ object Accessors {
     /** Traverse to nodes where the hash matches the regular expression `value`
       */
     def hash(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         hashExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -6327,7 +6326,7 @@ object Accessors {
     /** Traverse to nodes where the hash matches at least one of the regular expressions in `values`
       */
     def hash(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -6361,10 +6360,10 @@ object Accessors {
     /** Traverse to nodes where hash does not match the regular expression `value`.
       */
     def hashNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.hash.isEmpty || node.hash.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -6374,7 +6373,7 @@ object Accessors {
     /** Traverse to nodes where hash does not match any of the regular expressions in `values`.
       */
     def hashNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -6387,17 +6386,17 @@ object Accessors {
     /** Traverse to nodes where the language matches the regular expression `value`
       */
     def language(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         languageExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.language).matches }
       }
 
     /** Traverse to nodes where the language matches at least one of the regular expressions in `values`
       */
     def language(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.language).matches } }
     }
 
@@ -6424,10 +6423,10 @@ object Accessors {
     /** Traverse to nodes where language does not match the regular expression `value`.
       */
     def languageNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.language != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.language).matches }
       }
     }
@@ -6435,7 +6434,7 @@ object Accessors {
     /** Traverse to nodes where language does not match any of the regular expressions in `values`.
       */
     def languageNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.language).matches }.isEmpty }
     }
 
@@ -6450,17 +6449,17 @@ object Accessors {
     /** Traverse to nodes where the root matches the regular expression `value`
       */
     def root(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         rootExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.root).matches }
       }
 
     /** Traverse to nodes where the root matches at least one of the regular expressions in `values`
       */
     def root(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.root).matches } }
     }
 
@@ -6487,10 +6486,10 @@ object Accessors {
     /** Traverse to nodes where root does not match the regular expression `value`.
       */
     def rootNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.root != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.root).matches }
       }
     }
@@ -6498,7 +6497,7 @@ object Accessors {
     /** Traverse to nodes where root does not match any of the regular expressions in `values`.
       */
     def rootNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.root).matches }.isEmpty }
     }
 
@@ -6509,17 +6508,17 @@ object Accessors {
     /** Traverse to nodes where the version matches the regular expression `value`
       */
     def version(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         versionExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.version).matches }
       }
 
     /** Traverse to nodes where the version matches at least one of the regular expressions in `values`
       */
     def version(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.version).matches } }
     }
 
@@ -6546,10 +6545,10 @@ object Accessors {
     /** Traverse to nodes where version does not match the regular expression `value`.
       */
     def versionNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.version != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.version).matches }
       }
     }
@@ -6557,7 +6556,7 @@ object Accessors {
     /** Traverse to nodes where version does not match any of the regular expressions in `values`.
       */
     def versionNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.version).matches }.isEmpty }
     }
 
@@ -6571,17 +6570,17 @@ object Accessors {
     /** Traverse to nodes where the astParentFullName matches the regular expression `value`
       */
     def astParentFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentFullName).matches }
       }
 
     /** Traverse to nodes where the astParentFullName matches at least one of the regular expressions in `values`
       */
     def astParentFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentFullName).matches } }
     }
 
@@ -6608,10 +6607,10 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match the regular expression `value`.
       */
     def astParentFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentFullName).matches }
       }
     }
@@ -6619,7 +6618,7 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match any of the regular expressions in `values`.
       */
     def astParentFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentFullName).matches }.isEmpty }
     }
 
@@ -6630,17 +6629,17 @@ object Accessors {
     /** Traverse to nodes where the astParentType matches the regular expression `value`
       */
     def astParentType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentType).matches }
       }
 
     /** Traverse to nodes where the astParentType matches at least one of the regular expressions in `values`
       */
     def astParentType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentType).matches } }
     }
 
@@ -6667,10 +6666,10 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match the regular expression `value`.
       */
     def astParentTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentType).matches }
       }
     }
@@ -6678,7 +6677,7 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match any of the regular expressions in `values`.
       */
     def astParentTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentType).matches }.isEmpty }
     }
 
@@ -6737,17 +6736,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -6774,10 +6773,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -6785,7 +6784,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -6796,17 +6795,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -6833,10 +6832,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -6844,7 +6843,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -6855,10 +6854,10 @@ object Accessors {
     /** Traverse to nodes where the hash matches the regular expression `value`
       */
     def hash(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         hashExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -6868,7 +6867,7 @@ object Accessors {
     /** Traverse to nodes where the hash matches at least one of the regular expressions in `values`
       */
     def hash(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -6902,10 +6901,10 @@ object Accessors {
     /** Traverse to nodes where hash does not match the regular expression `value`.
       */
     def hashNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.hash.isEmpty || node.hash.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.hash; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -6915,7 +6914,7 @@ object Accessors {
     /** Traverse to nodes where hash does not match any of the regular expressions in `values`.
       */
     def hashNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.hash; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -7081,17 +7080,17 @@ object Accessors {
     /** Traverse to nodes where the signature matches the regular expression `value`
       */
     def signature(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         signatureExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.signature).matches }
       }
 
     /** Traverse to nodes where the signature matches at least one of the regular expressions in `values`
       */
     def signature(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.signature).matches } }
     }
 
@@ -7118,10 +7117,10 @@ object Accessors {
     /** Traverse to nodes where signature does not match the regular expression `value`.
       */
     def signatureNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.signature != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.signature).matches }
       }
     }
@@ -7129,7 +7128,7 @@ object Accessors {
     /** Traverse to nodes where signature does not match any of the regular expressions in `values`.
       */
     def signatureNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.signature).matches }.isEmpty }
     }
 
@@ -7145,10 +7144,10 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches the regular expression `value`
       */
     def closureBindingId(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         closureBindingIdExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -7158,7 +7157,7 @@ object Accessors {
     /** Traverse to nodes where the closureBindingId matches at least one of the regular expressions in `values`
       */
     def closureBindingId(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -7192,10 +7191,10 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match the regular expression `value`.
       */
     def closureBindingIdNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.closureBindingId.isEmpty || node.closureBindingId.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.closureBindingId; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -7205,7 +7204,7 @@ object Accessors {
     /** Traverse to nodes where closureBindingId does not match any of the regular expressions in `values`.
       */
     def closureBindingIdNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.closureBindingId; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -7222,17 +7221,17 @@ object Accessors {
     /** Traverse to nodes where the evaluationStrategy matches the regular expression `value`
       */
     def evaluationStrategy(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         evaluationStrategyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.evaluationStrategy).matches }
       }
 
     /** Traverse to nodes where the evaluationStrategy matches at least one of the regular expressions in `values`
       */
     def evaluationStrategy(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.evaluationStrategy).matches } }
     }
 
@@ -7259,10 +7258,10 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match the regular expression `value`.
       */
     def evaluationStrategyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.evaluationStrategy != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.evaluationStrategy).matches }
       }
     }
@@ -7270,7 +7269,7 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match any of the regular expressions in `values`.
       */
     def evaluationStrategyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.evaluationStrategy).matches }.isEmpty }
     }
 
@@ -7330,17 +7329,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -7367,10 +7366,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -7378,7 +7377,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -7394,17 +7393,17 @@ object Accessors {
     /** Traverse to nodes where the evaluationStrategy matches the regular expression `value`
       */
     def evaluationStrategy(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         evaluationStrategyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.evaluationStrategy).matches }
       }
 
     /** Traverse to nodes where the evaluationStrategy matches at least one of the regular expressions in `values`
       */
     def evaluationStrategy(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.evaluationStrategy).matches } }
     }
 
@@ -7431,10 +7430,10 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match the regular expression `value`.
       */
     def evaluationStrategyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.evaluationStrategy != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.evaluationStrategy).matches }
       }
     }
@@ -7442,7 +7441,7 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match any of the regular expressions in `values`.
       */
     def evaluationStrategyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.evaluationStrategy).matches }.isEmpty }
     }
 
@@ -7498,17 +7497,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -7535,10 +7534,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -7546,7 +7545,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -7565,17 +7564,17 @@ object Accessors {
     /** Traverse to nodes where the methodFullName matches the regular expression `value`
       */
     def methodFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         methodFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.methodFullName).matches }
       }
 
     /** Traverse to nodes where the methodFullName matches at least one of the regular expressions in `values`
       */
     def methodFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.methodFullName).matches } }
     }
 
@@ -7602,10 +7601,10 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match the regular expression `value`.
       */
     def methodFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.methodFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.methodFullName).matches }
       }
     }
@@ -7613,7 +7612,7 @@ object Accessors {
     /** Traverse to nodes where methodFullName does not match any of the regular expressions in `values`.
       */
     def methodFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.methodFullName).matches }.isEmpty }
     }
 
@@ -7628,17 +7627,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -7665,10 +7664,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -7676,7 +7675,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -7695,17 +7694,17 @@ object Accessors {
     /** Traverse to nodes where the evaluationStrategy matches the regular expression `value`
       */
     def evaluationStrategy(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         evaluationStrategyExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.evaluationStrategy).matches }
       }
 
     /** Traverse to nodes where the evaluationStrategy matches at least one of the regular expressions in `values`
       */
     def evaluationStrategy(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.evaluationStrategy).matches } }
     }
 
@@ -7732,10 +7731,10 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match the regular expression `value`.
       */
     def evaluationStrategyNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.evaluationStrategy != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.evaluationStrategy).matches }
       }
     }
@@ -7743,7 +7742,7 @@ object Accessors {
     /** Traverse to nodes where evaluationStrategy does not match any of the regular expressions in `values`.
       */
     def evaluationStrategyNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.evaluationStrategy).matches }.isEmpty }
     }
 
@@ -7758,17 +7757,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -7795,10 +7794,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -7806,7 +7805,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -7820,17 +7819,17 @@ object Accessors {
     /** Traverse to nodes where the modifierType matches the regular expression `value`
       */
     def modifierType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         modifierTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.modifierType).matches }
       }
 
     /** Traverse to nodes where the modifierType matches at least one of the regular expressions in `values`
       */
     def modifierType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.modifierType).matches } }
     }
 
@@ -7857,10 +7856,10 @@ object Accessors {
     /** Traverse to nodes where modifierType does not match the regular expression `value`.
       */
     def modifierTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.modifierType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.modifierType).matches }
       }
     }
@@ -7868,7 +7867,7 @@ object Accessors {
     /** Traverse to nodes where modifierType does not match any of the regular expressions in `values`.
       */
     def modifierTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.modifierType).matches }.isEmpty }
     }
 
@@ -7883,17 +7882,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -7920,10 +7919,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -7931,7 +7930,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -7946,17 +7945,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -7983,10 +7982,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -7994,7 +7993,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -8005,17 +8004,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -8042,10 +8041,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -8053,7 +8052,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -8064,17 +8063,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -8101,10 +8100,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -8112,7 +8111,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -8127,17 +8126,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -8164,10 +8163,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -8175,7 +8174,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -8186,17 +8185,17 @@ object Accessors {
     /** Traverse to nodes where the value matches the regular expression `value`
       */
     def value(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         valueExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.value).matches }
       }
 
     /** Traverse to nodes where the value matches at least one of the regular expressions in `values`
       */
     def value(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.value).matches } }
     }
 
@@ -8223,10 +8222,10 @@ object Accessors {
     /** Traverse to nodes where value does not match the regular expression `value`.
       */
     def valueNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.value != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.value).matches }
       }
     }
@@ -8234,7 +8233,7 @@ object Accessors {
     /** Traverse to nodes where value does not match any of the regular expressions in `values`.
       */
     def valueNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.value).matches }.isEmpty }
     }
 
@@ -8251,17 +8250,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -8288,10 +8287,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -8299,7 +8298,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -8313,17 +8312,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -8350,10 +8349,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -8361,7 +8360,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -8372,17 +8371,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -8409,10 +8408,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -8420,7 +8419,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -8431,17 +8430,17 @@ object Accessors {
     /** Traverse to nodes where the typeDeclFullName matches the regular expression `value`
       */
     def typeDeclFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeDeclFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeDeclFullName).matches }
       }
 
     /** Traverse to nodes where the typeDeclFullName matches at least one of the regular expressions in `values`
       */
     def typeDeclFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeDeclFullName).matches } }
     }
 
@@ -8468,10 +8467,10 @@ object Accessors {
     /** Traverse to nodes where typeDeclFullName does not match the regular expression `value`.
       */
     def typeDeclFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeDeclFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeDeclFullName).matches }
       }
     }
@@ -8479,7 +8478,7 @@ object Accessors {
     /** Traverse to nodes where typeDeclFullName does not match any of the regular expressions in `values`.
       */
     def typeDeclFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeDeclFullName).matches }.isEmpty }
     }
 
@@ -8495,10 +8494,10 @@ object Accessors {
     /** Traverse to nodes where the aliasTypeFullName matches the regular expression `value`
       */
     def aliasTypeFullName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         aliasTypeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.aliasTypeFullName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -8508,7 +8507,7 @@ object Accessors {
     /** Traverse to nodes where the aliasTypeFullName matches at least one of the regular expressions in `values`
       */
     def aliasTypeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.aliasTypeFullName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -8542,10 +8541,10 @@ object Accessors {
     /** Traverse to nodes where aliasTypeFullName does not match the regular expression `value`.
       */
     def aliasTypeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.aliasTypeFullName.isEmpty || node.aliasTypeFullName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.aliasTypeFullName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -8555,7 +8554,7 @@ object Accessors {
     /** Traverse to nodes where aliasTypeFullName does not match any of the regular expressions in `values`.
       */
     def aliasTypeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.aliasTypeFullName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -8568,17 +8567,17 @@ object Accessors {
     /** Traverse to nodes where the astParentFullName matches the regular expression `value`
       */
     def astParentFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentFullName).matches }
       }
 
     /** Traverse to nodes where the astParentFullName matches at least one of the regular expressions in `values`
       */
     def astParentFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentFullName).matches } }
     }
 
@@ -8605,10 +8604,10 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match the regular expression `value`.
       */
     def astParentFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentFullName).matches }
       }
     }
@@ -8616,7 +8615,7 @@ object Accessors {
     /** Traverse to nodes where astParentFullName does not match any of the regular expressions in `values`.
       */
     def astParentFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentFullName).matches }.isEmpty }
     }
 
@@ -8627,17 +8626,17 @@ object Accessors {
     /** Traverse to nodes where the astParentType matches the regular expression `value`
       */
     def astParentType(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         astParentTypeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.astParentType).matches }
       }
 
     /** Traverse to nodes where the astParentType matches at least one of the regular expressions in `values`
       */
     def astParentType(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.astParentType).matches } }
     }
 
@@ -8664,10 +8663,10 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match the regular expression `value`.
       */
     def astParentTypeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.astParentType != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.astParentType).matches }
       }
     }
@@ -8675,7 +8674,7 @@ object Accessors {
     /** Traverse to nodes where astParentType does not match any of the regular expressions in `values`.
       */
     def astParentTypeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.astParentType).matches }.isEmpty }
     }
 
@@ -8686,17 +8685,17 @@ object Accessors {
     /** Traverse to nodes where the filename matches the regular expression `value`
       */
     def filename(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         filenameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.filename).matches }
       }
 
     /** Traverse to nodes where the filename matches at least one of the regular expressions in `values`
       */
     def filename(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.filename).matches } }
     }
 
@@ -8723,10 +8722,10 @@ object Accessors {
     /** Traverse to nodes where filename does not match the regular expression `value`.
       */
     def filenameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.filename != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.filename).matches }
       }
     }
@@ -8734,7 +8733,7 @@ object Accessors {
     /** Traverse to nodes where filename does not match any of the regular expressions in `values`.
       */
     def filenameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.filename).matches }.isEmpty }
     }
 
@@ -8745,17 +8744,17 @@ object Accessors {
     /** Traverse to nodes where the fullName matches the regular expression `value`
       */
     def fullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         fullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.fullName).matches }
       }
 
     /** Traverse to nodes where the fullName matches at least one of the regular expressions in `values`
       */
     def fullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.fullName).matches } }
     }
 
@@ -8782,10 +8781,10 @@ object Accessors {
     /** Traverse to nodes where fullName does not match the regular expression `value`.
       */
     def fullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.fullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.fullName).matches }
       }
     }
@@ -8793,7 +8792,7 @@ object Accessors {
     /** Traverse to nodes where fullName does not match any of the regular expressions in `values`.
       */
     def fullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.fullName).matches }.isEmpty }
     }
 
@@ -8817,17 +8816,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -8854,10 +8853,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -8865,7 +8864,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -8976,17 +8975,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -9013,10 +9012,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -9024,7 +9023,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -9046,17 +9045,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -9083,10 +9082,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -9094,7 +9093,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -9108,17 +9107,17 @@ object Accessors {
     /** Traverse to nodes where the containedRef matches the regular expression `value`
       */
     def containedRef(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         containedRefExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.containedRef).matches }
       }
 
     /** Traverse to nodes where the containedRef matches at least one of the regular expressions in `values`
       */
     def containedRef(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.containedRef).matches } }
     }
 
@@ -9145,10 +9144,10 @@ object Accessors {
     /** Traverse to nodes where containedRef does not match the regular expression `value`.
       */
     def containedRefNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.containedRef != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.containedRef).matches }
       }
     }
@@ -9156,7 +9155,7 @@ object Accessors {
     /** Traverse to nodes where containedRef does not match any of the regular expressions in `values`.
       */
     def containedRefNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.containedRef).matches }.isEmpty }
     }
 
@@ -9171,17 +9170,17 @@ object Accessors {
     /** Traverse to nodes where the parserTypeName matches the regular expression `value`
       */
     def parserTypeName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         parserTypeNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.parserTypeName).matches }
       }
 
     /** Traverse to nodes where the parserTypeName matches at least one of the regular expressions in `values`
       */
     def parserTypeName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.parserTypeName).matches } }
     }
 
@@ -9208,10 +9207,10 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
       */
     def parserTypeNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.parserTypeName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.parserTypeName).matches }
       }
     }
@@ -9219,7 +9218,7 @@ object Accessors {
     /** Traverse to nodes where parserTypeName does not match any of the regular expressions in `values`.
       */
     def parserTypeNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.parserTypeName).matches }.isEmpty }
     }
 
@@ -9234,17 +9233,17 @@ object Accessors {
     /** Traverse to nodes where the typeFullName matches the regular expression `value`
       */
     def typeFullName(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         typeFullNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.typeFullName).matches }
       }
 
     /** Traverse to nodes where the typeFullName matches at least one of the regular expressions in `values`
       */
     def typeFullName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.typeFullName).matches } }
     }
 
@@ -9271,10 +9270,10 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match the regular expression `value`.
       */
     def typeFullNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.typeFullName != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.typeFullName).matches }
       }
     }
@@ -9282,7 +9281,7 @@ object Accessors {
     /** Traverse to nodes where typeFullName does not match any of the regular expressions in `values`.
       */
     def typeFullNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.typeFullName).matches }.isEmpty }
     }
 
@@ -9296,17 +9295,17 @@ object Accessors {
     /** Traverse to nodes where the code matches the regular expression `value`
       */
     def code(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         codeExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.code).matches }
       }
 
     /** Traverse to nodes where the code matches at least one of the regular expressions in `values`
       */
     def code(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.code).matches } }
     }
 
@@ -9333,10 +9332,10 @@ object Accessors {
     /** Traverse to nodes where code does not match the regular expression `value`.
       */
     def codeNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.code != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.code).matches }
       }
     }
@@ -9344,7 +9343,7 @@ object Accessors {
     /** Traverse to nodes where code does not match any of the regular expressions in `values`.
       */
     def codeNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.code).matches }.isEmpty }
     }
 
@@ -9490,17 +9489,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -9527,10 +9526,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -9538,7 +9537,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
@@ -9549,17 +9548,17 @@ object Accessors {
     /** Traverse to nodes where the signature matches the regular expression `value`
       */
     def signature(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         signatureExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.signature).matches }
       }
 
     /** Traverse to nodes where the signature matches at least one of the regular expressions in `values`
       */
     def signature(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.signature).matches } }
     }
 
@@ -9586,10 +9585,10 @@ object Accessors {
     /** Traverse to nodes where signature does not match the regular expression `value`.
       */
     def signatureNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.signature != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.signature).matches }
       }
     }
@@ -9597,7 +9596,7 @@ object Accessors {
     /** Traverse to nodes where signature does not match any of the regular expressions in `values`.
       */
     def signatureNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.signature).matches }.isEmpty }
     }
 
@@ -9649,10 +9648,10 @@ object Accessors {
     /** Traverse to nodes where the argumentName matches the regular expression `value`
       */
     def argumentName(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         argumentNameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item =>
           val tmp = item.argumentName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -9662,7 +9661,7 @@ object Accessors {
     /** Traverse to nodes where the argumentName matches at least one of the regular expressions in `values`
       */
     def argumentName(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item =>
         val tmp = item.argumentName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -9696,10 +9695,10 @@ object Accessors {
     /** Traverse to nodes where argumentName does not match the regular expression `value`.
       */
     def argumentNameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.argumentName.isEmpty || node.argumentName.get != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item =>
           val tmp = item.argumentName; tmp.isDefined && matcher.reset(tmp.get).matches
         }
@@ -9709,7 +9708,7 @@ object Accessors {
     /** Traverse to nodes where argumentName does not match any of the regular expressions in `values`.
       */
     def argumentNameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filterNot { item =>
         val tmp = item.argumentName; tmp.isDefined && matchers.exists { _.reset(tmp.get).matches }
       }
@@ -9726,17 +9725,17 @@ object Accessors {
     /** Traverse to nodes where the name matches the regular expression `value`
       */
     def name(pattern: String): Iterator[NodeType] =
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         nameExact(pattern)
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filter { item => matcher.reset(item.name).matches }
       }
 
     /** Traverse to nodes where the name matches at least one of the regular expressions in `values`
       */
     def name(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.exists { _.reset(item.name).matches } }
     }
 
@@ -9763,10 +9762,10 @@ object Accessors {
     /** Traverse to nodes where name does not match the regular expression `value`.
       */
     def nameNot(pattern: String): Iterator[NodeType] = {
-      if (!Misc.isRegex(pattern)) {
+      if (!flatgraph.misc.Regex.isRegex(pattern)) {
         traversal.filter { node => node.name != pattern }
       } else {
-        val matcher = java.util.regex.Pattern.compile(pattern).matcher("")
+        val matcher = flatgraph.misc.Regex.multilineMatcher(pattern)
         traversal.filterNot { item => matcher.reset(item.name).matches }
       }
     }
@@ -9774,7 +9773,7 @@ object Accessors {
     /** Traverse to nodes where name does not match any of the regular expressions in `values`.
       */
     def nameNot(patterns: String*): Iterator[NodeType] = {
-      val matchers = patterns.map { java.util.regex.Pattern.compile(_).matcher("") }
+      val matchers = patterns.map(flatgraph.misc.Regex.multilineMatcher)
       traversal.filter { item => matchers.find { _.reset(item.name).matches }.isEmpty }
     }
 
