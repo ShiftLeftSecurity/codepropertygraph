@@ -3,6 +3,7 @@ package io.shiftleft.passes
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.utils.TimeMetric
 import org.slf4j.{Logger, LoggerFactory, MDC}
 import overflowdb.BatchedUpdate
 
@@ -66,6 +67,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
     prefix: String = ""
   ): Unit = {
     baseLogger.info(s"Start of pass: $name")
+    TimeMetric.initiateNewStage(name, "ForkJoinParallelCpgPass")
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nanosBuilt = -1L
@@ -99,6 +101,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
         baseLogger.info(
           f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
         )
+        TimeMetric.endLastStage()
       }
     }
   }
