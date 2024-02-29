@@ -24,7 +24,7 @@ object TimeMetric {
   private var recorder: Option[TimeRecorder] = None
 
   def initialize(
-    newLogger: String => Unit = msg => println(msg),
+    newLogger: String => Unit = msg => baseLogger.debug(msg),
     timeMetricRecordConfig: Option[TimeMetricRecordConfig]
   ): Unit = {
     logger = newLogger
