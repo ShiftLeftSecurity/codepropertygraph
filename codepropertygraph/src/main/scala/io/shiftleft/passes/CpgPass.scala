@@ -61,7 +61,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
     // TODO remove
     1.to(4).foreach(_ => System.gc)
     val usedMemoryBefore = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
-    println(s"XXX [$name] total heap before pass: " + (usedMemoryBefore / 1024 / 1024) + "m")
+    // println(s"XXX [$name] total heap before pass: " + (usedMemoryBefore / 1024 / 1024) + "m")
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nanosBuilt = -1L
@@ -80,11 +80,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
 
       1.to(4).foreach(_ => System.gc)
       val memoryBeforeApply = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
-      println(s"XXX [$name] heap delta for DiffGraph: " + ((memoryBeforeApply - usedMemoryBefore) / 1024 / 1024) + "m")
+      // println(s"XXX [$name] heap delta for DiffGraph: " + ((memoryBeforeApply - usedMemoryBefore) / 1024 / 1024) + "m")
       val res = flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
       val memoryAfterApply = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
-      println(s"XXX [$name] heap delta for DiffGraph.apply: " + ((memoryAfterApply - memoryBeforeApply) / 1024 / 1024) + "m")
-      println(s"XXX [$name] total heap after pass: " + (memoryAfterApply / 1024 / 1024) + "m")
+      // println(s"XXX [$name] heap delta for DiffGraph.apply: " + ((memoryAfterApply - memoryBeforeApply) / 1024 / 1024) + "m")
+      // println(s"XXX [$name] total heap after pass: " + (memoryAfterApply / 1024 / 1024) + "m")
       res
     } catch {
       case exc: Exception =>
