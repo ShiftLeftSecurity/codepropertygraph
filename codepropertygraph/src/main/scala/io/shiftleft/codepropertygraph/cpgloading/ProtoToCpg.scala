@@ -1,7 +1,9 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
+import flatgraph.{DiffGraphBuilder, GNode}
 import flatgraph.misc.Conversions.toShortSafely
 import io.shiftleft.codepropertygraph.generated.Cpg
+import io.shiftleft.codepropertygraph.generated.PropertyKeys
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
@@ -33,50 +35,51 @@ object ProtoToCpg {
 class ProtoToCpg(storagePath: Option[Path]) {
   import ProtoToCpg._
   private val nodeFilter = new NodeFilter
-  private val graphBuilder = Cpg.newDiffGraphBuilder
   private val schema = io.shiftleft.codepropertygraph.generated.GraphSchema
   // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
   implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
+  
+  // we need to run two passes of DiffGraphs: one to add the nodes, and one to add edges, set node properties etc
+  private val diffGraphForAddingNodes = Cpg.newDiffGraphBuilder
+  private val diffGraphAdditionalOps = Seq.newBuilder[DiffGraphBuilder => Any]
 
   def addNodes(nodes: JCollection[Node]): Unit =
     addNodes(nodes.asScala)
 
-  def addNodes(nodes: Iterable[Node]): Unit =
+  def addNodes(nodes: Iterable[Node]): Unit = {
     nodes
       .filter(nodeFilter.filterNode)
-      .foreach(addNodeToGraph)
+      .foreach(protoNode => addNodeToGraph(protoNode))
+  }
 
-  private def addNodeToGraph(node: Node) = {
+  private def addNodeToGraph(protoNode: Node): (Long, GNode) = {
 //    val properties = node.getPropertyList.asScala.toSeq
 //      .map(prop => (prop.getName.name, prop.getValue))
 //      .map(toProperty)
     try {
-      if (node.getKey() == -1) {
+      if (protoNode.getKey() == -1) {
         throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
       }
 
       // dummy code - TODO implement differently, using the new 'odb-convert-lib'
-      val nodeKind = schema.nodeKindByLabel(node.getType.name())
-      // val newNodeFactory = schema.getNewNodeFactory(nodeKind)
-      // val dnode = newNodeFactory.create()  // no properties
+      protoNode.getKey
+      val nodeKind = schema.nodeKindByLabel(protoNode.getType.name())
       // buffer.add(dnode) // correlation between proto.Node and dnode is the order in the iterator
-      // // ... later on, second pass
+       // ... later on, second pass
       // val propertyKind = schema.getPropertyKindByName(...)
       // graphBuilder.setNodeProperty(dnode.storedRef.get, propertyKind, value)
 
 
-
-
       // TODO store node key -> object mapping in some internal temp map for future lookup by proto key
       val dnode = flatgraph.GenericDNode(nodeKind.toShortSafely)
-      graphBuilder.addNode(dnode)
-      ???
+      diffGraphForAddingNodes.addNode(dnode)
       // TODO how do i set properties for a dnode? `graphBuilder.setNodeProperty()` is only for GNodes
       // looking at GraphTests it looks like we have to do this in two rounds, but double check with Bernhard
 //      odbGraph.+(node.getType.name, node.getKey, properties: _*)
+      ???
     } catch {
       case e: Exception =>
-        throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
+        throw new RuntimeException("Failed to insert a node. proto:\n" + protoNode, e)
     }
   }
 
@@ -86,9 +89,9 @@ class ProtoToCpg(storagePath: Option[Path]) {
     try {
       propertyMaybe match {
         case None =>
-          graphBuilder.addEdge(srcNode, dstNode, typ.name())
+          diffGraphForAddingNodes.addEdge(srcNode, dstNode, typ.name())
         case Some(property) =>
-          graphBuilder.addEdge(srcNode, dstNode, typ.name(), property.getValue)
+          diffGraphForAddingNodes.addEdge(srcNode, dstNode, typ.name(), property.getValue)
       }
     } catch {
       case e: IllegalArgumentException =>
@@ -106,7 +109,7 @@ class ProtoToCpg(storagePath: Option[Path]) {
       case None => Cpg.empty
       case Some(path) => Cpg.withStorage(path)
     }
-    flatgraph.DiffGraphApplier.applyDiff(cpg.graph, graphBuilder)
+    flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraphForAddingNodes)
     cpg
   }
 

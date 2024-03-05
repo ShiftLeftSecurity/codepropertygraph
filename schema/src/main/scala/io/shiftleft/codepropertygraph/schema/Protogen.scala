@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.schema
 import flatgraph.codegen.ProtoGen
 import flatgraph.schema.{ProtoOptions, SchemaBuilder}
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.Paths
 
 object Protogen {
   def main(args: Array[String]): Unit = {
