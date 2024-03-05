@@ -85,7 +85,6 @@ object TimeMetric {
       case Some(rec) => rec.interrupt()
       case _         =>
     }
-    println(s"${getNewTime()} ------ Some one called this last end")
   }
 
   private def initiateNewSubStage(subStageName: String, additionalMetaDataToLog: String = STAGE_NOT_SET) = {
