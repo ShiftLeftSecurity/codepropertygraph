@@ -254,7 +254,7 @@ object TimeMetric {
     stage: Option[String] = None
   ): (Double, Double, Double, Option[(Double, Double)]) = {
     stage match {
-      case Some(st) =>
+      case Some(st) if stagePerformance.contains(st) =>
         val numberProcessor     = stagePerformance(st)
         val (avgCpu, avgMemory) = numberProcessor.getAverage
         val (maxCpu, maxMemory) = numberProcessor.getMax
