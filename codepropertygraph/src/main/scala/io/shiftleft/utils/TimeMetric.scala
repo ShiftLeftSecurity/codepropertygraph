@@ -73,7 +73,7 @@ object TimeMetric {
     }
   }
 
-  def toggleSubStageLogFlag: Unit = supressSubstages = !supressSubstages
+  def setSupressSubstagesFlag(flag: Boolean): Unit = supressSubstages = flag
 
   private class TimeRecorder(timeMetricRecordConfig: TimeMetricRecordConfig) extends Thread {
 
