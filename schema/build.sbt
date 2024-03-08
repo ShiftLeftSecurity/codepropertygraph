@@ -1,6 +1,6 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.joern.flatgraph" %% "domain-classes-generator" % Versions.flatgraph
+libraryDependencies += "io.joern" %% "flatgraph-domain-classes-generator" % Versions.flatgraph
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 enablePlugins(FlatgraphCodegenSbtPlugin)
