@@ -15,16 +15,6 @@ import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try, Using}
 import scala.jdk.CollectionConverters.*
 
-// This class is used to temporarily store edges we have red from proto before we store them
-// in the CPG. As usual proto is very memory inefficiet when it comes to memory and saving a
-// few bytes adds up since we keep all graph edge in this intermediate representation before
-// we start adding the edges to the CPG.
-case class TmpEdge(dst: Long, src: Long, typ: Int, properties: List[Edge.Property]) {
-  def this(edge: Edge) = {
-    this(edge.getDst, edge.getSrc, edge.getTypeValue, List.from(edge.getPropertyList.asScala))
-  }
-}
-
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
@@ -35,13 +25,13 @@ object ProtoCpgLoader {
         val edges = ArrayDeque.empty[TmpEdge]
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
-          val cpgStruct   = getNextProtoCpgFromStream(inputStream)
-          builder.addNodes(cpgStruct.getNodeList)
-          cpgStruct.getEdgeList.asScala.foreach { edge =>
+          val protoCpg   = getNextProtoCpgFromStream(inputStream)
+          builder.addProtoCpg
+          builder.addNodes(protoCpg.getNodeList)
+          protoCpg.getEdgeList.asScala.foreach { edge =>
             edges.append(new TmpEdge(edge))
           }
         }
-        // We remove the edges while iterating so that the GC can already collect them.
         while (edges.nonEmpty) {
           val edge = edges.removeHead()
           if (edge.properties.size > 1) {
@@ -56,11 +46,11 @@ object ProtoCpgLoader {
       }
     }
 
-  def loadFromListOfProtos(cpgs: Seq[CpgStruct], storagePath: Option[Path]): Cpg = {
+  def loadFromListOfProtos(protoCpgs: Seq[CpgStruct], storagePath: Option[Path]): Cpg = {
     val builder = new ProtoToCpg(storagePath)
-    cpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
-    cpgs.foreach { cpg =>
-      cpg.getEdgeList.asScala.foreach { edge =>
+    protoCpgs.foreach(cpg => builder.addNodes(cpg.getNodeList))
+    protoCpgs.foreach { protoCpg =>
+      protoCpg.getEdgeList.asScala.foreach { edge =>
         if (edge.getPropertyCount > 1) {
           throw new IllegalArgumentException(s"flatgraph only supports zero or one edge properties, but the given edge has ${edge.getPropertyCount}; details: $edge")
         } else {

@@ -1,131 +1,86 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import flatgraph.{DiffGraphBuilder, GNode}
+import flatgraph.*
+import flatgraph.misc.ConversionException
 import flatgraph.misc.Conversions.toShortSafely
-import io.shiftleft.codepropertygraph.generated.Cpg
-import io.shiftleft.codepropertygraph.generated.PropertyKeys
+import io.shiftleft.codepropertygraph.generated.{Cpg, PropertyKeys}
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
-import io.shiftleft.proto.cpg.Cpg.PropertyValue
 import io.shiftleft.proto.cpg.Cpg.PropertyValue.ValueCase.*
+import io.shiftleft.proto.cpg.Cpg.{CpgStruct, PropertyValue}
 import io.shiftleft.utils.StringInterner
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.nio.file.Path
 import java.util.{NoSuchElementException, Collection as JCollection}
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object ProtoToCpg {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-//  def toProperty(keyValue: (String, PropertyValue))(implicit interner: StringInterner): Property[Any] =
-//    new Property(keyValue._1, toRegularType(keyValue._2))
+  def apply(protoCpg: CpgStruct, cpg: Cpg, nodeFilter: NodeFilter = new NodeFilter): Unit = {
+    // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
+    implicit val interner: StringInterner = StringInterner.makeStrongInterner()
+    
+    def nodesIter = protoCpg.getNodeList.iterator().asScala.filter(nodeFilter.filterNode)
 
-//  private def toRegularType(value: PropertyValue)(implicit interner: StringInterner): Any =
-//    value.getValueCase match {
-//      case INT_VALUE     => value.getIntValue
-//      case BOOL_VALUE    => value.getBoolValue
-//      case STRING_VALUE  => interner.intern(value.getStringValue)
-//      case STRING_LIST   => value.getStringList.getValuesList.asScala.map(interner.intern).toList
-//      case VALUE_NOT_SET => ()
-//      case _             => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
-//    }
-}
+    // we need to run two passes of DiffGraphs: one to add the nodes, and one to add edges, set node properties etc
+    val protoNodeIdToGNode = addNodesRaw(nodesIter, cpg.graph)
 
-class ProtoToCpg(storagePath: Option[Path]) {
-  import ProtoToCpg._
-  private val nodeFilter = new NodeFilter
-  private val schema = io.shiftleft.codepropertygraph.generated.GraphSchema
-  // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
-  implicit private val interner: StringInterner = StringInterner.makeStrongInterner()
-  
-  // we need to run two passes of DiffGraphs: one to add the nodes, and one to add edges, set node properties etc
-  private val diffGraphForAddingNodes = Cpg.newDiffGraphBuilder
-  private val diffGraphAdditionalOps = Seq.newBuilder[DiffGraphBuilder => Any]
-
-  def addNodes(nodes: JCollection[Node]): Unit =
-    addNodes(nodes.asScala)
-
-  def addNodes(nodes: Iterable[Node]): Unit = {
-    nodes
-      .filter(nodeFilter.filterNode)
-      .foreach(protoNode => addNodeToGraph(protoNode))
-  }
-
-  private def addNodeToGraph(protoNode: Node): (Long, GNode) = {
-//    val properties = node.getPropertyList.asScala.toSeq
-//      .map(prop => (prop.getName.name, prop.getValue))
-//      .map(toProperty)
-    try {
-      if (protoNode.getKey() == -1) {
-        throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
+    // add vertex properties
+    val diffGraph = Cpg.newDiffGraphBuilder
+    nodesIter.foreach { protoNode =>
+      val protoNodeId = protoNode.getKey
+      lazy val gNode = protoNodeIdToGNode.get(protoNodeId)
+        .getOrElse(throw new ConversionException(s"node with proto node id=$protoNodeId not found in graph"))
+      protoNode.getPropertyList.iterator().asScala.foreach { protoProperty =>
+        diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
       }
-
-      // dummy code - TODO implement differently, using the new 'odb-convert-lib'
-      protoNode.getKey
-      val nodeKind = schema.nodeKindByLabel(protoNode.getType.name())
-      // buffer.add(dnode) // correlation between proto.Node and dnode is the order in the iterator
-       // ... later on, second pass
-      // val propertyKind = schema.getPropertyKindByName(...)
-      // graphBuilder.setNodeProperty(dnode.storedRef.get, propertyKind, value)
-
-
-      // TODO store node key -> object mapping in some internal temp map for future lookup by proto key
-      val dnode = flatgraph.GenericDNode(nodeKind.toShortSafely)
-      diffGraphForAddingNodes.addNode(dnode)
-      // TODO how do i set properties for a dnode? `graphBuilder.setNodeProperty()` is only for GNodes
-      // looking at GraphTests it looks like we have to do this in two rounds, but double check with Bernhard
-//      odbGraph.+(node.getType.name, node.getKey, properties: _*)
-      ???
-    } catch {
-      case e: Exception =>
-        throw new RuntimeException("Failed to insert a node. proto:\n" + protoNode, e)
     }
-  }
 
-  def addEdge(dst: Long, src: Long, typ: EdgeType, propertyMaybe: Option[Edge.Property]): Unit = {
-    val srcNode = findNodeById(src, typ)
-    val dstNode = findNodeById(dst, typ)
-    try {
-      propertyMaybe match {
-        case None =>
-          diffGraphForAddingNodes.addEdge(srcNode, dstNode, typ.name())
-        case Some(property) =>
-          diffGraphForAddingNodes.addEdge(srcNode, dstNode, typ.name(), property.getValue)
+    protoCpg.getEdgeList.iterator().asScala.foreach { protoEdge =>
+      List(protoEdge.getSrc, protoEdge.getDst).map(protoNodeIdToGNode.get) match {
+        case List(Some(srcNode), Some(dstNode)) =>
+          diffGraph.addEdge(srcNode, dstNode, protoEdge.getType.name(), extractEdgePropertyValue(protoEdge))
+        case _ => // at least one of the nodes doesn't exist in the cpg, most likely because it was filtered out - ignore
       }
-    } catch {
-      case e: IllegalArgumentException =>
-        val context = "label=" + typ.name +
-          ", srcNodeId=" + src +
-          ", dstNodeId=" + dst +
-          ", srcNode=" + srcNode +
-          ", dstNode=" + dstNode
-        logger.warn("Failed to insert an edge. context: " + context, e)
+    }
+    DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+  }
+
+  private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph): Map[Long, GNode] = {
+    val diffGraphForRawNodes  = new DiffGraphBuilder(graph.schema)
+    val protoNodeIdToGNode = mutable.Map.empty[Long, GenericDNode]
+    protoNodes.foreach { protoNode =>
+      val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
+      diffGraphForRawNodes.addNode(newNode)
+      protoNodeIdToGNode.put(protoNode.getKey, newNode)
+    }
+    DiffGraphApplier.applyDiff(graph, diffGraphForRawNodes)
+    protoNodeIdToGNode.view.mapValues(_.storedRef.get).toMap
+  }
+
+  private def extractPropertyValue(value: PropertyValue)(implicit interner: StringInterner): Any = {
+    value.getValueCase match {
+      case INT_VALUE => value.getIntValue
+      case BOOL_VALUE => value.getBoolValue
+      case STRING_VALUE => interner.intern(value.getStringValue)
+      case STRING_LIST => value.getStringList.getValuesList.asScala.map(interner.intern).toList
+      case VALUE_NOT_SET => null
+      case _ => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
     }
   }
 
-  def build(): Cpg = {
-    val cpg = storagePath match {
-      case None => Cpg.empty
-      case Some(path) => Cpg.withStorage(path)
-    }
-    flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraphForAddingNodes)
-    cpg
-  }
-
-  private def findNodeById(nodeId: Long, typ: EdgeType): flatgraph.DNode = {
-    if (nodeId == -1) {
-      throw new IllegalArgumentException("Illegal src|dst node ID -1 on edge of type " + typ.name)
-    } else {
-//      odbGraph
-//        .nodeOption(nodeId)
-//        .getOrElse(
-//          throw new NoSuchElementException("Couldn't find src|dst node " + nodeId + " for edge of type " + typ.name)
-//        )
-      // TODO lookup in some internal map, now that ids won't be assignable on creation?
-      ???
-    }
-
+  /** flatgraph only supports 0..1 edge properties */
+  private def extractEdgePropertyValue(protoEdge: CpgStruct.Edge)(implicit interner: StringInterner): Any = {
+    val protoProperties = protoEdge.getPropertyList.asScala
+    if (protoProperties.isEmpty) 
+      null
+    else if (protoProperties.size == 1)
+      extractPropertyValue(protoProperties.head.getValue)
+    else
+      throw new IllegalArgumentException(s"flatgraph only supports zero or one edge properties, but the given edge has ${protoProperties.size} properties: $protoProperties")
   }
 
 }
