@@ -463,7 +463,7 @@ object TimeMetric {
     * @return
     *   \- Formatted double value in string.
     */
-  private def doubleFormatter(value: Double): String = s"${String.format("%.2f", value)}"
+  private def doubleFormatter(value: Double): String = s"${"%.2f".formatLocal(java.util.Locale.US, value)}"
 
   /** Get current time by initialising internal latest data time tracker.
     * @return
