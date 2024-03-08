@@ -58,7 +58,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
   ): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info(s"Start of enhancement: $name")
-    TimeMetric.initiateNewStage(getClass.getSimpleName, Some(name), "ConcurrentWriterCpgPass")
+    TimeMetric.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nDiff      = 0

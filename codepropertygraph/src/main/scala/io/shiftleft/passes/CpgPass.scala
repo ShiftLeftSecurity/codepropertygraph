@@ -67,7 +67,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
     prefix: String = ""
   ): Unit = {
     baseLogger.info(s"Start of pass: $name")
-    TimeMetric.initiateNewStage(getClass.getSimpleName, Some(name), "ForkJoinParallelCpgPass")
+    TimeMetric.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nanosBuilt = -1L
