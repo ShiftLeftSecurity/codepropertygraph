@@ -3,7 +3,7 @@ package io.shiftleft.utils
 import com.sun.management.OperatingSystemMXBean
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
 import java.lang.management.ManagementFactory
 import java.util
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -193,7 +193,9 @@ object TimeMetric {
       * then log the stats of ongoing stage.
       */
     override def run(): Unit = {
-      val writer = new PrintWriter(timeMetricRecordConfig.resultFile)
+      val file = new File(timeMetricRecordConfig.resultFile)
+      file.getParentFile.mkdirs() // Create parent directories if they don't exist
+      val writer = new PrintWriter(file)
       try {
         writer.println(s"DateTime, MainStage, SubStage, MetaData, CPU (%), Used Memory (MB), Max Heap (MB)")
         while (true) {
