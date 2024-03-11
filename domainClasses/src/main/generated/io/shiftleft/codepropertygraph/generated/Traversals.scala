@@ -107,6 +107,18 @@ object Accessors {
       traversal.filter { node => vset.contains(node.argumentIndex) }
     }
 
+    /** Traverse to nodes where the argumentIndex is not equal to the given `value`
+      */
+    def argumentIndexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.argumentIndex != value }
+
+    /** Traverse to nodes where the argumentIndex is not equal to any of the given `values`
+      */
+    def argumentIndexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.argumentIndex) }
+    }
+
     /** Traverse to nodes where the argumentIndex is greater than the given `value`
       */
     def argumentIndexGt(value: Int): Iterator[NodeType] =
@@ -778,6 +790,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the columnNumber is not equal to the given `value`
+      */
+    def columnNumberNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.columnNumber; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the columnNumber does not equal any one of the given `values`
+      */
+    def columnNumberNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.columnNumber; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the columnNumber is greater than the given `value`
       */
     def columnNumberGt(value: Int): Iterator[NodeType] =
@@ -829,6 +857,22 @@ object Accessors {
       val vset = values.toSet
       traversal.filter { node =>
         val tmp = node.columnNumberEnd; tmp.isDefined && vset.contains(tmp.get)
+      }
+    }
+
+    /** Traverse to nodes where the columnNumberEnd is not equal to the given `value`
+      */
+    def columnNumberEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.columnNumberEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the columnNumberEnd does not equal any one of the given `values`
+      */
+    def columnNumberEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.columnNumberEnd; tmp.isEmpty || !vset.contains(tmp.get)
       }
     }
 
@@ -1673,6 +1717,18 @@ object Accessors {
       traversal.filter { node => vset.contains(node.index) }
     }
 
+    /** Traverse to nodes where the index is not equal to the given `value`
+      */
+    def indexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.index != value }
+
+    /** Traverse to nodes where the index is not equal to any of the given `values`
+      */
+    def indexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.index) }
+    }
+
     /** Traverse to nodes where the index is greater than the given `value`
       */
     def indexGt(value: Int): Iterator[NodeType] =
@@ -1917,6 +1973,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the lineNumber is not equal to the given `value`
+      */
+    def lineNumberNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the lineNumber does not equal any one of the given `values`
+      */
+    def lineNumberNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the lineNumber is greater than the given `value`
       */
     def lineNumberGt(value: Int): Iterator[NodeType] =
@@ -1968,6 +2040,22 @@ object Accessors {
       val vset = values.toSet
       traversal.filter { node =>
         val tmp = node.lineNumberEnd; tmp.isDefined && vset.contains(tmp.get)
+      }
+    }
+
+    /** Traverse to nodes where the lineNumberEnd is not equal to the given `value`
+      */
+    def lineNumberEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.lineNumberEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the lineNumberEnd does not equal any one of the given `values`
+      */
+    def lineNumberEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.lineNumberEnd; tmp.isEmpty || !vset.contains(tmp.get)
       }
     }
 
@@ -2347,6 +2435,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the offset is not equal to the given `value`
+      */
+    def offsetNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offset does not equal any one of the given `values`
+      */
+    def offsetNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the offset is greater than the given `value`
       */
     def offsetGt(value: Int): Iterator[NodeType] =
@@ -2400,6 +2504,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the offsetEnd is not equal to the given `value`
+      */
+    def offsetEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offsetEnd does not equal any one of the given `values`
+      */
+    def offsetEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the offsetEnd is greater than the given `value`
       */
     def offsetEndGt(value: Int): Iterator[NodeType] =
@@ -2447,6 +2567,18 @@ object Accessors {
     def order(values: Int*): Iterator[NodeType] = {
       val vset = values.toSet
       traversal.filter { node => vset.contains(node.order) }
+    }
+
+    /** Traverse to nodes where the order is not equal to the given `value`
+      */
+    def orderNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.order != value }
+
+    /** Traverse to nodes where the order is not equal to any of the given `values`
+      */
+    def orderNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.order) }
     }
 
     /** Traverse to nodes where the order is greater than the given `value`
@@ -5119,6 +5251,18 @@ object Accessors {
       traversal.filter { node => vset.contains(node.argumentIndex) }
     }
 
+    /** Traverse to nodes where the argumentIndex is not equal to the given `value`
+      */
+    def argumentIndexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.argumentIndex != value }
+
+    /** Traverse to nodes where the argumentIndex is not equal to any of the given `values`
+      */
+    def argumentIndexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.argumentIndex) }
+    }
+
     /** Traverse to nodes where the argumentIndex is greater than the given `value`
       */
     def argumentIndexGt(value: Int): Iterator[NodeType] =
@@ -5789,6 +5933,22 @@ object Accessors {
       val vset = values.toSet
       traversal.filter { node =>
         val tmp = node.lineNumber; tmp.isDefined && vset.contains(tmp.get)
+      }
+    }
+
+    /** Traverse to nodes where the lineNumber is not equal to the given `value`
+      */
+    def lineNumberNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the lineNumber does not equal any one of the given `values`
+      */
+    def lineNumberNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || !vset.contains(tmp.get)
       }
     }
 
@@ -6701,6 +6861,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the columnNumberEnd is not equal to the given `value`
+      */
+    def columnNumberEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.columnNumberEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the columnNumberEnd does not equal any one of the given `values`
+      */
+    def columnNumberEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.columnNumberEnd; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the columnNumberEnd is greater than the given `value`
       */
     def columnNumberEndGt(value: Int): Iterator[NodeType] =
@@ -6949,6 +7125,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the lineNumberEnd is not equal to the given `value`
+      */
+    def lineNumberEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.lineNumberEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the lineNumberEnd does not equal any one of the given `values`
+      */
+    def lineNumberEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.lineNumberEnd; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the lineNumberEnd is greater than the given `value`
       */
     def lineNumberEndGt(value: Int): Iterator[NodeType] =
@@ -6997,6 +7189,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the offset is not equal to the given `value`
+      */
+    def offsetNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offset does not equal any one of the given `values`
+      */
+    def offsetNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the offset is greater than the given `value`
       */
     def offsetGt(value: Int): Iterator[NodeType] =
@@ -7042,6 +7250,22 @@ object Accessors {
       val vset = values.toSet
       traversal.filter { node =>
         val tmp = node.offsetEnd; tmp.isDefined && vset.contains(tmp.get)
+      }
+    }
+
+    /** Traverse to nodes where the offsetEnd is not equal to the given `value`
+      */
+    def offsetEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offsetEnd does not equal any one of the given `values`
+      */
+    def offsetEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || !vset.contains(tmp.get)
       }
     }
 
@@ -7289,6 +7513,18 @@ object Accessors {
       traversal.filter { node => vset.contains(node.index) }
     }
 
+    /** Traverse to nodes where the index is not equal to the given `value`
+      */
+    def indexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.index != value }
+
+    /** Traverse to nodes where the index is not equal to any of the given `values`
+      */
+    def indexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.index) }
+    }
+
     /** Traverse to nodes where the index is greater than the given `value`
       */
     def indexGt(value: Int): Iterator[NodeType] =
@@ -7459,6 +7695,18 @@ object Accessors {
     def index(values: Int*): Iterator[NodeType] = {
       val vset = values.toSet
       traversal.filter { node => vset.contains(node.index) }
+    }
+
+    /** Traverse to nodes where the index is not equal to the given `value`
+      */
+    def indexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.index != value }
+
+    /** Traverse to nodes where the index is not equal to any of the given `values`
+      */
+    def indexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.index) }
     }
 
     /** Traverse to nodes where the index is greater than the given `value`
@@ -8888,6 +9136,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the offset is not equal to the given `value`
+      */
+    def offsetNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offset does not equal any one of the given `values`
+      */
+    def offsetNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offset; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the offset is greater than the given `value`
       */
     def offsetGt(value: Int): Iterator[NodeType] =
@@ -8933,6 +9197,22 @@ object Accessors {
       val vset = values.toSet
       traversal.filter { node =>
         val tmp = node.offsetEnd; tmp.isDefined && vset.contains(tmp.get)
+      }
+    }
+
+    /** Traverse to nodes where the offsetEnd is not equal to the given `value`
+      */
+    def offsetEndNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the offsetEnd does not equal any one of the given `values`
+      */
+    def offsetEndNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.offsetEnd; tmp.isEmpty || !vset.contains(tmp.get)
       }
     }
 
@@ -9367,6 +9647,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the columnNumber is not equal to the given `value`
+      */
+    def columnNumberNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.columnNumber; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the columnNumber does not equal any one of the given `values`
+      */
+    def columnNumberNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.columnNumber; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the columnNumber is greater than the given `value`
       */
     def columnNumberGt(value: Int): Iterator[NodeType] =
@@ -9415,6 +9711,22 @@ object Accessors {
       }
     }
 
+    /** Traverse to nodes where the lineNumber is not equal to the given `value`
+      */
+    def lineNumberNot(value: Int): Iterator[NodeType] =
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || tmp.get != value
+      }
+
+    /** Traverse to nodes where the lineNumber does not equal any one of the given `values`
+      */
+    def lineNumberNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node =>
+        val tmp = node.lineNumber; tmp.isEmpty || !vset.contains(tmp.get)
+      }
+    }
+
     /** Traverse to nodes where the lineNumber is greater than the given `value`
       */
     def lineNumberGt(value: Int): Iterator[NodeType] =
@@ -9457,6 +9769,18 @@ object Accessors {
     def order(values: Int*): Iterator[NodeType] = {
       val vset = values.toSet
       traversal.filter { node => vset.contains(node.order) }
+    }
+
+    /** Traverse to nodes where the order is not equal to the given `value`
+      */
+    def orderNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.order != value }
+
+    /** Traverse to nodes where the order is not equal to any of the given `values`
+      */
+    def orderNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.order) }
     }
 
     /** Traverse to nodes where the order is greater than the given `value`
@@ -9619,6 +9943,18 @@ object Accessors {
     def argumentIndex(values: Int*): Iterator[NodeType] = {
       val vset = values.toSet
       traversal.filter { node => vset.contains(node.argumentIndex) }
+    }
+
+    /** Traverse to nodes where the argumentIndex is not equal to the given `value`
+      */
+    def argumentIndexNot(value: Int): Iterator[NodeType] =
+      traversal.filter { _.argumentIndex != value }
+
+    /** Traverse to nodes where the argumentIndex is not equal to any of the given `values`
+      */
+    def argumentIndexNot(values: Int*): Iterator[NodeType] = {
+      val vset = values.toSet
+      traversal.filter { node => !vset.contains(node.argumentIndex) }
     }
 
     /** Traverse to nodes where the argumentIndex is greater than the given `value`
