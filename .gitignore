@@ -4,6 +4,7 @@
 target/
 codepropertygraph/project/
 /codepropertygraph/src/main/resources/cpg.json
+/codepropertygraph/src/test/resources/cpg.odb.fg
 private-key.pem
 travis_wait_*
 **/*.pyc
