@@ -203,15 +203,16 @@ public static final overflowdb.PropertyKey<String> NAME = new overflowdb.Propert
 public static final overflowdb.PropertyKey<String> NODE_LABEL = new overflowdb.PropertyKey<>("NODE_LABEL");
 
 /** Start offset into the CONTENT property of the corresponding FILE node.
-The offset is measure in characters so parts of the content can easily
+The offset is such that parts of the content can easily
 be accessed via `content.substring(offset, offsetEnd)`.
+This means that the offset must be measured in utf16 encoding (i.e. neither in
+characters/codeunits nor in byte-offsets into a utf8 encoding).
 E.g. for METHOD nodes this start offset points to the start of the methods
 source code in the string holding the source code of the entire file. */
 public static final overflowdb.PropertyKey<Integer> OFFSET = new overflowdb.PropertyKey<>("OFFSET");
 
 /** End offset (exclusive) into the CONTENT property of the corresponding FILE node.
-The end offset is measure in characters so parts of the content can easily
-be accessed via `content.substring(offset, offsetEnd)`.
+See OFFSET documentation for finer details.
 E.g. for METHOD nodes this end offset points to the first code position which is
 not part of the method. */
 public static final overflowdb.PropertyKey<Integer> OFFSET_END = new overflowdb.PropertyKey<>("OFFSET_END");
