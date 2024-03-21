@@ -49,6 +49,12 @@ public static final String MATCH = "MATCH";
 /** Represents a yield expression */
 public static final String YIELD = "YIELD";
 
+/** Represents a catch clause */
+public static final String CATCH = "CATCH";
+
+/** Represents a finally clause */
+public static final String FINALLY = "FINALLY";
+
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(BREAK);
@@ -64,6 +70,8 @@ add(TRY);
 add(THROW);
 add(MATCH);
 add(YIELD);
+add(CATCH);
+add(FINALLY);
 }};
 
 }
