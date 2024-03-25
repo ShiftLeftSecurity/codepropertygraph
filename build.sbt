@@ -1,7 +1,7 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val flatgraphVersion = "0.0.18+1-4feb7831"
+val flatgraphVersion = "0.0.19+8-32c79f77"
 
 inThisBuild(
   List(
