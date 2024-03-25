@@ -152,13 +152,9 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
 
 }
 
-object CpgPassBase {
-  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPassBase])
-}
-
 trait CpgPassBase {
 
-  protected def baseLogger: Logger = CpgPassBase.baseLogger
+  protected def baseLogger: Logger = LoggerFactory.getLogger(getClass)
 
   def createAndApply(): Unit
 
