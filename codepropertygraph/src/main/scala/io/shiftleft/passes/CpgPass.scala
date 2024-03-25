@@ -49,63 +49,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends NewStyleCpgPassBase[T] {
-
-  override def createApplySerializeAndStore(
-    serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
-    prefix: String = ""
-  ): Unit = {
-    baseLogger.info(s"Start of pass: $name")
-    val nanosStart = System.nanoTime()
-    var nParts     = 0
-    var nanosBuilt = -1L
-    var nDiff      = -1
-    var nDiffT     = -1
-    try {
-      val diffGraph = Cpg.newDiffGraphBuilder
-      nParts = runWithBuilder(diffGraph)
-      nanosBuilt = System.nanoTime()
-      nDiff = diffGraph.size
-
-      // TODO how about `nDiffT` which seems to count the number of modifications..
-//      nDiffT = overflowdb.BatchedUpdate
-//        .applyDiff(cpg.graph, diffGraph, null)
-//        .transitiveModifications()
-
-      flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
-    } catch {
-      case exc: Exception =>
-        baseLogger.error(s"Pass ${name} failed", exc)
-        throw exc
-    } finally {
-      try {
-        finish()
-      } finally {
-        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
-        // in the reported timings, and we must have our final log message if finish() throws
-        val nanosStop = System.nanoTime()
-        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
-        val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
-          if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
-        } else ""
-        baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
-        )
-      }
-    }
-  }
-
-}
-
-/** NewStyleCpgPassBase is the shared base between ForkJoinParallelCpgPass and ConcurrentWriterCpgPass, containing
-  * shared boilerplate. We don't want ConcurrentWriterCpgPass as a subclass of ForkJoinParallelCpgPass because that
-  * would make it hard to whether an instance is non-racy.
-  *
-  * Please don't subclass this directly. The only reason it's not sealed is that this would mess with our file
-  * hierarchy.
-  */
-abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
+abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends CpgPassBase {
   type DiffGraphBuilder = flatgraph.DiffGraphBuilder
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[_ <: AnyRef]
@@ -160,6 +104,52 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
       finish()
     }
   }
+
+  override def createApplySerializeAndStore(
+    serializedCpg: SerializedCpg,
+    inverse: Boolean = false,
+    prefix: String = ""
+  ): Unit = {
+    baseLogger.info(s"Start of pass: $name")
+    val nanosStart = System.nanoTime()
+    var nParts     = 0
+    var nanosBuilt = -1L
+    var nDiff      = -1
+    var nDiffT     = -1
+    try {
+      val diffGraph = Cpg.newDiffGraphBuilder
+      nParts = runWithBuilder(diffGraph)
+      nanosBuilt = System.nanoTime()
+      nDiff = diffGraph.size
+
+      // TODO how about `nDiffT` which seems to count the number of modifications..
+//      nDiffT = overflowdb.BatchedUpdate
+//        .applyDiff(cpg.graph, diffGraph, null)
+//        .transitiveModifications()
+
+      flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+    } catch {
+      case exc: Exception =>
+        baseLogger.error(s"Pass ${name} failed", exc)
+        throw exc
+    } finally {
+      try {
+        finish()
+      } finally {
+        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
+        // in the reported timings, and we must have our final log message if finish() throws
+        val nanosStop = System.nanoTime()
+        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+        val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
+          if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
+        } else ""
+        baseLogger.info(
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
+        )
+      }
+    }
+  }
+
 }
 
 object CpgPassBase {
