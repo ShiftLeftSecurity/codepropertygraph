@@ -34,7 +34,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  * of parts must live on the heap at the same time; on the other hand, there are no possible issues with iterator invalidation,
  * e.g. when running over all METHOD nodes and deleting some of them.
  *
- * Instead of streaming writes as ParallelCpgPass or ConcurrentWriterCpgPass do, all `runOnPart` invocations read the initial state
+ * Instead of streaming writes as ParallelCpgPass do, all `runOnPart` invocations read the initial state
  * of the graph. Then all changes (accumulated in the DiffGraphBuilders) are merged into a single change, and applied in one go.
  *
  * In other words, the parallelism follows the fork/join parallel map-reduce (java: collect, scala: aggregate) model.
@@ -43,8 +43,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  *
  * This simplifies semantics and makes it easy to reason about possible races.
  *
- * Note that ForkJoinParallelCpgPass never writes intermediate results, so one must consider peak memory consumption when
- * porting from ParallelCpgPass. Consider ConcurrentWriterCpgPass when this is a problem.
+ * Note that ForkJoinParallelCpgPass never writes intermediate results, so one must consider peak memory consumption when porting from ParallelCpgPass. 
  *
  * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
