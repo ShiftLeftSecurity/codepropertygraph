@@ -933,7 +933,7 @@ object GraphSchema extends flatgraph.Schema {
 
   override def getPropertyKindByName(label: String): Int =
     nodePropertyByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
-  override def getNumberOfProperties: Int = 59
+  override def getNumberOfPropertyKinds: Int = 59
   override def makeNode(graph: flatgraph.Graph, nodeKind: Short, seq: Int): nodes.StoredNode =
     nodeFactories(nodeKind)(graph, seq)
   override def makeEdge(
