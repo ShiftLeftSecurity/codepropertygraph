@@ -216,6 +216,9 @@ object TimeMetric {
         case exception: Exception =>
           baseLogger.debug("Some error in Time Recorder: ", exception)
       } finally {
+        // This while loop will take care of writing all the accumulated events in the queue first.
+        while (!queue.isEmpty) writer.println(queue.poll)
+        writer.flush()
         writer.close()
       }
     }
