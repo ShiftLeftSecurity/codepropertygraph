@@ -26,7 +26,7 @@ object ProtoCpgLoader {
       Using.Manager { use =>
         use(new ZipArchive(fileName)).entries.foreach { entry =>
           val inputStream = use(Files.newInputStream(entry))
-          val protoCpg   = getNextProtoCpgFromStream(inputStream)
+          val protoCpg    = getNextProtoCpgFromStream(inputStream)
           importProtoIntoCpg(protoCpg, cpg)
         }
       }.get
@@ -40,11 +40,11 @@ object ProtoCpgLoader {
     }
     cpg
   }
-  
+
   private def openOrCreateCpg(storagePath: Option[Path]): Cpg = {
     storagePath match {
       case Some(storagePath) => Cpg.withStorage(storagePath)
-      case None => Cpg.empty
+      case None              => Cpg.empty
     }
   }
 
@@ -52,7 +52,16 @@ object ProtoCpgLoader {
     // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
     implicit val interner: StringInterner = StringInterner.makeStrongInterner()
 
-    def nodesIter = protoCpg.getNodeList.iterator().asScala.filter(nodeFilter.filterNode)
+    def nodesIter = protoCpg.getNodeList.iterator().asScala.filter(nodeFilter.filterNode).filter { protoNode =>
+      // TODO remove debug code
+      // if (protoNode.getTypeValue == 36) {
+      //   println("XX0 PACKAGE_PREFIX node")
+      // }
+      //   println("XX0 ignoring PACKAGE_PREFIX node")
+      //   false
+      // } else
+      true
+    }
 
     // we need to run two passes of DiffGraphs: one to add the nodes, and one to add edges, set node properties etc
     val protoNodeIdToGNode = addNodesRaw(nodesIter, cpg.graph)
@@ -61,10 +70,18 @@ object ProtoCpgLoader {
     val diffGraph = Cpg.newDiffGraphBuilder
     nodesIter.foreach { protoNode =>
       val protoNodeId = protoNode.getKey
-      lazy val gNode = protoNodeIdToGNode.get(protoNodeId)
+      lazy val gNode = protoNodeIdToGNode
+        .get(protoNodeId)
         .getOrElse(throw new ConversionException(s"node with proto node id=$protoNodeId not found in graph"))
       protoNode.getPropertyList.iterator().asScala.foreach { protoProperty =>
-        diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
+        try {
+          diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
+        } catch {
+          case t =>
+            t.printStackTrace()
+            println("XXX0")
+            throw t
+        }
       }
     }
 
@@ -79,8 +96,8 @@ object ProtoCpgLoader {
   }
 
   private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph): Map[Long, GNode] = {
-    val diffGraphForRawNodes  = new DiffGraphBuilder(graph.schema)
-    val protoNodeIdToGNode = mutable.Map.empty[Long, GenericDNode]
+    val diffGraphForRawNodes = new DiffGraphBuilder(graph.schema)
+    val protoNodeIdToGNode   = mutable.Map.empty[Long, GenericDNode]
     protoNodes.foreach { protoNode =>
       val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
       diffGraphForRawNodes.addNode(newNode)
@@ -92,12 +109,12 @@ object ProtoCpgLoader {
 
   private def extractPropertyValue(value: PropertyValue)(implicit interner: StringInterner): Any = {
     value.getValueCase match {
-      case INT_VALUE => value.getIntValue
-      case BOOL_VALUE => value.getBoolValue
-      case STRING_VALUE => interner.intern(value.getStringValue)
-      case STRING_LIST => value.getStringList.getValuesList.asScala.map(interner.intern).toList
+      case INT_VALUE     => value.getIntValue
+      case BOOL_VALUE    => value.getBoolValue
+      case STRING_VALUE  => interner.intern(value.getStringValue)
+      case STRING_LIST   => value.getStringList.getValuesList.asScala.map(interner.intern).toList
       case VALUE_NOT_SET => null
-      case _ => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
+      case _             => throw new RuntimeException("Error: unsupported property case: " + value.getValueCase.name)
     }
   }
 
@@ -109,14 +126,16 @@ object ProtoCpgLoader {
     else if (protoProperties.size == 1)
       extractPropertyValue(protoProperties.head.getValue)
     else
-      throw new IllegalArgumentException(s"flatgraph only supports zero or one edge properties, but the given edge has ${protoProperties.size} properties: $protoProperties")
+      throw new IllegalArgumentException(
+        s"flatgraph only supports zero or one edge properties, but the given edge has ${protoProperties.size} properties: $protoProperties"
+      )
   }
 
-   def loadFromListOfProtos(cpgs: JList[CpgStruct], storagePath: Option[Path]): Cpg =
-     loadFromListOfProtos(cpgs.asScala.toSeq, storagePath)
+  def loadFromListOfProtos(cpgs: JList[CpgStruct], storagePath: Option[Path]): Cpg =
+    loadFromListOfProtos(cpgs.asScala.toSeq, storagePath)
 
-   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
-     loadOverlays(fileName, CpgOverlay.parseFrom)
+  def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
+    loadOverlays(fileName, CpgOverlay.parseFrom)
 
   private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
     Using(new ZipArchive(fileName)) { zip =>

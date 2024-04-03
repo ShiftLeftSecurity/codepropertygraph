@@ -43,7 +43,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  *
  * This simplifies semantics and makes it easy to reason about possible races.
  *
- * Note that ForkJoinParallelCpgPass never writes intermediate results, so one must consider peak memory consumption when porting from ParallelCpgPass. 
+ * Note that ForkJoinParallelCpgPass never writes intermediate results, so one must consider peak memory consumption when porting from ParallelCpgPass.
  *
  * Initialization and cleanup of external resources or large datastructures can be done in the `init()` and `finish()`
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct

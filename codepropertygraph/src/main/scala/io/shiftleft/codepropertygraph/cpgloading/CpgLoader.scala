@@ -16,18 +16,20 @@ object CpgLoader {
     load(Paths.get(filename))
 
   /** Load a Code Property Graph from the given file - persist in given second file.
-   * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file. **/
+    * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file. *
+    */
   def load(from: String, persistTo: String): Cpg =
     load(Paths.get(from), Paths.get(persistTo))
 
   /** Load a Code Property Graph from the given file
-   *
-   * Notes:
-   * - detects the format as either flatgraph, overflowdb or proto
-   * - a flatgraph storage opened straight away
-   * - OverflowDb and proto formats are first converted to flatgraph, which is written to the `persistTo` file
-   * - OverflowDb and proto formats are first converted to flatgraph, and therefor we create a new flatgraph
-   *   storage path, which can be obtained via `cpg.graph.storagePathMaybe`*/
+    *
+    * Notes:
+    *   - detects the format as either flatgraph, overflowdb or proto
+    *   - a flatgraph storage opened straight away
+    *   - OverflowDb and proto formats are first converted to flatgraph, which is written to the `persistTo` file
+    *   - OverflowDb and proto formats are first converted to flatgraph, and therefor we create a new flatgraph storage
+    *     path, which can be obtained via `cpg.graph.storagePathMaybe`
+    */
   def load(path: Path): Cpg = {
     val absolutePath = path.toAbsolutePath
     if (!Files.exists(absolutePath)) {
@@ -43,13 +45,14 @@ object CpgLoader {
   }
 
   /** Load a Code Property Graph from the given file, but persist it in the given second file.
-   * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file.
-   *
-   * Notes:
-   * - if the given 'persistTo' file already exists, it will be overridden
-   * - detects the format as either flatgraph, overflowdb or proto
-   * - a flatgraph storage is copied to the `persistTo` file and then opened straight away
-   * - OverflowDb and proto formats are first converted to flatgraph, which is written to the `persistTo` file */
+    * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file.
+    *
+    * Notes:
+    *   - if the given 'persistTo' file already exists, it will be overridden
+    *   - detects the format as either flatgraph, overflowdb or proto
+    *   - a flatgraph storage is copied to the `persistTo` file and then opened straight away
+    *   - OverflowDb and proto formats are first converted to flatgraph, which is written to the `persistTo` file
+    */
   def load(from: Path, persistTo: Path): Cpg = {
     val absolutePath = from.toAbsolutePath
     if (persistTo != from)
