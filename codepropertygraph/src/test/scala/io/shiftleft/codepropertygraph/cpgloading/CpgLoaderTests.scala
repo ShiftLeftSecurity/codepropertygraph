@@ -35,21 +35,6 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     }
   }
   
-  "allow loading from proto.bin.zip file created by java2cpg" in {
-    val cpgPath = ProjectRoot.relativise("codepropertygraph/src/test/resources/java2cpg.bin.zip")
-    val cpg = CpgLoader.load(cpgPath)
-    // cpg.graph.nodeCount() shouldBe 209
-    cpg.graph.nodeCount() shouldBe 208 // ignoring one packagePrefix node
-    cpg.graph.nodeCount(Type.Label) shouldBe 4
-
-    import io.shiftleft.codepropertygraph.generated.Language.*
-    import io.shiftleft.codepropertygraph.generated.nodes
-//    cpg.graph.nodes("TYPE").map(_.property(Properties.FULL_NAME)).toSeq.sorted shouldBe Seq("TODO")
-    cpg.graph.nodes("TYPE").map(node => node.asInstanceOf[nodes.Type].fullName).toSeq.sorted shouldBe Seq("TODO")
-
-    ??? // TODO cleanup/remove - this test is using the internal schema...
-  }
-
   "allow loading of CPG in overflowdb format" in {
     val odbCpg = ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.odb")
     Using.resource(CpgLoader.load(odbCpg)) { cpg =>
