@@ -12,34 +12,70 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.InputStream
 import java.nio.file.{Files, Path}
-import java.util.List as JList
-import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import scala.util.{Try, Using}
 
 object ProtoCpgLoader {
   private val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def loadFromProtoZip(fileName: String, storagePath: Option[Path]): Cpg =
+  def loadFromProtoZip(fileName: String, storagePath: Option[Path]): Cpg = {
     measureAndReport {
-      val cpg = openOrCreateCpg(storagePath)
       Using.Manager { use =>
-        use(new ZipArchive(fileName)).entries.foreach { entry =>
-          val inputStream = use(Files.newInputStream(entry))
-          val protoCpg    = getNextProtoCpgFromStream(inputStream)
-          importProtoIntoCpg(protoCpg, cpg)
+        def cpgProtos: Iterator[CpgStruct] = {
+          use(new ZipArchive(fileName)).entries.iterator.map { entry =>
+            val inputStream = use(Files.newInputStream(entry))
+            CpgStruct.parseFrom(inputStream)
+          }
         }
+        loadFromListOfProtos(() => cpgProtos, storagePath)
       }.get
-      cpg
+    }
+  }
+
+
+  /**
+   * @param protoCpgs is a function because we need to run two passes due to flatgraph-specific
+   *                  implementation details: one to add the nodes, and one to add edges and set node properties
+   */
+  def loadFromListOfProtos(protoCpgs: () => Iterator[CpgStruct], storagePath: Option[Path]): Cpg = {
+    // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
+    implicit val interner: StringInterner = StringInterner.makeStrongInterner()
+    val protoToGraphNodeMappings = new ProtoToGraphNodeMappings
+    val cpg = openOrCreateCpg(storagePath)
+
+    // first pass: add the raw nodes without any properties or edges
+    protoCpgs().foreach { cpgProto =>
+      addNodesRaw(nodesIter(cpgProto), cpg.graph, protoToGraphNodeMappings)
     }
 
-  def loadFromListOfProtos(protoCpgs: Seq[CpgStruct], storagePath: Option[Path]): Cpg = {
-    val cpg = openOrCreateCpg(storagePath)
-    protoCpgs.foreach { protoCpg =>
-      importProtoIntoCpg(protoCpg, cpg)
+    // second pass: set node properties and add edges
+    val diffGraph = Cpg.newDiffGraphBuilder
+    protoCpgs().foreach { protoCpg =>
+      nodesIter(protoCpg).foreach { protoNode =>
+        val protoNodeId = protoNode.getKey
+        lazy val gNode = protoToGraphNodeMappings
+          .findGNode(protoNode)
+          .getOrElse(throw new ConversionException(s"node with proto node id=$protoNodeId not found in graph"))
+        protoNode.getPropertyList.iterator().asScala.foreach { protoProperty =>
+          diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
+        }
+      }
+
+      protoCpg.getEdgeList.iterator().asScala.foreach { protoEdge =>
+        List(protoEdge.getSrc, protoEdge.getDst).map(protoToGraphNodeMappings.findGNode) match {
+          case List(Some(srcNode), Some(dstNode)) =>
+            diffGraph.addEdge(srcNode, dstNode, protoEdge.getType.name(), extractEdgePropertyValue(protoEdge))
+          case _ => // at least one of the nodes doesn't exist in the cpg, most likely because it was filtered out - ignore
+        }
+      }
     }
+
+    DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
     cpg
   }
+
+  def loadFromListOfProtos(cpgs: java.util.List[CpgStruct], storagePath: Option[Path]): Cpg =
+    loadFromListOfProtos(() => cpgs.asScala.iterator, storagePath)
 
   private def openOrCreateCpg(storagePath: Option[Path]): Cpg = {
     storagePath match {
@@ -48,63 +84,17 @@ object ProtoCpgLoader {
     }
   }
 
-  def importProtoIntoCpg(protoCpg: CpgStruct, cpg: Cpg, nodeFilter: NodeFilter = new NodeFilter): Unit = {
-    // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
-    implicit val interner: StringInterner = StringInterner.makeStrongInterner()
+  private def nodesIter(protoCpg: CpgStruct): Iterator[CpgStruct.Node] =
+    protoCpg.getNodeList.iterator().asScala
 
-    def nodesIter = protoCpg.getNodeList.iterator().asScala.filter(nodeFilter.filterNode).filter { protoNode =>
-      // TODO remove debug code
-      // if (protoNode.getTypeValue == 36) {
-      //   println("XX0 PACKAGE_PREFIX node")
-      // }
-      //   println("XX0 ignoring PACKAGE_PREFIX node")
-      //   false
-      // } else
-      true
-    }
-
-    // we need to run two passes of DiffGraphs: one to add the nodes, and one to add edges, set node properties etc
-    val protoNodeIdToGNode = addNodesRaw(nodesIter, cpg.graph)
-
-    // add vertex properties
+  private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph, protoToGraphNodeMappings: ProtoToGraphNodeMappings): Unit = {
     val diffGraph = Cpg.newDiffGraphBuilder
-    nodesIter.foreach { protoNode =>
-      val protoNodeId = protoNode.getKey
-      lazy val gNode = protoNodeIdToGNode
-        .get(protoNodeId)
-        .getOrElse(throw new ConversionException(s"node with proto node id=$protoNodeId not found in graph"))
-      protoNode.getPropertyList.iterator().asScala.foreach { protoProperty =>
-        try {
-          diffGraph.setNodeProperty(gNode, protoProperty.getName.name(), extractPropertyValue(protoProperty.getValue()))
-        } catch {
-          case t =>
-            t.printStackTrace()
-            println("XXX0")
-            throw t
-        }
-      }
-    }
-
-    protoCpg.getEdgeList.iterator().asScala.foreach { protoEdge =>
-      List(protoEdge.getSrc, protoEdge.getDst).map(protoNodeIdToGNode.get) match {
-        case List(Some(srcNode), Some(dstNode)) =>
-          diffGraph.addEdge(srcNode, dstNode, protoEdge.getType.name(), extractEdgePropertyValue(protoEdge))
-        case _ => // at least one of the nodes doesn't exist in the cpg, most likely because it was filtered out - ignore
-      }
-    }
-    DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
-  }
-
-  private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph): Map[Long, GNode] = {
-    val diffGraphForRawNodes = new DiffGraphBuilder(graph.schema)
-    val protoNodeIdToGNode   = mutable.Map.empty[Long, GenericDNode]
-    protoNodes.foreach { protoNode =>
+    protoNodes.filterNot(protoToGraphNodeMappings.contains).foreach { protoNode =>
       val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
-      diffGraphForRawNodes.addNode(newNode)
-      protoNodeIdToGNode.put(protoNode.getKey, newNode)
+      diffGraph.addNode(newNode)
+      protoToGraphNodeMappings.add(protoNode, newNode)
     }
-    DiffGraphApplier.applyDiff(graph, diffGraphForRawNodes)
-    protoNodeIdToGNode.view.mapValues(_.storedRef.get).toMap
+    DiffGraphApplier.applyDiff(graph, diffGraph)
   }
 
   private def extractPropertyValue(value: PropertyValue)(implicit interner: StringInterner): Any = {
@@ -131,9 +121,6 @@ object ProtoCpgLoader {
       )
   }
 
-  def loadFromListOfProtos(cpgs: JList[CpgStruct], storagePath: Option[Path]): Cpg =
-    loadFromListOfProtos(cpgs.asScala.toSeq, storagePath)
-
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
     loadOverlays(fileName, CpgOverlay.parseFrom)
 
@@ -156,9 +143,6 @@ object ProtoCpgLoader {
     else
       file1Split(0).toInt < file2Split(0).toInt
   }
-
-  private def getNextProtoCpgFromStream(inputStream: InputStream) =
-    CpgStruct.parseFrom(inputStream)
 
   private def measureAndReport[A](f: => A): A = {
     val start  = System.currentTimeMillis()
