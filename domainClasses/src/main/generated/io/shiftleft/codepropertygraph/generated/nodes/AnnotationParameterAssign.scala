@@ -78,8 +78,9 @@ class AnnotationParameterAssign(graph_4762: Graph, id_4762: Long /*cf https://gi
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astOut: Iterator[StoredNode] = get().astOut
+  override def _astOut             = get()._astOut
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
@@ -98,7 +99,9 @@ class AnnotationParameterAssign(graph_4762: Graph, id_4762: Long /*cf https://gi
     */
   def _arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = get()._arrayInitializerViaAstOut
 
-  def astIn: Iterator[Annotation] = get().astIn
+  /** Actually this Iterator includes only `Annotation` nodes, but we need to stick to the inherited type from BaseNode
+    */
+  def astIn: Iterator[StoredNode] = get().astIn
   override def _astIn             = get()._astIn
 
   /** Traverse to ANNOTATION via AST IN edge.

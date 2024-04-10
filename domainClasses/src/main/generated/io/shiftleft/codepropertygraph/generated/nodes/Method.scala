@@ -174,8 +174,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case _                      => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astOut: Iterator[StoredNode] = get().astOut
+  override def _astOut             = get()._astOut
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
@@ -220,8 +221,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeParameterViaAstOut: overflowdb.traversal.Traversal[TypeParameter] = get()._typeParameterViaAstOut
 
-  def cfgOut: Iterator[AstNode] = get().cfgOut
-  override def _cfgOut          = get()._cfgOut
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def cfgOut: Iterator[StoredNode] = get().cfgOut
+  override def _cfgOut             = get()._cfgOut
 
   /** First control flow graph node Traverse to CFG_NODE via CFG OUT edge.
     */
@@ -233,8 +235,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _methodReturnViaCfgOut: Option[MethodReturn] = get()._methodReturnViaCfgOut
 
-  def containsOut: Iterator[CfgNode] = get().containsOut
-  override def _containsOut          = get()._containsOut
+  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def containsOut: Iterator[StoredNode] = get().containsOut
+  override def _containsOut             = get()._containsOut
 
   /** Traverse to BLOCK via CONTAINS OUT edge.
     */
@@ -288,8 +291,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _unknownViaContainsOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaContainsOut
 
-  def dominateOut: Iterator[CfgNode] = get().dominateOut
-  override def _dominateOut          = get()._dominateOut
+  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def dominateOut: Iterator[StoredNode] = get().dominateOut
+  override def _dominateOut             = get()._dominateOut
 
   /** Traverse to BLOCK via DOMINATE OUT edge.
     */
@@ -332,8 +336,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateOut
 
-  def reachingDefOut: Iterator[CfgNode] = get().reachingDefOut
-  override def _reachingDefOut          = get()._reachingDefOut
+  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def reachingDefOut: Iterator[StoredNode] = get().reachingDefOut
+  override def _reachingDefOut             = get()._reachingDefOut
 
   /** Traverse to CALL via REACHING_DEF OUT edge.
     */
@@ -369,22 +374,25 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
 
-  def sourceFileOut: Iterator[File] = get().sourceFileOut
-  override def _sourceFileOut       = get()._sourceFileOut
+  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
+  def sourceFileOut: Iterator[StoredNode] = get().sourceFileOut
+  override def _sourceFileOut             = get()._sourceFileOut
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
   def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
 
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
+  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
+  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
+  override def _taggedByOut             = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  def astIn: Iterator[AstNode] = get().astIn
-  override def _astIn          = get()._astIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to METHOD via AST IN edge.
     */
@@ -398,18 +406,21 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeDeclViaAstIn: Option[TypeDecl] = get()._typeDeclViaAstIn
 
-  def callIn: Iterator[Call] = get().callIn
-  override def _callIn       = get()._callIn
+  /** Actually this Iterator includes only `Call` nodes, but we need to stick to the inherited type from BaseNode */
+  def callIn: Iterator[StoredNode] = get().callIn
+  override def _callIn             = get()._callIn
 
   /** Traverse to CALL via CALL IN edge.
     */
   def _callViaCallIn: overflowdb.traversal.Traversal[Call] = get()._callViaCallIn
 
-  def cfgIn: Iterator[CfgNode] = get().cfgIn
-  override def _cfgIn          = get()._cfgIn
+  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def cfgIn: Iterator[StoredNode] = get().cfgIn
+  override def _cfgIn             = get()._cfgIn
 
-  def containsIn: Iterator[AstNode] = get().containsIn
-  override def _containsIn          = get()._containsIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def containsIn: Iterator[StoredNode] = get().containsIn
+  override def _containsIn             = get()._containsIn
 
   /** Traverse to FILE via CONTAINS IN edge.
     */
@@ -419,8 +430,9 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeDeclViaContainsIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaContainsIn
 
-  def postDominateIn: Iterator[CfgNode] = get().postDominateIn
-  override def _postDominateIn          = get()._postDominateIn
+  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def postDominateIn: Iterator[StoredNode] = get().postDominateIn
+  override def _postDominateIn             = get()._postDominateIn
 
   /** Traverse to BLOCK via POST_DOMINATE IN edge.
     */
@@ -469,6 +481,8 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateIn
 
+  /** Actually this Iterator includes only `StoredNode` nodes, but we need to stick to the inherited type from BaseNode
+    */
   def refIn: Iterator[StoredNode] = get().refIn
   override def _refIn             = get()._refIn
 

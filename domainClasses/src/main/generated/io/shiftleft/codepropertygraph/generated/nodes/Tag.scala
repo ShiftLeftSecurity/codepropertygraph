@@ -69,13 +69,16 @@ class Tag(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/iss
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
+  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
+  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
+  override def _taggedByOut             = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
+  /** Actually this Iterator includes only `StoredNode` nodes, but we need to stick to the inherited type from BaseNode
+    */
   def taggedByIn: Iterator[StoredNode] = get().taggedByIn
   override def _taggedByIn             = get()._taggedByIn
 

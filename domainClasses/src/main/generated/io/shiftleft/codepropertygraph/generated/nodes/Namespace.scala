@@ -84,8 +84,11 @@ class Namespace(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def refIn: Iterator[NamespaceBlock] = get().refIn
-  override def _refIn                 = get()._refIn
+  /** Actually this Iterator includes only `NamespaceBlock` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def refIn: Iterator[StoredNode] = get().refIn
+  override def _refIn             = get()._refIn
 
   /** Traverse to NAMESPACE_BLOCK via REF IN edge.
     */

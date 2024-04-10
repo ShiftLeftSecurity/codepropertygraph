@@ -81,22 +81,27 @@ class TypeArgument(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def bindsToOut: Iterator[TypeParameter] = get().bindsToOut
-  override def _bindsToOut                = get()._bindsToOut
+  /** Actually this Iterator includes only `TypeParameter` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def bindsToOut: Iterator[StoredNode] = get().bindsToOut
+  override def _bindsToOut             = get()._bindsToOut
 
   /** Traverse to TYPE_PARAMETER via BINDS_TO OUT edge.
     */
   def _typeParameterViaBindsToOut: overflowdb.traversal.Traversal[TypeParameter] = get()._typeParameterViaBindsToOut
 
-  def refOut: Iterator[Type] = get().refOut
-  override def _refOut       = get()._refOut
+  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
+  def refOut: Iterator[StoredNode] = get().refOut
+  override def _refOut             = get()._refOut
 
   /** Traverse to TYPE via REF OUT edge.
     */
   def _typeViaRefOut: overflowdb.traversal.Traversal[Type] = get()._typeViaRefOut
 
-  def astIn: Iterator[Type] = get().astIn
-  override def _astIn       = get()._astIn
+  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to TYPE via AST IN edge.
     */

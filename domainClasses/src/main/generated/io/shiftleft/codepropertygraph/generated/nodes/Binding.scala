@@ -75,15 +75,17 @@ class Binding(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case _                  => super.propertyDefaultValue(propertyKey)
     }
 
-  def refOut: Iterator[Method] = get().refOut
-  override def _refOut         = get()._refOut
+  /** Actually this Iterator includes only `Method` nodes, but we need to stick to the inherited type from BaseNode */
+  def refOut: Iterator[StoredNode] = get().refOut
+  override def _refOut             = get()._refOut
 
   /** Traverse to METHOD via REF OUT edge.
     */
   def boundMethod: Method = get().boundMethod
 
-  def bindsIn: Iterator[TypeDecl] = get().bindsIn
-  override def _bindsIn           = get()._bindsIn
+  /** Actually this Iterator includes only `TypeDecl` nodes, but we need to stick to the inherited type from BaseNode */
+  def bindsIn: Iterator[StoredNode] = get().bindsIn
+  override def _bindsIn             = get()._bindsIn
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */

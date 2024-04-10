@@ -4,10 +4,10 @@ import overflowdb._
 import scala.jdk.CollectionConverters._
 
 object PropertyErrorRegister {
-  private var errorMap = Set[(Class[_], String)]()
+  private var errorMap = Set[(Class[?], String)]()
   private val logger   = org.slf4j.LoggerFactory.getLogger(getClass)
 
-  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+  def logPropertyErrorIfFirst(clazz: Class[?], propertyName: String): Unit = {
     if (!errorMap.contains((clazz, propertyName))) {
       logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
       errorMap += ((clazz, propertyName))
@@ -95,7 +95,7 @@ trait StoredNode extends Node with AbstractNode with Product {
 }
 
 object Factories {
-  lazy val all: Seq[NodeFactory[_]] = Seq(
+  lazy val all: Seq[NodeFactory[?]] = Seq(
     Annotation.factory,
     AnnotationLiteral.factory,
     AnnotationParameter.factory,
@@ -141,5 +141,5 @@ object Factories {
     TypeRef.factory,
     Unknown.factory
   )
-  lazy val allAsJava: java.util.List[NodeFactory[_]] = all.asJava
+  lazy val allAsJava: java.util.List[NodeFactory[?]] = all.asJava
 }

@@ -74,8 +74,9 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case _                     => super.propertyDefaultValue(propertyKey)
     }
 
-  def refOut: Iterator[AstNode] = get().refOut
-  override def _refOut          = get()._refOut
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def refOut: Iterator[StoredNode] = get().refOut
+  override def _refOut             = get()._refOut
 
   /** Traverse to LOCAL via REF OUT edge.
     */
@@ -85,7 +86,9 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _methodParameterInViaRefOut: Option[MethodParameterIn] = get()._methodParameterInViaRefOut
 
-  def captureIn: Iterator[Expression] = get().captureIn
+  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
+    */
+  def captureIn: Iterator[StoredNode] = get().captureIn
   override def _captureIn             = get()._captureIn
 
   /** Traverse to METHOD_REF via CAPTURE IN edge.
@@ -96,8 +99,9 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
 
-  def capturedByIn: Iterator[AstNode] = get().capturedByIn
-  override def _capturedByIn          = get()._capturedByIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def capturedByIn: Iterator[StoredNode] = get().capturedByIn
+  override def _capturedByIn             = get()._capturedByIn
 
   /** Traverse to LOCAL via CAPTURED_BY IN edge.
     */

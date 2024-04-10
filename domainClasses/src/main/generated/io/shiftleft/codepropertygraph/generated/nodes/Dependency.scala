@@ -73,8 +73,9 @@ class Dependency(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
       case _         => super.propertyDefaultValue(propertyKey)
     }
 
-  def importsIn: Iterator[Import] = get().importsIn
-  override def _importsIn         = get()._importsIn
+  /** Actually this Iterator includes only `Import` nodes, but we need to stick to the inherited type from BaseNode */
+  def importsIn: Iterator[StoredNode] = get().importsIn
+  override def _importsIn             = get()._importsIn
 
   /** Traverse to IMPORT via IMPORTS IN edge.
     */

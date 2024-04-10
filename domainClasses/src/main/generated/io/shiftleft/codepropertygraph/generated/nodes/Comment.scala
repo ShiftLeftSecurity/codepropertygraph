@@ -87,22 +87,25 @@ class Comment(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case _          => super.propertyDefaultValue(propertyKey)
     }
 
-  def sourceFileOut: Iterator[Comment] = get().sourceFileOut
-  override def _sourceFileOut          = get()._sourceFileOut
+  /** Actually this Iterator includes only `Comment` nodes, but we need to stick to the inherited type from BaseNode */
+  def sourceFileOut: Iterator[StoredNode] = get().sourceFileOut
+  override def _sourceFileOut             = get()._sourceFileOut
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
   def file: overflowdb.traversal.Traversal[Comment] = get().file
 
-  def astIn: Iterator[File] = get().astIn
-  override def _astIn       = get()._astIn
+  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to FILE via AST IN edge.
     */
   def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
 
-  def sourceFileIn: Iterator[Comment] = get().sourceFileIn
-  override def _sourceFileIn          = get()._sourceFileIn
+  /** Actually this Iterator includes only `Comment` nodes, but we need to stick to the inherited type from BaseNode */
+  def sourceFileIn: Iterator[StoredNode] = get().sourceFileIn
+  override def _sourceFileIn             = get()._sourceFileIn
 
   /** Traverse to COMMENT via SOURCE_FILE IN edge.
     */

@@ -120,16 +120,20 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
       case _                => super.propertyDefaultValue(propertyKey)
     }
 
-  def capturedByOut: Iterator[ClosureBinding] = get().capturedByOut
-  override def _capturedByOut                 = get()._capturedByOut
+  /** Actually this Iterator includes only `ClosureBinding` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def capturedByOut: Iterator[StoredNode] = get().capturedByOut
+  override def _capturedByOut             = get()._capturedByOut
 
   /** Traverse to CLOSURE_BINDING via CAPTURED_BY OUT edge.
     */
   def _closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
     get()._closureBindingViaCapturedByOut
 
-  def evalTypeOut: Iterator[Type] = get().evalTypeOut
-  override def _evalTypeOut       = get()._evalTypeOut
+  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
+  def evalTypeOut: Iterator[StoredNode] = get().evalTypeOut
+  override def _evalTypeOut             = get()._evalTypeOut
 
   /** The type of the local. Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -137,14 +141,17 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
   @overflowdb.traversal.help.Doc(info = """The type of the local.""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
+  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
+  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
+  override def _taggedByOut             = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  def astIn: Iterator[Expression] = get().astIn
+  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
+    */
+  def astIn: Iterator[StoredNode] = get().astIn
   override def _astIn             = get()._astIn
 
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
@@ -161,6 +168,8 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
     */
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
 
+  /** Actually this Iterator includes only `StoredNode` nodes, but we need to stick to the inherited type from BaseNode
+    */
   def refIn: Iterator[StoredNode] = get().refIn
   override def _refIn             = get()._refIn
 

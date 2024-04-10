@@ -83,15 +83,19 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case _                     => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[TypeArgument] = get().astOut
-  override def _astOut               = get()._astOut
+  /** Actually this Iterator includes only `TypeArgument` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def astOut: Iterator[StoredNode] = get().astOut
+  override def _astOut             = get()._astOut
 
   /** Traverse to TYPE_ARGUMENT via AST OUT edge.
     */
   def _typeArgumentViaAstOut: overflowdb.traversal.Traversal[TypeArgument] = get()._typeArgumentViaAstOut
 
-  def refOut: Iterator[TypeDecl] = get().refOut
-  override def _refOut           = get()._refOut
+  /** Actually this Iterator includes only `TypeDecl` nodes, but we need to stick to the inherited type from BaseNode */
+  def refOut: Iterator[StoredNode] = get().refOut
+  override def _refOut             = get()._refOut
 
   /** Type declaration which is referenced by this type. Traverse to TYPE_DECL via REF OUT edge.
     */
@@ -99,8 +103,9 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   @overflowdb.traversal.help.Doc(info = """Type declaration which is referenced by this type.""")
   def referencedTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().referencedTypeDecl
 
-  def aliasOfIn: Iterator[TypeDecl] = get().aliasOfIn
-  override def _aliasOfIn           = get()._aliasOfIn
+  /** Actually this Iterator includes only `TypeDecl` nodes, but we need to stick to the inherited type from BaseNode */
+  def aliasOfIn: Iterator[StoredNode] = get().aliasOfIn
+  override def _aliasOfIn             = get()._aliasOfIn
 
   /** Direct alias type declarations. Traverse to TYPE_DECL via ALIAS_OF IN edge.
     */
@@ -108,8 +113,9 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   @overflowdb.traversal.help.Doc(info = """Direct alias type declarations.""")
   def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().aliasTypeDecl
 
-  def evalTypeIn: Iterator[AstNode] = get().evalTypeIn
-  override def _evalTypeIn          = get()._evalTypeIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def evalTypeIn: Iterator[StoredNode] = get().evalTypeIn
+  override def _evalTypeIn             = get()._evalTypeIn
 
   /** Traverse to ARRAY_INITIALIZER via EVAL_TYPE IN edge.
     */
@@ -171,15 +177,19 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaEvalTypeIn
 
-  def inheritsFromIn: Iterator[TypeDecl] = get().inheritsFromIn
-  override def _inheritsFromIn           = get()._inheritsFromIn
+  /** Actually this Iterator includes only `TypeDecl` nodes, but we need to stick to the inherited type from BaseNode */
+  def inheritsFromIn: Iterator[StoredNode] = get().inheritsFromIn
+  override def _inheritsFromIn             = get()._inheritsFromIn
 
   /** Traverse to TYPE_DECL via INHERITS_FROM IN edge.
     */
   def _typeDeclViaInheritsFromIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaInheritsFromIn
 
-  def refIn: Iterator[TypeArgument] = get().refIn
-  override def _refIn               = get()._refIn
+  /** Actually this Iterator includes only `TypeArgument` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def refIn: Iterator[StoredNode] = get().refIn
+  override def _refIn             = get()._refIn
 
   /** Traverse to TYPE_ARGUMENT via REF IN edge.
     */

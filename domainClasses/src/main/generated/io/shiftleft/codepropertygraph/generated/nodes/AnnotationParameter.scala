@@ -78,8 +78,11 @@ class AnnotationParameter(graph_4762: Graph, id_4762: Long /*cf https://github.c
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def astIn: Iterator[AnnotationParameterAssign] = get().astIn
-  override def _astIn                            = get()._astIn
+  /** Actually this Iterator includes only `AnnotationParameterAssign` nodes, but we need to stick to the inherited type
+    * from BaseNode
+    */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */

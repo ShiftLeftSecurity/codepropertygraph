@@ -129,8 +129,9 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case _                      => super.propertyDefaultValue(propertyKey)
     }
 
-  def astOut: Iterator[AstNode] = get().astOut
-  override def _astOut          = get()._astOut
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astOut: Iterator[StoredNode] = get().astOut
+  override def _astOut             = get()._astOut
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
@@ -140,8 +141,9 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
 
-  def evalTypeOut: Iterator[Type] = get().evalTypeOut
-  override def _evalTypeOut       = get()._evalTypeOut
+  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
+  def evalTypeOut: Iterator[StoredNode] = get().evalTypeOut
+  override def _evalTypeOut             = get()._evalTypeOut
 
   /** Traverse to member type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -149,15 +151,17 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   @overflowdb.traversal.help.Doc(info = """Traverse to member type""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
+  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
+  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
+  override def _taggedByOut             = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  def astIn: Iterator[AstNode] = get().astIn
-  override def _astIn          = get()._astIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */
@@ -169,8 +173,9 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
 
-  def refIn: Iterator[Call] = get().refIn
-  override def _refIn       = get()._refIn
+  /** Actually this Iterator includes only `Call` nodes, but we need to stick to the inherited type from BaseNode */
+  def refIn: Iterator[StoredNode] = get().refIn
+  override def _refIn             = get()._refIn
 
   /** Traverse to CALL via REF IN edge.
     */

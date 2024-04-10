@@ -4,10 +4,10 @@ import overflowdb._
 import scala.jdk.CollectionConverters._
 
 object PropertyErrorRegister {
-  private var errorMap = Set[(Class[_], String)]()
+  private var errorMap = Set[(Class[?], String)]()
   private val logger   = org.slf4j.LoggerFactory.getLogger(getClass)
 
-  def logPropertyErrorIfFirst(clazz: Class[_], propertyName: String): Unit = {
+  def logPropertyErrorIfFirst(clazz: Class[?], propertyName: String): Unit = {
     if (!errorMap.contains((clazz, propertyName))) {
       logger.warn("Property " + propertyName + " is deprecated for " + clazz.getName + ".")
       errorMap += ((clazz, propertyName))
@@ -16,7 +16,7 @@ object PropertyErrorRegister {
 }
 
 object Factories {
-  lazy val all: Seq[EdgeFactory[_]] = Seq(
+  lazy val all: Seq[EdgeFactory[?]] = Seq(
     AliasOf.factory,
     Argument.factory,
     Ast.factory,
@@ -42,5 +42,5 @@ object Factories {
     SourceFile.factory,
     TaggedBy.factory
   )
-  lazy val allAsJava: java.util.List[EdgeFactory[_]] = all.asJava
+  lazy val allAsJava: java.util.List[EdgeFactory[?]] = all.asJava
 }

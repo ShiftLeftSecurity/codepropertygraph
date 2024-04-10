@@ -105,22 +105,26 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case _       => super.propertyDefaultValue(propertyKey)
     }
 
-  def importsOut: Iterator[Dependency] = get().importsOut
+  /** Actually this Iterator includes only `Dependency` nodes, but we need to stick to the inherited type from BaseNode
+    */
+  def importsOut: Iterator[StoredNode] = get().importsOut
   override def _importsOut             = get()._importsOut
 
   /** Traverse to DEPENDENCY via IMPORTS OUT edge.
     */
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = get()._dependencyViaImportsOut
 
-  def taggedByOut: Iterator[Tag] = get().taggedByOut
-  override def _taggedByOut      = get()._taggedByOut
+  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
+  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
+  override def _taggedByOut             = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  def astIn: Iterator[AstNode] = get().astIn
-  override def _astIn          = get()._astIn
+  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to BLOCK via AST IN edge.
     */
@@ -134,8 +138,9 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
-  def isCallForImportIn: Iterator[Call] = get().isCallForImportIn
-  override def _isCallForImportIn       = get()._isCallForImportIn
+  /** Actually this Iterator includes only `Call` nodes, but we need to stick to the inherited type from BaseNode */
+  def isCallForImportIn: Iterator[StoredNode] = get().isCallForImportIn
+  override def _isCallForImportIn             = get()._isCallForImportIn
 
   /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
     */

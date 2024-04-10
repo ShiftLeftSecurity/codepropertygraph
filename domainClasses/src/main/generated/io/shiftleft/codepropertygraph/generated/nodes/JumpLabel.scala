@@ -90,8 +90,11 @@ class JumpLabel(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
       case _                  => super.propertyDefaultValue(propertyKey)
     }
 
-  def astIn: Iterator[ControlStructure] = get().astIn
-  override def _astIn                   = get()._astIn
+  /** Actually this Iterator includes only `ControlStructure` nodes, but we need to stick to the inherited type from
+    * BaseNode
+    */
+  def astIn: Iterator[StoredNode] = get().astIn
+  override def _astIn             = get()._astIn
 
   /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
