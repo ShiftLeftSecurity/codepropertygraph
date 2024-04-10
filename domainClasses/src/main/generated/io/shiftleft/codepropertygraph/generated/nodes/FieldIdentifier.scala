@@ -102,7 +102,7 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
   override def columnNumber: Option[Integer] = get().columnNumber
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => FieldIdentifier.PropertyDefaults.ArgumentIndex
       case "CANONICAL_NAME" => FieldIdentifier.PropertyDefaults.CanonicalName
@@ -110,15 +110,13 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
       case "ORDER"          => FieldIdentifier.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def argumentOut: Iterator[StoredNode] = get().argumentOut
-  override def _argumentOut             = get()._argumentOut
+  def argumentOut: Iterator[TemplateDom] = get().argumentOut
+  override def _argumentOut              = get()._argumentOut
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cdgOut: Iterator[StoredNode] = get().cdgOut
-  override def _cdgOut             = get()._cdgOut
+  def cdgOut: Iterator[CfgNode] = get().cdgOut
+  override def _cdgOut          = get()._cdgOut
 
   /** Traverse to BLOCK via CDG OUT edge.
     */
@@ -168,9 +166,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaCdgOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgOut
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cfgOut: Iterator[StoredNode] = get().cfgOut
-  override def _cfgOut             = get()._cfgOut
+  def cfgOut: Iterator[AstNode] = get().cfgOut
+  override def _cfgOut          = get()._cfgOut
 
   /** Traverse to CALL via CFG OUT edge.
     */
@@ -180,9 +177,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _cfgNodeViaCfgOut: overflowdb.traversal.Traversal[CfgNode] = get()._cfgNodeViaCfgOut
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def dominateOut: Iterator[StoredNode] = get().dominateOut
-  override def _dominateOut             = get()._dominateOut
+  def dominateOut: Iterator[CfgNode] = get().dominateOut
+  override def _dominateOut          = get()._dominateOut
 
   /** Traverse to BLOCK via DOMINATE OUT edge.
     */
@@ -234,9 +230,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateOut
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def postDominateOut: Iterator[StoredNode] = get().postDominateOut
-  override def _postDominateOut             = get()._postDominateOut
+  def postDominateOut: Iterator[CfgNode] = get().postDominateOut
+  override def _postDominateOut          = get()._postDominateOut
 
   /** Traverse to BLOCK via POST_DOMINATE OUT edge.
     */
@@ -288,25 +283,21 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaPostDominateOut: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateOut
 
-  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
-  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
-  override def _taggedByOut             = get()._taggedByOut
+  def taggedByOut: Iterator[Tag] = get().taggedByOut
+  override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  /** Actually this Iterator includes only `Call` nodes, but we need to stick to the inherited type from BaseNode */
-  def argumentIn: Iterator[StoredNode] = get().argumentIn
-  override def _argumentIn             = get()._argumentIn
+  def argumentIn: Iterator[Call] = get().argumentIn
+  override def _argumentIn       = get()._argumentIn
 
   /** Traverse to CALL via ARGUMENT IN edge.
     */
   def _callViaArgumentIn: Call = get()._callViaArgumentIn
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def astIn: Iterator[StoredNode] = get().astIn
+  def astIn: Iterator[Expression] = get().astIn
   override def _astIn             = get()._astIn
 
   /** Traverse to CALL via AST IN edge.
@@ -317,9 +308,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cdgIn: Iterator[StoredNode] = get().cdgIn
-  override def _cdgIn             = get()._cdgIn
+  def cdgIn: Iterator[CfgNode] = get().cdgIn
+  override def _cdgIn          = get()._cdgIn
 
   /** Traverse to BLOCK via CDG IN edge.
     */
@@ -361,21 +351,18 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaCdgIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaCdgIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cfgIn: Iterator[StoredNode] = get().cfgIn
-  override def _cfgIn             = get()._cfgIn
+  def cfgIn: Iterator[CfgNode] = get().cfgIn
+  override def _cfgIn          = get()._cfgIn
 
-  /** Actually this Iterator includes only `Method` nodes, but we need to stick to the inherited type from BaseNode */
-  def containsIn: Iterator[StoredNode] = get().containsIn
-  override def _containsIn             = get()._containsIn
+  def containsIn: Iterator[Method] = get().containsIn
+  override def _containsIn         = get()._containsIn
 
   /** Traverse to METHOD via CONTAINS IN edge.
     */
   def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def dominateIn: Iterator[StoredNode] = get().dominateIn
-  override def _dominateIn             = get()._dominateIn
+  def dominateIn: Iterator[CfgNode] = get().dominateIn
+  override def _dominateIn          = get()._dominateIn
 
   /** Traverse to BLOCK via DOMINATE IN edge.
     */
@@ -427,9 +414,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaDominateIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def postDominateIn: Iterator[StoredNode] = get().postDominateIn
-  override def _postDominateIn             = get()._postDominateIn
+  def postDominateIn: Iterator[CfgNode] = get().postDominateIn
+  override def _postDominateIn          = get()._postDominateIn
 
   /** Traverse to BLOCK via POST_DOMINATE IN edge.
     */
@@ -482,10 +468,8 @@ class FieldIdentifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/s
     */
   def _unknownViaPostDominateIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaPostDominateIn
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def reachingDefIn: Iterator[StoredNode] = get().reachingDefIn
-  override def _reachingDefIn             = get()._reachingDefIn
+  def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
+  override def _reachingDefIn              = get()._reachingDefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.

@@ -68,15 +68,15 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   override def closureBindingId: Option[String]    = get().closureBindingId
   override def closureOriginalName: Option[String] = get().closureOriginalName
   override def evaluationStrategy: String          = get().evaluationStrategy
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "EVALUATION_STRATEGY" => ClosureBinding.PropertyDefaults.EvaluationStrategy
       case _                     => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def refOut: Iterator[StoredNode] = get().refOut
-  override def _refOut             = get()._refOut
+  def refOut: Iterator[AstNode] = get().refOut
+  override def _refOut          = get()._refOut
 
   /** Traverse to LOCAL via REF OUT edge.
     */
@@ -86,9 +86,7 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _methodParameterInViaRefOut: Option[MethodParameterIn] = get()._methodParameterInViaRefOut
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def captureIn: Iterator[StoredNode] = get().captureIn
+  def captureIn: Iterator[Expression] = get().captureIn
   override def _captureIn             = get()._captureIn
 
   /** Traverse to METHOD_REF via CAPTURE IN edge.
@@ -99,9 +97,8 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def capturedByIn: Iterator[StoredNode] = get().capturedByIn
-  override def _capturedByIn             = get()._capturedByIn
+  def capturedByIn: Iterator[AstNode] = get().capturedByIn
+  override def _capturedByIn          = get()._capturedByIn
 
   /** Traverse to LOCAL via CAPTURED_BY IN edge.
     */

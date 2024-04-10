@@ -98,33 +98,30 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def isWildcard: Option[java.lang.Boolean] = get().isWildcard
   override def lineNumber: Option[Integer]           = get().lineNumber
   override def order: scala.Int                      = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => Import.PropertyDefaults.Code
       case "ORDER" => Import.PropertyDefaults.Order
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Dependency` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def importsOut: Iterator[StoredNode] = get().importsOut
+  def importsOut: Iterator[Dependency] = get().importsOut
   override def _importsOut             = get()._importsOut
 
   /** Traverse to DEPENDENCY via IMPORTS OUT edge.
     */
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = get()._dependencyViaImportsOut
 
-  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
-  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
-  override def _taggedByOut             = get()._taggedByOut
+  def taggedByOut: Iterator[Tag] = get().taggedByOut
+  override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[AstNode] = get().astIn
+  override def _astIn          = get()._astIn
 
   /** Traverse to BLOCK via AST IN edge.
     */
@@ -138,9 +135,8 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
-  /** Actually this Iterator includes only `Call` nodes, but we need to stick to the inherited type from BaseNode */
-  def isCallForImportIn: Iterator[StoredNode] = get().isCallForImportIn
-  override def _isCallForImportIn             = get()._isCallForImportIn
+  def isCallForImportIn: Iterator[Call] = get().isCallForImportIn
+  override def _isCallForImportIn       = get()._isCallForImportIn
 
   /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
     */

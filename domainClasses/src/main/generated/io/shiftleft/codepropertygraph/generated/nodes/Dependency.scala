@@ -66,16 +66,16 @@ class Dependency(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def dependencyGroupId: Option[String] = get().dependencyGroupId
   override def name: String                      = get().name
   override def version: String                   = get().version
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "NAME"    => Dependency.PropertyDefaults.Name
       case "VERSION" => Dependency.PropertyDefaults.Version
       case _         => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Import` nodes, but we need to stick to the inherited type from BaseNode */
-  def importsIn: Iterator[StoredNode] = get().importsIn
-  override def _importsIn             = get()._importsIn
+  def importsIn: Iterator[Import] = get().importsIn
+  override def _importsIn         = get()._importsIn
 
   /** Traverse to IMPORT via IMPORTS IN edge.
     */

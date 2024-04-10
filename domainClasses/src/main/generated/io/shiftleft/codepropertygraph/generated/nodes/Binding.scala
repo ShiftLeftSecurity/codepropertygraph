@@ -67,25 +67,24 @@ class Binding(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def methodFullName: String = get().methodFullName
   override def name: String           = get().name
   override def signature: String      = get().signature
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "METHOD_FULL_NAME" => Binding.PropertyDefaults.MethodFullName
       case "NAME"             => Binding.PropertyDefaults.Name
       case "SIGNATURE"        => Binding.PropertyDefaults.Signature
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Method` nodes, but we need to stick to the inherited type from BaseNode */
-  def refOut: Iterator[StoredNode] = get().refOut
-  override def _refOut             = get()._refOut
+  def refOut: Iterator[Method] = get().refOut
+  override def _refOut         = get()._refOut
 
   /** Traverse to METHOD via REF OUT edge.
     */
   def boundMethod: Method = get().boundMethod
 
-  /** Actually this Iterator includes only `TypeDecl` nodes, but we need to stick to the inherited type from BaseNode */
-  def bindsIn: Iterator[StoredNode] = get().bindsIn
-  override def _bindsIn             = get()._bindsIn
+  def bindsIn: Iterator[TypeDecl] = get().bindsIn
+  override def _bindsIn           = get()._bindsIn
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */

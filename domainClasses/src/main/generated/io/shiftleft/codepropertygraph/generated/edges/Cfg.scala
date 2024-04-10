@@ -29,10 +29,11 @@ object Cfg {
 class Cfg(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[NodeDb])
     extends Edge(_graph, Cfg.Label, _outNode, _inNode, Cfg.PropertyNames.allAsJava) {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }

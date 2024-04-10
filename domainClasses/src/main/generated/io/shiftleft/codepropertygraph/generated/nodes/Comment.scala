@@ -79,33 +79,31 @@ class Comment(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def filename: String              = get().filename
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"     => Comment.PropertyDefaults.Code
       case "FILENAME" => Comment.PropertyDefaults.Filename
       case "ORDER"    => Comment.PropertyDefaults.Order
       case _          => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Comment` nodes, but we need to stick to the inherited type from BaseNode */
-  def sourceFileOut: Iterator[StoredNode] = get().sourceFileOut
-  override def _sourceFileOut             = get()._sourceFileOut
+  def sourceFileOut: Iterator[Comment] = get().sourceFileOut
+  override def _sourceFileOut          = get()._sourceFileOut
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
   def file: overflowdb.traversal.Traversal[Comment] = get().file
 
-  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[File] = get().astIn
+  override def _astIn       = get()._astIn
 
   /** Traverse to FILE via AST IN edge.
     */
   def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
 
-  /** Actually this Iterator includes only `Comment` nodes, but we need to stick to the inherited type from BaseNode */
-  def sourceFileIn: Iterator[StoredNode] = get().sourceFileIn
-  override def _sourceFileIn             = get()._sourceFileIn
+  def sourceFileIn: Iterator[Comment] = get().sourceFileIn
+  override def _sourceFileIn          = get()._sourceFileIn
 
   /** Traverse to COMMENT via SOURCE_FILE IN edge.
     */

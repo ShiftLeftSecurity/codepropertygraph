@@ -29,10 +29,11 @@ object Contains {
 class Contains(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[NodeDb])
     extends Edge(_graph, Contains.Label, _outNode, _inNode, Contains.PropertyNames.allAsJava) {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }

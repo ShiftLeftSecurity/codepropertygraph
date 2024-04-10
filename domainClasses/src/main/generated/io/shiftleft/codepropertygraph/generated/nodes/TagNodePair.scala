@@ -52,11 +52,12 @@ class TagNodePair(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     with TagNodePairBase
     with StoredNode {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def node: StoredNode = get().node
 

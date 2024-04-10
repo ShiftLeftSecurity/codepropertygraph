@@ -76,17 +76,17 @@ class Modifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def modifierType: String          = get().modifierType
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"          => Modifier.PropertyDefaults.Code
       case "MODIFIER_TYPE" => Modifier.PropertyDefaults.ModifierType
       case "ORDER"         => Modifier.PropertyDefaults.Order
       case _               => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[AstNode] = get().astIn
+  override def _astIn          = get()._astIn
 
   /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */

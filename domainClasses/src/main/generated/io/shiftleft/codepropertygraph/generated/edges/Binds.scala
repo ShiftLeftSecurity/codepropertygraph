@@ -29,10 +29,11 @@ object Binds {
 class Binds(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[NodeDb])
     extends Edge(_graph, Binds.Label, _outNode, _inNode, Binds.PropertyNames.allAsJava) {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }

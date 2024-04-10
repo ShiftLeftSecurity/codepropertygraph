@@ -96,7 +96,7 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => TemplateDom.PropertyDefaults.ArgumentIndex
       case "CODE"           => TemplateDom.PropertyDefaults.Code
@@ -104,59 +104,47 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
       case "ORDER"          => TemplateDom.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def argumentOut: Iterator[StoredNode] = get().argumentOut
-  override def _argumentOut             = get()._argumentOut
+  def argumentOut: Iterator[TemplateDom] = get().argumentOut
+  override def _argumentOut              = get()._argumentOut
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def astOut: Iterator[StoredNode] = get().astOut
+  def astOut: Iterator[Expression] = get().astOut
   override def _astOut             = get()._astOut
 
   /** Traverse to EXPRESSION via AST OUT edge.
     */
   def _expressionViaAstOut: overflowdb.traversal.Traversal[Expression] = get()._expressionViaAstOut
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def reachingDefOut: Iterator[StoredNode] = get().reachingDefOut
+  def reachingDefOut: Iterator[Expression] = get().reachingDefOut
   override def _reachingDefOut             = get()._reachingDefOut
 
   /** Traverse to EXPRESSION via REACHING_DEF OUT edge.
     */
   def _expressionViaReachingDefOut: overflowdb.traversal.Traversal[Expression] = get()._expressionViaReachingDefOut
 
-  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
-  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
-  override def _taggedByOut             = get()._taggedByOut
+  def taggedByOut: Iterator[Tag] = get().taggedByOut
+  override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def argumentIn: Iterator[StoredNode] = get().argumentIn
+  def argumentIn: Iterator[Expression] = get().argumentIn
   override def _argumentIn             = get()._argumentIn
 
   /** Traverse to EXPRESSION via ARGUMENT IN edge.
     */
   def _expressionViaArgumentIn: overflowdb.traversal.Traversal[Expression] = get()._expressionViaArgumentIn
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[TemplateDom] = get().astIn
+  override def _astIn              = get()._astIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cfgIn: Iterator[StoredNode] = get().cfgIn
-  override def _cfgIn             = get()._cfgIn
+  def cfgIn: Iterator[CfgNode] = get().cfgIn
+  override def _cfgIn          = get()._cfgIn
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def containsIn: Iterator[StoredNode] = get().containsIn
-  override def _containsIn             = get()._containsIn
+  def containsIn: Iterator[AstNode] = get().containsIn
+  override def _containsIn          = get()._containsIn
 
   /** Traverse to FILE via CONTAINS IN edge.
     */
@@ -166,10 +154,8 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     */
   def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def reachingDefIn: Iterator[StoredNode] = get().reachingDefIn
-  override def _reachingDefIn             = get()._reachingDefIn
+  def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
+  override def _reachingDefIn              = get()._reachingDefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.

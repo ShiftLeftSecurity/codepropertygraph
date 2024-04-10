@@ -89,7 +89,7 @@ class AnnotationLiteral(graph_4762: Graph, id_4762: Long /*cf https://github.com
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => AnnotationLiteral.PropertyDefaults.ArgumentIndex
       case "CODE"           => AnnotationLiteral.PropertyDefaults.Code
@@ -97,29 +97,24 @@ class AnnotationLiteral(graph_4762: Graph, id_4762: Long /*cf https://github.com
       case "ORDER"          => AnnotationLiteral.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def argumentOut: Iterator[StoredNode] = get().argumentOut
-  override def _argumentOut             = get()._argumentOut
+  def argumentOut: Iterator[TemplateDom] = get().argumentOut
+  override def _argumentOut              = get()._argumentOut
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[AstNode] = get().astIn
+  override def _astIn          = get()._astIn
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     get()._annotationParameterAssignViaAstIn
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cfgIn: Iterator[StoredNode] = get().cfgIn
-  override def _cfgIn             = get()._cfgIn
+  def cfgIn: Iterator[CfgNode] = get().cfgIn
+  override def _cfgIn          = get()._cfgIn
 
-  /** Actually this Iterator includes only `TemplateDom` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def reachingDefIn: Iterator[StoredNode] = get().reachingDefIn
-  override def _reachingDefIn             = get()._reachingDefIn
+  def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
+  override def _reachingDefIn              = get()._reachingDefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.

@@ -108,7 +108,7 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
   override def typeFullName: String          = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"                => MethodParameterOut.PropertyDefaults.Code
       case "EVALUATION_STRATEGY" => MethodParameterOut.PropertyDefaults.EvaluationStrategy
@@ -119,10 +119,10 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
       case "TYPE_FULL_NAME"      => MethodParameterOut.PropertyDefaults.TypeFullName
       case _                     => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
-  def evalTypeOut: Iterator[StoredNode] = get().evalTypeOut
-  override def _evalTypeOut             = get()._evalTypeOut
+  def evalTypeOut: Iterator[Type] = get().evalTypeOut
+  override def _evalTypeOut       = get()._evalTypeOut
 
   /** Traverse to parameter type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -130,9 +130,7 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
   @overflowdb.traversal.help.Doc(info = """Traverse to parameter type""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
-  /** Actually this Iterator includes only `Expression` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def reachingDefOut: Iterator[StoredNode] = get().reachingDefOut
+  def reachingDefOut: Iterator[Expression] = get().reachingDefOut
   override def _reachingDefOut             = get()._reachingDefOut
 
   /** Traverse to CALL via REACHING_DEF OUT edge.
@@ -159,39 +157,32 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
     */
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
 
-  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
-  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
-  override def _taggedByOut             = get()._taggedByOut
+  def taggedByOut: Iterator[Tag] = get().taggedByOut
+  override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  /** Actually this Iterator includes only `Method` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[Method] = get().astIn
+  override def _astIn         = get()._astIn
 
   /** Traverse to METHOD via AST IN edge.
     */
   def method: Method = get().method
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def cfgIn: Iterator[StoredNode] = get().cfgIn
-  override def _cfgIn             = get()._cfgIn
+  def cfgIn: Iterator[CfgNode] = get().cfgIn
+  override def _cfgIn          = get()._cfgIn
 
-  /** Actually this Iterator includes only `MethodParameterIn` nodes, but we need to stick to the inherited type from
-    * BaseNode
-    */
-  def parameterLinkIn: Iterator[StoredNode] = get().parameterLinkIn
-  override def _parameterLinkIn             = get()._parameterLinkIn
+  def parameterLinkIn: Iterator[MethodParameterIn] = get().parameterLinkIn
+  override def _parameterLinkIn                    = get()._parameterLinkIn
 
   /** Traverse to METHOD_PARAMETER_IN via PARAMETER_LINK IN edge.
     */
   def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = get().asInput
 
-  /** Actually this Iterator includes only `CfgNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def reachingDefIn: Iterator[StoredNode] = get().reachingDefIn
-  override def _reachingDefIn             = get()._reachingDefIn
+  def reachingDefIn: Iterator[CfgNode] = get().reachingDefIn
+  override def _reachingDefIn          = get()._reachingDefIn
 
   /** Traverse to BLOCK via REACHING_DEF IN edge.
     */

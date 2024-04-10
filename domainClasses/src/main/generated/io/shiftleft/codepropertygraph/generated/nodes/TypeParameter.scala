@@ -79,17 +79,17 @@ class TypeParameter(graph_4762: Graph, id_4762: Long /*cf https://github.com/sca
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => TypeParameter.PropertyDefaults.Code
       case "NAME"  => TypeParameter.PropertyDefaults.Name
       case "ORDER" => TypeParameter.PropertyDefaults.Order
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[AstNode] = get().astIn
+  override def _astIn          = get()._astIn
 
   /** Traverse to METHOD via AST IN edge.
     */
@@ -99,11 +99,8 @@ class TypeParameter(graph_4762: Graph, id_4762: Long /*cf https://github.com/sca
     */
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
 
-  /** Actually this Iterator includes only `TypeArgument` nodes, but we need to stick to the inherited type from
-    * BaseNode
-    */
-  def bindsToIn: Iterator[StoredNode] = get().bindsToIn
-  override def _bindsToIn             = get()._bindsToIn
+  def bindsToIn: Iterator[TypeArgument] = get().bindsToIn
+  override def _bindsToIn               = get()._bindsToIn
 
   /** Traverse to TYPE_ARGUMENT via BINDS_TO IN edge.
     */

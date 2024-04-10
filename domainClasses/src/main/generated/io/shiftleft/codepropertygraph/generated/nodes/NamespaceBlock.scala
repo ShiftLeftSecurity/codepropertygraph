@@ -90,7 +90,7 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"      => NamespaceBlock.PropertyDefaults.Code
       case "FILENAME"  => NamespaceBlock.PropertyDefaults.Filename
@@ -99,10 +99,10 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case "ORDER"     => NamespaceBlock.PropertyDefaults.Order
       case _           => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astOut: Iterator[StoredNode] = get().astOut
-  override def _astOut             = get()._astOut
+  def astOut: Iterator[AstNode] = get().astOut
+  override def _astOut          = get()._astOut
 
   /** Traverse to METHOD via AST OUT edge.
     */
@@ -112,26 +112,22 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstOut
 
-  /** Actually this Iterator includes only `Namespace` nodes, but we need to stick to the inherited type from BaseNode
-    */
-  def refOut: Iterator[StoredNode] = get().refOut
-  override def _refOut             = get()._refOut
+  def refOut: Iterator[Namespace] = get().refOut
+  override def _refOut            = get()._refOut
 
   /** Traverse to NAMESPACE via REF OUT edge.
     */
   def _namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = get()._namespaceViaRefOut
 
-  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
-  def sourceFileOut: Iterator[StoredNode] = get().sourceFileOut
-  override def _sourceFileOut             = get()._sourceFileOut
+  def sourceFileOut: Iterator[File] = get().sourceFileOut
+  override def _sourceFileOut       = get()._sourceFileOut
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
   def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
 
-  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[File] = get().astIn
+  override def _astIn       = get()._astIn
 
   /** Traverse to FILE via AST IN edge.
     */

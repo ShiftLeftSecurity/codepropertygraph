@@ -57,12 +57,13 @@ class KeyValuePair(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
     with StoredNode {
   override def key: String   = get().key
   override def value: String = get().value
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "KEY"   => KeyValuePair.PropertyDefaults.Key
       case "VALUE" => KeyValuePair.PropertyDefaults.Value
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.

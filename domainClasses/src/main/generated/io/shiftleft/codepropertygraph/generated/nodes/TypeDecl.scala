@@ -144,7 +144,7 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   override def offset: Option[Integer]                      = get().offset
   override def offsetEnd: Option[Integer]                   = get().offsetEnd
   override def order: scala.Int                             = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "AST_PARENT_FULL_NAME" => TypeDecl.PropertyDefaults.AstParentFullName
       case "AST_PARENT_TYPE"      => TypeDecl.PropertyDefaults.AstParentType
@@ -156,18 +156,17 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
       case "ORDER"                => TypeDecl.PropertyDefaults.Order
       case _                      => super.propertyDefaultValue(propertyKey)
     }
+  }
 
-  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
-  def aliasOfOut: Iterator[StoredNode] = get().aliasOfOut
-  override def _aliasOfOut             = get()._aliasOfOut
+  def aliasOfOut: Iterator[Type] = get().aliasOfOut
+  override def _aliasOfOut       = get()._aliasOfOut
 
   /** Traverse to TYPE via ALIAS_OF OUT edge.
     */
   def aliasedType: overflowdb.traversal.Traversal[Type] = get().aliasedType
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astOut: Iterator[StoredNode] = get().astOut
-  override def _astOut             = get()._astOut
+  def astOut: Iterator[AstNode] = get().astOut
+  override def _astOut          = get()._astOut
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
@@ -197,49 +196,43 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _typeParameterViaAstOut: overflowdb.traversal.Traversal[TypeParameter] = get()._typeParameterViaAstOut
 
-  /** Actually this Iterator includes only `Binding` nodes, but we need to stick to the inherited type from BaseNode */
-  def bindsOut: Iterator[StoredNode] = get().bindsOut
-  override def _bindsOut             = get()._bindsOut
+  def bindsOut: Iterator[Binding] = get().bindsOut
+  override def _bindsOut          = get()._bindsOut
 
   /** Traverse to BINDING via BINDS OUT edge.
     */
   def _bindingViaBindsOut: overflowdb.traversal.Traversal[Binding] = get()._bindingViaBindsOut
 
-  /** Actually this Iterator includes only `Method` nodes, but we need to stick to the inherited type from BaseNode */
-  def containsOut: Iterator[StoredNode] = get().containsOut
-  override def _containsOut             = get()._containsOut
+  def containsOut: Iterator[Method] = get().containsOut
+  override def _containsOut         = get()._containsOut
 
   /** Traverse to METHOD via CONTAINS OUT edge.
     */
   def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
 
-  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
-  def inheritsFromOut: Iterator[StoredNode] = get().inheritsFromOut
-  override def _inheritsFromOut             = get()._inheritsFromOut
+  def inheritsFromOut: Iterator[Type] = get().inheritsFromOut
+  override def _inheritsFromOut       = get()._inheritsFromOut
 
   /** Traverse to TYPE via INHERITS_FROM OUT edge.
     */
   def _typeViaInheritsFromOut: overflowdb.traversal.Traversal[Type] = get()._typeViaInheritsFromOut
 
-  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
-  def sourceFileOut: Iterator[StoredNode] = get().sourceFileOut
-  override def _sourceFileOut             = get()._sourceFileOut
+  def sourceFileOut: Iterator[File] = get().sourceFileOut
+  override def _sourceFileOut       = get()._sourceFileOut
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
   def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
 
-  /** Actually this Iterator includes only `Tag` nodes, but we need to stick to the inherited type from BaseNode */
-  def taggedByOut: Iterator[StoredNode] = get().taggedByOut
-  override def _taggedByOut             = get()._taggedByOut
+  def taggedByOut: Iterator[Tag] = get().taggedByOut
+  override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
-  /** Actually this Iterator includes only `AstNode` nodes, but we need to stick to the inherited type from BaseNode */
-  def astIn: Iterator[StoredNode] = get().astIn
-  override def _astIn             = get()._astIn
+  def astIn: Iterator[AstNode] = get().astIn
+  override def _astIn          = get()._astIn
 
   /** Traverse to METHOD via AST IN edge.
     */
@@ -253,17 +246,15 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _typeDeclViaAstIn: Option[TypeDecl] = get()._typeDeclViaAstIn
 
-  /** Actually this Iterator includes only `File` nodes, but we need to stick to the inherited type from BaseNode */
-  def containsIn: Iterator[StoredNode] = get().containsIn
-  override def _containsIn             = get()._containsIn
+  def containsIn: Iterator[File] = get().containsIn
+  override def _containsIn       = get()._containsIn
 
   /** Traverse to FILE via CONTAINS IN edge.
     */
   def _fileViaContainsIn: overflowdb.traversal.Traversal[File] = get()._fileViaContainsIn
 
-  /** Actually this Iterator includes only `Type` nodes, but we need to stick to the inherited type from BaseNode */
-  def refIn: Iterator[StoredNode] = get().refIn
-  override def _refIn             = get()._refIn
+  def refIn: Iterator[Type] = get().refIn
+  override def _refIn       = get()._refIn
 
   /** Traverse to TYPE via REF IN edge.
     */
