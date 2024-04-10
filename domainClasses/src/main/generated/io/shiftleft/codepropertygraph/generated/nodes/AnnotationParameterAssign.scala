@@ -71,12 +71,13 @@ class AnnotationParameterAssign(graph_4762: Graph, id_4762: Long /*cf https://gi
   override def columnNumber: Option[Integer] = get().columnNumber
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => AnnotationParameterAssign.PropertyDefaults.Code
       case "ORDER" => AnnotationParameterAssign.PropertyDefaults.Order
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut

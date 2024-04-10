@@ -178,7 +178,7 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def signature: String                           = get().signature
   override def typeFullName: String                        = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"   => Call.PropertyDefaults.ArgumentIndex
       case "CODE"             => Call.PropertyDefaults.Code
@@ -190,6 +190,7 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
       case "TYPE_FULL_NAME"   => Call.PropertyDefaults.TypeFullName
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[CfgNode] = get().argumentOut
   override def _argumentOut          = get()._argumentOut

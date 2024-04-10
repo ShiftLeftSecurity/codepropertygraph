@@ -11,8 +11,8 @@ class SerializedCpg extends AutoCloseable {
 
   /** We allow creating a dummy serialized CPG that does not do anything.
     */
-  private[this] var zipFileSystem: FileSystem = null
-  private[this] var counter                   = 0
+  private var zipFileSystem: FileSystem = null
+  private var counter                   = 0
 
   /** Create Serialized CPG from existing file. If the file does not exist, an empty Serialized CPG is created.
     */
@@ -25,7 +25,7 @@ class SerializedCpg extends AutoCloseable {
 
   @throws[URISyntaxException]
   @throws[IOException]
-  private[this] def initZipFilesystem(filename: String): Unit = {
+  private def initZipFilesystem(filename: String): Unit = {
     val env = new util.HashMap[String, AnyRef]
     // This ensures that the file is created if it does not exist
     env.put("create", "true")

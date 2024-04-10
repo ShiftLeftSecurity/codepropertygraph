@@ -29,10 +29,11 @@ object Receiver {
 class Receiver(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[NodeDb])
     extends Edge(_graph, Receiver.Label, _outNode, _inNode, Receiver.PropertyNames.allAsJava) {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }

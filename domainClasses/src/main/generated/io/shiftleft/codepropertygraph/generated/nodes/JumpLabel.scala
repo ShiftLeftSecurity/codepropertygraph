@@ -81,7 +81,7 @@ class JumpLabel(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
   override def parserTypeName: String        = get().parserTypeName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"             => JumpLabel.PropertyDefaults.Code
       case "NAME"             => JumpLabel.PropertyDefaults.Name
@@ -89,6 +89,7 @@ class JumpLabel(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
       case "PARSER_TYPE_NAME" => JumpLabel.PropertyDefaults.ParserTypeName
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def astIn: Iterator[ControlStructure] = get().astIn
   override def _astIn                   = get()._astIn

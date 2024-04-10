@@ -98,12 +98,13 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def isWildcard: Option[java.lang.Boolean] = get().isWildcard
   override def lineNumber: Option[Integer]           = get().lineNumber
   override def order: scala.Int                      = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => Import.PropertyDefaults.Code
       case "ORDER" => Import.PropertyDefaults.Order
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def importsOut: Iterator[Dependency] = get().importsOut
   override def _importsOut             = get()._importsOut

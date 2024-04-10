@@ -54,7 +54,7 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
       if (node.getKey() == -1) {
         throw new IllegalArgumentException("node has illegal key -1. Something is wrong with the cpg.")
       }
-      odbGraph.+(node.getType.name, node.getKey, properties: _*)
+      odbGraph.+(node.getType.name, node.getKey, properties*)
     } catch {
       case e: Exception =>
         throw new RuntimeException("Failed to insert a node. proto:\n" + node, e)
@@ -68,7 +68,7 @@ class ProtoToCpg(overflowConfig: Config = Config.withoutOverflow) {
       .map(prop => (prop.getName.name, prop.getValue))
       .map(toProperty)
     try {
-      srcNode.---(typ.name, propertyPairs: _*) --> dstNode
+      srcNode.---(typ.name, propertyPairs*) --> dstNode
     } catch {
       case e: IllegalArgumentException =>
         val context = "label=" + typ.name +

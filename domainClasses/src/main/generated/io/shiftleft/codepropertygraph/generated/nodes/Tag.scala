@@ -62,12 +62,13 @@ class Tag(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/iss
     with StoredNode {
   override def name: String  = get().name
   override def value: String = get().value
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "NAME"  => Tag.PropertyDefaults.Name
       case "VALUE" => Tag.PropertyDefaults.Value
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut

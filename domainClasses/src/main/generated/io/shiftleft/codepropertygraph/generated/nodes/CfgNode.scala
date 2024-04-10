@@ -49,7 +49,7 @@ trait CfgNodeNew extends NewNode with AstNodeNew {
 trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
   import overflowdb.traversal._
 
-  def cfgIn: Iterator[_ <: StoredNode]
+  def cfgIn: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via CFG IN edge.
     */

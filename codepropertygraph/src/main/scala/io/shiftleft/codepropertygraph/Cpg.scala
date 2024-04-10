@@ -21,9 +21,8 @@ object Cpg {
 
   /** Instantiate cpg with storage. If the storage file already exists, it will load (a subset of) the data into memory.
     * Otherwise it will create an empty cpg. In either case, configuring storage means that OverflowDb will be stored to
-    * disk on shutdown (`close`).
-    * I.e. if you want to preserve state between sessions, just use this method to instantiate the cpg and ensure to
-    * properly `close` the cpg at the end.
+    * disk on shutdown (`close`). I.e. if you want to preserve state between sessions, just use this method to
+    * instantiate the cpg and ensure to properly `close` the cpg at the end.
     * @param path
     *   to the storage file, e.g. /home/user1/overflowdb.bin
     */

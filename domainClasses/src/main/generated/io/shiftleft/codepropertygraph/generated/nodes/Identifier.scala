@@ -153,7 +153,7 @@ class Identifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => Identifier.PropertyDefaults.ArgumentIndex
       case "CODE"           => Identifier.PropertyDefaults.Code
@@ -162,6 +162,7 @@ class Identifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
       case "TYPE_FULL_NAME" => Identifier.PropertyDefaults.TypeFullName
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

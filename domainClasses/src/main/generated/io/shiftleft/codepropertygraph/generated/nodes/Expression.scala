@@ -59,7 +59,7 @@ trait ExpressionNew extends NewNode with AstNodeNew with CfgNodeNew {
 
 trait Expression extends StoredNode with ExpressionBase with AstNode with CfgNode {
   import overflowdb.traversal._
-  def argumentOut: Iterator[_ <: StoredNode]
+  def argumentOut: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via ARGUMENT OUT edge.
     */
@@ -81,7 +81,7 @@ trait Expression extends StoredNode with ExpressionBase with AstNode with CfgNod
   def _templateDomViaArgumentOut: overflowdb.traversal.Traversal[TemplateDom] =
     argumentOut.collectAll[TemplateDom]
 
-  def astIn: Iterator[_ <: StoredNode]
+  def astIn: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via AST IN edge.
     */
@@ -103,7 +103,7 @@ trait Expression extends StoredNode with ExpressionBase with AstNode with CfgNod
   def _templateDomViaAstIn: overflowdb.traversal.Traversal[TemplateDom] =
     astIn.collectAll[TemplateDom]
 
-  def reachingDefIn: Iterator[_ <: StoredNode]
+  def reachingDefIn: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via REACHING_DEF IN edge.
     */

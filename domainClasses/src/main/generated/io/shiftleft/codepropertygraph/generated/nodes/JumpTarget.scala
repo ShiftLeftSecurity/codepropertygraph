@@ -102,7 +102,7 @@ class JumpTarget(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
   override def parserTypeName: String        = get().parserTypeName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"   => JumpTarget.PropertyDefaults.ArgumentIndex
       case "CODE"             => JumpTarget.PropertyDefaults.Code
@@ -111,6 +111,7 @@ class JumpTarget(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
       case "PARSER_TYPE_NAME" => JumpTarget.PropertyDefaults.ParserTypeName
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def cdgOut: Iterator[CfgNode] = get().cdgOut
   override def _cdgOut          = get()._cdgOut

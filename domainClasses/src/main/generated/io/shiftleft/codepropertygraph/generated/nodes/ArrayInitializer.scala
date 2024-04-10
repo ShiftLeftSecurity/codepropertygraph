@@ -89,13 +89,14 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
   override def columnNumber: Option[Integer] = get().columnNumber
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => ArrayInitializer.PropertyDefaults.ArgumentIndex
       case "CODE"           => ArrayInitializer.PropertyDefaults.Code
       case "ORDER"          => ArrayInitializer.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

@@ -75,13 +75,14 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   override def fullName: String         = get().fullName
   override def name: String             = get().name
   override def typeDeclFullName: String = get().typeDeclFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "FULL_NAME"           => Type.PropertyDefaults.FullName
       case "NAME"                => Type.PropertyDefaults.Name
       case "TYPE_DECL_FULL_NAME" => Type.PropertyDefaults.TypeDeclFullName
       case _                     => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def astOut: Iterator[TypeArgument] = get().astOut
   override def _astOut               = get()._astOut

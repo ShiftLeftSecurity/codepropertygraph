@@ -144,7 +144,7 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   override def offset: Option[Integer]                      = get().offset
   override def offsetEnd: Option[Integer]                   = get().offsetEnd
   override def order: scala.Int                             = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "AST_PARENT_FULL_NAME" => TypeDecl.PropertyDefaults.AstParentFullName
       case "AST_PARENT_TYPE"      => TypeDecl.PropertyDefaults.AstParentType
@@ -156,6 +156,7 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
       case "ORDER"                => TypeDecl.PropertyDefaults.Order
       case _                      => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def aliasOfOut: Iterator[Type] = get().aliasOfOut
   override def _aliasOfOut       = get()._aliasOfOut

@@ -35,10 +35,11 @@ class ReachingDef(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[Nod
 
   def variable: String = property("VARIABLE").asInstanceOf[String]
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "VARIABLE" => ReachingDef.PropertyDefaults.Variable
       case _          => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }
