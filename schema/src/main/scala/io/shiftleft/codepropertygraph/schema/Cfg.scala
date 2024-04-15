@@ -99,6 +99,8 @@ object Cfg extends SchemaBase {
       stepNameIn = "toReturn"
     )
 
+    callNode.addOutEdge(edge = cfg, inNode = methodReturn)
+
     methodRef.addOutEdge(edge = cfg, inNode = methodReturn)
     typeRef.addOutEdge(edge = cfg, inNode = methodReturn)
   }

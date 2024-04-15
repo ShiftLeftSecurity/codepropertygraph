@@ -21,6 +21,10 @@ final class AccessNeighborsForMethodReturn(val node: nodes.MethodReturn) extends
     */
   def callViaCdgIn: Iterator[nodes.Call] = cdgIn.collectAll[nodes.Call]
 
+  /** Traverse to CALL via CFG IN edge.
+    */
+  def callViaCfgIn: Iterator[nodes.Call] = cfgIn.collectAll[nodes.Call]
+
   /** Traverse to CALL via DOMINATE IN edge.
     */
   def callViaDominateIn: Iterator[nodes.Call] = dominateIn.collectAll[nodes.Call]
@@ -100,6 +104,10 @@ final class AccessNeighborsForMethodReturn(val node: nodes.MethodReturn) extends
     }
   }
 
+  /** Traverse to METHOD via CFG IN edge.
+    */
+  def methodViaCfgIn: Option[nodes.Method] = cfgIn.collectAll[nodes.Method].nextOption()
+
   /** Traverse to METHOD via DOMINATE IN edge.
     */
   def methodViaDominateIn: Iterator[nodes.Method] = dominateIn.collectAll[nodes.Method]
@@ -111,6 +119,10 @@ final class AccessNeighborsForMethodReturn(val node: nodes.MethodReturn) extends
   /** Traverse to METHOD_REF via CDG IN edge.
     */
   def methodRefViaCdgIn: Iterator[nodes.MethodRef] = cdgIn.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via CFG IN edge.
+    */
+  def methodRefViaCfgIn: Iterator[nodes.MethodRef] = cfgIn.collectAll[nodes.MethodRef]
 
   /** Traverse to METHOD_REF via DOMINATE IN edge.
     */
@@ -153,6 +165,10 @@ final class AccessNeighborsForMethodReturn(val node: nodes.MethodReturn) extends
     */
   def typeRefViaCdgIn: Iterator[nodes.TypeRef] = cdgIn.collectAll[nodes.TypeRef]
 
+  /** Traverse to TYPE_REF via CFG IN edge.
+    */
+  def typeRefViaCfgIn: Iterator[nodes.TypeRef] = cfgIn.collectAll[nodes.TypeRef]
+
   /** Traverse to TYPE_REF via DOMINATE IN edge.
     */
   def typeRefViaDominateIn: Iterator[nodes.TypeRef] = dominateIn.collectAll[nodes.TypeRef]
@@ -177,7 +193,7 @@ final class AccessNeighborsForMethodReturn(val node: nodes.MethodReturn) extends
 
   def cdgIn: Iterator[nodes.CfgNode] = node._cdgIn.cast[nodes.CfgNode]
 
-  def cfgIn: Iterator[nodes.Return] = node._cfgIn.cast[nodes.Return]
+  def cfgIn: Iterator[nodes.CfgNode] = node._cfgIn.cast[nodes.CfgNode]
 
   def dominateIn: Iterator[nodes.CfgNode] = node._dominateIn.cast[nodes.CfgNode]
 
@@ -207,6 +223,10 @@ final class AccessNeighborsForMethodReturnTraversal(val traversal: Iterator[node
   /** Traverse to CALL via CDG IN edge.
     */
   def callViaCdgIn: Iterator[nodes.Call] = traversal.flatMap(_.callViaCdgIn)
+
+  /** Traverse to CALL via CFG IN edge.
+    */
+  def callViaCfgIn: Iterator[nodes.Call] = traversal.flatMap(_.callViaCfgIn)
 
   /** Traverse to CALL via DOMINATE IN edge.
     */
@@ -279,6 +299,10 @@ final class AccessNeighborsForMethodReturnTraversal(val traversal: Iterator[node
     */
   def methodViaAstIn: Iterator[nodes.Method] = traversal.map(_.methodViaAstIn)
 
+  /** Traverse to METHOD via CFG IN edge.
+    */
+  def methodViaCfgIn: Iterator[nodes.Method] = traversal.flatMap(_.methodViaCfgIn)
+
   /** Traverse to METHOD via DOMINATE IN edge.
     */
   def methodViaDominateIn: Iterator[nodes.Method] = traversal.flatMap(_.methodViaDominateIn)
@@ -290,6 +314,10 @@ final class AccessNeighborsForMethodReturnTraversal(val traversal: Iterator[node
   /** Traverse to METHOD_REF via CDG IN edge.
     */
   def methodRefViaCdgIn: Iterator[nodes.MethodRef] = traversal.flatMap(_.methodRefViaCdgIn)
+
+  /** Traverse to METHOD_REF via CFG IN edge.
+    */
+  def methodRefViaCfgIn: Iterator[nodes.MethodRef] = traversal.flatMap(_.methodRefViaCfgIn)
 
   /** Traverse to METHOD_REF via DOMINATE IN edge.
     */
@@ -332,6 +360,10 @@ final class AccessNeighborsForMethodReturnTraversal(val traversal: Iterator[node
     */
   def typeRefViaCdgIn: Iterator[nodes.TypeRef] = traversal.flatMap(_.typeRefViaCdgIn)
 
+  /** Traverse to TYPE_REF via CFG IN edge.
+    */
+  def typeRefViaCfgIn: Iterator[nodes.TypeRef] = traversal.flatMap(_.typeRefViaCfgIn)
+
   /** Traverse to TYPE_REF via DOMINATE IN edge.
     */
   def typeRefViaDominateIn: Iterator[nodes.TypeRef] = traversal.flatMap(_.typeRefViaDominateIn)
@@ -356,7 +388,7 @@ final class AccessNeighborsForMethodReturnTraversal(val traversal: Iterator[node
 
   def cdgIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgIn)
 
-  def cfgIn: Iterator[nodes.Return] = traversal.flatMap(_.cfgIn)
+  def cfgIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.cfgIn)
 
   def dominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.dominateIn)
 
