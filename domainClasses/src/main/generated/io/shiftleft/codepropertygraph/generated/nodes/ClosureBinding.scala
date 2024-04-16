@@ -16,7 +16,7 @@ trait ClosureBindingBase extends AbstractNode with StaticType[ClosureBindingEMT]
     val res = new java.util.HashMap[String, Any]()
     this.closureBindingId.foreach { p => res.put("CLOSURE_BINDING_ID", p) }
     this.closureOriginalName.foreach { p => res.put("CLOSURE_ORIGINAL_NAME", p) }
-    res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
+    if (("<empty>": String) != this.evaluationStrategy) res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
     res
   }
 }

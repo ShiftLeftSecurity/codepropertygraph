@@ -10,9 +10,9 @@ trait BindingBase extends AbstractNode with StaticType[BindingEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("METHOD_FULL_NAME", this.methodFullName)
-    res.put("NAME", this.name)
-    res.put("SIGNATURE", this.signature)
+    if (("<empty>": String) != this.methodFullName) res.put("METHOD_FULL_NAME", this.methodFullName)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if (("": String) != this.signature) res.put("SIGNATURE", this.signature)
     res
   }
 }

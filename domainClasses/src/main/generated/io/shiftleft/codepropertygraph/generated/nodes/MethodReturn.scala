@@ -16,16 +16,16 @@ trait MethodReturnBase extends AbstractNode with CfgNodeBase with StaticType[Met
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
-    res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
+    if (("<empty>": String) != this.evaluationStrategy) res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("ORDER", this.order)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     val tmpPossibleTypes = this.possibleTypes;
     if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
-    res.put("TYPE_FULL_NAME", this.typeFullName)
+    if (("<empty>": String) != this.typeFullName) res.put("TYPE_FULL_NAME", this.typeFullName)
     res
   }
 }

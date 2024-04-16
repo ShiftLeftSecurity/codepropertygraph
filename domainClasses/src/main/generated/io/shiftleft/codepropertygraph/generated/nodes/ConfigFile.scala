@@ -10,8 +10,8 @@ trait ConfigFileBase extends AbstractNode with StaticType[ConfigFileEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("CONTENT", this.content)
-    res.put("NAME", this.name)
+    if (("<empty>": String) != this.content) res.put("CONTENT", this.content)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
     res
   }
 }

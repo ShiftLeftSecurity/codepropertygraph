@@ -10,13 +10,13 @@ trait JumpTargetBase extends AbstractNode with CfgNodeBase with StaticType[JumpT
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("ARGUMENT_INDEX", this.argumentIndex)
-    res.put("CODE", this.code)
+    if ((-1: Int) != this.argumentIndex) res.put("ARGUMENT_INDEX", this.argumentIndex)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("NAME", this.name)
-    res.put("ORDER", this.order)
-    res.put("PARSER_TYPE_NAME", this.parserTypeName)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
+    if (("<empty>": String) != this.parserTypeName) res.put("PARSER_TYPE_NAME", this.parserTypeName)
     res
   }
 }

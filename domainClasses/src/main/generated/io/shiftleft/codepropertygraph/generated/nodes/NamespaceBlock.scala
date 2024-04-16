@@ -10,13 +10,13 @@ trait NamespaceBlockBase extends AbstractNode with AstNodeBase with StaticType[N
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
-    res.put("FILENAME", this.filename)
-    res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
+    if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("NAME", this.name)
-    res.put("ORDER", this.order)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     res
   }
 }

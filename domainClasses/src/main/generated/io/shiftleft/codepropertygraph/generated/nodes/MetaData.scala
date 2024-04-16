@@ -17,10 +17,10 @@ trait MetaDataBase extends AbstractNode with StaticType[MetaDataEMT] {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
     this.hash.foreach { p => res.put("HASH", p) }
-    res.put("LANGUAGE", this.language)
+    if (("<empty>": String) != this.language) res.put("LANGUAGE", this.language)
     val tmpOverlays = this.overlays; if (tmpOverlays.nonEmpty) res.put("OVERLAYS", tmpOverlays)
-    res.put("ROOT", this.root)
-    res.put("VERSION", this.version)
+    if (("<empty>": String) != this.root) res.put("ROOT", this.root)
+    if (("<empty>": String) != this.version) res.put("VERSION", this.version)
     res
   }
 }

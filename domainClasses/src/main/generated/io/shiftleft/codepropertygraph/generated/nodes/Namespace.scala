@@ -10,11 +10,11 @@ trait NamespaceBase extends AbstractNode with AstNodeBase with StaticType[Namesp
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("NAME", this.name)
-    res.put("ORDER", this.order)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     res
   }
 }

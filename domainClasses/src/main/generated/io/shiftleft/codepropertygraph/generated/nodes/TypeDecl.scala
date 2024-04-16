@@ -23,20 +23,20 @@ trait TypeDeclBase extends AbstractNode with AstNodeBase with StaticType[TypeDec
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
     this.aliasTypeFullName.foreach { p => res.put("ALIAS_TYPE_FULL_NAME", p) }
-    res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
-    res.put("AST_PARENT_TYPE", this.astParentType)
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.astParentFullName) res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
+    if (("<empty>": String) != this.astParentType) res.put("AST_PARENT_TYPE", this.astParentType)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
-    res.put("FILENAME", this.filename)
-    res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
+    if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
     val tmpInheritsFromTypeFullName = this.inheritsFromTypeFullName;
     if (tmpInheritsFromTypeFullName.nonEmpty) res.put("INHERITS_FROM_TYPE_FULL_NAME", tmpInheritsFromTypeFullName)
-    res.put("IS_EXTERNAL", this.isExternal)
+    if ((false: Boolean) != this.isExternal) res.put("IS_EXTERNAL", this.isExternal)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("NAME", this.name)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
     this.offset.foreach { p => res.put("OFFSET", p) }
     this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
-    res.put("ORDER", this.order)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     res
   }
 }
