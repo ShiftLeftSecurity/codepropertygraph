@@ -18,18 +18,18 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase with
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
-    res.put("AST_PARENT_TYPE", this.astParentType)
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.astParentFullName) res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
+    if (("<empty>": String) != this.astParentType) res.put("AST_PARENT_TYPE", this.astParentType)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("NAME", this.name)
-    res.put("ORDER", this.order)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     val tmpPossibleTypes = this.possibleTypes;
     if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
-    res.put("TYPE_FULL_NAME", this.typeFullName)
+    if (("<empty>": String) != this.typeFullName) res.put("TYPE_FULL_NAME", this.typeFullName)
     res
   }
 }

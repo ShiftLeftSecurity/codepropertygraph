@@ -10,9 +10,9 @@ trait TypeBase extends AbstractNode with StaticType[TypeEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("FULL_NAME", this.fullName)
-    res.put("NAME", this.name)
-    res.put("TYPE_DECL_FULL_NAME", this.typeDeclFullName)
+    if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if (("<empty>": String) != this.typeDeclFullName) res.put("TYPE_DECL_FULL_NAME", this.typeDeclFullName)
     res
   }
 }

@@ -16,18 +16,18 @@ trait MethodRefBase extends AbstractNode with ExpressionBase with StaticType[Met
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("ARGUMENT_INDEX", this.argumentIndex)
+    if ((-1: Int) != this.argumentIndex) res.put("ARGUMENT_INDEX", this.argumentIndex)
     this.argumentName.foreach { p => res.put("ARGUMENT_NAME", p) }
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("METHOD_FULL_NAME", this.methodFullName)
-    res.put("ORDER", this.order)
+    if (("<empty>": String) != this.methodFullName) res.put("METHOD_FULL_NAME", this.methodFullName)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
     val tmpPossibleTypes = this.possibleTypes;
     if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
-    res.put("TYPE_FULL_NAME", this.typeFullName)
+    if (("<empty>": String) != this.typeFullName) res.put("TYPE_FULL_NAME", this.typeFullName)
     res
   }
 }

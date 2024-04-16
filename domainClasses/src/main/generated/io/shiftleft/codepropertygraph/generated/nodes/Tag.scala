@@ -10,8 +10,8 @@ trait TagBase extends AbstractNode with StaticType[TagEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("NAME", this.name)
-    res.put("VALUE", this.value)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if (("": String) != this.value) res.put("VALUE", this.value)
     res
   }
 }

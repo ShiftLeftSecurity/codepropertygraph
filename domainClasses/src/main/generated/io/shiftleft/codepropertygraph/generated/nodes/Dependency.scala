@@ -11,8 +11,8 @@ trait DependencyBase extends AbstractNode with StaticType[DependencyEMT] {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
     this.dependencyGroupId.foreach { p => res.put("DEPENDENCY_GROUP_ID", p) }
-    res.put("NAME", this.name)
-    res.put("VERSION", this.version)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    if (("<empty>": String) != this.version) res.put("VERSION", this.version)
     res
   }
 }

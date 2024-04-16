@@ -10,8 +10,8 @@ trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("KEY", this.key)
-    res.put("VALUE", this.value)
+    if (("<empty>": String) != this.key) res.put("KEY", this.key)
+    if (("": String) != this.value) res.put("VALUE", this.value)
     res
   }
 }

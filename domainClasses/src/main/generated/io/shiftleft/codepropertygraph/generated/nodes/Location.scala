@@ -20,15 +20,15 @@ trait LocationBase extends AbstractNode with StaticType[LocationEMT] {
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("CLASS_NAME", this.className)
-    res.put("CLASS_SHORT_NAME", this.classShortName)
-    res.put("FILENAME", this.filename)
+    if (("<empty>": String) != this.className) res.put("CLASS_NAME", this.className)
+    if (("<empty>": String) != this.classShortName) res.put("CLASS_SHORT_NAME", this.classShortName)
+    if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
-    res.put("METHOD_FULL_NAME", this.methodFullName)
-    res.put("METHOD_SHORT_NAME", this.methodShortName)
-    res.put("NODE_LABEL", this.nodeLabel)
-    res.put("PACKAGE_NAME", this.packageName)
-    res.put("SYMBOL", this.symbol)
+    if (("<empty>": String) != this.methodFullName) res.put("METHOD_FULL_NAME", this.methodFullName)
+    if (("<empty>": String) != this.methodShortName) res.put("METHOD_SHORT_NAME", this.methodShortName)
+    if (("<empty>": String) != this.nodeLabel) res.put("NODE_LABEL", this.nodeLabel)
+    if (("<empty>": String) != this.packageName) res.put("PACKAGE_NAME", this.packageName)
+    if (("<empty>": String) != this.symbol) res.put("SYMBOL", this.symbol)
     this.node.foreach { p => res.put("node", p) }
     res
   }

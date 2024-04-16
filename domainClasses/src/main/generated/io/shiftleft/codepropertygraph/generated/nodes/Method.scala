@@ -24,22 +24,22 @@ trait MethodBase extends AbstractNode with CfgNodeBase with DeclarationBase with
   override def propertiesMap: java.util.Map[String, Any] = {
     import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
     val res = new java.util.HashMap[String, Any]()
-    res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
-    res.put("AST_PARENT_TYPE", this.astParentType)
-    res.put("CODE", this.code)
+    if (("<empty>": String) != this.astParentFullName) res.put("AST_PARENT_FULL_NAME", this.astParentFullName)
+    if (("<empty>": String) != this.astParentType) res.put("AST_PARENT_TYPE", this.astParentType)
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     this.columnNumberEnd.foreach { p => res.put("COLUMN_NUMBER_END", p) }
-    res.put("FILENAME", this.filename)
-    res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
+    if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
     this.hash.foreach { p => res.put("HASH", p) }
-    res.put("IS_EXTERNAL", this.isExternal)
+    if ((false: Boolean) != this.isExternal) res.put("IS_EXTERNAL", this.isExternal)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     this.lineNumberEnd.foreach { p => res.put("LINE_NUMBER_END", p) }
-    res.put("NAME", this.name)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
     this.offset.foreach { p => res.put("OFFSET", p) }
     this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
-    res.put("ORDER", this.order)
-    res.put("SIGNATURE", this.signature)
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
+    if (("": String) != this.signature) res.put("SIGNATURE", this.signature)
     res
   }
 }
