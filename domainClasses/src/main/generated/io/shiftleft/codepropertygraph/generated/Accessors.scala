@@ -880,168 +880,164 @@ object Accessors {
 trait ConcreteStoredConversions extends ConcreteBaseConversions {
   import Accessors.*
   implicit def accessPropertyAliasTypeFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasAliasTypeFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasAliasTypeFullNameEMT]
   ): Access_Property_ALIAS_TYPE_FULL_NAME = new Access_Property_ALIAS_TYPE_FULL_NAME(node)
   implicit def accessPropertyArgumentIndex(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasArgumentIndexEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasArgumentIndexEMT]
   ): Access_Property_ARGUMENT_INDEX = new Access_Property_ARGUMENT_INDEX(node)
   implicit def accessPropertyArgumentName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasArgumentNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasArgumentNameEMT]
   ): Access_Property_ARGUMENT_NAME = new Access_Property_ARGUMENT_NAME(node)
   implicit def accessPropertyAstParentFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasAstParentFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasAstParentFullNameEMT]
   ): Access_Property_AST_PARENT_FULL_NAME = new Access_Property_AST_PARENT_FULL_NAME(node)
   implicit def accessPropertyAstParentType(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasAstParentTypeEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasAstParentTypeEMT]
   ): Access_Property_AST_PARENT_TYPE = new Access_Property_AST_PARENT_TYPE(node)
   implicit def accessPropertyCanonicalName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasCanonicalNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasCanonicalNameEMT]
   ): Access_Property_CANONICAL_NAME = new Access_Property_CANONICAL_NAME(node)
   implicit def accessPropertyClassName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasClassNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasClassNameEMT]
   ): Access_Property_CLASS_NAME = new Access_Property_CLASS_NAME(node)
   implicit def accessPropertyClassShortName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasClassShortNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasClassShortNameEMT]
   ): Access_Property_CLASS_SHORT_NAME = new Access_Property_CLASS_SHORT_NAME(node)
   implicit def accessPropertyClosureBindingId(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasClosureBindingIdEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasClosureBindingIdEMT]
   ): Access_Property_CLOSURE_BINDING_ID = new Access_Property_CLOSURE_BINDING_ID(node)
   implicit def accessPropertyClosureOriginalName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasClosureOriginalNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasClosureOriginalNameEMT]
   ): Access_Property_CLOSURE_ORIGINAL_NAME = new Access_Property_CLOSURE_ORIGINAL_NAME(node)
-  implicit def accessPropertyCode(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasCodeEMT]
-  ): Access_Property_CODE = new Access_Property_CODE(node)
+  implicit def accessPropertyCode(node: nodes.StoredNode & nodes.StaticType[nodes.HasCodeEMT]): Access_Property_CODE =
+    new Access_Property_CODE(node)
   implicit def accessPropertyColumnNumber(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasColumnNumberEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasColumnNumberEMT]
   ): Access_Property_COLUMN_NUMBER = new Access_Property_COLUMN_NUMBER(node)
   implicit def accessPropertyColumnNumberEnd(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasColumnNumberEndEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasColumnNumberEndEMT]
   ): Access_Property_COLUMN_NUMBER_END = new Access_Property_COLUMN_NUMBER_END(node)
   implicit def accessPropertyContainedRef(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasContainedRefEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasContainedRefEMT]
   ): Access_Property_CONTAINED_REF = new Access_Property_CONTAINED_REF(node)
   implicit def accessPropertyContent(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasContentEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasContentEMT]
   ): Access_Property_CONTENT = new Access_Property_CONTENT(node)
   implicit def accessPropertyControlStructureType(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasControlStructureTypeEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasControlStructureTypeEMT]
   ): Access_Property_CONTROL_STRUCTURE_TYPE = new Access_Property_CONTROL_STRUCTURE_TYPE(node)
   implicit def accessPropertyDependencyGroupId(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasDependencyGroupIdEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasDependencyGroupIdEMT]
   ): Access_Property_DEPENDENCY_GROUP_ID = new Access_Property_DEPENDENCY_GROUP_ID(node)
   implicit def accessPropertyDispatchType(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasDispatchTypeEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasDispatchTypeEMT]
   ): Access_Property_DISPATCH_TYPE = new Access_Property_DISPATCH_TYPE(node)
   implicit def accessPropertyDynamicTypeHintFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasDynamicTypeHintFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasDynamicTypeHintFullNameEMT]
   ): Access_Property_DYNAMIC_TYPE_HINT_FULL_NAME = new Access_Property_DYNAMIC_TYPE_HINT_FULL_NAME(node)
   implicit def accessPropertyEvaluationStrategy(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasEvaluationStrategyEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasEvaluationStrategyEMT]
   ): Access_Property_EVALUATION_STRATEGY = new Access_Property_EVALUATION_STRATEGY(node)
   implicit def accessPropertyExplicitAs(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasExplicitAsEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasExplicitAsEMT]
   ): Access_Property_EXPLICIT_AS = new Access_Property_EXPLICIT_AS(node)
   implicit def accessPropertyFilename(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasFilenameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasFilenameEMT]
   ): Access_Property_FILENAME = new Access_Property_FILENAME(node)
   implicit def accessPropertyFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasFullNameEMT]
   ): Access_Property_FULL_NAME = new Access_Property_FULL_NAME(node)
-  implicit def accessPropertyHash(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasHashEMT]
-  ): Access_Property_HASH = new Access_Property_HASH(node)
+  implicit def accessPropertyHash(node: nodes.StoredNode & nodes.StaticType[nodes.HasHashEMT]): Access_Property_HASH =
+    new Access_Property_HASH(node)
   implicit def accessPropertyImportedAs(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasImportedAsEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasImportedAsEMT]
   ): Access_Property_IMPORTED_AS = new Access_Property_IMPORTED_AS(node)
   implicit def accessPropertyImportedEntity(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasImportedEntityEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasImportedEntityEMT]
   ): Access_Property_IMPORTED_ENTITY = new Access_Property_IMPORTED_ENTITY(node)
   implicit def accessPropertyIndex(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasIndexEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasIndexEMT]
   ): Access_Property_INDEX = new Access_Property_INDEX(node)
   implicit def accessPropertyInheritsFromTypeFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasInheritsFromTypeFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasInheritsFromTypeFullNameEMT]
   ): Access_Property_INHERITS_FROM_TYPE_FULL_NAME = new Access_Property_INHERITS_FROM_TYPE_FULL_NAME(node)
   implicit def accessPropertyIsExplicit(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasIsExplicitEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasIsExplicitEMT]
   ): Access_Property_IS_EXPLICIT = new Access_Property_IS_EXPLICIT(node)
   implicit def accessPropertyIsExternal(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasIsExternalEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasIsExternalEMT]
   ): Access_Property_IS_EXTERNAL = new Access_Property_IS_EXTERNAL(node)
   implicit def accessPropertyIsVariadic(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasIsVariadicEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasIsVariadicEMT]
   ): Access_Property_IS_VARIADIC = new Access_Property_IS_VARIADIC(node)
   implicit def accessPropertyIsWildcard(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasIsWildcardEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasIsWildcardEMT]
   ): Access_Property_IS_WILDCARD = new Access_Property_IS_WILDCARD(node)
-  implicit def accessPropertyKey(node: nodes.StoredNode with nodes.StaticType[nodes.HasKeyEMT]): Access_Property_KEY =
+  implicit def accessPropertyKey(node: nodes.StoredNode & nodes.StaticType[nodes.HasKeyEMT]): Access_Property_KEY =
     new Access_Property_KEY(node)
   implicit def accessPropertyLanguage(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasLanguageEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasLanguageEMT]
   ): Access_Property_LANGUAGE = new Access_Property_LANGUAGE(node)
   implicit def accessPropertyLineNumber(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasLineNumberEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasLineNumberEMT]
   ): Access_Property_LINE_NUMBER = new Access_Property_LINE_NUMBER(node)
   implicit def accessPropertyLineNumberEnd(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasLineNumberEndEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasLineNumberEndEMT]
   ): Access_Property_LINE_NUMBER_END = new Access_Property_LINE_NUMBER_END(node)
   implicit def accessPropertyMethodFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasMethodFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasMethodFullNameEMT]
   ): Access_Property_METHOD_FULL_NAME = new Access_Property_METHOD_FULL_NAME(node)
   implicit def accessPropertyMethodShortName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasMethodShortNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasMethodShortNameEMT]
   ): Access_Property_METHOD_SHORT_NAME = new Access_Property_METHOD_SHORT_NAME(node)
   implicit def accessPropertyModifierType(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasModifierTypeEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasModifierTypeEMT]
   ): Access_Property_MODIFIER_TYPE = new Access_Property_MODIFIER_TYPE(node)
-  implicit def accessPropertyName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasNameEMT]
-  ): Access_Property_NAME = new Access_Property_NAME(node)
+  implicit def accessPropertyName(node: nodes.StoredNode & nodes.StaticType[nodes.HasNameEMT]): Access_Property_NAME =
+    new Access_Property_NAME(node)
   implicit def accessPropertyNodeLabel(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasNodeLabelEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasNodeLabelEMT]
   ): Access_Property_NODE_LABEL = new Access_Property_NODE_LABEL(node)
   implicit def accessPropertyOffset(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasOffsetEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasOffsetEMT]
   ): Access_Property_OFFSET = new Access_Property_OFFSET(node)
   implicit def accessPropertyOffsetEnd(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasOffsetEndEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasOffsetEndEMT]
   ): Access_Property_OFFSET_END = new Access_Property_OFFSET_END(node)
   implicit def accessPropertyOrder(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasOrderEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasOrderEMT]
   ): Access_Property_ORDER = new Access_Property_ORDER(node)
   implicit def accessPropertyOverlays(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasOverlaysEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasOverlaysEMT]
   ): Access_Property_OVERLAYS = new Access_Property_OVERLAYS(node)
   implicit def accessPropertyPackageName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasPackageNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasPackageNameEMT]
   ): Access_Property_PACKAGE_NAME = new Access_Property_PACKAGE_NAME(node)
   implicit def accessPropertyParserTypeName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasParserTypeNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasParserTypeNameEMT]
   ): Access_Property_PARSER_TYPE_NAME = new Access_Property_PARSER_TYPE_NAME(node)
   implicit def accessPropertyPossibleTypes(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasPossibleTypesEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasPossibleTypesEMT]
   ): Access_Property_POSSIBLE_TYPES = new Access_Property_POSSIBLE_TYPES(node)
-  implicit def accessPropertyRoot(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasRootEMT]
-  ): Access_Property_ROOT = new Access_Property_ROOT(node)
+  implicit def accessPropertyRoot(node: nodes.StoredNode & nodes.StaticType[nodes.HasRootEMT]): Access_Property_ROOT =
+    new Access_Property_ROOT(node)
   implicit def accessPropertySignature(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasSignatureEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasSignatureEMT]
   ): Access_Property_SIGNATURE = new Access_Property_SIGNATURE(node)
   implicit def accessPropertySymbol(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasSymbolEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasSymbolEMT]
   ): Access_Property_SYMBOL = new Access_Property_SYMBOL(node)
   implicit def accessPropertyTypeDeclFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasTypeDeclFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasTypeDeclFullNameEMT]
   ): Access_Property_TYPE_DECL_FULL_NAME = new Access_Property_TYPE_DECL_FULL_NAME(node)
   implicit def accessPropertyTypeFullName(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasTypeFullNameEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasTypeFullNameEMT]
   ): Access_Property_TYPE_FULL_NAME = new Access_Property_TYPE_FULL_NAME(node)
   implicit def accessPropertyValue(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasValueEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasValueEMT]
   ): Access_Property_VALUE = new Access_Property_VALUE(node)
   implicit def accessPropertyVersion(
-    node: nodes.StoredNode with nodes.StaticType[nodes.HasVersionEMT]
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasVersionEMT]
   ): Access_Property_VERSION = new Access_Property_VERSION(node)
 }
 
