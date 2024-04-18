@@ -47,6 +47,9 @@ class Cpg(private val _graph: flatgraph.Graph = new flatgraph.Graph(GraphSchema)
 
   override def close(): Unit =
     _graph.close()
+
+  override def toString(): String =
+    String.format("Cpg[%s]", graph)
 }
 
 @flatgraph.help.TraversalSource
