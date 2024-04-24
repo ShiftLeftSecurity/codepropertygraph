@@ -90,7 +90,7 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"      => NamespaceBlock.PropertyDefaults.Code
       case "FILENAME"  => NamespaceBlock.PropertyDefaults.Filename
@@ -99,6 +99,7 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
       case "ORDER"     => NamespaceBlock.PropertyDefaults.Order
       case _           => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut

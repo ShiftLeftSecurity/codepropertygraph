@@ -97,7 +97,7 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def name: String                  = get().name
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => Annotation.PropertyDefaults.ArgumentIndex
       case "CODE"           => Annotation.PropertyDefaults.Code
@@ -106,6 +106,7 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
       case "ORDER"          => Annotation.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

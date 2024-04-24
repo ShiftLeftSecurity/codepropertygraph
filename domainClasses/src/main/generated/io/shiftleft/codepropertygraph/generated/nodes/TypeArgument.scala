@@ -74,12 +74,13 @@ class TypeArgument(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
   override def columnNumber: Option[Integer] = get().columnNumber
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => TypeArgument.PropertyDefaults.Code
       case "ORDER" => TypeArgument.PropertyDefaults.Order
       case _       => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def bindsToOut: Iterator[TypeParameter] = get().bindsToOut
   override def _bindsToOut                = get()._bindsToOut

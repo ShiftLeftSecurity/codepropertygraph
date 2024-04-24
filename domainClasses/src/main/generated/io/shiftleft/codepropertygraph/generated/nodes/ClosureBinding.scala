@@ -68,11 +68,12 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
   override def closureBindingId: Option[String]    = get().closureBindingId
   override def closureOriginalName: Option[String] = get().closureOriginalName
   override def evaluationStrategy: String          = get().evaluationStrategy
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "EVALUATION_STRATEGY" => ClosureBinding.PropertyDefaults.EvaluationStrategy
       case _                     => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def refOut: Iterator[AstNode] = get().refOut
   override def _refOut          = get()._refOut

@@ -135,7 +135,7 @@ class ControlStructure(graph_4762: Graph, id_4762: Long /*cf https://github.com/
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
   override def parserTypeName: String        = get().parserTypeName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"         => ControlStructure.PropertyDefaults.ArgumentIndex
       case "CODE"                   => ControlStructure.PropertyDefaults.Code
@@ -144,6 +144,7 @@ class ControlStructure(graph_4762: Graph, id_4762: Long /*cf https://github.com/
       case "PARSER_TYPE_NAME"       => ControlStructure.PropertyDefaults.ParserTypeName
       case _                        => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

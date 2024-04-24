@@ -29,10 +29,11 @@ object SourceFile {
 class SourceFile(_graph: Graph, _outNode: NodeRef[NodeDb], _inNode: NodeRef[NodeDb])
     extends Edge(_graph, SourceFile.Label, _outNode, _inNode, SourceFile.PropertyNames.allAsJava) {
 
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
 
       case _ => super.propertyDefaultValue(propertyKey)
     }
+  }
 
 }

@@ -148,7 +148,7 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def parserTypeName: String                      = get().parserTypeName
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"   => Unknown.PropertyDefaults.ArgumentIndex
       case "CODE"             => Unknown.PropertyDefaults.Code
@@ -158,6 +158,7 @@ class Unknown(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
       case "TYPE_FULL_NAME"   => Unknown.PropertyDefaults.TypeFullName
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

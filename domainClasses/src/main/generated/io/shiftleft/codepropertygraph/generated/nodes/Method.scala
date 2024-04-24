@@ -160,7 +160,7 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def offsetEnd: Option[Integer]       = get().offsetEnd
   override def order: scala.Int                 = get().order
   override def signature: String                = get().signature
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "AST_PARENT_FULL_NAME" => Method.PropertyDefaults.AstParentFullName
       case "AST_PARENT_TYPE"      => Method.PropertyDefaults.AstParentType
@@ -173,6 +173,7 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
       case "SIGNATURE"            => Method.PropertyDefaults.Signature
       case _                      => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def astOut: Iterator[AstNode] = get().astOut
   override def _astOut          = get()._astOut

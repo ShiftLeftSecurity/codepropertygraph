@@ -66,12 +66,13 @@ class Dependency(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
   override def dependencyGroupId: Option[String] = get().dependencyGroupId
   override def name: String                      = get().name
   override def version: String                   = get().version
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "NAME"    => Dependency.PropertyDefaults.Name
       case "VERSION" => Dependency.PropertyDefaults.Version
       case _         => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def importsIn: Iterator[Import] = get().importsIn
   override def _importsIn         = get()._importsIn

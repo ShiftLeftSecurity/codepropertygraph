@@ -22,7 +22,7 @@ abstract class CpgPass(cpg: Cpg, outName: String = "", keyPool: Option[KeyPool] 
 
   def run(builder: overflowdb.BatchedUpdate.DiffGraphBuilder): Unit
 
-  final override def generateParts(): Array[_ <: AnyRef] = Array[AnyRef](null)
+  final override def generateParts(): Array[? <: AnyRef] = Array[AnyRef](null)
 
   final override def runOnPart(builder: overflowdb.BatchedUpdate.DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
@@ -118,7 +118,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
 abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
   type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
   // generate Array of parts that can be processed in parallel
-  def generateParts(): Array[_ <: AnyRef]
+  def generateParts(): Array[? <: AnyRef]
   // setup large data structures, acquire external resources
   def init(): Unit = {}
   // release large data structures and external resources

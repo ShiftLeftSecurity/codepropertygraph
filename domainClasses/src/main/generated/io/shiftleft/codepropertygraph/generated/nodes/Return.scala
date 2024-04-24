@@ -99,13 +99,14 @@ class Return(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def columnNumber: Option[Integer] = get().columnNumber
   override def lineNumber: Option[Integer]   = get().lineNumber
   override def order: scala.Int              = get().order
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => Return.PropertyDefaults.ArgumentIndex
       case "CODE"           => Return.PropertyDefaults.Code
       case "ORDER"          => Return.PropertyDefaults.Order
       case _                => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[CfgNode] = get().argumentOut
   override def _argumentOut          = get()._argumentOut

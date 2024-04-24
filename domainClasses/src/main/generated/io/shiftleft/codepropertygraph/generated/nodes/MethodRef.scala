@@ -155,7 +155,7 @@ class MethodRef(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"   => MethodRef.PropertyDefaults.ArgumentIndex
       case "CODE"             => MethodRef.PropertyDefaults.Code
@@ -164,6 +164,7 @@ class MethodRef(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
       case "TYPE_FULL_NAME"   => MethodRef.PropertyDefaults.TypeFullName
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def argumentOut: Iterator[TemplateDom] = get().argumentOut
   override def _argumentOut              = get()._argumentOut

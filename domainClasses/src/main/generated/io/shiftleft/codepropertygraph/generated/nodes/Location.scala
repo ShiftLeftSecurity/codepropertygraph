@@ -104,7 +104,7 @@ class Location(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   override def nodeLabel: String           = get().nodeLabel
   override def packageName: String         = get().packageName
   override def symbol: String              = get().symbol
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CLASS_NAME"        => Location.PropertyDefaults.ClassName
       case "CLASS_SHORT_NAME"  => Location.PropertyDefaults.ClassShortName
@@ -116,6 +116,7 @@ class Location(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
       case "SYMBOL"            => Location.PropertyDefaults.Symbol
       case _                   => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def node: Option[StoredNode] = get().node
 

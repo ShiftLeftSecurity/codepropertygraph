@@ -1,13 +1,13 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.189"
-val overflowdbCodegenVersion = "2.106"
+val overflowdbVersion = "1.192"
+val overflowdbCodegenVersion = "2.107"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "3.3.1",
+    scalaVersion       := "3.4.1",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
@@ -61,7 +61,7 @@ ThisBuild / scalacOptions ++= Seq(
   "-feature",
   // "-explain",
   // "-Xfatal-warnings",
-  "-Wconf:cat=deprecation:w,any:e",
+  // "-Wconf:cat=deprecation:w,any:e",
   "-language:implicitConversions"
 )
 

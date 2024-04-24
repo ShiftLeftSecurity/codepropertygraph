@@ -67,13 +67,14 @@ class Binding(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def methodFullName: String = get().methodFullName
   override def name: String           = get().name
   override def signature: String      = get().signature
-  override def propertyDefaultValue(propertyKey: String) =
+  override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "METHOD_FULL_NAME" => Binding.PropertyDefaults.MethodFullName
       case "NAME"             => Binding.PropertyDefaults.Name
       case "SIGNATURE"        => Binding.PropertyDefaults.Signature
       case _                  => super.propertyDefaultValue(propertyKey)
     }
+  }
 
   def refOut: Iterator[Method] = get().refOut
   override def _refOut         = get()._refOut

@@ -10,7 +10,7 @@ object Schema2Json extends App {
 
   val schema = CpgSchema.instance
 
-  implicit val formats: AnyRef with Formats =
+  implicit val formats: AnyRef & Formats =
     Serialization.formats(NoTypeHints)
 
   val json =
