@@ -22,11 +22,54 @@ trait CommentBase extends AbstractNode with AstNodeBase with StaticType[CommentE
 object Comment {
   val Label = "COMMENT"
   object PropertyNames {
-    val Code         = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val Filename     = io.shiftleft.codepropertygraph.generated.PropertyNames.FILENAME
-    val LineNumber   = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Order        = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = "FILENAME"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code     = "<empty>"

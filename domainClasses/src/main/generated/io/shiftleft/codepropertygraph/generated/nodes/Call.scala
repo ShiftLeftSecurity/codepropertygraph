@@ -40,19 +40,140 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase with S
 object Call {
   val Label = "CALL"
   object PropertyNames {
-    val ArgumentIndex           = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_INDEX
-    val ArgumentName            = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_NAME
-    val Code                    = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber            = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val DispatchType            = io.shiftleft.codepropertygraph.generated.PropertyNames.DISPATCH_TYPE
-    val DynamicTypeHintFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.DYNAMIC_TYPE_HINT_FULL_NAME
-    val LineNumber              = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val MethodFullName          = io.shiftleft.codepropertygraph.generated.PropertyNames.METHOD_FULL_NAME
-    val Name                    = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Order                   = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
-    val PossibleTypes           = io.shiftleft.codepropertygraph.generated.PropertyNames.POSSIBLE_TYPES
-    val Signature               = io.shiftleft.codepropertygraph.generated.PropertyNames.SIGNATURE
-    val TypeFullName            = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
+
+    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
+      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
+      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
+      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
+      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
+      * ignored. It is suggested to set it to -1.
+      */
+    val ArgumentIndex = "ARGUMENT_INDEX"
+
+    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
+      * the expression. For all other calls, this field is unset.
+      */
+    val ArgumentName = "ARGUMENT_NAME"
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or `DYNAMIC_DISPATCH`. For
+      * statically dispatched method calls, the call target is known at compile time while for dynamically dispatched
+      * calls, it can only be determined at runtime as it may depend on the type of an object (as is the case for
+      * virtual method calls) or calculation of an offset.
+      */
+    val DispatchType = "DISPATCH_TYPE"
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = "METHOD_FULL_NAME"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = "POSSIBLE_TYPES"
+
+    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
+      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
+      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
+      * can be chosen by the frontend implementor to fit the source language.
+      */
+    val Signature = "SIGNATURE"
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = "TYPE_FULL_NAME"
+  }
+  object PropertyKeys {
+
+    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
+      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
+      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
+      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
+      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
+      * ignored. It is suggested to set it to -1.
+      */
+    val ArgumentIndex = flatgraph.SinglePropertyKey[Int](kind = 1, name = "ARGUMENT_INDEX", default = -1: Int)
+
+    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
+      * the expression. For all other calls, this field is unset.
+      */
+    val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or `DYNAMIC_DISPATCH`. For
+      * statically dispatched method calls, the call target is known at compile time while for dynamically dispatched
+      * calls, it can only be determined at runtime as it may depend on the type of an object (as is the case for
+      * virtual method calls) or calculation of an offset.
+      */
+    val DispatchType = flatgraph.SinglePropertyKey[String](kind = 17, name = "DISPATCH_TYPE", default = "<empty>")
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+
+    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
+      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
+      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
+      * can be chosen by the frontend implementor to fit the source language.
+      */
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex  = -1: Int

@@ -19,7 +19,11 @@ trait FindingBase extends AbstractNode with StaticType[FindingEMT] {
 
 object Finding {
   val Label = "FINDING"
-  object PropertyNames    {}
+  object PropertyNames {
+    val Evidence      = "evidence"
+    val Keyvaluepairs = "keyValuePairs"
+  }
+  object PropertyKeys     {}
   object PropertyDefaults {}
 }
 

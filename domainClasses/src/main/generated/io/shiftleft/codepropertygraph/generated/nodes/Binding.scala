@@ -20,9 +20,38 @@ trait BindingBase extends AbstractNode with StaticType[BindingEMT] {
 object Binding {
   val Label = "BINDING"
   object PropertyNames {
-    val MethodFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.METHOD_FULL_NAME
-    val Name           = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Signature      = io.shiftleft.codepropertygraph.generated.PropertyNames.SIGNATURE
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = "METHOD_FULL_NAME"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
+      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
+      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
+      * can be chosen by the frontend implementor to fit the source language.
+      */
+    val Signature = "SIGNATURE"
+  }
+  object PropertyKeys {
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
+      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
+      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
+      * can be chosen by the frontend implementor to fit the source language.
+      */
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
   }
   object PropertyDefaults {
     val MethodFullName = "<empty>"

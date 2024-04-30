@@ -37,15 +37,95 @@ trait MethodParameterOutBase
 object MethodParameterOut {
   val Label = "METHOD_PARAMETER_OUT"
   object PropertyNames {
-    val Code               = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber       = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val EvaluationStrategy = io.shiftleft.codepropertygraph.generated.PropertyNames.EVALUATION_STRATEGY
-    val Index              = io.shiftleft.codepropertygraph.generated.PropertyNames.INDEX
-    val IsVariadic         = io.shiftleft.codepropertygraph.generated.PropertyNames.IS_VARIADIC
-    val LineNumber         = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Name               = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Order              = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
-    val TypeFullName       = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy = "EVALUATION_STRATEGY"
+
+    /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
+      * 0 is reserved for implicit self / this parameter.
+      */
+    val Index = "INDEX"
+
+    /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
+      * parameter of a method is allowed to have this property set to true.
+      */
+    val IsVariadic = "IS_VARIADIC"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = "TYPE_FULL_NAME"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy =
+      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
+
+    /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
+      * 0 is reserved for implicit self / this parameter.
+      */
+    val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
+
+    /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
+      * parameter of a method is allowed to have this property set to true.
+      */
+    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_VARIADIC", default = false)
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code               = "<empty>"

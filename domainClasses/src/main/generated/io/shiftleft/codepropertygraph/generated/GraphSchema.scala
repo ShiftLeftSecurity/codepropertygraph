@@ -1,10 +1,11 @@
 package io.shiftleft.codepropertygraph.generated
+
 import io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.edges
 import flatgraph.FormalQtyType
 
 object GraphSchema extends flatgraph.Schema {
-  val nodeLabels = Array(
+  private val nodeLabels = IndexedSeq(
     "ANNOTATION",
     "ANNOTATION_LITERAL",
     "ANNOTATION_PARAMETER",
@@ -77,7 +78,7 @@ object GraphSchema extends flatgraph.Schema {
     "SOURCE_FILE",
     "TAGGED_BY"
   )
-  val edgeIdByLabel = edgeLabels.zipWithIndex.toMap
+  val edgeKindByLabel = edgeLabels.zipWithIndex.toMap
   val edgePropertyAllocators: Array[Int => Array[?]] = Array(
     size => null,
     size => null,
@@ -920,7 +921,278 @@ object GraphSchema extends flatgraph.Schema {
   override def getNodeLabel(nodeKind: Int): String    = nodeLabels(nodeKind)
   override def getNodeKindByLabel(label: String): Int = nodeKindByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
   override def getEdgeLabel(nodeKind: Int, edgeKind: Int): String = edgeLabels(edgeKind)
-  override def getEdgeKindByLabel(label: String): Int = edgeIdByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
+  override def getEdgeKindByLabel(label: String): Int = edgeKindByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
+  override def getNodePropertyNames(nodeLabel: String): Set[String] = {
+    nodeLabel match {
+      case "ANNOTATION" =>
+        Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CODE", "COLUMN_NUMBER", "FULL_NAME", "LINE_NUMBER", "NAME", "ORDER")
+      case "ANNOTATION_LITERAL" =>
+        Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER")
+      case "ANNOTATION_PARAMETER"        => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "ANNOTATION_PARAMETER_ASSIGN" => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "ARRAY_INITIALIZER" =>
+        Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "BINDING" => Set("METHOD_FULL_NAME", "NAME", "SIGNATURE")
+      case "BLOCK" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "CALL" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DISPATCH_TYPE",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "METHOD_FULL_NAME",
+          "NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "SIGNATURE",
+          "TYPE_FULL_NAME"
+        )
+      case "CLOSURE_BINDING" => Set("CLOSURE_BINDING_ID", "CLOSURE_ORIGINAL_NAME", "EVALUATION_STRATEGY")
+      case "COMMENT"         => Set("CODE", "COLUMN_NUMBER", "FILENAME", "LINE_NUMBER", "ORDER")
+      case "CONFIG_FILE"     => Set("CONTENT", "NAME")
+      case "CONTROL_STRUCTURE" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "CONTROL_STRUCTURE_TYPE",
+          "LINE_NUMBER",
+          "ORDER",
+          "PARSER_TYPE_NAME"
+        )
+      case "DEPENDENCY" => Set("DEPENDENCY_GROUP_ID", "NAME", "VERSION")
+      case "FIELD_IDENTIFIER" =>
+        Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CANONICAL_NAME", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "FILE"    => Set("CODE", "COLUMN_NUMBER", "CONTENT", "HASH", "LINE_NUMBER", "NAME", "ORDER")
+      case "FINDING" => Set()
+      case "IDENTIFIER" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "IMPORT" =>
+        Set(
+          "CODE",
+          "COLUMN_NUMBER",
+          "EXPLICIT_AS",
+          "IMPORTED_AS",
+          "IMPORTED_ENTITY",
+          "IS_EXPLICIT",
+          "IS_WILDCARD",
+          "LINE_NUMBER",
+          "ORDER"
+        )
+      case "JUMP_LABEL" => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER", "PARSER_TYPE_NAME")
+      case "JUMP_TARGET" =>
+        Set("ARGUMENT_INDEX", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER", "PARSER_TYPE_NAME")
+      case "KEY_VALUE_PAIR" => Set("KEY", "VALUE")
+      case "LITERAL" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "LOCAL" =>
+        Set(
+          "CLOSURE_BINDING_ID",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "LOCATION" =>
+        Set(
+          "CLASS_NAME",
+          "CLASS_SHORT_NAME",
+          "FILENAME",
+          "LINE_NUMBER",
+          "METHOD_FULL_NAME",
+          "METHOD_SHORT_NAME",
+          "NODE_LABEL",
+          "PACKAGE_NAME",
+          "SYMBOL"
+        )
+      case "MEMBER" =>
+        Set(
+          "AST_PARENT_FULL_NAME",
+          "AST_PARENT_TYPE",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "META_DATA" => Set("HASH", "LANGUAGE", "OVERLAYS", "ROOT", "VERSION")
+      case "METHOD" =>
+        Set(
+          "AST_PARENT_FULL_NAME",
+          "AST_PARENT_TYPE",
+          "CODE",
+          "COLUMN_NUMBER",
+          "COLUMN_NUMBER_END",
+          "FILENAME",
+          "FULL_NAME",
+          "HASH",
+          "IS_EXTERNAL",
+          "LINE_NUMBER",
+          "LINE_NUMBER_END",
+          "NAME",
+          "OFFSET",
+          "OFFSET_END",
+          "ORDER",
+          "SIGNATURE"
+        )
+      case "METHOD_PARAMETER_IN" =>
+        Set(
+          "CLOSURE_BINDING_ID",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "EVALUATION_STRATEGY",
+          "INDEX",
+          "IS_VARIADIC",
+          "LINE_NUMBER",
+          "NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "METHOD_PARAMETER_OUT" =>
+        Set(
+          "CODE",
+          "COLUMN_NUMBER",
+          "EVALUATION_STRATEGY",
+          "INDEX",
+          "IS_VARIADIC",
+          "LINE_NUMBER",
+          "NAME",
+          "ORDER",
+          "TYPE_FULL_NAME"
+        )
+      case "METHOD_REF" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "METHOD_FULL_NAME",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "METHOD_RETURN" =>
+        Set(
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "EVALUATION_STRATEGY",
+          "LINE_NUMBER",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "MODIFIER"        => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "MODIFIER_TYPE", "ORDER")
+      case "NAMESPACE"       => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER")
+      case "NAMESPACE_BLOCK" => Set("CODE", "COLUMN_NUMBER", "FILENAME", "FULL_NAME", "LINE_NUMBER", "NAME", "ORDER")
+      case "RETURN"          => Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "TAG"             => Set("NAME", "VALUE")
+      case "TAG_NODE_PAIR"   => Set()
+      case "TEMPLATE_DOM" =>
+        Set("ARGUMENT_INDEX", "ARGUMENT_NAME", "CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER")
+      case "TYPE"          => Set("FULL_NAME", "NAME", "TYPE_DECL_FULL_NAME")
+      case "TYPE_ARGUMENT" => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "ORDER")
+      case "TYPE_DECL" =>
+        Set(
+          "ALIAS_TYPE_FULL_NAME",
+          "AST_PARENT_FULL_NAME",
+          "AST_PARENT_TYPE",
+          "CODE",
+          "COLUMN_NUMBER",
+          "FILENAME",
+          "FULL_NAME",
+          "INHERITS_FROM_TYPE_FULL_NAME",
+          "IS_EXTERNAL",
+          "LINE_NUMBER",
+          "NAME",
+          "OFFSET",
+          "OFFSET_END",
+          "ORDER"
+        )
+      case "TYPE_PARAMETER" => Set("CODE", "COLUMN_NUMBER", "LINE_NUMBER", "NAME", "ORDER")
+      case "TYPE_REF" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "ORDER",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case "UNKNOWN" =>
+        Set(
+          "ARGUMENT_INDEX",
+          "ARGUMENT_NAME",
+          "CODE",
+          "COLUMN_NUMBER",
+          "CONTAINED_REF",
+          "DYNAMIC_TYPE_HINT_FULL_NAME",
+          "LINE_NUMBER",
+          "ORDER",
+          "PARSER_TYPE_NAME",
+          "POSSIBLE_TYPES",
+          "TYPE_FULL_NAME"
+        )
+      case _ => Set.empty
+    }
+  }
+  override def getEdgePropertyName(label: String): Option[String] = {
+    label match {
+      case "REACHING_DEF" => Some("VARIABLE")
+      case _              => None
+    }
+  }
+
   override def getPropertyLabel(nodeKind: Int, propertyKind: Int): String = {
     if (propertyKind < 55) normalNodePropertyNames(propertyKind)
     else if (propertyKind == 55 && nodeKind == 15) "evidence"      /*on node FINDING*/

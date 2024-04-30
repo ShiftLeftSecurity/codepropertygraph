@@ -19,8 +19,20 @@ trait TagBase extends AbstractNode with StaticType[TagEMT] {
 object Tag {
   val Label = "TAG"
   object PropertyNames {
-    val Name  = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Value = io.shiftleft.codepropertygraph.generated.PropertyNames.VALUE
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = "VALUE"
+  }
+  object PropertyKeys {
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
   }
   object PropertyDefaults {
     val Name  = "<empty>"

@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.generated
 
-import flatgraph.PropertyKey
-
 object PropertyKeys {
 
   /** This property holds the fully qualified name of the type that the node is a type alias of.
@@ -267,5 +265,4 @@ object PropertyKeys {
     * this CPG conforms to
     */
   val Version = flatgraph.SinglePropertyKey[String](kind = 54, name = "VERSION", default = "<empty>")
-
 }

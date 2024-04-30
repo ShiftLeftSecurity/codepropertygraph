@@ -33,15 +33,94 @@ trait ImportBase extends AbstractNode with AstNodeBase with StaticType[ImportEMT
 object Import {
   val Label = "IMPORT"
   object PropertyNames {
-    val Code           = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber   = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val ExplicitAs     = io.shiftleft.codepropertygraph.generated.PropertyNames.EXPLICIT_AS
-    val ImportedAs     = io.shiftleft.codepropertygraph.generated.PropertyNames.IMPORTED_AS
-    val ImportedEntity = io.shiftleft.codepropertygraph.generated.PropertyNames.IMPORTED_ENTITY
-    val IsExplicit     = io.shiftleft.codepropertygraph.generated.PropertyNames.IS_EXPLICIT
-    val IsWildcard     = io.shiftleft.codepropertygraph.generated.PropertyNames.IS_WILDCARD
-    val LineNumber     = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Order          = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** Specifies whether the IMPORTED_AS property was explicitly present in the code. For languages like Java which do
+      * not allow a renaming during import this is always false. For e.g. Kotlin it depends on the existence of the "as"
+      * keyword.
+      */
+    val ExplicitAs = "EXPLICIT_AS"
+
+    /** The identifier under which the import can be accessed in the importing context. For a Java import this is always
+      * identical to the class name. But e.g. for a Kotlin import like "import java.nio.ByteBuffer as BBuffer" this
+      * would be "BBuffer". This property is ignored if IS_WILDCARD is true.
+      */
+    val ImportedAs = "IMPORTED_AS"
+
+    /** The identifying string of the imported entity. For a Java import like "import java.nio.ByteBuffer;" this would
+      * be "java.nio.ByteBuffer".
+      */
+    val ImportedEntity = "IMPORTED_ENTITY"
+
+    /** Specifies whether this is an explicit import. Most languages have implicit default imports of some standard
+      * library elements and this flag is used to distinguish those from explicit imports found in the code base.
+      */
+    val IsExplicit = "IS_EXPLICIT"
+
+    /** Specifies whether this is a wildcard import. For a Java import like "import java.nio.*;" IS_WILDCARD would be
+      * "true" and IMPORTED_ENTITY would be "java.nio". For wildcard imports the IMPORTED_AS property is ignored.
+      */
+    val IsWildcard = "IS_WILDCARD"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** Specifies whether the IMPORTED_AS property was explicitly present in the code. For languages like Java which do
+      * not allow a renaming during import this is always false. For e.g. Kotlin it depends on the existence of the "as"
+      * keyword.
+      */
+    val ExplicitAs = flatgraph.OptionalPropertyKey[Boolean](kind = 20, name = "EXPLICIT_AS")
+
+    /** The identifier under which the import can be accessed in the importing context. For a Java import this is always
+      * identical to the class name. But e.g. for a Kotlin import like "import java.nio.ByteBuffer as BBuffer" this
+      * would be "BBuffer". This property is ignored if IS_WILDCARD is true.
+      */
+    val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 24, name = "IMPORTED_AS")
+
+    /** The identifying string of the imported entity. For a Java import like "import java.nio.ByteBuffer;" this would
+      * be "java.nio.ByteBuffer".
+      */
+    val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_ENTITY")
+
+    /** Specifies whether this is an explicit import. Most languages have implicit default imports of some standard
+      * library elements and this flag is used to distinguish those from explicit imports found in the code base.
+      */
+    val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 28, name = "IS_EXPLICIT")
+
+    /** Specifies whether this is a wildcard import. For a Java import like "import java.nio.*;" IS_WILDCARD would be
+      * "true" and IMPORTED_ENTITY would be "java.nio". For wildcard imports the IMPORTED_AS property is ignored.
+      */
+    val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 31, name = "IS_WILDCARD")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code  = "<empty>"

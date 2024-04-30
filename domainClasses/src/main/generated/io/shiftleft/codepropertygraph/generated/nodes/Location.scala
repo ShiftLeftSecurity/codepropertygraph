@@ -37,15 +37,60 @@ trait LocationBase extends AbstractNode with StaticType[LocationEMT] {
 object Location {
   val Label = "LOCATION"
   object PropertyNames {
-    val ClassName       = io.shiftleft.codepropertygraph.generated.PropertyNames.CLASS_NAME
-    val ClassShortName  = io.shiftleft.codepropertygraph.generated.PropertyNames.CLASS_SHORT_NAME
-    val Filename        = io.shiftleft.codepropertygraph.generated.PropertyNames.FILENAME
-    val LineNumber      = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val MethodFullName  = io.shiftleft.codepropertygraph.generated.PropertyNames.METHOD_FULL_NAME
-    val MethodShortName = io.shiftleft.codepropertygraph.generated.PropertyNames.METHOD_SHORT_NAME
-    val NodeLabel       = io.shiftleft.codepropertygraph.generated.PropertyNames.NODE_LABEL
-    val PackageName     = io.shiftleft.codepropertygraph.generated.PropertyNames.PACKAGE_NAME
-    val Symbol          = io.shiftleft.codepropertygraph.generated.PropertyNames.SYMBOL
+
+    val ClassName = "CLASS_NAME"
+
+    val ClassShortName = "CLASS_SHORT_NAME"
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = "FILENAME"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = "METHOD_FULL_NAME"
+
+    val MethodShortName = "METHOD_SHORT_NAME"
+
+    val NodeLabel = "NODE_LABEL"
+
+    val PackageName = "PACKAGE_NAME"
+
+    val Symbol = "SYMBOL"
+    val Node   = "node"
+  }
+  object PropertyKeys {
+    val ClassName      = flatgraph.SinglePropertyKey[String](kind = 6, name = "CLASS_NAME", default = "<empty>")
+    val ClassShortName = flatgraph.SinglePropertyKey[String](kind = 7, name = "CLASS_SHORT_NAME", default = "<empty>")
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
+      * for each METHOD_FULL_NAME
+      */
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+    val MethodShortName =
+      flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_SHORT_NAME", default = "<empty>")
+    val NodeLabel   = flatgraph.SinglePropertyKey[String](kind = 40, name = "NODE_LABEL", default = "<empty>")
+    val PackageName = flatgraph.SinglePropertyKey[String](kind = 45, name = "PACKAGE_NAME", default = "<empty>")
+    val Symbol      = flatgraph.SinglePropertyKey[String](kind = 50, name = "SYMBOL", default = "<empty>")
   }
   object PropertyDefaults {
     val ClassName       = "<empty>"

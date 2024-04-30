@@ -25,14 +25,87 @@ trait ControlStructureBase extends AbstractNode with ExpressionBase with StaticT
 object ControlStructure {
   val Label = "CONTROL_STRUCTURE"
   object PropertyNames {
-    val ArgumentIndex        = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_INDEX
-    val ArgumentName         = io.shiftleft.codepropertygraph.generated.PropertyNames.ARGUMENT_NAME
-    val Code                 = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber         = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val ControlStructureType = io.shiftleft.codepropertygraph.generated.PropertyNames.CONTROL_STRUCTURE_TYPE
-    val LineNumber           = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Order                = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
-    val ParserTypeName       = io.shiftleft.codepropertygraph.generated.PropertyNames.PARSER_TYPE_NAME
+
+    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
+      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
+      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
+      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
+      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
+      * ignored. It is suggested to set it to -1.
+      */
+    val ArgumentIndex = "ARGUMENT_INDEX"
+
+    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
+      * the expression. For all other calls, this field is unset.
+      */
+    val ArgumentName = "ARGUMENT_NAME"
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure a `CONTROL_STRUCTURE` node
+      * represents. The available types are the following: BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, THROW
+      * and SWITCH.
+      */
+    val ControlStructureType = "CONTROL_STRUCTURE_TYPE"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+
+    /** AST node type name emitted by parser. */
+    val ParserTypeName = "PARSER_TYPE_NAME"
+  }
+  object PropertyKeys {
+
+    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
+      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
+      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
+      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
+      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
+      * ignored. It is suggested to set it to -1.
+      */
+    val ArgumentIndex = flatgraph.SinglePropertyKey[Int](kind = 1, name = "ARGUMENT_INDEX", default = -1: Int)
+
+    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
+      * the expression. For all other calls, this field is unset.
+      */
+    val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** The `CONTROL_STRUCTURE_TYPE` field indicates which kind of control structure a `CONTROL_STRUCTURE` node
+      * represents. The available types are the following: BREAK, CONTINUE, DO, WHILE, FOR, GOTO, IF, ELSE, TRY, THROW
+      * and SWITCH.
+      */
+    val ControlStructureType =
+      flatgraph.SinglePropertyKey[String](kind = 15, name = "CONTROL_STRUCTURE_TYPE", default = "<empty>")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+
+    /** AST node type name emitted by parser. */
+    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 46, name = "PARSER_TYPE_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex        = -1: Int

@@ -24,13 +24,70 @@ trait FileBase extends AbstractNode with AstNodeBase with StaticType[FileEMT] {
 object File {
   val Label = "FILE"
   object PropertyNames {
-    val Code         = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val Content      = io.shiftleft.codepropertygraph.generated.PropertyNames.CONTENT
-    val Hash         = io.shiftleft.codepropertygraph.generated.PropertyNames.HASH
-    val LineNumber   = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Name         = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Order        = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = "CONTENT"
+
+    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
+      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
+      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
+      * be deferred or skipped if the hash is not needed.
+      */
+    val Hash = "HASH"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = flatgraph.SinglePropertyKey[String](kind = 14, name = "CONTENT", default = "<empty>")
+
+    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
+      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
+      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
+      * be deferred or skipped if the hash is not needed.
+      */
+    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code    = "<empty>"
