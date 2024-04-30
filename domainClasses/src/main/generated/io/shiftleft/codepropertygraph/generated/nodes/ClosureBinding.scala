@@ -24,9 +24,41 @@ trait ClosureBindingBase extends AbstractNode with StaticType[ClosureBindingEMT]
 object ClosureBinding {
   val Label = "CLOSURE_BINDING"
   object PropertyNames {
-    val ClosureBindingId    = io.shiftleft.codepropertygraph.generated.PropertyNames.CLOSURE_BINDING_ID
-    val ClosureOriginalName = io.shiftleft.codepropertygraph.generated.PropertyNames.CLOSURE_ORIGINAL_NAME
-    val EvaluationStrategy  = io.shiftleft.codepropertygraph.generated.PropertyNames.EVALUATION_STRATEGY
+
+    /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
+      * the corresponding CLOSURE_BINDING nodes
+      */
+    val ClosureBindingId = "CLOSURE_BINDING_ID"
+
+    /** The original name of the (potentially mangled) captured variable */
+    val ClosureOriginalName = "CLOSURE_ORIGINAL_NAME"
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy = "EVALUATION_STRATEGY"
+  }
+  object PropertyKeys {
+
+    /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
+      * the corresponding CLOSURE_BINDING nodes
+      */
+    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 8, name = "CLOSURE_BINDING_ID")
+
+    /** The original name of the (potentially mangled) captured variable */
+    val ClosureOriginalName = flatgraph.OptionalPropertyKey[String](kind = 9, name = "CLOSURE_ORIGINAL_NAME")
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy =
+      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
   }
   object PropertyDefaults {
     val EvaluationStrategy = "<empty>"

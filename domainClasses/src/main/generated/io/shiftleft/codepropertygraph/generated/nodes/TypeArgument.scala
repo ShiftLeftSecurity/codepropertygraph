@@ -21,10 +21,40 @@ trait TypeArgumentBase extends AbstractNode with AstNodeBase with StaticType[Typ
 object TypeArgument {
   val Label = "TYPE_ARGUMENT"
   object PropertyNames {
-    val Code         = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val LineNumber   = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Order        = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code  = "<empty>"

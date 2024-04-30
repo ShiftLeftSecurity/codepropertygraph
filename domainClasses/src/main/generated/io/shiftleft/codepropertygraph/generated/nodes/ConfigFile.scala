@@ -19,8 +19,24 @@ trait ConfigFileBase extends AbstractNode with StaticType[ConfigFileEMT] {
 object ConfigFile {
   val Label = "CONFIG_FILE"
   object PropertyNames {
-    val Content = io.shiftleft.codepropertygraph.generated.PropertyNames.CONTENT
-    val Name    = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
+
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = "CONTENT"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+  }
+  object PropertyKeys {
+
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = flatgraph.SinglePropertyKey[String](kind = 14, name = "CONTENT", default = "<empty>")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Content = "<empty>"

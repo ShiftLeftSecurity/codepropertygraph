@@ -20,9 +20,35 @@ trait TypeBase extends AbstractNode with StaticType[TypeEMT] {
 object Type {
   val Label = "TYPE"
   object PropertyNames {
-    val FullName         = io.shiftleft.codepropertygraph.generated.PropertyNames.FULL_NAME
-    val Name             = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val TypeDeclFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_DECL_FULL_NAME
+
+    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
+      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
+      */
+    val FullName = "FULL_NAME"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is
+      * required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
+      */
+    val TypeDeclFullName = "TYPE_DECL_FULL_NAME"
+  }
+  object PropertyKeys {
+
+    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
+      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
+      */
+    val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is
+      * required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
+      */
+    val TypeDeclFullName =
+      flatgraph.SinglePropertyKey[String](kind = 51, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val FullName         = "<empty>"

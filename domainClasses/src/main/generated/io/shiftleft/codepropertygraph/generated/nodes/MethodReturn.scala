@@ -33,14 +33,85 @@ trait MethodReturnBase extends AbstractNode with CfgNodeBase with StaticType[Met
 object MethodReturn {
   val Label = "METHOD_RETURN"
   object PropertyNames {
-    val Code                    = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber            = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val DynamicTypeHintFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.DYNAMIC_TYPE_HINT_FULL_NAME
-    val EvaluationStrategy      = io.shiftleft.codepropertygraph.generated.PropertyNames.EVALUATION_STRATEGY
-    val LineNumber              = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Order                   = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
-    val PossibleTypes           = io.shiftleft.codepropertygraph.generated.PropertyNames.POSSIBLE_TYPES
-    val TypeFullName            = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy = "EVALUATION_STRATEGY"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = "POSSIBLE_TYPES"
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = "TYPE_FULL_NAME"
+  }
+  object PropertyKeys {
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+
+    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
+      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
+      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
+      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
+      * object that it points to is not made.
+      */
+    val EvaluationStrategy =
+      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code               = "<empty>"

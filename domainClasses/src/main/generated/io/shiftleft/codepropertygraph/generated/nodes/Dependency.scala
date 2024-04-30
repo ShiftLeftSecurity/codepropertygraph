@@ -20,9 +20,30 @@ trait DependencyBase extends AbstractNode with StaticType[DependencyEMT] {
 object Dependency {
   val Label = "DEPENDENCY"
   object PropertyNames {
-    val DependencyGroupId = io.shiftleft.codepropertygraph.generated.PropertyNames.DEPENDENCY_GROUP_ID
-    val Name              = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Version           = io.shiftleft.codepropertygraph.generated.PropertyNames.VERSION
+
+    /** The group ID for a dependency */
+    val DependencyGroupId = "DEPENDENCY_GROUP_ID"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
+      * this CPG conforms to
+      */
+    val Version = "VERSION"
+  }
+  object PropertyKeys {
+
+    /** The group ID for a dependency */
+    val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 16, name = "DEPENDENCY_GROUP_ID")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
+      * this CPG conforms to
+      */
+    val Version = flatgraph.SinglePropertyKey[String](kind = 54, name = "VERSION", default = "<empty>")
   }
   object PropertyDefaults {
     val Name    = "<empty>"

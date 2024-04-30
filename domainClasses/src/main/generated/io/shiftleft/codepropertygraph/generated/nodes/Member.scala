@@ -37,16 +37,91 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase with
 object Member {
   val Label = "MEMBER"
   object PropertyNames {
-    val AstParentFullName       = io.shiftleft.codepropertygraph.generated.PropertyNames.AST_PARENT_FULL_NAME
-    val AstParentType           = io.shiftleft.codepropertygraph.generated.PropertyNames.AST_PARENT_TYPE
-    val Code                    = io.shiftleft.codepropertygraph.generated.PropertyNames.CODE
-    val ColumnNumber            = io.shiftleft.codepropertygraph.generated.PropertyNames.COLUMN_NUMBER
-    val DynamicTypeHintFullName = io.shiftleft.codepropertygraph.generated.PropertyNames.DYNAMIC_TYPE_HINT_FULL_NAME
-    val LineNumber              = io.shiftleft.codepropertygraph.generated.PropertyNames.LINE_NUMBER
-    val Name                    = io.shiftleft.codepropertygraph.generated.PropertyNames.NAME
-    val Order                   = io.shiftleft.codepropertygraph.generated.PropertyNames.ORDER
-    val PossibleTypes           = io.shiftleft.codepropertygraph.generated.PropertyNames.POSSIBLE_TYPES
-    val TypeFullName            = io.shiftleft.codepropertygraph.generated.PropertyNames.TYPE_FULL_NAME
+
+    /** This field holds the FULL_NAME of the AST parent of an entity. */
+    val AstParentFullName = "AST_PARENT_FULL_NAME"
+
+    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
+      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
+      */
+    val AstParentType = "AST_PARENT_TYPE"
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = "POSSIBLE_TYPES"
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = "TYPE_FULL_NAME"
+  }
+  object PropertyKeys {
+
+    /** This field holds the FULL_NAME of the AST parent of an entity. */
+    val AstParentFullName =
+      flatgraph.SinglePropertyKey[String](kind = 3, name = "AST_PARENT_FULL_NAME", default = "<empty>")
+
+    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
+      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
+      */
+    val AstParentType = flatgraph.SinglePropertyKey[String](kind = 4, name = "AST_PARENT_TYPE", default = "<empty>")
+
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+
+    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
+      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
+      */
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+
+    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
+      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
+      * cannot be determined, this field should be set to the empty string.
+      */
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val AstParentFullName = "<empty>"

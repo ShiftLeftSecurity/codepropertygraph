@@ -19,8 +19,20 @@ trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {
 object KeyValuePair {
   val Label = "KEY_VALUE_PAIR"
   object PropertyNames {
-    val Key   = io.shiftleft.codepropertygraph.generated.PropertyNames.KEY
-    val Value = io.shiftleft.codepropertygraph.generated.PropertyNames.VALUE
+
+    /** This property denotes a key of a key-value pair. */
+    val Key = "KEY"
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = "VALUE"
+  }
+  object PropertyKeys {
+
+    /** This property denotes a key of a key-value pair. */
+    val Key = flatgraph.SinglePropertyKey[String](kind = 32, name = "KEY", default = "<empty>")
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
   }
   object PropertyDefaults {
     val Key   = "<empty>"
