@@ -3,6 +3,9 @@ package io.shiftleft.codepropertygraph.generated.nodes
 import io.shiftleft.codepropertygraph.generated.Language.*
 import scala.collection.immutable.{IndexedSeq, ArraySeq}
 
+/** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
+  * erased at runtime
+  */
 trait KeyValuePairEMT extends AnyRef with HasKeyEMT with HasValueEMT
 
 trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {

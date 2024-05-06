@@ -50,7 +50,7 @@ object Pdg extends SchemaBase {
             |""".stripMargin
       )
       .protoId(137)
-      .addProperties(variable)
+      .withProperty(variable)
 
     literal
       .addOutEdge(edge = cdg, inNode = callNode)
