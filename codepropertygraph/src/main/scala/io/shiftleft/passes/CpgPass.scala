@@ -60,10 +60,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
   keyPool: Option[KeyPool] = None
 ) extends NewStyleCpgPassBase[T] {
 
-  override def createApplySerializeAndStore(
-    serializedCpg: SerializedCpg,
-    prefix: String = ""
-  ): Unit = {
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
     baseLogger.info(s"Start of pass: $name")
     val nanosStart = System.nanoTime()
     var nParts     = 0
