@@ -62,7 +62,6 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
 
   override def createApplySerializeAndStore(
     serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
     prefix: String = ""
   ): Unit = {
     baseLogger.info(s"Start of pass: $name")
@@ -94,7 +93,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
         val nanosStop = System.nanoTime()
         val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
         val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
-          if (inverse) " Inverse serialized and stored." else " Diff serialized and stored."
+          " Diff serialized and stored."
         } else ""
         baseLogger.info(
           f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
@@ -179,7 +178,7 @@ trait CpgPassBase {
 
   def createAndApply(): Unit
 
-  def createApplySerializeAndStore(serializedCpg: SerializedCpg, inverse: Boolean = false, prefix: String = ""): Unit
+  def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit
 
   /** Name of the pass. By default it is inferred from the name of the class, override if needed.
     */

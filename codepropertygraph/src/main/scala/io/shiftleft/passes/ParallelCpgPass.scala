@@ -53,7 +53,6 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
     */
   override def createApplySerializeAndStore(
     serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
     prefix: String = ""
   ): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
