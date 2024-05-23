@@ -51,11 +51,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
     *
     * E.g. adding a CFG edge to node X races with reading an AST edge of node X.
     */
-  override def createApplySerializeAndStore(
-    serializedCpg: SerializedCpg,
-    inverse: Boolean = false,
-    prefix: String = ""
-  ): Unit = {
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info(s"Start of enhancement: $name")
     val nanosStart = System.nanoTime()

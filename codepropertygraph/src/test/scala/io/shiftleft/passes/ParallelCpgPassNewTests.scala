@@ -36,12 +36,12 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
       cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
     }
 
-    "produce a serialized inverse CPG" in Fixture() { (_, pass) =>
+    "produce a serialized CPG file" in Fixture() { (_, pass) =>
       File.usingTemporaryFile("pass", ".zip") { file =>
         file.delete()
         val filename      = file.path.toString
         val serializedCpg = new SerializedCpg(filename)
-        pass.createApplySerializeAndStore(serializedCpg, true)
+        pass.createApplySerializeAndStore(serializedCpg)
         serializedCpg.close()
         file.exists shouldBe true
         Files.size(file.path) should not be 0
