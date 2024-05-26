@@ -5,4 +5,5 @@ addSbtPlugin("io.shiftleft"      % "sbt-ci-release-early" % "2.0.18")
 addSbtPlugin("com.dwijnand"      % "sbt-dynver"           % "4.1.1")
 addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"  % "1.3.5")
 addSbtPlugin("io.shiftleft"      % "sbt-overflowdb"       % "2.106")
+addSbtPlugin("com.codecommit"  % "sbt-github-packages"  % "0.5.3")
 

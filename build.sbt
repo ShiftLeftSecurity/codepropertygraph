@@ -75,3 +75,13 @@ Global / onLoad := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
   (Global / onLoad).value
 }
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )
