@@ -2,7 +2,7 @@
 
 set -e
 
-git remote set upstream https://github.com/ShiftLeftSecurity/codepropertygraph
+git remote add upstream https://github.com/ShiftLeftSecurity/codepropertygraph
 
 usage() {
   echo "Usage: $0 [--publish]"
