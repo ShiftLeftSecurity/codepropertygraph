@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.generated.neighboraccessors
 
 import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.Language.*
+import io.shiftleft.codepropertygraph.generated.language.*
 
 final class AccessNeighborsForMethodRef(val node: nodes.MethodRef) extends AnyVal {
 

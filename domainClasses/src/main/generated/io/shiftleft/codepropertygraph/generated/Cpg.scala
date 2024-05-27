@@ -2,7 +2,7 @@ package io.shiftleft.codepropertygraph.generated
 import flatgraph.{DiffGraphApplier, DiffGraphBuilder}
 import flatgraph.help.DocSearchPackages
 import flatgraph.help.Table.AvailableWidthProvider
-import Language.*
+import io.shiftleft.codepropertygraph.generated.language.*
 
 object Cpg {
   val defaultDocSearchPackage = DocSearchPackages.default.withAdditionalPackage(getClass.getPackage.getName)

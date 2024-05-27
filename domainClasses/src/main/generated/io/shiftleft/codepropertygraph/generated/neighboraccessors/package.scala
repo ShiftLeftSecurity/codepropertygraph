@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.generated
 
-import flatgraph.traversal.Language.*
+import flatgraph.traversal.language.*
 import io.shiftleft.codepropertygraph.generated.nodes
 
 package object neighboraccessors {
