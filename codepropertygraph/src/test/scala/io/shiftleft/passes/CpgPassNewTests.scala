@@ -5,7 +5,7 @@ import flatgraph.SchemaViolationException
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewFile
-import io.shiftleft.codepropertygraph.generated.Language.*
+import io.shiftleft.codepropertygraph.generated.language.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
