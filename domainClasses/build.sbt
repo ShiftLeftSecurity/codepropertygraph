@@ -17,3 +17,14 @@ Compile / scalacOptions --= Seq("-Wconf:cat=deprecation:w,any:e", "-Wunused", "-
 // this is just a temporarily commented out to fix the release build...
 // minified command that fails if the below line isn't commented: `sbt clean doc`
 // cleanFiles += baseDirectory.value / "src/main/generated"
+
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )
