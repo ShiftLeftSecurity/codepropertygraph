@@ -1,4 +1,4 @@
-name: master & release build
+name: gh packages release
 
 on:
   push:
@@ -13,6 +13,7 @@ jobs:
       with:
         lfs: true
         fetch-depth: 0
+    - run: export $GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
     - name: Clone submodules
       run: git submodule update --init --recursive
     - name: apt-get update
@@ -24,14 +25,20 @@ jobs:
         java-version: 19
     - name: Check formatting
       run: sbt scalafmtCheck Test/scalafmtCheck
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: echo "Previous step failed because code is not formatted. Run 'sbt scalafmt'"
       if: ${{ failure() }}
     - name: Check domain classes
       run: sbt generateDomainClassesCheck
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: echo "Previous step failed because latest domain classes are not committed. Run 'sbt generateDomainClasses' (should be triggered automatically by `sbt compile`, so maybe you just forgot to commit?)"
       if: ${{ failure() }}
     - name: Compile and run tests
       run: sbt +test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
   release:
         concurrency: release
