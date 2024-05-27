@@ -13,7 +13,6 @@ jobs:
       with:
         lfs: true
         fetch-depth: 0
-    - run: export $GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
     - name: Clone submodules
       run: git submodule update --init --recursive
     - name: apt-get update
@@ -42,7 +41,7 @@ jobs:
     
   release:
         concurrency: release
-        # needs: [test-codepropertygraph]
+        needs: [test-codepropertygraph]
         runs-on: ubuntu-22.04
         steps:
           - uses: actions/checkout@v4
