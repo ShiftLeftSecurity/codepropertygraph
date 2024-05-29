@@ -1,7 +1,7 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.Cpg
-import io.shiftleft.utils.ExecutionContextProvider
+import io.shiftleft.utils.{ExecutionContextProvider, StatsLogger}
 import org.slf4j.MDC
 
 import java.util.concurrent.LinkedBlockingQueue
@@ -54,6 +54,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
     import ConcurrentWriterCpgPass.producerQueueCapacity
     baseLogger.info(s"Start of enhancement: $name")
+    StatsLogger.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nDiff      = 0
@@ -120,6 +121,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
       baseLogger.info(
         f"Enhancement $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms. ${nDiff}%d  + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
       )
+      StatsLogger.endLastStage()
     }
   }
 
