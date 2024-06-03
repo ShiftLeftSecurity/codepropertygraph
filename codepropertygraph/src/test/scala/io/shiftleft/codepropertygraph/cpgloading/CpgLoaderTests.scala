@@ -14,8 +14,8 @@ import java.nio.file.{Files, Path, Paths}
 import scala.compiletime.uninitialized
 import scala.util.Using
 
-/** CpgLoader allows CPGs to be loaded from the CPG protobuf file format (based on Google protocol buffers),
- * overflowdb and flatgraph binaries.
+/** CpgLoader allows CPGs to be loaded from the CPG protobuf file format (based on Google protocol buffers), overflowdb
+  * and flatgraph binaries.
   */
 class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
@@ -35,7 +35,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
       cpg.graph.nodes("METHOD").size shouldBe 1
     }
   }
-  
+
   "allow loading of CPG in overflowdb format" in {
     val odbCpg = ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.odb")
     Using.resource(CpgLoader.load(odbCpg)) { cpg =>
@@ -52,7 +52,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   "allow loading of CPG in flatgraph format and persist changes to separate file" in {
     val flatgraphCpg = Paths.get(ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.fg"))
-    val persistTo = Files.createTempFile(getClass.getSimpleName, "persistToTest")
+    val persistTo    = Files.createTempFile(getClass.getSimpleName, "persistToTest")
 
     Using.resource(CpgLoader.load(flatgraphCpg, persistTo)) { cpg =>
       DiffGraphApplier.applyDiff(cpg.graph, Cpg.newDiffGraphBuilder.addNode(NewMethod()))

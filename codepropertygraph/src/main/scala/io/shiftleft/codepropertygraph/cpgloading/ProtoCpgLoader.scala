@@ -32,16 +32,15 @@ object ProtoCpgLoader {
     }
   }
 
-
-  /**
-   * @param protoCpgs is a function because we need to run two passes due to flatgraph-specific
-   *                  implementation details: one to add the nodes, and one to add edges and set node properties
-   */
+  /** @param protoCpgs
+    *   is a function because we need to run two passes due to flatgraph-specific implementation details: one to add the
+    *   nodes, and one to add edges and set node properties
+    */
   def loadFromListOfProtos(protoCpgs: () => Iterator[CpgStruct], storagePath: Option[Path]): Cpg = {
     // TODO use centralised string interner everywhere, maybe move to flatgraph core - keep in mind strong references / GC.
     implicit val interner: StringInterner = StringInterner.makeStrongInterner()
-    val protoToGraphNodeMappings = new ProtoToGraphNodeMappings
-    val cpg = openOrCreateCpg(storagePath)
+    val protoToGraphNodeMappings          = new ProtoToGraphNodeMappings
+    val cpg                               = openOrCreateCpg(storagePath)
 
     // first pass: add the raw nodes without any properties or edges
     protoCpgs().foreach { cpgProto =>
@@ -87,7 +86,11 @@ object ProtoCpgLoader {
   private def nodesIter(protoCpg: CpgStruct): Iterator[CpgStruct.Node] =
     protoCpg.getNodeList.iterator().asScala
 
-  private def addNodesRaw(protoNodes: Iterator[CpgStruct.Node], graph: Graph, protoToGraphNodeMappings: ProtoToGraphNodeMappings): Unit = {
+  private def addNodesRaw(
+    protoNodes: Iterator[CpgStruct.Node],
+    graph: Graph,
+    protoToGraphNodeMappings: ProtoToGraphNodeMappings
+  ): Unit = {
     val diffGraph = Cpg.newDiffGraphBuilder
     protoNodes.filterNot(protoToGraphNodeMappings.contains).foreach { protoNode =>
       val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
