@@ -15,8 +15,8 @@ object CpgLoader {
   def load(filename: String): Cpg =
     load(Paths.get(filename))
 
-  /** Load a Code Property Graph from the given file - persist in given second file.
-    * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file. *
+  /** Load a Code Property Graph from the given file - persist in given second file. I.e. the given input file will not
+    * be modified, all changes will be written to the given 'persistTo' file. *
     */
   def load(from: String, persistTo: String): Cpg =
     load(Paths.get(from), Paths.get(persistTo))
@@ -44,8 +44,8 @@ object CpgLoader {
     }
   }
 
-  /** Load a Code Property Graph from the given file, but persist it in the given second file.
-    * I.e. the given input file will not be modified, all changes will be written to the given 'persistTo' file.
+  /** Load a Code Property Graph from the given file, but persist it in the given second file. I.e. the given input file
+    * will not be modified, all changes will be written to the given 'persistTo' file.
     *
     * Notes:
     *   - if the given 'persistTo' file already exists, it will be overridden

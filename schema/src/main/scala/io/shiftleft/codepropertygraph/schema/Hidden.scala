@@ -280,9 +280,12 @@ object Hidden extends SchemaBase {
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
 
-    val secondaryId = builder.addProperty(name = "SECONDARY_ID", ValueType.String, comment =
-      """ID from a different context, e.g. if the graph was imported from a different format,
-        |we can use this to preserve the link to the original""".stripMargin)
+    val secondaryId = builder.addProperty(
+      name = "SECONDARY_ID",
+      ValueType.String,
+      comment = """ID from a different context, e.g. if the graph was imported from a different format,
+        |we can use this to preserve the link to the original""".stripMargin
+    )
 
   }
 

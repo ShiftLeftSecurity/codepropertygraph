@@ -12,7 +12,7 @@ class StepsTest extends AnyWordSpec with Matchers {
 
   ".help step" should {
     given AvailableWidthProvider = ConstantWidth(120)
-    given DocSearchPackages = generated.Cpg.defaultDocSearchPackage
+    given DocSearchPackages      = generated.Cpg.defaultDocSearchPackage
 
     "show domain overview" in {
       val domainStartersHelp = Cpg.emptyCpg.help
