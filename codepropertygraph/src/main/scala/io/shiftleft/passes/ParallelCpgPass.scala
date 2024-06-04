@@ -1,6 +1,6 @@
 package io.shiftleft.passes
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.utils.ExecutionContextProvider
 import org.slf4j.MDC
 

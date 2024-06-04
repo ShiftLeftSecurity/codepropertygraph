@@ -1,7 +1,7 @@
 package io.shiftleft.mypass
 
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.cpgloading.{CpgLoader, CpgLoaderConfig}
 import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import io.shiftleft.passes.SimpleCpgPass

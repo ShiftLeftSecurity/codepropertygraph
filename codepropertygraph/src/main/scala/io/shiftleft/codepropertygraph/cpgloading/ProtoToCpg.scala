@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.{Edge, Node}
 import io.shiftleft.proto.cpg.Cpg.PropertyValue
