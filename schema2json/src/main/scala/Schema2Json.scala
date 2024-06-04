@@ -17,9 +17,8 @@ object Schema2Json extends App {
     ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
 
   val outFileName = "/tmp/schema.json"
-  better.files
-    .File(outFileName)
-    .write(compact(render(json)))
+  os.write(os.Path(outFileName), compact(render(json)))
+  // Files.writeString(Paths.get(outFileName), compact(render(json)))
   println(s"Schema written to: $outFileName")
 
   private def schemaName(nodeType: AbstractNodeType): String =
