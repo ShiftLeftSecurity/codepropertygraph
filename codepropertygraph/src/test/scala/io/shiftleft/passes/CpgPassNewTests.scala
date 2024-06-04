@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import better.files.File
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewFile
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -14,7 +14,7 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
     def apply(keyPool: Option[KeyPool] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
-      val cpg = Cpg.emptyCpg
+      val cpg = Cpg.empty
       class MyPass(cpg: Cpg) extends SimpleCpgPass(cpg, "MyPass", keyPool) {
         override def run(builder: DiffGraphBuilder): Unit = {
           val builder2 = new DiffGraphBuilder
@@ -52,7 +52,7 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
     }
 
     "fail for schema violations" in {
-      val cpg = Cpg.emptyCpg
+      val cpg = Cpg.empty
       val pass = new SimpleCpgPass(cpg, "pass1") {
         override def run(dst: DiffGraphBuilder): Unit = {
           val file1 = NewFile().name("foo")

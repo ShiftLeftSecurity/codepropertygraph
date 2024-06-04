@@ -1,6 +1,6 @@
 package io.shiftleft
 
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import overflowdb.Graph
 
 object OverflowDbTestInstance {

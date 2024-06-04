@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import org.slf4j.{Logger, LoggerFactory, MDC}
 import overflowdb.BatchedUpdate
 
