@@ -93,9 +93,15 @@ object ProtoCpgLoader {
   ): Unit = {
     val diffGraph = Cpg.newDiffGraphBuilder
     protoNodes.filterNot(protoToGraphNodeMappings.contains).foreach { protoNode =>
-      val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
-      diffGraph.addNode(newNode)
-      protoToGraphNodeMappings.add(protoNode, newNode)
+      val label = protoNode.getType.name()
+      graph.schema.getNodeKindByLabelMaybe(label) match {
+        case None =>
+          logger.warn(s"nodeKind for label=`$label` not found - is this a valid proto cpg?")
+        case Some(nodeKind) =>
+          val newNode = new GenericDNode(graph.schema.getNodeKindByLabel(protoNode.getType.name()).toShortSafely)
+          diffGraph.addNode(newNode)
+          protoToGraphNodeMappings.add(protoNode, newNode)
+      }
     }
     DiffGraphApplier.applyDiff(graph, diffGraph)
   }
