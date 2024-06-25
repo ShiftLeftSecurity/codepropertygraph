@@ -1286,7 +1286,7 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -1300,7 +1300,7 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -1314,7 +1314,7 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -2655,7 +2655,7 @@ class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with Expre
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -2669,7 +2669,7 @@ class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with Expre
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -2678,7 +2678,7 @@ class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with Expre
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -4010,7 +4010,7 @@ class NewAnnotationParameter extends NewNode with AnnotationParameterBase with A
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -4019,7 +4019,7 @@ class NewAnnotationParameter extends NewNode with AnnotationParameterBase with A
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -5337,7 +5337,7 @@ class NewAnnotationParameterAssign extends NewNode with AnnotationParameterAssig
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -5346,7 +5346,7 @@ class NewAnnotationParameterAssign extends NewNode with AnnotationParameterAssig
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -6668,7 +6668,7 @@ class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNode
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -6682,7 +6682,7 @@ class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNode
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -6691,7 +6691,7 @@ class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNode
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -8103,7 +8103,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -8117,7 +8117,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -8131,7 +8131,7 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -9494,7 +9494,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -9508,7 +9508,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -9527,7 +9527,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -9662,7 +9662,7 @@ class NewClosureBinding extends NewNode with ClosureBindingBase {
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value)
+    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -9671,7 +9671,7 @@ class NewClosureBinding extends NewNode with ClosureBindingBase {
   })
 
   def closureOriginalName(value: String): this.type = {
-    this.closureOriginalName = Option(value)
+    this.closureOriginalName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -10988,7 +10988,7 @@ class NewComment extends NewNode with CommentBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -11002,7 +11002,7 @@ class NewComment extends NewNode with CommentBase with AstNodeNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -12399,7 +12399,7 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -12413,7 +12413,7 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -12427,7 +12427,7 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -12524,7 +12524,7 @@ class NewDependency extends NewNode with DependencyBase {
   }
 
   def dependencyGroupId(value: String): this.type = {
-    this.dependencyGroupId = Option(value)
+    this.dependencyGroupId = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -13850,7 +13850,7 @@ class NewFieldIdentifier extends NewNode with FieldIdentifierBase with Expressio
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -13869,7 +13869,7 @@ class NewFieldIdentifier extends NewNode with FieldIdentifierBase with Expressio
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -13878,7 +13878,7 @@ class NewFieldIdentifier extends NewNode with FieldIdentifierBase with Expressio
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -15211,7 +15211,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -15225,7 +15225,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value)
+    this.hash = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -15234,7 +15234,7 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -16646,7 +16646,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -16660,7 +16660,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -16674,7 +16674,7 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -18037,7 +18037,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -18046,7 +18046,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def explicitAs(value: java.lang.Boolean): this.type = {
-    this.explicitAs = Option(value)
+    this.explicitAs = Option(value).asInstanceOf[Option[Boolean]]
     this
   }
 
@@ -18055,7 +18055,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def importedAs(value: String): this.type = {
-    this.importedAs = Option(value)
+    this.importedAs = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -18064,7 +18064,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def importedEntity(value: String): this.type = {
-    this.importedEntity = Option(value)
+    this.importedEntity = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -18073,7 +18073,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def isExplicit(value: java.lang.Boolean): this.type = {
-    this.isExplicit = Option(value)
+    this.isExplicit = Option(value).asInstanceOf[Option[Boolean]]
     this
   }
 
@@ -18082,7 +18082,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def isWildcard(value: java.lang.Boolean): this.type = {
-    this.isWildcard = Option(value)
+    this.isWildcard = Option(value).asInstanceOf[Option[Boolean]]
     this
   }
 
@@ -18091,7 +18091,7 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -19428,7 +19428,7 @@ class NewJumpLabel extends NewNode with JumpLabelBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -19437,7 +19437,7 @@ class NewJumpLabel extends NewNode with JumpLabelBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -20782,7 +20782,7 @@ class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with Cfg
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -20791,7 +20791,7 @@ class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with Cfg
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -22206,7 +22206,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -22220,7 +22220,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -22234,7 +22234,7 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -23584,7 +23584,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value)
+    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -23598,7 +23598,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -23612,7 +23612,7 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -23753,7 +23753,7 @@ class NewLocation extends NewNode with LocationBase {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -23787,7 +23787,7 @@ class NewLocation extends NewNode with LocationBase {
   }
 
   def node(value: AbstractNode): this.type = {
-    this.node = Option(value)
+    this.node = Option(value).asInstanceOf[Option[AbstractNode]]
     this
   }
 
@@ -25140,7 +25140,7 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -25154,7 +25154,7 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -25273,7 +25273,7 @@ class NewMetaData extends NewNode with MetaDataBase {
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value)
+    this.hash = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -26643,7 +26643,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -26652,7 +26652,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   })
 
   def columnNumberEnd(value: Integer): this.type = {
-    this.columnNumberEnd = Option(value)
+    this.columnNumberEnd = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -26671,7 +26671,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value)
+    this.hash = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -26685,7 +26685,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -26694,7 +26694,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   })
 
   def lineNumberEnd(value: Integer): this.type = {
-    this.lineNumberEnd = Option(value)
+    this.lineNumberEnd = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -26708,7 +26708,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def offset(value: Integer): this.type = {
-    this.offset = Option(value)
+    this.offset = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -26717,7 +26717,7 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   })
 
   def offsetEnd(value: Integer): this.type = {
-    this.offsetEnd = Option(value)
+    this.offsetEnd = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -28092,7 +28092,7 @@ class NewMethodParameterIn
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value)
+    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -28106,7 +28106,7 @@ class NewMethodParameterIn
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -28135,7 +28135,7 @@ class NewMethodParameterIn
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -29509,7 +29509,7 @@ class NewMethodParameterOut
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -29533,7 +29533,7 @@ class NewMethodParameterOut
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -30888,7 +30888,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -30902,7 +30902,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -30916,7 +30916,7 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -32277,7 +32277,7 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -32296,7 +32296,7 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -33640,7 +33640,7 @@ class NewModifier extends NewNode with ModifierBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -33649,7 +33649,7 @@ class NewModifier extends NewNode with ModifierBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -34977,7 +34977,7 @@ class NewNamespace extends NewNode with NamespaceBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -34986,7 +34986,7 @@ class NewNamespace extends NewNode with NamespaceBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -36318,7 +36318,7 @@ class NewNamespaceBlock extends NewNode with NamespaceBlockBase with AstNodeNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -36337,7 +36337,7 @@ class NewNamespaceBlock extends NewNode with NamespaceBlockBase with AstNodeNew 
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -37673,7 +37673,7 @@ class NewReturn extends NewNode with ReturnBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -37687,7 +37687,7 @@ class NewReturn extends NewNode with ReturnBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -37696,7 +37696,7 @@ class NewReturn extends NewNode with ReturnBase with ExpressionNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -39187,7 +39187,7 @@ class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -39201,7 +39201,7 @@ class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -39210,7 +39210,7 @@ class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -40640,7 +40640,7 @@ class NewTypeArgument extends NewNode with TypeArgumentBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -40649,7 +40649,7 @@ class NewTypeArgument extends NewNode with TypeArgumentBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -41982,7 +41982,7 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def aliasTypeFullName(value: String): this.type = {
-    this.aliasTypeFullName = Option(value)
+    this.aliasTypeFullName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -42006,7 +42006,7 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -42035,7 +42035,7 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -42049,7 +42049,7 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def offset(value: Integer): this.type = {
-    this.offset = Option(value)
+    this.offset = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -42058,7 +42058,7 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   })
 
   def offsetEnd(value: Integer): this.type = {
-    this.offsetEnd = Option(value)
+    this.offsetEnd = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -43410,7 +43410,7 @@ class NewTypeParameter extends NewNode with TypeParameterBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -43419,7 +43419,7 @@ class NewTypeParameter extends NewNode with TypeParameterBase with AstNodeNew {
   })
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -44755,7 +44755,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -44769,7 +44769,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -44783,7 +44783,7 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -46142,7 +46142,7 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value)
+    this.argumentName = Option(value).asInstanceOf[Option[String]]
     this
   }
 
@@ -46156,7 +46156,7 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value)
+    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
@@ -46175,7 +46175,7 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value)
+    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
     this
   }
 
