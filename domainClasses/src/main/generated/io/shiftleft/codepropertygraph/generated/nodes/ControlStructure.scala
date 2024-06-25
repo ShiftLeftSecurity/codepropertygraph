@@ -26,9 +26,9 @@ object ControlStructure {
     val ArgumentIndex        = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName         = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code                 = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber         = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber         = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val ControlStructureType = new overflowdb.PropertyKey[String]("CONTROL_STRUCTURE_TYPE")
-    val LineNumber           = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber           = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Order                = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val ParserTypeName       = new overflowdb.PropertyKey[String]("PARSER_TYPE_NAME")
 
@@ -114,9 +114,9 @@ trait ControlStructureBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def controlStructureType: String
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
   def parserTypeName: String
 
@@ -127,14 +127,14 @@ class ControlStructure(graph_4762: Graph, id_4762: Long /*cf https://github.com/
     with ControlStructureBase
     with StoredNode
     with Expression {
-  override def argumentIndex: scala.Int      = get().argumentIndex
-  override def argumentName: Option[String]  = get().argumentName
-  override def code: String                  = get().code
-  override def columnNumber: Option[Integer] = get().columnNumber
-  override def controlStructureType: String  = get().controlStructureType
-  override def lineNumber: Option[Integer]   = get().lineNumber
-  override def order: scala.Int              = get().order
-  override def parserTypeName: String        = get().parserTypeName
+  override def argumentIndex: scala.Int        = get().argumentIndex
+  override def argumentName: Option[String]    = get().argumentName
+  override def code: String                    = get().code
+  override def columnNumber: Option[scala.Int] = get().columnNumber
+  override def controlStructureType: String    = get().controlStructureType
+  override def lineNumber: Option[scala.Int]   = get().lineNumber
+  override def order: scala.Int                = get().order
+  override def parserTypeName: String          = get().parserTypeName
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX"         => ControlStructure.PropertyDefaults.ArgumentIndex
@@ -720,19 +720,19 @@ class ControlStructureDb(ref: NodeRef[NodeDb])
 
   override def layoutInformation: NodeLayoutInformation = ControlStructure.layoutInformation
 
-  private var _argumentIndex: scala.Int     = ControlStructure.PropertyDefaults.ArgumentIndex
+  private var _argumentIndex: Integer       = ControlStructure.PropertyDefaults.ArgumentIndex
   def argumentIndex: scala.Int              = _argumentIndex
   private var _argumentName: String         = null
-  def argumentName: Option[String]          = Option(_argumentName)
+  def argumentName: Option[String]          = Option(_argumentName).asInstanceOf[Option[String]]
   private var _code: String                 = ControlStructure.PropertyDefaults.Code
   def code: String                          = _code
   private var _columnNumber: Integer        = null
-  def columnNumber: Option[Integer]         = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]       = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _controlStructureType: String = ControlStructure.PropertyDefaults.ControlStructureType
   def controlStructureType: String          = _controlStructureType
   private var _lineNumber: Integer          = null
-  def lineNumber: Option[Integer]           = Option(_lineNumber)
-  private var _order: scala.Int             = ControlStructure.PropertyDefaults.Order
+  def lineNumber: Option[scala.Int]         = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _order: Integer               = ControlStructure.PropertyDefaults.Order
   def order: scala.Int                      = _order
   private var _parserTypeName: String       = ControlStructure.PropertyDefaults.ParserTypeName
   def parserTypeName: String                = _parserTypeName
@@ -1007,9 +1007,9 @@ class ControlStructureDb(ref: NodeRef[NodeDb])
       case "ARGUMENT_INDEX"         => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"          => this._argumentName = value.asInstanceOf[String]
       case "CODE"                   => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"          => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"          => this._columnNumber = value.asInstanceOf[scala.Int]
       case "CONTROL_STRUCTURE_TYPE" => this._controlStructureType = value.asInstanceOf[String]
-      case "LINE_NUMBER"            => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"            => this._lineNumber = value.asInstanceOf[scala.Int]
       case "ORDER"                  => this._order = value.asInstanceOf[scala.Int]
       case "PARSER_TYPE_NAME"       => this._parserTypeName = value.asInstanceOf[String]
 
@@ -1028,11 +1028,17 @@ class ControlStructureDb(ref: NodeRef[NodeDb])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewControlStructure].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewControlStructure].argumentName.orNull
+    this._argumentName = newNode.asInstanceOf[NewControlStructure].argumentName match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewControlStructure].code
-    this._columnNumber = newNode.asInstanceOf[NewControlStructure].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewControlStructure].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._controlStructureType = newNode.asInstanceOf[NewControlStructure].controlStructureType
-    this._lineNumber = newNode.asInstanceOf[NewControlStructure].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewControlStructure].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._order = newNode.asInstanceOf[NewControlStructure].order
     this._parserTypeName = newNode.asInstanceOf[NewControlStructure].parserTypeName
 

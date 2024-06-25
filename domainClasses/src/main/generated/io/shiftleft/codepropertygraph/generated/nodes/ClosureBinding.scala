@@ -150,9 +150,9 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   override def layoutInformation: NodeLayoutInformation = ClosureBinding.layoutInformation
 
   private var _closureBindingId: String    = null
-  def closureBindingId: Option[String]     = Option(_closureBindingId)
+  def closureBindingId: Option[String]     = Option(_closureBindingId).asInstanceOf[Option[String]]
   private var _closureOriginalName: String = null
-  def closureOriginalName: Option[String]  = Option(_closureOriginalName)
+  def closureOriginalName: Option[String]  = Option(_closureOriginalName).asInstanceOf[Option[String]]
   private var _evaluationStrategy: String  = ClosureBinding.PropertyDefaults.EvaluationStrategy
   def evaluationStrategy: String           = _evaluationStrategy
 
@@ -248,8 +248,12 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._closureBindingId = newNode.asInstanceOf[NewClosureBinding].closureBindingId.orNull
-    this._closureOriginalName = newNode.asInstanceOf[NewClosureBinding].closureOriginalName.orNull
+    this._closureBindingId = newNode.asInstanceOf[NewClosureBinding].closureBindingId match {
+      case None => null; case Some(value) => value
+    }
+    this._closureOriginalName = newNode.asInstanceOf[NewClosureBinding].closureOriginalName match {
+      case None => null; case Some(value) => value
+    }
     this._evaluationStrategy = newNode.asInstanceOf[NewClosureBinding].evaluationStrategy
 
   }

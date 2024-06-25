@@ -36,9 +36,9 @@ object TypeRef {
     val ArgumentIndex           = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName            = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
@@ -113,9 +113,9 @@ trait TypeRefBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
   def typeFullName: String
@@ -130,9 +130,9 @@ class TypeRef(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
   override def argumentIndex: scala.Int                    = get().argumentIndex
   override def argumentName: Option[String]                = get().argumentName
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
@@ -681,19 +681,19 @@ class TypeRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
 
   override def layoutInformation: NodeLayoutInformation = TypeRef.layoutInformation
 
-  private var _argumentIndex: scala.Int                    = TypeRef.PropertyDefaults.ArgumentIndex
+  private var _argumentIndex: Integer                      = TypeRef.PropertyDefaults.ArgumentIndex
   def argumentIndex: scala.Int                             = _argumentIndex
   private var _argumentName: String                        = null
-  def argumentName: Option[String]                         = Option(_argumentName)
+  def argumentName: Option[String]                         = Option(_argumentName).asInstanceOf[Option[String]]
   private var _code: String                                = TypeRef.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
-  private var _order: scala.Int                            = TypeRef.PropertyDefaults.Order
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _order: Integer                              = TypeRef.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -970,7 +970,7 @@ class TypeRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -989,7 +989,7 @@ class TypeRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
       case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
         this._possibleTypes = value match {
@@ -1026,14 +1026,20 @@ class TypeRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with E
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewTypeRef].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewTypeRef].argumentName.orNull
+    this._argumentName = newNode.asInstanceOf[NewTypeRef].argumentName match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewTypeRef].code
-    this._columnNumber = newNode.asInstanceOf[NewTypeRef].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewTypeRef].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewTypeRef].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewTypeRef].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewTypeRef].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewTypeRef].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._order = newNode.asInstanceOf[NewTypeRef].order
     this._possibleTypes =
       if (newNode.asInstanceOf[NewTypeRef].possibleTypes != null) newNode.asInstanceOf[NewTypeRef].possibleTypes

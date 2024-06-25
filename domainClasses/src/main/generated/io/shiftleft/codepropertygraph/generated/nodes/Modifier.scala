@@ -20,8 +20,8 @@ object Modifier {
 
   object Properties {
     val Code         = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val LineNumber   = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val ColumnNumber = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val LineNumber   = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val ModifierType = new overflowdb.PropertyKey[String]("MODIFIER_TYPE")
     val Order        = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
@@ -59,8 +59,8 @@ trait ModifierBase extends AbstractNode with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def modifierType: String
   def order: scala.Int
 
@@ -71,11 +71,11 @@ class Modifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     with ModifierBase
     with StoredNode
     with AstNode {
-  override def code: String                  = get().code
-  override def columnNumber: Option[Integer] = get().columnNumber
-  override def lineNumber: Option[Integer]   = get().lineNumber
-  override def modifierType: String          = get().modifierType
-  override def order: scala.Int              = get().order
+  override def code: String                    = get().code
+  override def columnNumber: Option[scala.Int] = get().columnNumber
+  override def lineNumber: Option[scala.Int]   = get().lineNumber
+  override def modifierType: String            = get().modifierType
+  override def order: scala.Int                = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"          => Modifier.PropertyDefaults.Code
@@ -152,16 +152,16 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
 
   override def layoutInformation: NodeLayoutInformation = Modifier.layoutInformation
 
-  private var _code: String          = Modifier.PropertyDefaults.Code
-  def code: String                   = _code
-  private var _columnNumber: Integer = null
-  def columnNumber: Option[Integer]  = Option(_columnNumber)
-  private var _lineNumber: Integer   = null
-  def lineNumber: Option[Integer]    = Option(_lineNumber)
-  private var _modifierType: String  = Modifier.PropertyDefaults.ModifierType
-  def modifierType: String           = _modifierType
-  private var _order: scala.Int      = Modifier.PropertyDefaults.Order
-  def order: scala.Int               = _order
+  private var _code: String           = Modifier.PropertyDefaults.Code
+  def code: String                    = _code
+  private var _columnNumber: Integer  = null
+  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  private var _lineNumber: Integer    = null
+  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _modifierType: String   = Modifier.PropertyDefaults.ModifierType
+  def modifierType: String            = _modifierType
+  private var _order: Integer         = Modifier.PropertyDefaults.Order
+  def order: scala.Int                = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -254,8 +254,8 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
-      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[scala.Int]
       case "MODIFIER_TYPE" => this._modifierType = value.asInstanceOf[String]
       case "ORDER"         => this._order = value.asInstanceOf[scala.Int]
 
@@ -274,8 +274,12 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewModifier].code
-    this._columnNumber = newNode.asInstanceOf[NewModifier].columnNumber.orNull
-    this._lineNumber = newNode.asInstanceOf[NewModifier].lineNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewModifier].columnNumber match {
+      case None => null; case Some(value) => value
+    }
+    this._lineNumber = newNode.asInstanceOf[NewModifier].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._modifierType = newNode.asInstanceOf[NewModifier].modifierType
     this._order = newNode.asInstanceOf[NewModifier].order
 

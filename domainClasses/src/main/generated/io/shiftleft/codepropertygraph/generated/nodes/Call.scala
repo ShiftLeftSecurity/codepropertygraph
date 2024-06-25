@@ -44,10 +44,10 @@ object Call {
     val ArgumentIndex           = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName            = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DispatchType            = new overflowdb.PropertyKey[String]("DISPATCH_TYPE")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val MethodFullName          = new overflowdb.PropertyKey[String]("METHOD_FULL_NAME")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
@@ -146,10 +146,10 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dispatchType: String
   def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def methodFullName: String
   def name: String
   def order: scala.Int
@@ -168,10 +168,10 @@ class Call(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   override def argumentIndex: scala.Int                    = get().argumentIndex
   override def argumentName: Option[String]                = get().argumentName
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dispatchType: String                        = get().dispatchType
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def methodFullName: String                      = get().methodFullName
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
@@ -864,25 +864,25 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
 
   override def layoutInformation: NodeLayoutInformation = Call.layoutInformation
 
-  private var _argumentIndex: scala.Int                    = Call.PropertyDefaults.ArgumentIndex
+  private var _argumentIndex: Integer                      = Call.PropertyDefaults.ArgumentIndex
   def argumentIndex: scala.Int                             = _argumentIndex
   private var _argumentName: String                        = null
-  def argumentName: Option[String]                         = Option(_argumentName)
+  def argumentName: Option[String]                         = Option(_argumentName).asInstanceOf[Option[String]]
   private var _code: String                                = Call.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dispatchType: String                        = Call.PropertyDefaults.DispatchType
   def dispatchType: String                                 = _dispatchType
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _methodFullName: String                      = Call.PropertyDefaults.MethodFullName
   def methodFullName: String                               = _methodFullName
   private var _name: String                                = Call.PropertyDefaults.Name
   def name: String                                         = _name
-  private var _order: scala.Int                            = Call.PropertyDefaults.Order
+  private var _order: Integer                              = Call.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -1230,7 +1230,7 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DISPATCH_TYPE"  => this._dispatchType = value.asInstanceOf[String]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
@@ -1250,7 +1250,7 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[scala.Int]
       case "METHOD_FULL_NAME" => this._methodFullName = value.asInstanceOf[String]
       case "NAME"             => this._name = value.asInstanceOf[String]
       case "ORDER"            => this._order = value.asInstanceOf[scala.Int]
@@ -1290,15 +1290,19 @@ class CallDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Call
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewCall].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewCall].argumentName.orNull
+    this._argumentName = newNode.asInstanceOf[NewCall].argumentName match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewCall].code
-    this._columnNumber = newNode.asInstanceOf[NewCall].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewCall].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dispatchType = newNode.asInstanceOf[NewCall].dispatchType
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewCall].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewCall].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewCall].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewCall].lineNumber match { case None => null; case Some(value) => value }
     this._methodFullName = newNode.asInstanceOf[NewCall].methodFullName
     this._name = newNode.asInstanceOf[NewCall].name
     this._order = newNode.asInstanceOf[NewCall].order

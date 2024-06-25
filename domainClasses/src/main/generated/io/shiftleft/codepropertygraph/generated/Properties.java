@@ -61,11 +61,11 @@ public static final overflowdb.PropertyKey<String> CODE = new overflowdb.Propert
 
 /** This optional fields provides the column number of the program construct
 represented by the node. */
-public static final overflowdb.PropertyKey<Integer> COLUMN_NUMBER = new overflowdb.PropertyKey<>("COLUMN_NUMBER");
+public static final overflowdb.PropertyKey<scala.Int> COLUMN_NUMBER = new overflowdb.PropertyKey<>("COLUMN_NUMBER");
 
 /** This optional fields provides the column number at which the program construct
 represented by the node ends. */
-public static final overflowdb.PropertyKey<Integer> COLUMN_NUMBER_END = new overflowdb.PropertyKey<>("COLUMN_NUMBER_END");
+public static final overflowdb.PropertyKey<scala.Int> COLUMN_NUMBER_END = new overflowdb.PropertyKey<>("COLUMN_NUMBER_END");
 
 /** References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless. */
 public static final overflowdb.PropertyKey<String> CONTAINED_REF = new overflowdb.PropertyKey<>("CONTAINED_REF");
@@ -104,7 +104,7 @@ public static final overflowdb.PropertyKey<String> EVALUATION_STRATEGY = new ove
 /** Specifies whether the IMPORTED_AS property was explicitly present in the code.
 For languages like Java which do not allow a renaming during import this is
 always false. For e.g. Kotlin it depends on the existence of the "as" keyword. */
-public static final overflowdb.PropertyKey<java.lang.Boolean> EXPLICIT_AS = new overflowdb.PropertyKey<>("EXPLICIT_AS");
+public static final overflowdb.PropertyKey<Boolean> EXPLICIT_AS = new overflowdb.PropertyKey<>("EXPLICIT_AS");
 
 /** The path of the source file this node was generated from, relative to the root
 path in the meta data node. This field must be set but may be set to the value `<unknown>` to
@@ -150,7 +150,7 @@ public static final overflowdb.PropertyKey<scala.collection.IndexedSeq<String>> 
 Most languages have implicit default imports of some standard library elements
 and this flag is used to distinguish those from explicit imports found in the
 code base. */
-public static final overflowdb.PropertyKey<java.lang.Boolean> IS_EXPLICIT = new overflowdb.PropertyKey<>("IS_EXPLICIT");
+public static final overflowdb.PropertyKey<Boolean> IS_EXPLICIT = new overflowdb.PropertyKey<>("IS_EXPLICIT");
 
 /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is,
 it is referenced but not defined in the code (applies both to insular
@@ -166,7 +166,7 @@ public static final overflowdb.PropertyKey<Boolean> IS_VARIADIC = new overflowdb
 For a Java import like "import java.nio.*;" IS_WILDCARD would be "true" and
 IMPORTED_ENTITY would be "java.nio".
 For wildcard imports the IMPORTED_AS property is ignored. */
-public static final overflowdb.PropertyKey<java.lang.Boolean> IS_WILDCARD = new overflowdb.PropertyKey<>("IS_WILDCARD");
+public static final overflowdb.PropertyKey<Boolean> IS_WILDCARD = new overflowdb.PropertyKey<>("IS_WILDCARD");
 
 /** This property denotes a key of a key-value pair. */
 public static final overflowdb.PropertyKey<String> KEY = new overflowdb.PropertyKey<>("KEY");
@@ -179,11 +179,11 @@ public static final overflowdb.PropertyKey<String> LANGUAGE = new overflowdb.Pro
 
 /** This optional field provides the line number of the program construct
 represented by the node. */
-public static final overflowdb.PropertyKey<Integer> LINE_NUMBER = new overflowdb.PropertyKey<>("LINE_NUMBER");
+public static final overflowdb.PropertyKey<scala.Int> LINE_NUMBER = new overflowdb.PropertyKey<>("LINE_NUMBER");
 
 /** This optional fields provides the line number at which the program construct
 represented by the node ends. */
-public static final overflowdb.PropertyKey<Integer> LINE_NUMBER_END = new overflowdb.PropertyKey<>("LINE_NUMBER_END");
+public static final overflowdb.PropertyKey<scala.Int> LINE_NUMBER_END = new overflowdb.PropertyKey<>("LINE_NUMBER_END");
 
 /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required
 to have exactly one METHOD node for each METHOD_FULL_NAME */
@@ -209,13 +209,13 @@ This means that the offset must be measured in utf16 encoding (i.e. neither in
 characters/codeunits nor in byte-offsets into a utf8 encoding).
 E.g. for METHOD nodes this start offset points to the start of the methods
 source code in the string holding the source code of the entire file. */
-public static final overflowdb.PropertyKey<Integer> OFFSET = new overflowdb.PropertyKey<>("OFFSET");
+public static final overflowdb.PropertyKey<scala.Int> OFFSET = new overflowdb.PropertyKey<>("OFFSET");
 
 /** End offset (exclusive) into the CONTENT property of the corresponding FILE node.
 See OFFSET documentation for finer details.
 E.g. for METHOD nodes this end offset points to the first code position which is
 not part of the method. */
-public static final overflowdb.PropertyKey<Integer> OFFSET_END = new overflowdb.PropertyKey<>("OFFSET_END");
+public static final overflowdb.PropertyKey<scala.Int> OFFSET_END = new overflowdb.PropertyKey<>("OFFSET_END");
 
 /** This integer indicates the position of the node among
 its siblings in the AST. The left-most child has an
