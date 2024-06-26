@@ -38,9 +38,9 @@ object Member {
     val AstParentFullName       = new overflowdb.PropertyKey[String]("AST_PARENT_FULL_NAME")
     val AstParentType           = new overflowdb.PropertyKey[String]("AST_PARENT_TYPE")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
@@ -92,9 +92,9 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase {
   def astParentFullName: String
   def astParentType: String
   def code: String
-  def columnNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
   def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[scala.Int]
+  def lineNumber: Option[Integer]
   def name: String
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
@@ -111,9 +111,9 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   override def astParentFullName: String                   = get().astParentFullName
   override def astParentType: String                       = get().astParentType
   override def code: String                                = get().code
-  override def columnNumber: Option[scala.Int]             = get().columnNumber
+  override def columnNumber: Option[Integer]               = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[scala.Int]               = get().lineNumber
+  override def lineNumber: Option[Integer]                 = get().lineNumber
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
@@ -238,14 +238,14 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   private var _code: String                                = Member.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  def columnNumber: Option[Integer]                        = Option(_columnNumber)
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  def lineNumber: Option[Integer]                          = Option(_lineNumber)
   private var _name: String                                = Member.PropertyDefaults.Name
   def name: String                                         = _name
-  private var _order: Integer                              = Member.PropertyDefaults.Order
+  private var _order: scala.Int                            = Member.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -381,7 +381,7 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
       case "AST_PARENT_FULL_NAME" => this._astParentFullName = value.asInstanceOf[String]
       case "AST_PARENT_TYPE"      => this._astParentType = value.asInstanceOf[String]
       case "CODE"                 => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[Integer]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -400,7 +400,7 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
       case "NAME"        => this._name = value.asInstanceOf[String]
       case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
@@ -440,14 +440,12 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
     this._astParentFullName = newNode.asInstanceOf[NewMember].astParentFullName
     this._astParentType = newNode.asInstanceOf[NewMember].astParentType
     this._code = newNode.asInstanceOf[NewMember].code
-    this._columnNumber = newNode.asInstanceOf[NewMember].columnNumber match {
-      case None => null; case Some(value) => value
-    }
+    this._columnNumber = newNode.asInstanceOf[NewMember].columnNumber.orNull
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewMember].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewMember].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewMember].lineNumber match { case None => null; case Some(value) => value }
+    this._lineNumber = newNode.asInstanceOf[NewMember].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewMember].name
     this._order = newNode.asInstanceOf[NewMember].order
     this._possibleTypes =

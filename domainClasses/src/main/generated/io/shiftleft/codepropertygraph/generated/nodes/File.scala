@@ -22,10 +22,10 @@ object File {
 
   object Properties {
     val Code         = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val ColumnNumber = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
     val Content      = new overflowdb.PropertyKey[String]("CONTENT")
     val Hash         = new overflowdb.PropertyKey[String]("HASH")
-    val LineNumber   = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val LineNumber   = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name         = new overflowdb.PropertyKey[String]("NAME")
     val Order        = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
@@ -68,10 +68,10 @@ trait FileBase extends AbstractNode with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
   def content: String
   def hash: Option[String]
-  def lineNumber: Option[scala.Int]
+  def lineNumber: Option[Integer]
   def name: String
   def order: scala.Int
 
@@ -82,13 +82,13 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     with FileBase
     with StoredNode
     with AstNode {
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def content: String                 = get().content
-  override def hash: Option[String]            = get().hash
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def name: String                    = get().name
-  override def order: scala.Int                = get().order
+  override def code: String                  = get().code
+  override def columnNumber: Option[Integer] = get().columnNumber
+  override def content: String               = get().content
+  override def hash: Option[String]          = get().hash
+  override def lineNumber: Option[Integer]   = get().lineNumber
+  override def name: String                  = get().name
+  override def order: scala.Int              = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"    => File.PropertyDefaults.Code
@@ -199,20 +199,20 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
 
   override def layoutInformation: NodeLayoutInformation = File.layoutInformation
 
-  private var _code: String           = File.PropertyDefaults.Code
-  def code: String                    = _code
-  private var _columnNumber: Integer  = null
-  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _content: String        = File.PropertyDefaults.Content
-  def content: String                 = _content
-  private var _hash: String           = null
-  def hash: Option[String]            = Option(_hash).asInstanceOf[Option[String]]
-  private var _lineNumber: Integer    = null
-  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _name: String           = File.PropertyDefaults.Name
-  def name: String                    = _name
-  private var _order: Integer         = File.PropertyDefaults.Order
-  def order: scala.Int                = _order
+  private var _code: String          = File.PropertyDefaults.Code
+  def code: String                   = _code
+  private var _columnNumber: Integer = null
+  def columnNumber: Option[Integer]  = Option(_columnNumber)
+  private var _content: String       = File.PropertyDefaults.Content
+  def content: String                = _content
+  private var _hash: String          = null
+  def hash: Option[String]           = Option(_hash)
+  private var _lineNumber: Integer   = null
+  def lineNumber: Option[Integer]    = Option(_lineNumber)
+  private var _name: String          = File.PropertyDefaults.Name
+  def name: String                   = _name
+  private var _order: scala.Int      = File.PropertyDefaults.Order
+  def order: scala.Int               = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -315,10 +315,10 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
       case "CONTENT"       => this._content = value.asInstanceOf[String]
       case "HASH"          => this._hash = value.asInstanceOf[String]
-      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[Integer]
       case "NAME"          => this._name = value.asInstanceOf[String]
       case "ORDER"         => this._order = value.asInstanceOf[scala.Int]
 
@@ -337,12 +337,10 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewFile].code
-    this._columnNumber = newNode.asInstanceOf[NewFile].columnNumber match {
-      case None => null; case Some(value) => value
-    }
+    this._columnNumber = newNode.asInstanceOf[NewFile].columnNumber.orNull
     this._content = newNode.asInstanceOf[NewFile].content
-    this._hash = newNode.asInstanceOf[NewFile].hash match { case None => null; case Some(value) => value }
-    this._lineNumber = newNode.asInstanceOf[NewFile].lineNumber match { case None => null; case Some(value) => value }
+    this._hash = newNode.asInstanceOf[NewFile].hash.orNull
+    this._lineNumber = newNode.asInstanceOf[NewFile].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewFile].name
     this._order = newNode.asInstanceOf[NewFile].order
 

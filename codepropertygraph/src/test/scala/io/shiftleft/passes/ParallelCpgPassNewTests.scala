@@ -33,7 +33,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
   "ConcurrentWriterCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.nodes.map(_.property(Properties.Name)).toSetMutable shouldBe Set("foo", "bar")
+      cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
     }
 
     "produce a serialized CPG file" in Fixture() { (_, pass) =>

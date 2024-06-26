@@ -1256,14 +1256,14 @@ object NewAnnotation {
 class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   type StoredType = Annotation
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var fullName: String                = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var fullName: String              = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "ANNOTATION"
 
@@ -1280,19 +1280,17 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -1300,13 +1298,11 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def fullName(value: String): this.type = {
     this.fullName = value
@@ -1314,20 +1310,18 @@ class NewAnnotation extends NewNode with AnnotationBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -2627,13 +2621,13 @@ object NewAnnotationLiteral {
 class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with ExpressionNew {
   type StoredType = AnnotationLiteral
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "ANNOTATION_LITERAL"
 
@@ -2649,19 +2643,17 @@ class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with Expre
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -2669,29 +2661,25 @@ class NewAnnotationLiteral extends NewNode with AnnotationLiteralBase with Expre
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -3988,10 +3976,10 @@ object NewAnnotationParameter {
 class NewAnnotationParameter extends NewNode with AnnotationParameterBase with AstNodeNew {
   type StoredType = AnnotationParameter
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "ANNOTATION_PARAMETER"
 
@@ -4010,24 +3998,20 @@ class NewAnnotationParameter extends NewNode with AnnotationParameterBase with A
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -5315,10 +5299,10 @@ object NewAnnotationParameterAssign {
 class NewAnnotationParameterAssign extends NewNode with AnnotationParameterAssignBase with AstNodeNew {
   type StoredType = AnnotationParameterAssign
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "ANNOTATION_PARAMETER_ASSIGN"
 
@@ -5337,24 +5321,20 @@ class NewAnnotationParameterAssign extends NewNode with AnnotationParameterAssig
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -6642,12 +6622,12 @@ object NewArrayInitializer {
 class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNodeNew with ExpressionNew {
   type StoredType = ArrayInitializer
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "ARRAY_INITIALIZER"
 
@@ -6662,19 +6642,17 @@ class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNode
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -6682,24 +6660,20 @@ class NewArrayInitializer extends NewNode with ArrayInitializerBase with AstNode
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -8074,9 +8048,9 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   var typeFullName: String                        = "<empty>"
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -8097,19 +8071,17 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -8117,13 +8089,11 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -8131,15 +8101,13 @@ class NewBlock extends NewNode with BlockBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -9460,10 +9428,10 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
   var methodFullName: String                      = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   var dispatchType: String                        = "<empty>"
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -9488,19 +9456,17 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -9508,13 +9474,11 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dispatchType(value: String): this.type = {
     this.dispatchType = value
@@ -9527,13 +9491,11 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def methodFullName(value: String): this.type = {
     this.methodFullName = value
@@ -9545,7 +9507,7 @@ class NewCall extends NewNode with CallBase with CallReprNew with ExpressionNew 
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -9662,22 +9624,18 @@ class NewClosureBinding extends NewNode with ClosureBindingBase {
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
+    this.closureBindingId = Option(value)
     this
   }
 
-  def closureBindingId(value: Option[String]): this.type = closureBindingId(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def closureBindingId(value: Option[String]): this.type = closureBindingId(value.orNull)
 
   def closureOriginalName(value: String): this.type = {
-    this.closureOriginalName = Option(value).asInstanceOf[Option[String]]
+    this.closureOriginalName = Option(value)
     this
   }
 
-  def closureOriginalName(value: Option[String]): this.type = closureOriginalName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def closureOriginalName(value: Option[String]): this.type = closureOriginalName(value.orNull)
 
   def evaluationStrategy(value: String): this.type = {
     this.evaluationStrategy = value
@@ -10964,11 +10922,11 @@ object NewComment {
 class NewComment extends NewNode with CommentBase with AstNodeNew {
   type StoredType = Comment
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var filename: String                = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var filename: String              = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "COMMENT"
 
@@ -10988,13 +10946,11 @@ class NewComment extends NewNode with CommentBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def filename(value: String): this.type = {
     this.filename = value
@@ -11002,15 +10958,13 @@ class NewComment extends NewNode with CommentBase with AstNodeNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -12369,14 +12323,14 @@ object NewControlStructure {
 class NewControlStructure extends NewNode with ControlStructureBase with ExpressionNew {
   type StoredType = ControlStructure
 
-  var parserTypeName: String          = "<empty>"
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var controlStructureType: String    = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var parserTypeName: String        = "<empty>"
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var controlStructureType: String  = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "CONTROL_STRUCTURE"
 
@@ -12393,19 +12347,17 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -12413,13 +12365,11 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def controlStructureType(value: String): this.type = {
     this.controlStructureType = value
@@ -12427,15 +12377,13 @@ class NewControlStructure extends NewNode with ControlStructureBase with Express
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -12524,13 +12472,11 @@ class NewDependency extends NewNode with DependencyBase {
   }
 
   def dependencyGroupId(value: String): this.type = {
-    this.dependencyGroupId = Option(value).asInstanceOf[Option[String]]
+    this.dependencyGroupId = Option(value)
     this
   }
 
-  def dependencyGroupId(value: Option[String]): this.type = dependencyGroupId(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def dependencyGroupId(value: Option[String]): this.type = dependencyGroupId(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
@@ -13822,13 +13768,13 @@ object NewFieldIdentifier {
 class NewFieldIdentifier extends NewNode with FieldIdentifierBase with ExpressionNew {
   type StoredType = FieldIdentifier
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var canonicalName: String           = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var canonicalName: String         = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "FIELD_IDENTIFIER"
 
@@ -13844,19 +13790,17 @@ class NewFieldIdentifier extends NewNode with FieldIdentifierBase with Expressio
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def canonicalName(value: String): this.type = {
     this.canonicalName = value
@@ -13869,24 +13813,20 @@ class NewFieldIdentifier extends NewNode with FieldIdentifierBase with Expressio
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -15183,13 +15123,13 @@ object NewFile {
 class NewFile extends NewNode with FileBase with AstNodeNew {
   type StoredType = File
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var hash: Option[String]            = None
-  var content: String                 = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var hash: Option[String]          = None
+  var content: String               = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "FILE"
 
@@ -15211,13 +15151,11 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def content(value: String): this.type = {
     this.content = value
@@ -15225,29 +15163,25 @@ class NewFile extends NewNode with FileBase with AstNodeNew {
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value).asInstanceOf[Option[String]]
+    this.hash = Option(value)
     this
   }
 
-  def hash(value: Option[String]): this.type = hash(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def hash(value: Option[String]): this.type = hash(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -16616,9 +16550,9 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -16640,19 +16574,17 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -16660,13 +16592,11 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -16674,20 +16604,18 @@ class NewIdentifier extends NewNode with IdentifierBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -18005,15 +17933,15 @@ object NewImport {
 class NewImport extends NewNode with ImportBase with AstNodeNew {
   type StoredType = Import
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var isWildcard: Option[Boolean]     = None
-  var isExplicit: Option[Boolean]     = None
-  var importedEntity: Option[String]  = None
-  var importedAs: Option[String]      = None
-  var explicitAs: Option[Boolean]     = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int                      = -1: Int
+  var lineNumber: Option[Integer]           = None
+  var isWildcard: Option[java.lang.Boolean] = None
+  var isExplicit: Option[java.lang.Boolean] = None
+  var importedEntity: Option[String]        = None
+  var importedAs: Option[String]            = None
+  var explicitAs: Option[java.lang.Boolean] = None
+  var columnNumber: Option[Integer]         = None
+  var code: String                          = "<empty>"
 
   override def label: String = "IMPORT"
 
@@ -18037,69 +17965,55 @@ class NewImport extends NewNode with ImportBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def explicitAs(value: java.lang.Boolean): this.type = {
-    this.explicitAs = Option(value).asInstanceOf[Option[Boolean]]
+    this.explicitAs = Option(value)
     this
   }
 
-  def explicitAs(value: Option[Boolean]): this.type = explicitAs(value match {
-    case None => null; case Some(value) => value: java.lang.Boolean
-  })
+  def explicitAs(value: Option[java.lang.Boolean]): this.type = explicitAs(value.orNull)
 
   def importedAs(value: String): this.type = {
-    this.importedAs = Option(value).asInstanceOf[Option[String]]
+    this.importedAs = Option(value)
     this
   }
 
-  def importedAs(value: Option[String]): this.type = importedAs(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def importedAs(value: Option[String]): this.type = importedAs(value.orNull)
 
   def importedEntity(value: String): this.type = {
-    this.importedEntity = Option(value).asInstanceOf[Option[String]]
+    this.importedEntity = Option(value)
     this
   }
 
-  def importedEntity(value: Option[String]): this.type = importedEntity(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def importedEntity(value: Option[String]): this.type = importedEntity(value.orNull)
 
   def isExplicit(value: java.lang.Boolean): this.type = {
-    this.isExplicit = Option(value).asInstanceOf[Option[Boolean]]
+    this.isExplicit = Option(value)
     this
   }
 
-  def isExplicit(value: Option[Boolean]): this.type = isExplicit(value match {
-    case None => null; case Some(value) => value: java.lang.Boolean
-  })
+  def isExplicit(value: Option[java.lang.Boolean]): this.type = isExplicit(value.orNull)
 
   def isWildcard(value: java.lang.Boolean): this.type = {
-    this.isWildcard = Option(value).asInstanceOf[Option[Boolean]]
+    this.isWildcard = Option(value)
     this
   }
 
-  def isWildcard(value: Option[Boolean]): this.type = isWildcard(value match {
-    case None => null; case Some(value) => value: java.lang.Boolean
-  })
+  def isWildcard(value: Option[java.lang.Boolean]): this.type = isWildcard(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -19402,12 +19316,12 @@ object NewJumpLabel {
 class NewJumpLabel extends NewNode with JumpLabelBase with AstNodeNew {
   type StoredType = JumpLabel
 
-  var parserTypeName: String          = "<empty>"
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var parserTypeName: String        = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "JUMP_LABEL"
 
@@ -19428,29 +19342,25 @@ class NewJumpLabel extends NewNode with JumpLabelBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -20749,13 +20659,13 @@ object NewJumpTarget {
 class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with CfgNodeNew {
   type StoredType = JumpTarget
 
-  var parserTypeName: String          = "<empty>"
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentIndex: scala.Int        = -1: Int
+  var parserTypeName: String        = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "JUMP_TARGET"
 
@@ -20771,7 +20681,7 @@ class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with Cfg
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
@@ -20782,29 +20692,25 @@ class NewJumpTarget extends NewNode with JumpTargetBase with AstNodeNew with Cfg
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -22177,9 +22083,9 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   var typeFullName: String                        = "<empty>"
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -22200,19 +22106,17 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -22220,13 +22124,11 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -22234,15 +22136,13 @@ class NewLiteral extends NewNode with LiteralBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -23561,9 +23461,9 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var closureBindingId: Option[String]            = None
 
@@ -23584,13 +23484,11 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
+    this.closureBindingId = Option(value)
     this
   }
 
-  def closureBindingId(value: Option[String]): this.type = closureBindingId(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def closureBindingId(value: Option[String]): this.type = closureBindingId(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -23598,13 +23496,11 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -23612,20 +23508,18 @@ class NewLocal extends NewNode with LocalBase with AstNodeNew with DeclarationNe
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -23709,16 +23603,16 @@ object NewLocation {
 class NewLocation extends NewNode with LocationBase {
   type StoredType = Location
 
-  var node: Option[AbstractNode]    = None
-  var symbol: String                = "<empty>"
-  var packageName: String           = "<empty>"
-  var nodeLabel: String             = "<empty>"
-  var methodShortName: String       = "<empty>"
-  var methodFullName: String        = "<empty>"
-  var lineNumber: Option[scala.Int] = None
-  var filename: String              = "<empty>"
-  var classShortName: String        = "<empty>"
-  var className: String             = "<empty>"
+  var node: Option[AbstractNode]  = None
+  var symbol: String              = "<empty>"
+  var packageName: String         = "<empty>"
+  var nodeLabel: String           = "<empty>"
+  var methodShortName: String     = "<empty>"
+  var methodFullName: String      = "<empty>"
+  var lineNumber: Option[Integer] = None
+  var filename: String            = "<empty>"
+  var classShortName: String      = "<empty>"
+  var className: String           = "<empty>"
 
   override def label: String = "LOCATION"
 
@@ -23753,13 +23647,11 @@ class NewLocation extends NewNode with LocationBase {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def methodFullName(value: String): this.type = {
     this.methodFullName = value
@@ -23787,13 +23679,11 @@ class NewLocation extends NewNode with LocationBase {
   }
 
   def node(value: AbstractNode): this.type = {
-    this.node = Option(value).asInstanceOf[Option[AbstractNode]]
+    this.node = Option(value)
     this
   }
 
-  def node(value: Option[AbstractNode]): this.type = node(value match {
-    case None => null; case Some(value) => value: AbstractNode
-  })
+  def node(value: Option[AbstractNode]): this.type = node(value.orNull)
 
   override def properties: Map[String, Any] = {
     var res = Map[String, Any]()
@@ -25100,9 +24990,9 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var astParentType: String                       = "<empty>"
   var astParentFullName: String                   = "<empty>"
@@ -25140,13 +25030,11 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -25154,20 +25042,18 @@ class NewMember extends NewNode with MemberBase with AstNodeNew with Declaration
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -25273,13 +25159,11 @@ class NewMetaData extends NewNode with MetaDataBase {
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value).asInstanceOf[Option[String]]
+    this.hash = Option(value)
     this
   }
 
-  def hash(value: Option[String]): this.type = hash(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def hash(value: Option[String]): this.type = hash(value.orNull)
 
   def language(value: String): this.type = {
     this.language = value
@@ -26587,22 +26471,22 @@ object NewMethod {
 class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew with DeclarationNew {
   type StoredType = Method
 
-  var signature: String                  = ""
-  var order: scala.Int                   = -1: Int
-  var offsetEnd: Option[scala.Int]       = None
-  var offset: Option[scala.Int]          = None
-  var name: String                       = "<empty>"
-  var lineNumberEnd: Option[scala.Int]   = None
-  var lineNumber: Option[scala.Int]      = None
-  var isExternal: Boolean                = false
-  var hash: Option[String]               = None
-  var fullName: String                   = "<empty>"
-  var filename: String                   = "<empty>"
-  var columnNumberEnd: Option[scala.Int] = None
-  var columnNumber: Option[scala.Int]    = None
-  var code: String                       = "<empty>"
-  var astParentType: String              = "<empty>"
-  var astParentFullName: String          = "<empty>"
+  var signature: String                = ""
+  var order: scala.Int                 = -1: Int
+  var offsetEnd: Option[Integer]       = None
+  var offset: Option[Integer]          = None
+  var name: String                     = "<empty>"
+  var lineNumberEnd: Option[Integer]   = None
+  var lineNumber: Option[Integer]      = None
+  var isExternal: Boolean              = false
+  var hash: Option[String]             = None
+  var fullName: String                 = "<empty>"
+  var filename: String                 = "<empty>"
+  var columnNumberEnd: Option[Integer] = None
+  var columnNumber: Option[Integer]    = None
+  var code: String                     = "<empty>"
+  var astParentType: String            = "<empty>"
+  var astParentFullName: String        = "<empty>"
 
   override def label: String = "METHOD"
 
@@ -26643,22 +26527,18 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def columnNumberEnd(value: Integer): this.type = {
-    this.columnNumberEnd = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumberEnd = Option(value)
     this
   }
 
-  def columnNumberEnd(value: Option[scala.Int]): this.type = columnNumberEnd(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumberEnd(value: Option[Integer]): this.type = columnNumberEnd(value.orNull)
 
   def filename(value: String): this.type = {
     this.filename = value
@@ -26671,36 +26551,30 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def hash(value: String): this.type = {
-    this.hash = Option(value).asInstanceOf[Option[String]]
+    this.hash = Option(value)
     this
   }
 
-  def hash(value: Option[String]): this.type = hash(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def hash(value: Option[String]): this.type = hash(value.orNull)
 
-  def isExternal(value: java.lang.Boolean): this.type = {
+  def isExternal(value: Boolean): this.type = {
     this.isExternal = value
     this
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def lineNumberEnd(value: Integer): this.type = {
-    this.lineNumberEnd = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumberEnd = Option(value)
     this
   }
 
-  def lineNumberEnd(value: Option[scala.Int]): this.type = lineNumberEnd(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumberEnd(value: Option[Integer]): this.type = lineNumberEnd(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
@@ -26708,24 +26582,20 @@ class NewMethod extends NewNode with MethodBase with AstNodeNew with CfgNodeNew 
   }
 
   def offset(value: Integer): this.type = {
-    this.offset = Option(value).asInstanceOf[Option[scala.Int]]
+    this.offset = Option(value)
     this
   }
 
-  def offset(value: Option[scala.Int]): this.type = offset(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def offset(value: Option[Integer]): this.type = offset(value.orNull)
 
   def offsetEnd(value: Integer): this.type = {
-    this.offsetEnd = Option(value).asInstanceOf[Option[scala.Int]]
+    this.offsetEnd = Option(value)
     this
   }
 
-  def offsetEnd(value: Option[scala.Int]): this.type = offsetEnd(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def offsetEnd(value: Option[Integer]): this.type = offsetEnd(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -28063,12 +27933,12 @@ class NewMethodParameterIn
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var name: String                                = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var isVariadic: Boolean                         = false
   var index: scala.Int                            = -1: Int
   var evaluationStrategy: String                  = "<empty>"
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var closureBindingId: Option[String]            = None
 
@@ -28092,13 +27962,11 @@ class NewMethodParameterIn
   }
 
   def closureBindingId(value: String): this.type = {
-    this.closureBindingId = Option(value).asInstanceOf[Option[String]]
+    this.closureBindingId = Option(value)
     this
   }
 
-  def closureBindingId(value: Option[String]): this.type = closureBindingId(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def closureBindingId(value: Option[String]): this.type = closureBindingId(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -28106,13 +27974,11 @@ class NewMethodParameterIn
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -28124,31 +27990,29 @@ class NewMethodParameterIn
     this
   }
 
-  def index(value: Integer): this.type = {
+  def index(value: scala.Int): this.type = {
     this.index = value
     this
   }
 
-  def isVariadic(value: java.lang.Boolean): this.type = {
+  def isVariadic(value: Boolean): this.type = {
     this.isVariadic = value
     this
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -29477,15 +29341,15 @@ class NewMethodParameterOut
     with DeclarationNew {
   type StoredType = MethodParameterOut
 
-  var typeFullName: String            = "<empty>"
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var isVariadic: Boolean             = false
-  var index: scala.Int                = -1: Int
-  var evaluationStrategy: String      = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var typeFullName: String          = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var isVariadic: Boolean           = false
+  var index: scala.Int              = -1: Int
+  var evaluationStrategy: String    = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "METHOD_PARAMETER_OUT"
 
@@ -29509,44 +29373,40 @@ class NewMethodParameterOut
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def evaluationStrategy(value: String): this.type = {
     this.evaluationStrategy = value
     this
   }
 
-  def index(value: Integer): this.type = {
+  def index(value: scala.Int): this.type = {
     this.index = value
     this
   }
 
-  def isVariadic(value: java.lang.Boolean): this.type = {
+  def isVariadic(value: Boolean): this.type = {
     this.isVariadic = value
     this
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -30858,9 +30718,9 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
   var methodFullName: String                      = "<empty>"
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -30882,19 +30742,17 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -30902,13 +30760,11 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -30916,20 +30772,18 @@ class NewMethodRef extends NewNode with MethodRefBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def methodFullName(value: String): this.type = {
     this.methodFullName = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -32250,10 +32104,10 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   var typeFullName: String                        = "<empty>"
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var evaluationStrategy: String                  = "<empty>"
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
 
   override def label: String = "METHOD_RETURN"
@@ -32277,13 +32131,11 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -32296,15 +32148,13 @@ class NewMethodReturn extends NewNode with MethodReturnBase with CfgNodeNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -33616,11 +33466,11 @@ object NewModifier {
 class NewModifier extends NewNode with ModifierBase with AstNodeNew {
   type StoredType = Modifier
 
-  var order: scala.Int                = -1: Int
-  var modifierType: String            = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var modifierType: String          = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "MODIFIER"
 
@@ -33640,29 +33490,25 @@ class NewModifier extends NewNode with ModifierBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def modifierType(value: String): this.type = {
     this.modifierType = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -34953,11 +34799,11 @@ object NewNamespace {
 class NewNamespace extends NewNode with NamespaceBase with AstNodeNew {
   type StoredType = Namespace
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "NAMESPACE"
 
@@ -34977,29 +34823,25 @@ class NewNamespace extends NewNode with NamespaceBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -36290,13 +36132,13 @@ object NewNamespaceBlock {
 class NewNamespaceBlock extends NewNode with NamespaceBlockBase with AstNodeNew {
   type StoredType = NamespaceBlock
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var fullName: String                = "<empty>"
-  var filename: String                = "<empty>"
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var fullName: String              = "<empty>"
+  var filename: String              = "<empty>"
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "NAMESPACE_BLOCK"
 
@@ -36318,13 +36160,11 @@ class NewNamespaceBlock extends NewNode with NamespaceBlockBase with AstNodeNew 
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def filename(value: String): this.type = {
     this.filename = value
@@ -36337,20 +36177,18 @@ class NewNamespaceBlock extends NewNode with NamespaceBlockBase with AstNodeNew 
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -37647,12 +37485,12 @@ object NewReturn {
 class NewReturn extends NewNode with ReturnBase with ExpressionNew {
   type StoredType = Return
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "RETURN"
 
@@ -37667,19 +37505,17 @@ class NewReturn extends NewNode with ReturnBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -37687,24 +37523,20 @@ class NewReturn extends NewNode with ReturnBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -39159,13 +38991,13 @@ object NewTemplateDom {
 class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
   type StoredType = TemplateDom
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
-  var argumentName: Option[String]    = None
-  var argumentIndex: scala.Int        = -1: Int
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
+  var argumentName: Option[String]  = None
+  var argumentIndex: scala.Int      = -1: Int
 
   override def label: String = "TEMPLATE_DOM"
 
@@ -39181,19 +39013,17 @@ class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -39201,29 +39031,25 @@ class NewTemplateDom extends NewNode with TemplateDomBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -40618,10 +40444,10 @@ object NewTypeArgument {
 class NewTypeArgument extends NewNode with TypeArgumentBase with AstNodeNew {
   type StoredType = TypeArgument
 
-  var order: scala.Int                = -1: Int
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "TYPE_ARGUMENT"
 
@@ -40640,24 +40466,20 @@ class NewTypeArgument extends NewNode with TypeArgumentBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -41946,15 +41768,15 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   type StoredType = TypeDecl
 
   var order: scala.Int                             = -1: Int
-  var offsetEnd: Option[scala.Int]                 = None
-  var offset: Option[scala.Int]                    = None
+  var offsetEnd: Option[Integer]                   = None
+  var offset: Option[Integer]                      = None
   var name: String                                 = "<empty>"
-  var lineNumber: Option[scala.Int]                = None
+  var lineNumber: Option[Integer]                  = None
   var isExternal: Boolean                          = false
   var inheritsFromTypeFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   var fullName: String                             = "<empty>"
   var filename: String                             = "<empty>"
-  var columnNumber: Option[scala.Int]              = None
+  var columnNumber: Option[Integer]                = None
   var code: String                                 = "<empty>"
   var astParentType: String                        = "<empty>"
   var astParentFullName: String                    = "<empty>"
@@ -41982,13 +41804,11 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def aliasTypeFullName(value: String): this.type = {
-    this.aliasTypeFullName = Option(value).asInstanceOf[Option[String]]
+    this.aliasTypeFullName = Option(value)
     this
   }
 
-  def aliasTypeFullName(value: Option[String]): this.type = aliasTypeFullName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def aliasTypeFullName(value: Option[String]): this.type = aliasTypeFullName(value.orNull)
 
   def astParentFullName(value: String): this.type = {
     this.astParentFullName = value
@@ -42006,13 +41826,11 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def filename(value: String): this.type = {
     this.filename = value
@@ -42029,19 +41847,17 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
     this
   }
 
-  def isExternal(value: java.lang.Boolean): this.type = {
+  def isExternal(value: Boolean): this.type = {
     this.isExternal = value
     this
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
@@ -42049,24 +41865,20 @@ class NewTypeDecl extends NewNode with TypeDeclBase with AstNodeNew {
   }
 
   def offset(value: Integer): this.type = {
-    this.offset = Option(value).asInstanceOf[Option[scala.Int]]
+    this.offset = Option(value)
     this
   }
 
-  def offset(value: Option[scala.Int]): this.type = offset(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def offset(value: Option[Integer]): this.type = offset(value.orNull)
 
   def offsetEnd(value: Integer): this.type = {
-    this.offsetEnd = Option(value).asInstanceOf[Option[scala.Int]]
+    this.offsetEnd = Option(value)
     this
   }
 
-  def offsetEnd(value: Option[scala.Int]): this.type = offsetEnd(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def offsetEnd(value: Option[Integer]): this.type = offsetEnd(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -43386,11 +43198,11 @@ object NewTypeParameter {
 class NewTypeParameter extends NewNode with TypeParameterBase with AstNodeNew {
   type StoredType = TypeParameter
 
-  var order: scala.Int                = -1: Int
-  var name: String                    = "<empty>"
-  var lineNumber: Option[scala.Int]   = None
-  var columnNumber: Option[scala.Int] = None
-  var code: String                    = "<empty>"
+  var order: scala.Int              = -1: Int
+  var name: String                  = "<empty>"
+  var lineNumber: Option[Integer]   = None
+  var columnNumber: Option[Integer] = None
+  var code: String                  = "<empty>"
 
   override def label: String = "TYPE_PARAMETER"
 
@@ -43410,29 +43222,25 @@ class NewTypeParameter extends NewNode with TypeParameterBase with AstNodeNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
   def name(value: String): this.type = {
     this.name = value
     this
   }
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -44726,9 +44534,9 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   var typeFullName: String                        = "<empty>"
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var order: scala.Int                            = -1: Int
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -44749,19 +44557,17 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -44769,13 +44575,11 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(collection.immutable.ArraySeq)
@@ -44783,15 +44587,13 @@ class NewTypeRef extends NewNode with TypeRefBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }
@@ -46110,10 +45912,10 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   var possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   var parserTypeName: String                      = "<empty>"
   var order: scala.Int                            = -1: Int
-  var lineNumber: Option[scala.Int]               = None
+  var lineNumber: Option[Integer]                 = None
   var dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   var containedRef: String                        = "<empty>"
-  var columnNumber: Option[scala.Int]             = None
+  var columnNumber: Option[Integer]               = None
   var code: String                                = "<empty>"
   var argumentName: Option[String]                = None
   var argumentIndex: scala.Int                    = -1: Int
@@ -46136,19 +45938,17 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
     newInstance.asInstanceOf[this.type]
   }
 
-  def argumentIndex(value: Integer): this.type = {
+  def argumentIndex(value: scala.Int): this.type = {
     this.argumentIndex = value
     this
   }
 
   def argumentName(value: String): this.type = {
-    this.argumentName = Option(value).asInstanceOf[Option[String]]
+    this.argumentName = Option(value)
     this
   }
 
-  def argumentName(value: Option[String]): this.type = argumentName(value match {
-    case None => null; case Some(value) => value: String
-  })
+  def argumentName(value: Option[String]): this.type = argumentName(value.orNull)
 
   def code(value: String): this.type = {
     this.code = value
@@ -46156,13 +45956,11 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   }
 
   def columnNumber(value: Integer): this.type = {
-    this.columnNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.columnNumber = Option(value)
     this
   }
 
-  def columnNumber(value: Option[scala.Int]): this.type = columnNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def columnNumber(value: Option[Integer]): this.type = columnNumber(value.orNull)
 
   def containedRef(value: String): this.type = {
     this.containedRef = value
@@ -46175,15 +45973,13 @@ class NewUnknown extends NewNode with UnknownBase with ExpressionNew {
   }
 
   def lineNumber(value: Integer): this.type = {
-    this.lineNumber = Option(value).asInstanceOf[Option[scala.Int]]
+    this.lineNumber = Option(value)
     this
   }
 
-  def lineNumber(value: Option[scala.Int]): this.type = lineNumber(value match {
-    case None => null; case Some(value) => value: Integer
-  })
+  def lineNumber(value: Option[Integer]): this.type = lineNumber(value.orNull)
 
-  def order(value: Integer): this.type = {
+  def order(value: scala.Int): this.type = {
     this.order = value
     this
   }

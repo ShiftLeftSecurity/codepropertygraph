@@ -24,8 +24,8 @@ object TemplateDom {
     val ArgumentIndex = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName  = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code          = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber  = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val LineNumber    = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val ColumnNumber  = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val LineNumber    = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name          = new overflowdb.PropertyKey[String]("NAME")
     val Order         = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
@@ -77,8 +77,8 @@ trait TemplateDomBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[scala.Int]
-  def lineNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
+  def lineNumber: Option[Integer]
   def name: String
   def order: scala.Int
 
@@ -89,13 +89,13 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     with TemplateDomBase
     with StoredNode
     with Expression {
-  override def argumentIndex: scala.Int        = get().argumentIndex
-  override def argumentName: Option[String]    = get().argumentName
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def name: String                    = get().name
-  override def order: scala.Int                = get().order
+  override def argumentIndex: scala.Int      = get().argumentIndex
+  override def argumentName: Option[String]  = get().argumentName
+  override def code: String                  = get().code
+  override def columnNumber: Option[Integer] = get().columnNumber
+  override def lineNumber: Option[Integer]   = get().lineNumber
+  override def name: String                  = get().name
+  override def order: scala.Int              = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => TemplateDom.PropertyDefaults.ArgumentIndex
@@ -205,20 +205,20 @@ class TemplateDomDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wi
 
   override def layoutInformation: NodeLayoutInformation = TemplateDom.layoutInformation
 
-  private var _argumentIndex: Integer = TemplateDom.PropertyDefaults.ArgumentIndex
-  def argumentIndex: scala.Int        = _argumentIndex
-  private var _argumentName: String   = null
-  def argumentName: Option[String]    = Option(_argumentName).asInstanceOf[Option[String]]
-  private var _code: String           = TemplateDom.PropertyDefaults.Code
-  def code: String                    = _code
-  private var _columnNumber: Integer  = null
-  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _lineNumber: Integer    = null
-  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _name: String           = TemplateDom.PropertyDefaults.Name
-  def name: String                    = _name
-  private var _order: Integer         = TemplateDom.PropertyDefaults.Order
-  def order: scala.Int                = _order
+  private var _argumentIndex: scala.Int = TemplateDom.PropertyDefaults.ArgumentIndex
+  def argumentIndex: scala.Int          = _argumentIndex
+  private var _argumentName: String     = null
+  def argumentName: Option[String]      = Option(_argumentName)
+  private var _code: String             = TemplateDom.PropertyDefaults.Code
+  def code: String                      = _code
+  private var _columnNumber: Integer    = null
+  def columnNumber: Option[Integer]     = Option(_columnNumber)
+  private var _lineNumber: Integer      = null
+  def lineNumber: Option[Integer]       = Option(_lineNumber)
+  private var _name: String             = TemplateDom.PropertyDefaults.Name
+  def name: String                      = _name
+  private var _order: scala.Int         = TemplateDom.PropertyDefaults.Order
+  def order: scala.Int                  = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -334,8 +334,8 @@ class TemplateDomDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wi
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
       case "NAME"           => this._name = value.asInstanceOf[String]
       case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
 
@@ -354,16 +354,10 @@ class TemplateDomDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wi
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewTemplateDom].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewTemplateDom].argumentName match {
-      case None => null; case Some(value) => value
-    }
+    this._argumentName = newNode.asInstanceOf[NewTemplateDom].argumentName.orNull
     this._code = newNode.asInstanceOf[NewTemplateDom].code
-    this._columnNumber = newNode.asInstanceOf[NewTemplateDom].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._lineNumber = newNode.asInstanceOf[NewTemplateDom].lineNumber match {
-      case None => null; case Some(value) => value
-    }
+    this._columnNumber = newNode.asInstanceOf[NewTemplateDom].columnNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewTemplateDom].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewTemplateDom].name
     this._order = newNode.asInstanceOf[NewTemplateDom].order
 

@@ -15,8 +15,8 @@ object Expression {
     val ArgumentIndex = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName  = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code          = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber  = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val LineNumber    = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val ColumnNumber  = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val LineNumber    = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order         = new overflowdb.PropertyKey[scala.Int]("ORDER")
   }
 
@@ -37,8 +37,8 @@ trait ExpressionBase extends AbstractNode with AstNodeBase with CfgNodeBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[scala.Int]
-  def lineNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
+  def lineNumber: Option[Integer]
   def order: scala.Int
 }
 
@@ -46,14 +46,14 @@ trait ExpressionNew extends NewNode with AstNodeNew with CfgNodeNew {
   def argumentIndex_=(value: scala.Int): Unit
   def argumentName_=(value: Option[String]): Unit
   def code_=(value: String): Unit
-  def columnNumber_=(value: Option[scala.Int]): Unit
-  def lineNumber_=(value: Option[scala.Int]): Unit
+  def columnNumber_=(value: Option[Integer]): Unit
+  def lineNumber_=(value: Option[Integer]): Unit
   def order_=(value: scala.Int): Unit
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[scala.Int]
-  def lineNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
+  def lineNumber: Option[Integer]
   def order: scala.Int
 }
 

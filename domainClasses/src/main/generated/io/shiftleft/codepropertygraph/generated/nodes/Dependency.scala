@@ -122,7 +122,7 @@ class DependencyDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   override def layoutInformation: NodeLayoutInformation = Dependency.layoutInformation
 
   private var _dependencyGroupId: String = null
-  def dependencyGroupId: Option[String]  = Option(_dependencyGroupId).asInstanceOf[Option[String]]
+  def dependencyGroupId: Option[String]  = Option(_dependencyGroupId)
   private var _name: String              = Dependency.PropertyDefaults.Name
   def name: String                       = _name
   private var _version: String           = Dependency.PropertyDefaults.Version
@@ -208,9 +208,7 @@ class DependencyDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._dependencyGroupId = newNode.asInstanceOf[NewDependency].dependencyGroupId match {
-      case None => null; case Some(value) => value
-    }
+    this._dependencyGroupId = newNode.asInstanceOf[NewDependency].dependencyGroupId.orNull
     this._name = newNode.asInstanceOf[NewDependency].name
     this._version = newNode.asInstanceOf[NewDependency].version
 

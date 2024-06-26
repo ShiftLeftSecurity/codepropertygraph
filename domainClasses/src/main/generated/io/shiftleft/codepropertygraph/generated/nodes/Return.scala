@@ -23,8 +23,8 @@ object Return {
     val ArgumentIndex = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName  = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code          = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber  = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val LineNumber    = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val ColumnNumber  = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val LineNumber    = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order         = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
   }
@@ -82,8 +82,8 @@ trait ReturnBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[scala.Int]
-  def lineNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
+  def lineNumber: Option[Integer]
   def order: scala.Int
 
 }
@@ -93,12 +93,12 @@ class Return(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     with ReturnBase
     with StoredNode
     with Expression {
-  override def argumentIndex: scala.Int        = get().argumentIndex
-  override def argumentName: Option[String]    = get().argumentName
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def order: scala.Int                = get().order
+  override def argumentIndex: scala.Int      = get().argumentIndex
+  override def argumentName: Option[String]  = get().argumentName
+  override def code: String                  = get().code
+  override def columnNumber: Option[Integer] = get().columnNumber
+  override def lineNumber: Option[Integer]   = get().lineNumber
+  override def order: scala.Int              = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => Return.PropertyDefaults.ArgumentIndex
@@ -634,18 +634,18 @@ class ReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ex
 
   override def layoutInformation: NodeLayoutInformation = Return.layoutInformation
 
-  private var _argumentIndex: Integer = Return.PropertyDefaults.ArgumentIndex
-  def argumentIndex: scala.Int        = _argumentIndex
-  private var _argumentName: String   = null
-  def argumentName: Option[String]    = Option(_argumentName).asInstanceOf[Option[String]]
-  private var _code: String           = Return.PropertyDefaults.Code
-  def code: String                    = _code
-  private var _columnNumber: Integer  = null
-  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _lineNumber: Integer    = null
-  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer         = Return.PropertyDefaults.Order
-  def order: scala.Int                = _order
+  private var _argumentIndex: scala.Int = Return.PropertyDefaults.ArgumentIndex
+  def argumentIndex: scala.Int          = _argumentIndex
+  private var _argumentName: String     = null
+  def argumentName: Option[String]      = Option(_argumentName)
+  private var _code: String             = Return.PropertyDefaults.Code
+  def code: String                      = _code
+  private var _columnNumber: Integer    = null
+  def columnNumber: Option[Integer]     = Option(_columnNumber)
+  private var _lineNumber: Integer      = null
+  def lineNumber: Option[Integer]       = Option(_lineNumber)
+  private var _order: scala.Int         = Return.PropertyDefaults.Order
+  def order: scala.Int                  = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -898,8 +898,8 @@ class ReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ex
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
       case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -917,14 +917,10 @@ class ReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ex
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewReturn].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewReturn].argumentName match {
-      case None => null; case Some(value) => value
-    }
+    this._argumentName = newNode.asInstanceOf[NewReturn].argumentName.orNull
     this._code = newNode.asInstanceOf[NewReturn].code
-    this._columnNumber = newNode.asInstanceOf[NewReturn].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._lineNumber = newNode.asInstanceOf[NewReturn].lineNumber match { case None => null; case Some(value) => value }
+    this._columnNumber = newNode.asInstanceOf[NewReturn].columnNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewReturn].lineNumber.orNull
     this._order = newNode.asInstanceOf[NewReturn].order
 
   }

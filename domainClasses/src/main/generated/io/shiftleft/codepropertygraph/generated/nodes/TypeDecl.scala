@@ -47,15 +47,15 @@ object TypeDecl {
     val AstParentFullName        = new overflowdb.PropertyKey[String]("AST_PARENT_FULL_NAME")
     val AstParentType            = new overflowdb.PropertyKey[String]("AST_PARENT_TYPE")
     val Code                     = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber             = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val ColumnNumber             = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
     val Filename                 = new overflowdb.PropertyKey[String]("FILENAME")
     val FullName                 = new overflowdb.PropertyKey[String]("FULL_NAME")
     val InheritsFromTypeFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("INHERITS_FROM_TYPE_FULL_NAME")
     val IsExternal               = new overflowdb.PropertyKey[Boolean]("IS_EXTERNAL")
-    val LineNumber               = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val LineNumber               = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Name                     = new overflowdb.PropertyKey[String]("NAME")
-    val Offset                   = new overflowdb.PropertyKey[scala.Int]("OFFSET")
-    val OffsetEnd                = new overflowdb.PropertyKey[scala.Int]("OFFSET_END")
+    val Offset                   = new overflowdb.PropertyKey[Integer]("OFFSET")
+    val OffsetEnd                = new overflowdb.PropertyKey[Integer]("OFFSET_END")
     val Order                    = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
   }
@@ -112,15 +112,15 @@ trait TypeDeclBase extends AbstractNode with AstNodeBase {
   def astParentFullName: String
   def astParentType: String
   def code: String
-  def columnNumber: Option[scala.Int]
+  def columnNumber: Option[Integer]
   def filename: String
   def fullName: String
   def inheritsFromTypeFullName: IndexedSeq[String]
   def isExternal: Boolean
-  def lineNumber: Option[scala.Int]
+  def lineNumber: Option[Integer]
   def name: String
-  def offset: Option[scala.Int]
-  def offsetEnd: Option[scala.Int]
+  def offset: Option[Integer]
+  def offsetEnd: Option[Integer]
   def order: scala.Int
 
 }
@@ -134,15 +134,15 @@ class TypeDecl(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
   override def astParentFullName: String                    = get().astParentFullName
   override def astParentType: String                        = get().astParentType
   override def code: String                                 = get().code
-  override def columnNumber: Option[scala.Int]              = get().columnNumber
+  override def columnNumber: Option[Integer]                = get().columnNumber
   override def filename: String                             = get().filename
   override def fullName: String                             = get().fullName
   override def inheritsFromTypeFullName: IndexedSeq[String] = get().inheritsFromTypeFullName
   override def isExternal: Boolean                          = get().isExternal
-  override def lineNumber: Option[scala.Int]                = get().lineNumber
+  override def lineNumber: Option[Integer]                  = get().lineNumber
   override def name: String                                 = get().name
-  override def offset: Option[scala.Int]                    = get().offset
-  override def offsetEnd: Option[scala.Int]                 = get().offsetEnd
+  override def offset: Option[Integer]                      = get().offset
+  override def offsetEnd: Option[Integer]                   = get().offsetEnd
   override def order: scala.Int                             = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
@@ -323,7 +323,7 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   override def layoutInformation: NodeLayoutInformation = TypeDecl.layoutInformation
 
   private var _aliasTypeFullName: String                    = null
-  def aliasTypeFullName: Option[String]                     = Option(_aliasTypeFullName).asInstanceOf[Option[String]]
+  def aliasTypeFullName: Option[String]                     = Option(_aliasTypeFullName)
   private var _astParentFullName: String                    = TypeDecl.PropertyDefaults.AstParentFullName
   def astParentFullName: String                             = _astParentFullName
   private var _astParentType: String                        = TypeDecl.PropertyDefaults.AstParentType
@@ -331,24 +331,24 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   private var _code: String                                 = TypeDecl.PropertyDefaults.Code
   def code: String                                          = _code
   private var _columnNumber: Integer                        = null
-  def columnNumber: Option[scala.Int]                       = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  def columnNumber: Option[Integer]                         = Option(_columnNumber)
   private var _filename: String                             = TypeDecl.PropertyDefaults.Filename
   def filename: String                                      = _filename
   private var _fullName: String                             = TypeDecl.PropertyDefaults.FullName
   def fullName: String                                      = _fullName
   private var _inheritsFromTypeFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def inheritsFromTypeFullName: IndexedSeq[String]          = _inheritsFromTypeFullName
-  private var _isExternal: java.lang.Boolean                = TypeDecl.PropertyDefaults.IsExternal
+  private var _isExternal: Boolean                          = TypeDecl.PropertyDefaults.IsExternal
   def isExternal: Boolean                                   = _isExternal
   private var _lineNumber: Integer                          = null
-  def lineNumber: Option[scala.Int]                         = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  def lineNumber: Option[Integer]                           = Option(_lineNumber)
   private var _name: String                                 = TypeDecl.PropertyDefaults.Name
   def name: String                                          = _name
   private var _offset: Integer                              = null
-  def offset: Option[scala.Int]                             = Option(_offset).asInstanceOf[Option[scala.Int]]
+  def offset: Option[Integer]                               = Option(_offset)
   private var _offsetEnd: Integer                           = null
-  def offsetEnd: Option[scala.Int]                          = Option(_offsetEnd).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer                               = TypeDecl.PropertyDefaults.Order
+  def offsetEnd: Option[Integer]                            = Option(_offsetEnd)
+  private var _order: scala.Int                             = TypeDecl.PropertyDefaults.Order
   def order: scala.Int                                      = _order
 
   /** faster than the default implementation */
@@ -520,7 +520,7 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
       case "AST_PARENT_FULL_NAME" => this._astParentFullName = value.asInstanceOf[String]
       case "AST_PARENT_TYPE"      => this._astParentType = value.asInstanceOf[String]
       case "CODE"                 => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[Integer]
       case "FILENAME"             => this._filename = value.asInstanceOf[String]
       case "FULL_NAME"            => this._fullName = value.asInstanceOf[String]
       case "INHERITS_FROM_TYPE_FULL_NAME" =>
@@ -542,10 +542,10 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
             } else collection.immutable.ArraySeq.empty
         }
       case "IS_EXTERNAL" => this._isExternal = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
       case "NAME"        => this._name = value.asInstanceOf[String]
-      case "OFFSET"      => this._offset = value.asInstanceOf[scala.Int]
-      case "OFFSET_END"  => this._offsetEnd = value.asInstanceOf[scala.Int]
+      case "OFFSET"      => this._offset = value.asInstanceOf[Integer]
+      case "OFFSET_END"  => this._offsetEnd = value.asInstanceOf[Integer]
       case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -562,15 +562,11 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._aliasTypeFullName = newNode.asInstanceOf[NewTypeDecl].aliasTypeFullName match {
-      case None => null; case Some(value) => value
-    }
+    this._aliasTypeFullName = newNode.asInstanceOf[NewTypeDecl].aliasTypeFullName.orNull
     this._astParentFullName = newNode.asInstanceOf[NewTypeDecl].astParentFullName
     this._astParentType = newNode.asInstanceOf[NewTypeDecl].astParentType
     this._code = newNode.asInstanceOf[NewTypeDecl].code
-    this._columnNumber = newNode.asInstanceOf[NewTypeDecl].columnNumber match {
-      case None => null; case Some(value) => value
-    }
+    this._columnNumber = newNode.asInstanceOf[NewTypeDecl].columnNumber.orNull
     this._filename = newNode.asInstanceOf[NewTypeDecl].filename
     this._fullName = newNode.asInstanceOf[NewTypeDecl].fullName
     this._inheritsFromTypeFullName =
@@ -578,12 +574,10 @@ class TypeDeclDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
         newNode.asInstanceOf[NewTypeDecl].inheritsFromTypeFullName
       else collection.immutable.ArraySeq.empty
     this._isExternal = newNode.asInstanceOf[NewTypeDecl].isExternal
-    this._lineNumber = newNode.asInstanceOf[NewTypeDecl].lineNumber match {
-      case None => null; case Some(value) => value
-    }
+    this._lineNumber = newNode.asInstanceOf[NewTypeDecl].lineNumber.orNull
     this._name = newNode.asInstanceOf[NewTypeDecl].name
-    this._offset = newNode.asInstanceOf[NewTypeDecl].offset match { case None => null; case Some(value) => value }
-    this._offsetEnd = newNode.asInstanceOf[NewTypeDecl].offsetEnd match { case None => null; case Some(value) => value }
+    this._offset = newNode.asInstanceOf[NewTypeDecl].offset.orNull
+    this._offsetEnd = newNode.asInstanceOf[NewTypeDecl].offsetEnd.orNull
     this._order = newNode.asInstanceOf[NewTypeDecl].order
 
     graph.indexManager.putIfIndexed("FULL_NAME", newNode.asInstanceOf[NewTypeDecl].fullName, this.ref)

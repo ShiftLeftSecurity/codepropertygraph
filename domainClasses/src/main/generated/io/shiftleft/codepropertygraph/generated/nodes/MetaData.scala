@@ -124,7 +124,7 @@ class MetaDataDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   override def layoutInformation: NodeLayoutInformation = MetaData.layoutInformation
 
   private var _hash: String                 = null
-  def hash: Option[String]                  = Option(_hash).asInstanceOf[Option[String]]
+  def hash: Option[String]                  = Option(_hash)
   private var _language: String             = MetaData.PropertyDefaults.Language
   def language: String                      = _language
   private var _overlays: IndexedSeq[String] = collection.immutable.ArraySeq.empty
@@ -240,7 +240,7 @@ class MetaDataDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._hash = newNode.asInstanceOf[NewMetaData].hash match { case None => null; case Some(value) => value }
+    this._hash = newNode.asInstanceOf[NewMetaData].hash.orNull
     this._language = newNode.asInstanceOf[NewMetaData].language
     this._overlays =
       if (newNode.asInstanceOf[NewMetaData].overlays != null) newNode.asInstanceOf[NewMetaData].overlays

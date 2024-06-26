@@ -25,13 +25,13 @@ object Import {
 
   object Properties {
     val Code           = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber   = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val ExplicitAs     = new overflowdb.PropertyKey[Boolean]("EXPLICIT_AS")
+    val ColumnNumber   = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ExplicitAs     = new overflowdb.PropertyKey[java.lang.Boolean]("EXPLICIT_AS")
     val ImportedAs     = new overflowdb.PropertyKey[String]("IMPORTED_AS")
     val ImportedEntity = new overflowdb.PropertyKey[String]("IMPORTED_ENTITY")
-    val IsExplicit     = new overflowdb.PropertyKey[Boolean]("IS_EXPLICIT")
-    val IsWildcard     = new overflowdb.PropertyKey[Boolean]("IS_WILDCARD")
-    val LineNumber     = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val IsExplicit     = new overflowdb.PropertyKey[java.lang.Boolean]("IS_EXPLICIT")
+    val IsWildcard     = new overflowdb.PropertyKey[java.lang.Boolean]("IS_WILDCARD")
+    val LineNumber     = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
     val Order          = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
   }
@@ -73,13 +73,13 @@ trait ImportBase extends AbstractNode with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[scala.Int]
-  def explicitAs: Option[Boolean]
+  def columnNumber: Option[Integer]
+  def explicitAs: Option[java.lang.Boolean]
   def importedAs: Option[String]
   def importedEntity: Option[String]
-  def isExplicit: Option[Boolean]
-  def isWildcard: Option[Boolean]
-  def lineNumber: Option[scala.Int]
+  def isExplicit: Option[java.lang.Boolean]
+  def isWildcard: Option[java.lang.Boolean]
+  def lineNumber: Option[Integer]
   def order: scala.Int
 
 }
@@ -89,15 +89,15 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     with ImportBase
     with StoredNode
     with AstNode {
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def explicitAs: Option[Boolean]     = get().explicitAs
-  override def importedAs: Option[String]      = get().importedAs
-  override def importedEntity: Option[String]  = get().importedEntity
-  override def isExplicit: Option[Boolean]     = get().isExplicit
-  override def isWildcard: Option[Boolean]     = get().isWildcard
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def order: scala.Int                = get().order
+  override def code: String                          = get().code
+  override def columnNumber: Option[Integer]         = get().columnNumber
+  override def explicitAs: Option[java.lang.Boolean] = get().explicitAs
+  override def importedAs: Option[String]            = get().importedAs
+  override def importedEntity: Option[String]        = get().importedEntity
+  override def isExplicit: Option[java.lang.Boolean] = get().isExplicit
+  override def isWildcard: Option[java.lang.Boolean] = get().isWildcard
+  override def lineNumber: Option[Integer]           = get().lineNumber
+  override def order: scala.Int                      = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => Import.PropertyDefaults.Code
@@ -197,20 +197,20 @@ class ImportDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   private var _code: String                  = Import.PropertyDefaults.Code
   def code: String                           = _code
   private var _columnNumber: Integer         = null
-  def columnNumber: Option[scala.Int]        = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  def columnNumber: Option[Integer]          = Option(_columnNumber)
   private var _explicitAs: java.lang.Boolean = null
-  def explicitAs: Option[Boolean]            = Option(_explicitAs).asInstanceOf[Option[Boolean]]
+  def explicitAs: Option[java.lang.Boolean]  = Option(_explicitAs)
   private var _importedAs: String            = null
-  def importedAs: Option[String]             = Option(_importedAs).asInstanceOf[Option[String]]
+  def importedAs: Option[String]             = Option(_importedAs)
   private var _importedEntity: String        = null
-  def importedEntity: Option[String]         = Option(_importedEntity).asInstanceOf[Option[String]]
+  def importedEntity: Option[String]         = Option(_importedEntity)
   private var _isExplicit: java.lang.Boolean = null
-  def isExplicit: Option[Boolean]            = Option(_isExplicit).asInstanceOf[Option[Boolean]]
+  def isExplicit: Option[java.lang.Boolean]  = Option(_isExplicit)
   private var _isWildcard: java.lang.Boolean = null
-  def isWildcard: Option[Boolean]            = Option(_isWildcard).asInstanceOf[Option[Boolean]]
+  def isWildcard: Option[java.lang.Boolean]  = Option(_isWildcard)
   private var _lineNumber: Integer           = null
-  def lineNumber: Option[scala.Int]          = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer                = Import.PropertyDefaults.Order
+  def lineNumber: Option[Integer]            = Option(_lineNumber)
+  private var _order: scala.Int              = Import.PropertyDefaults.Order
   def order: scala.Int                       = _order
 
   /** faster than the default implementation */
@@ -320,13 +320,13 @@ class ImportDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"            => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"   => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "EXPLICIT_AS"     => this._explicitAs = value.asInstanceOf[Boolean]
+      case "COLUMN_NUMBER"   => this._columnNumber = value.asInstanceOf[Integer]
+      case "EXPLICIT_AS"     => this._explicitAs = value.asInstanceOf[java.lang.Boolean]
       case "IMPORTED_AS"     => this._importedAs = value.asInstanceOf[String]
       case "IMPORTED_ENTITY" => this._importedEntity = value.asInstanceOf[String]
-      case "IS_EXPLICIT"     => this._isExplicit = value.asInstanceOf[Boolean]
-      case "IS_WILDCARD"     => this._isWildcard = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER"     => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "IS_EXPLICIT"     => this._isExplicit = value.asInstanceOf[java.lang.Boolean]
+      case "IS_WILDCARD"     => this._isWildcard = value.asInstanceOf[java.lang.Boolean]
+      case "LINE_NUMBER"     => this._lineNumber = value.asInstanceOf[Integer]
       case "ORDER"           => this._order = value.asInstanceOf[scala.Int]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -344,17 +344,13 @@ class ImportDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewImport].code
-    this._columnNumber = newNode.asInstanceOf[NewImport].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._explicitAs = newNode.asInstanceOf[NewImport].explicitAs match { case None => null; case Some(value) => value }
-    this._importedAs = newNode.asInstanceOf[NewImport].importedAs match { case None => null; case Some(value) => value }
-    this._importedEntity = newNode.asInstanceOf[NewImport].importedEntity match {
-      case None => null; case Some(value) => value
-    }
-    this._isExplicit = newNode.asInstanceOf[NewImport].isExplicit match { case None => null; case Some(value) => value }
-    this._isWildcard = newNode.asInstanceOf[NewImport].isWildcard match { case None => null; case Some(value) => value }
-    this._lineNumber = newNode.asInstanceOf[NewImport].lineNumber match { case None => null; case Some(value) => value }
+    this._columnNumber = newNode.asInstanceOf[NewImport].columnNumber.orNull
+    this._explicitAs = newNode.asInstanceOf[NewImport].explicitAs.orNull
+    this._importedAs = newNode.asInstanceOf[NewImport].importedAs.orNull
+    this._importedEntity = newNode.asInstanceOf[NewImport].importedEntity.orNull
+    this._isExplicit = newNode.asInstanceOf[NewImport].isExplicit.orNull
+    this._isWildcard = newNode.asInstanceOf[NewImport].isWildcard.orNull
+    this._lineNumber = newNode.asInstanceOf[NewImport].lineNumber.orNull
     this._order = newNode.asInstanceOf[NewImport].order
 
   }
