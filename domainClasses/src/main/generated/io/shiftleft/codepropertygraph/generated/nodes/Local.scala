@@ -35,9 +35,9 @@ object Local {
   object Properties {
     val ClosureBindingId        = new overflowdb.PropertyKey[String]("CLOSURE_BINDING_ID")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
@@ -86,9 +86,9 @@ trait LocalBase extends AbstractNode with AstNodeBase with DeclarationBase {
 
   def closureBindingId: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def name: String
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
@@ -104,9 +104,9 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
     with Declaration {
   override def closureBindingId: Option[String]            = get().closureBindingId
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
@@ -228,18 +228,18 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
   override def layoutInformation: NodeLayoutInformation = Local.layoutInformation
 
   private var _closureBindingId: String                    = null
-  def closureBindingId: Option[String]                     = Option(_closureBindingId)
+  def closureBindingId: Option[String]                     = Option(_closureBindingId).asInstanceOf[Option[String]]
   private var _code: String                                = Local.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _name: String                                = Local.PropertyDefaults.Name
   def name: String                                         = _name
-  private var _order: scala.Int                            = Local.PropertyDefaults.Order
+  private var _order: Integer                              = Local.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -364,7 +364,7 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
     key match {
       case "CLOSURE_BINDING_ID" => this._closureBindingId = value.asInstanceOf[String]
       case "CODE"               => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"      => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"      => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -383,7 +383,7 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER" => this._lineNumber = value.asInstanceOf[scala.Int]
       case "NAME"        => this._name = value.asInstanceOf[String]
       case "ORDER"       => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
@@ -420,14 +420,18 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._closureBindingId = newNode.asInstanceOf[NewLocal].closureBindingId.orNull
+    this._closureBindingId = newNode.asInstanceOf[NewLocal].closureBindingId match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewLocal].code
-    this._columnNumber = newNode.asInstanceOf[NewLocal].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewLocal].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewLocal].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewLocal].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewLocal].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewLocal].lineNumber match { case None => null; case Some(value) => value }
     this._name = newNode.asInstanceOf[NewLocal].name
     this._order = newNode.asInstanceOf[NewLocal].order
     this._possibleTypes =

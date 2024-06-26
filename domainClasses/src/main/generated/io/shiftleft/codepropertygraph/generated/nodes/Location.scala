@@ -38,7 +38,7 @@ object Location {
     val ClassName       = new overflowdb.PropertyKey[String]("CLASS_NAME")
     val ClassShortName  = new overflowdb.PropertyKey[String]("CLASS_SHORT_NAME")
     val Filename        = new overflowdb.PropertyKey[String]("FILENAME")
-    val LineNumber      = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber      = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val MethodFullName  = new overflowdb.PropertyKey[String]("METHOD_FULL_NAME")
     val MethodShortName = new overflowdb.PropertyKey[String]("METHOD_SHORT_NAME")
     val NodeLabel       = new overflowdb.PropertyKey[String]("NODE_LABEL")
@@ -81,7 +81,7 @@ trait LocationBase extends AbstractNode {
   def className: String
   def classShortName: String
   def filename: String
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def methodFullName: String
   def methodShortName: String
   def nodeLabel: String
@@ -95,15 +95,15 @@ class Location(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     extends NodeRef[LocationDb](graph_4762, id_4762)
     with LocationBase
     with StoredNode {
-  override def className: String           = get().className
-  override def classShortName: String      = get().classShortName
-  override def filename: String            = get().filename
-  override def lineNumber: Option[Integer] = get().lineNumber
-  override def methodFullName: String      = get().methodFullName
-  override def methodShortName: String     = get().methodShortName
-  override def nodeLabel: String           = get().nodeLabel
-  override def packageName: String         = get().packageName
-  override def symbol: String              = get().symbol
+  override def className: String             = get().className
+  override def classShortName: String        = get().classShortName
+  override def filename: String              = get().filename
+  override def lineNumber: Option[scala.Int] = get().lineNumber
+  override def methodFullName: String        = get().methodFullName
+  override def methodShortName: String       = get().methodShortName
+  override def nodeLabel: String             = get().nodeLabel
+  override def packageName: String           = get().packageName
+  override def symbol: String                = get().symbol
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CLASS_NAME"        => Location.PropertyDefaults.ClassName
@@ -181,7 +181,7 @@ class LocationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   private var _filename: String        = Location.PropertyDefaults.Filename
   def filename: String                 = _filename
   private var _lineNumber: Integer     = null
-  def lineNumber: Option[Integer]      = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]    = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _methodFullName: String  = Location.PropertyDefaults.MethodFullName
   def methodFullName: String           = _methodFullName
   private var _methodShortName: String = Location.PropertyDefaults.MethodShortName
@@ -290,7 +290,7 @@ class LocationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
       case "CLASS_NAME"        => this._className = value.asInstanceOf[String]
       case "CLASS_SHORT_NAME"  => this._classShortName = value.asInstanceOf[String]
       case "FILENAME"          => this._filename = value.asInstanceOf[String]
-      case "LINE_NUMBER"       => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"       => this._lineNumber = value.asInstanceOf[scala.Int]
       case "METHOD_FULL_NAME"  => this._methodFullName = value.asInstanceOf[String]
       case "METHOD_SHORT_NAME" => this._methodShortName = value.asInstanceOf[String]
       case "NODE_LABEL"        => this._nodeLabel = value.asInstanceOf[String]
@@ -314,7 +314,9 @@ class LocationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
     this._className = newNode.asInstanceOf[NewLocation].className
     this._classShortName = newNode.asInstanceOf[NewLocation].classShortName
     this._filename = newNode.asInstanceOf[NewLocation].filename
-    this._lineNumber = newNode.asInstanceOf[NewLocation].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewLocation].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._methodFullName = newNode.asInstanceOf[NewLocation].methodFullName
     this._methodShortName = newNode.asInstanceOf[NewLocation].methodShortName
     this._nodeLabel = newNode.asInstanceOf[NewLocation].nodeLabel

@@ -21,8 +21,8 @@ object JumpLabel {
 
   object Properties {
     val Code           = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber   = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val LineNumber     = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val ColumnNumber   = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val LineNumber     = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Name           = new overflowdb.PropertyKey[String]("NAME")
     val Order          = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val ParserTypeName = new overflowdb.PropertyKey[String]("PARSER_TYPE_NAME")
@@ -62,8 +62,8 @@ trait JumpLabelBase extends AbstractNode with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def name: String
   def order: scala.Int
   def parserTypeName: String
@@ -75,12 +75,12 @@ class JumpLabel(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
     with JumpLabelBase
     with StoredNode
     with AstNode {
-  override def code: String                  = get().code
-  override def columnNumber: Option[Integer] = get().columnNumber
-  override def lineNumber: Option[Integer]   = get().lineNumber
-  override def name: String                  = get().name
-  override def order: scala.Int              = get().order
-  override def parserTypeName: String        = get().parserTypeName
+  override def code: String                    = get().code
+  override def columnNumber: Option[scala.Int] = get().columnNumber
+  override def lineNumber: Option[scala.Int]   = get().lineNumber
+  override def name: String                    = get().name
+  override def order: scala.Int                = get().order
+  override def parserTypeName: String          = get().parserTypeName
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"             => JumpLabel.PropertyDefaults.Code
@@ -147,12 +147,12 @@ class JumpLabelDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
   private var _code: String           = JumpLabel.PropertyDefaults.Code
   def code: String                    = _code
   private var _columnNumber: Integer  = null
-  def columnNumber: Option[Integer]   = Option(_columnNumber)
+  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _lineNumber: Integer    = null
-  def lineNumber: Option[Integer]     = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _name: String           = JumpLabel.PropertyDefaults.Name
   def name: String                    = _name
-  private var _order: scala.Int       = JumpLabel.PropertyDefaults.Order
+  private var _order: Integer         = JumpLabel.PropertyDefaults.Order
   def order: scala.Int                = _order
   private var _parserTypeName: String = JumpLabel.PropertyDefaults.ParserTypeName
   def parserTypeName: String          = _parserTypeName
@@ -235,8 +235,8 @@ class JumpLabelDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"             => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"    => this._columnNumber = value.asInstanceOf[Integer]
-      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"    => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[scala.Int]
       case "NAME"             => this._name = value.asInstanceOf[String]
       case "ORDER"            => this._order = value.asInstanceOf[scala.Int]
       case "PARSER_TYPE_NAME" => this._parserTypeName = value.asInstanceOf[String]
@@ -256,8 +256,12 @@ class JumpLabelDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewJumpLabel].code
-    this._columnNumber = newNode.asInstanceOf[NewJumpLabel].columnNumber.orNull
-    this._lineNumber = newNode.asInstanceOf[NewJumpLabel].lineNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewJumpLabel].columnNumber match {
+      case None => null; case Some(value) => value
+    }
+    this._lineNumber = newNode.asInstanceOf[NewJumpLabel].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._name = newNode.asInstanceOf[NewJumpLabel].name
     this._order = newNode.asInstanceOf[NewJumpLabel].order
     this._parserTypeName = newNode.asInstanceOf[NewJumpLabel].parserTypeName

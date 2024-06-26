@@ -32,10 +32,10 @@ object MethodReturn {
 
   object Properties {
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
     val EvaluationStrategy      = new overflowdb.PropertyKey[String]("EVALUATION_STRATEGY")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
     val TypeFullName            = new overflowdb.PropertyKey[String]("TYPE_FULL_NAME")
@@ -85,10 +85,10 @@ trait MethodReturnBase extends AbstractNode with CfgNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dynamicTypeHintFullName: IndexedSeq[String]
   def evaluationStrategy: String
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
   def typeFullName: String
@@ -101,10 +101,10 @@ class MethodReturn(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
     with StoredNode
     with CfgNode {
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
   override def evaluationStrategy: String                  = get().evaluationStrategy
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
   override def typeFullName: String                        = get().typeFullName
@@ -351,14 +351,14 @@ class MethodReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
   private var _code: String                                = MethodReturn.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _evaluationStrategy: String                  = MethodReturn.PropertyDefaults.EvaluationStrategy
   def evaluationStrategy: String                           = _evaluationStrategy
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
-  private var _order: scala.Int                            = MethodReturn.PropertyDefaults.Order
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _order: Integer                              = MethodReturn.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -526,7 +526,7 @@ class MethodReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -546,7 +546,7 @@ class MethodReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
             } else collection.immutable.ArraySeq.empty
         }
       case "EVALUATION_STRATEGY" => this._evaluationStrategy = value.asInstanceOf[String]
-      case "LINE_NUMBER"         => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"         => this._lineNumber = value.asInstanceOf[scala.Int]
       case "ORDER"               => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
         this._possibleTypes = value match {
@@ -583,13 +583,17 @@ class MethodReturnDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewMethodReturn].code
-    this._columnNumber = newNode.asInstanceOf[NewMethodReturn].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewMethodReturn].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewMethodReturn].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewMethodReturn].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
     this._evaluationStrategy = newNode.asInstanceOf[NewMethodReturn].evaluationStrategy
-    this._lineNumber = newNode.asInstanceOf[NewMethodReturn].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewMethodReturn].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._order = newNode.asInstanceOf[NewMethodReturn].order
     this._possibleTypes =
       if (newNode.asInstanceOf[NewMethodReturn].possibleTypes != null)

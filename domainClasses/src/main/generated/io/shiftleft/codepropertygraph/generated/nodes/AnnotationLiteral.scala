@@ -24,8 +24,8 @@ object AnnotationLiteral {
     val ArgumentIndex = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName  = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code          = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber  = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val LineNumber    = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val ColumnNumber  = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val LineNumber    = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Name          = new overflowdb.PropertyKey[String]("NAME")
     val Order         = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
@@ -70,8 +70,8 @@ trait AnnotationLiteralBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def name: String
   def order: scala.Int
 
@@ -82,13 +82,13 @@ class AnnotationLiteral(graph_4762: Graph, id_4762: Long /*cf https://github.com
     with AnnotationLiteralBase
     with StoredNode
     with Expression {
-  override def argumentIndex: scala.Int      = get().argumentIndex
-  override def argumentName: Option[String]  = get().argumentName
-  override def code: String                  = get().code
-  override def columnNumber: Option[Integer] = get().columnNumber
-  override def lineNumber: Option[Integer]   = get().lineNumber
-  override def name: String                  = get().name
-  override def order: scala.Int              = get().order
+  override def argumentIndex: scala.Int        = get().argumentIndex
+  override def argumentName: Option[String]    = get().argumentName
+  override def code: String                    = get().code
+  override def columnNumber: Option[scala.Int] = get().columnNumber
+  override def lineNumber: Option[scala.Int]   = get().lineNumber
+  override def name: String                    = get().name
+  override def order: scala.Int                = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "ARGUMENT_INDEX" => AnnotationLiteral.PropertyDefaults.ArgumentIndex
@@ -168,20 +168,20 @@ class AnnotationLiteralDb(ref: NodeRef[NodeDb])
 
   override def layoutInformation: NodeLayoutInformation = AnnotationLiteral.layoutInformation
 
-  private var _argumentIndex: scala.Int = AnnotationLiteral.PropertyDefaults.ArgumentIndex
-  def argumentIndex: scala.Int          = _argumentIndex
-  private var _argumentName: String     = null
-  def argumentName: Option[String]      = Option(_argumentName)
-  private var _code: String             = AnnotationLiteral.PropertyDefaults.Code
-  def code: String                      = _code
-  private var _columnNumber: Integer    = null
-  def columnNumber: Option[Integer]     = Option(_columnNumber)
-  private var _lineNumber: Integer      = null
-  def lineNumber: Option[Integer]       = Option(_lineNumber)
-  private var _name: String             = AnnotationLiteral.PropertyDefaults.Name
-  def name: String                      = _name
-  private var _order: scala.Int         = AnnotationLiteral.PropertyDefaults.Order
-  def order: scala.Int                  = _order
+  private var _argumentIndex: Integer = AnnotationLiteral.PropertyDefaults.ArgumentIndex
+  def argumentIndex: scala.Int        = _argumentIndex
+  private var _argumentName: String   = null
+  def argumentName: Option[String]    = Option(_argumentName).asInstanceOf[Option[String]]
+  private var _code: String           = AnnotationLiteral.PropertyDefaults.Code
+  def code: String                    = _code
+  private var _columnNumber: Integer  = null
+  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  private var _lineNumber: Integer    = null
+  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _name: String           = AnnotationLiteral.PropertyDefaults.Name
+  def name: String                    = _name
+  private var _order: Integer         = AnnotationLiteral.PropertyDefaults.Order
+  def order: scala.Int                = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -278,8 +278,8 @@ class AnnotationLiteralDb(ref: NodeRef[NodeDb])
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
-      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER"    => this._lineNumber = value.asInstanceOf[scala.Int]
       case "NAME"           => this._name = value.asInstanceOf[String]
       case "ORDER"          => this._order = value.asInstanceOf[scala.Int]
 
@@ -298,10 +298,16 @@ class AnnotationLiteralDb(ref: NodeRef[NodeDb])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewAnnotationLiteral].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewAnnotationLiteral].argumentName.orNull
+    this._argumentName = newNode.asInstanceOf[NewAnnotationLiteral].argumentName match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewAnnotationLiteral].code
-    this._columnNumber = newNode.asInstanceOf[NewAnnotationLiteral].columnNumber.orNull
-    this._lineNumber = newNode.asInstanceOf[NewAnnotationLiteral].lineNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewAnnotationLiteral].columnNumber match {
+      case None => null; case Some(value) => value
+    }
+    this._lineNumber = newNode.asInstanceOf[NewAnnotationLiteral].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._name = newNode.asInstanceOf[NewAnnotationLiteral].name
     this._order = newNode.asInstanceOf[NewAnnotationLiteral].order
 
