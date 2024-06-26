@@ -130,6 +130,9 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
   @overflowdb.traversal.help.Doc(info = """Traverse to parameter type""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
+  @deprecated("please use `typ`", "June 2024")
+  def _typ = typ
+
   def reachingDefOut: Iterator[Expression] = get().reachingDefOut
   override def _reachingDefOut             = get()._reachingDefOut
 
@@ -137,25 +140,43 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
     */
   def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefOut
 
+  @deprecated("please use `_callViaReachingDefOut`", "June 2024")
+  def __callViaReachingDefOut = _callViaReachingDefOut
+
   /** Traverse to IDENTIFIER via REACHING_DEF OUT edge.
     */
   def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefOut
+
+  @deprecated("please use `_identifierViaReachingDefOut`", "June 2024")
+  def __identifierViaReachingDefOut = _identifierViaReachingDefOut
 
   /** Traverse to LITERAL via REACHING_DEF OUT edge.
     */
   def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefOut
 
+  @deprecated("please use `_literalViaReachingDefOut`", "June 2024")
+  def __literalViaReachingDefOut = _literalViaReachingDefOut
+
   /** Traverse to METHOD_REF via REACHING_DEF OUT edge.
     */
   def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefOut
+
+  @deprecated("please use `_methodRefViaReachingDefOut`", "June 2024")
+  def __methodRefViaReachingDefOut = _methodRefViaReachingDefOut
 
   /** Traverse to RETURN via REACHING_DEF OUT edge.
     */
   def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefOut
 
+  @deprecated("please use `_returnViaReachingDefOut`", "June 2024")
+  def __returnViaReachingDefOut = _returnViaReachingDefOut
+
   /** Traverse to TYPE_REF via REACHING_DEF OUT edge.
     */
   def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefOut
+
+  @deprecated("please use `_typeRefViaReachingDefOut`", "June 2024")
+  def __typeRefViaReachingDefOut = _typeRefViaReachingDefOut
 
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
@@ -164,12 +185,18 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def astIn: Iterator[Method] = get().astIn
   override def _astIn         = get()._astIn
 
   /** Traverse to METHOD via AST IN edge.
     */
   def method: Method = get().method
+
+  @deprecated("please use `method`", "June 2024")
+  def _method = method
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -181,6 +208,9 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
     */
   def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = get().asInput
 
+  @deprecated("please use `asInput`", "June 2024")
+  def _asInput = asInput
+
   def reachingDefIn: Iterator[CfgNode] = get().reachingDefIn
   override def _reachingDefIn          = get()._reachingDefIn
 
@@ -188,47 +218,80 @@ class MethodParameterOut(graph_4762: Graph, id_4762: Long /*cf https://github.co
     */
   def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = get()._blockViaReachingDefIn
 
+  @deprecated("please use `_blockViaReachingDefIn`", "June 2024")
+  def __blockViaReachingDefIn = _blockViaReachingDefIn
+
   /** Traverse to CALL via REACHING_DEF IN edge.
     */
   def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call] = get()._callViaReachingDefIn
+
+  @deprecated("please use `_callViaReachingDefIn`", "June 2024")
+  def __callViaReachingDefIn = _callViaReachingDefIn
 
   /** Traverse to CONTROL_STRUCTURE via REACHING_DEF IN edge.
     */
   def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
     get()._controlStructureViaReachingDefIn
 
+  @deprecated("please use `_controlStructureViaReachingDefIn`", "June 2024")
+  def __controlStructureViaReachingDefIn = _controlStructureViaReachingDefIn
+
   /** Traverse to IDENTIFIER via REACHING_DEF IN edge.
     */
   def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaReachingDefIn
+
+  @deprecated("please use `_identifierViaReachingDefIn`", "June 2024")
+  def __identifierViaReachingDefIn = _identifierViaReachingDefIn
 
   /** Traverse to LITERAL via REACHING_DEF IN edge.
     */
   def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaReachingDefIn
 
+  @deprecated("please use `_literalViaReachingDefIn`", "June 2024")
+  def __literalViaReachingDefIn = _literalViaReachingDefIn
+
   /** Traverse to METHOD via REACHING_DEF IN edge.
     */
   def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = get()._methodViaReachingDefIn
+
+  @deprecated("please use `_methodViaReachingDefIn`", "June 2024")
+  def __methodViaReachingDefIn = _methodViaReachingDefIn
 
   /** Traverse to METHOD_PARAMETER_IN via REACHING_DEF IN edge.
     */
   def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     get()._methodParameterInViaReachingDefIn
 
+  @deprecated("please use `_methodParameterInViaReachingDefIn`", "June 2024")
+  def __methodParameterInViaReachingDefIn = _methodParameterInViaReachingDefIn
+
   /** Traverse to METHOD_REF via REACHING_DEF IN edge.
     */
   def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaReachingDefIn
+
+  @deprecated("please use `_methodRefViaReachingDefIn`", "June 2024")
+  def __methodRefViaReachingDefIn = _methodRefViaReachingDefIn
 
   /** Traverse to RETURN via REACHING_DEF IN edge.
     */
   def _returnViaReachingDefIn: overflowdb.traversal.Traversal[Return] = get()._returnViaReachingDefIn
 
+  @deprecated("please use `_returnViaReachingDefIn`", "June 2024")
+  def __returnViaReachingDefIn = _returnViaReachingDefIn
+
   /** Traverse to TYPE_REF via REACHING_DEF IN edge.
     */
   def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaReachingDefIn
 
+  @deprecated("please use `_typeRefViaReachingDefIn`", "June 2024")
+  def __typeRefViaReachingDefIn = _typeRefViaReachingDefIn
+
   /** Traverse to UNKNOWN via REACHING_DEF IN edge.
     */
   def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaReachingDefIn
+
+  @deprecated("please use `_unknownViaReachingDefIn`", "June 2024")
+  def __unknownViaReachingDefIn = _unknownViaReachingDefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -340,25 +403,56 @@ class MethodParameterOutDb(ref: NodeRef[NodeDb])
   }
 
   import overflowdb.traversal._
-  def evalTypeOut: Iterator[Type]               = createAdjacentNodeScalaIteratorByOffSet[Type](0)
-  override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+  def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](0)
+  override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `typ`", "June 2024")
+  def _typ = typ
+
   def typ: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
   def reachingDefOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
   override def _reachingDefOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call]             = reachingDefOut.collectAll[Call]
-  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
-  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal]       = reachingDefOut.collectAll[Literal]
-  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef]   = reachingDefOut.collectAll[MethodRef]
-  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return]         = reachingDefOut.collectAll[Return]
-  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef]       = reachingDefOut.collectAll[TypeRef]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  @deprecated("please use `_callViaReachingDefOut`", "June 2024")
+  def __callViaReachingDefOut = _callViaReachingDefOut
+
+  def _callViaReachingDefOut: overflowdb.traversal.Traversal[Call] = reachingDefOut.collectAll[Call]
+  @deprecated("please use `_identifierViaReachingDefOut`", "June 2024")
+  def __identifierViaReachingDefOut = _identifierViaReachingDefOut
+
+  def _identifierViaReachingDefOut: overflowdb.traversal.Traversal[Identifier] = reachingDefOut.collectAll[Identifier]
+  @deprecated("please use `_literalViaReachingDefOut`", "June 2024")
+  def __literalViaReachingDefOut = _literalViaReachingDefOut
+
+  def _literalViaReachingDefOut: overflowdb.traversal.Traversal[Literal] = reachingDefOut.collectAll[Literal]
+  @deprecated("please use `_methodRefViaReachingDefOut`", "June 2024")
+  def __methodRefViaReachingDefOut = _methodRefViaReachingDefOut
+
+  def _methodRefViaReachingDefOut: overflowdb.traversal.Traversal[MethodRef] = reachingDefOut.collectAll[MethodRef]
+  @deprecated("please use `_returnViaReachingDefOut`", "June 2024")
+  def __returnViaReachingDefOut = _returnViaReachingDefOut
+
+  def _returnViaReachingDefOut: overflowdb.traversal.Traversal[Return] = reachingDefOut.collectAll[Return]
+  @deprecated("please use `_typeRefViaReachingDefOut`", "June 2024")
+  def __typeRefViaReachingDefOut = _typeRefViaReachingDefOut
+
+  def _typeRefViaReachingDefOut: overflowdb.traversal.Traversal[TypeRef] = reachingDefOut.collectAll[TypeRef]
+
+  def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
+  override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
   def astIn: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](3)
   override def _astIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `method`", "June 2024")
+  def _method = method
+
   def method: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -373,23 +467,61 @@ class MethodParameterOutDb(ref: NodeRef[NodeDb])
 
   def parameterLinkIn: Iterator[MethodParameterIn] = createAdjacentNodeScalaIteratorByOffSet[MethodParameterIn](5)
   override def _parameterLinkIn                    = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+
+  @deprecated("please use `asInput`", "June 2024")
+  def _asInput = asInput
+
   def asInput: overflowdb.traversal.Traversal[MethodParameterIn] = parameterLinkIn.collectAll[MethodParameterIn]
 
   def reachingDefIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
   override def _reachingDefIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
+
+  @deprecated("please use `_blockViaReachingDefIn`", "June 2024")
+  def __blockViaReachingDefIn = _blockViaReachingDefIn
+
   def _blockViaReachingDefIn: overflowdb.traversal.Traversal[Block] = reachingDefIn.collectAll[Block]
-  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call]   = reachingDefIn.collectAll[Call]
+  @deprecated("please use `_callViaReachingDefIn`", "June 2024")
+  def __callViaReachingDefIn = _callViaReachingDefIn
+
+  def _callViaReachingDefIn: overflowdb.traversal.Traversal[Call] = reachingDefIn.collectAll[Call]
+  @deprecated("please use `_controlStructureViaReachingDefIn`", "June 2024")
+  def __controlStructureViaReachingDefIn = _controlStructureViaReachingDefIn
+
   def _controlStructureViaReachingDefIn: overflowdb.traversal.Traversal[ControlStructure] =
     reachingDefIn.collectAll[ControlStructure]
+  @deprecated("please use `_identifierViaReachingDefIn`", "June 2024")
+  def __identifierViaReachingDefIn = _identifierViaReachingDefIn
+
   def _identifierViaReachingDefIn: overflowdb.traversal.Traversal[Identifier] = reachingDefIn.collectAll[Identifier]
-  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal]       = reachingDefIn.collectAll[Literal]
-  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method]         = reachingDefIn.collectAll[Method]
+  @deprecated("please use `_literalViaReachingDefIn`", "June 2024")
+  def __literalViaReachingDefIn = _literalViaReachingDefIn
+
+  def _literalViaReachingDefIn: overflowdb.traversal.Traversal[Literal] = reachingDefIn.collectAll[Literal]
+  @deprecated("please use `_methodViaReachingDefIn`", "June 2024")
+  def __methodViaReachingDefIn = _methodViaReachingDefIn
+
+  def _methodViaReachingDefIn: overflowdb.traversal.Traversal[Method] = reachingDefIn.collectAll[Method]
+  @deprecated("please use `_methodParameterInViaReachingDefIn`", "June 2024")
+  def __methodParameterInViaReachingDefIn = _methodParameterInViaReachingDefIn
+
   def _methodParameterInViaReachingDefIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     reachingDefIn.collectAll[MethodParameterIn]
+  @deprecated("please use `_methodRefViaReachingDefIn`", "June 2024")
+  def __methodRefViaReachingDefIn = _methodRefViaReachingDefIn
+
   def _methodRefViaReachingDefIn: overflowdb.traversal.Traversal[MethodRef] = reachingDefIn.collectAll[MethodRef]
-  def _returnViaReachingDefIn: overflowdb.traversal.Traversal[Return]       = reachingDefIn.collectAll[Return]
-  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef]     = reachingDefIn.collectAll[TypeRef]
-  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown]     = reachingDefIn.collectAll[Unknown]
+  @deprecated("please use `_returnViaReachingDefIn`", "June 2024")
+  def __returnViaReachingDefIn = _returnViaReachingDefIn
+
+  def _returnViaReachingDefIn: overflowdb.traversal.Traversal[Return] = reachingDefIn.collectAll[Return]
+  @deprecated("please use `_typeRefViaReachingDefIn`", "June 2024")
+  def __typeRefViaReachingDefIn = _typeRefViaReachingDefIn
+
+  def _typeRefViaReachingDefIn: overflowdb.traversal.Traversal[TypeRef] = reachingDefIn.collectAll[TypeRef]
+  @deprecated("please use `_unknownViaReachingDefIn`", "June 2024")
+  def __unknownViaReachingDefIn = _unknownViaReachingDefIn
+
+  def _unknownViaReachingDefIn: overflowdb.traversal.Traversal[Unknown] = reachingDefIn.collectAll[Unknown]
 
   override def label: String = {
     MethodParameterOut.Label

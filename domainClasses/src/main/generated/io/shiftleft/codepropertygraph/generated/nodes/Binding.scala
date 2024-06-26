@@ -83,12 +83,18 @@ class Binding(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
     */
   def boundMethod: Method = get().boundMethod
 
+  @deprecated("please use `boundMethod`", "June 2024")
+  def _boundMethod = boundMethod
+
   def bindsIn: Iterator[TypeDecl] = get().bindsIn
   override def _bindsIn           = get()._bindsIn
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */
   def bindingTypeDecl: TypeDecl = get().bindingTypeDecl
+
+  @deprecated("please use `bindingTypeDecl`", "June 2024")
+  def _bindingTypeDecl = bindingTypeDecl
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -160,6 +166,10 @@ class BindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with B
   import overflowdb.traversal._
   def refOut: Iterator[Method] = createAdjacentNodeScalaIteratorByOffSet[Method](0)
   override def _refOut         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `boundMethod`", "June 2024")
+  def _boundMethod = boundMethod
+
   def boundMethod: Method = try { refOut.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -171,6 +181,10 @@ class BindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with B
 
   def bindsIn: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](1)
   override def _bindsIn           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `bindingTypeDecl`", "June 2024")
+  def _bindingTypeDecl = bindingTypeDecl
+
   def bindingTypeDecl: TypeDecl = try { bindsIn.collectAll[TypeDecl].next() }
   catch {
     case e: java.util.NoSuchElementException =>

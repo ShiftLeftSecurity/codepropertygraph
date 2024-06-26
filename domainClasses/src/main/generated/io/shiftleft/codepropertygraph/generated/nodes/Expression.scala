@@ -63,66 +63,102 @@ trait Expression extends StoredNode with ExpressionBase with AstNode with CfgNod
 
   /** Traverse to EXPRESSION via ARGUMENT OUT edge.
     */
-  def _expressionViaArgumentOut: overflowdb.traversal.Traversal[Expression] =
+  def expressionViaArgumentOut: overflowdb.traversal.Traversal[Expression] =
     argumentOut.collectAll[Expression]
+
+  @deprecated("please use `expressionViaArgumentOut`", "June 2024")
+  def _expressionViaArgumentOut = expressionViaArgumentOut
 
   /** Traverse to AST_NODE via ARGUMENT OUT edge.
     */
-  def _astNodeViaArgumentOut: overflowdb.traversal.Traversal[AstNode] =
+  def astNodeViaArgumentOut: overflowdb.traversal.Traversal[AstNode] =
     argumentOut.collectAll[AstNode]
+
+  @deprecated("please use `astNodeViaArgumentOut`", "June 2024")
+  def _astNodeViaArgumentOut = astNodeViaArgumentOut
 
   /** Traverse to CFG_NODE via ARGUMENT OUT edge.
     */
-  def _cfgNodeViaArgumentOut: overflowdb.traversal.Traversal[CfgNode] =
+  def cfgNodeViaArgumentOut: overflowdb.traversal.Traversal[CfgNode] =
     argumentOut.collectAll[CfgNode]
+
+  @deprecated("please use `cfgNodeViaArgumentOut`", "June 2024")
+  def _cfgNodeViaArgumentOut = cfgNodeViaArgumentOut
 
   /** Traverse to TEMPLATE_DOM via ARGUMENT OUT edge.
     */
-  def _templateDomViaArgumentOut: overflowdb.traversal.Traversal[TemplateDom] =
+  def templateDomViaArgumentOut: overflowdb.traversal.Traversal[TemplateDom] =
     argumentOut.collectAll[TemplateDom]
+
+  @deprecated("please use `templateDomViaArgumentOut`", "June 2024")
+  def _templateDomViaArgumentOut = templateDomViaArgumentOut
 
   def astIn: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via AST IN edge.
     */
-  def _expressionViaAstIn: overflowdb.traversal.Traversal[Expression] =
+  def expressionViaAstIn: overflowdb.traversal.Traversal[Expression] =
     astIn.collectAll[Expression]
+
+  @deprecated("please use `expressionViaAstIn`", "June 2024")
+  def _expressionViaAstIn = expressionViaAstIn
 
   /** Traverse to AST_NODE via AST IN edge.
     */
-  def _astNodeViaAstIn: overflowdb.traversal.Traversal[AstNode] =
+  def astNodeViaAstIn: overflowdb.traversal.Traversal[AstNode] =
     astIn.collectAll[AstNode]
+
+  @deprecated("please use `astNodeViaAstIn`", "June 2024")
+  def _astNodeViaAstIn = astNodeViaAstIn
 
   /** Traverse to CFG_NODE via AST IN edge.
     */
-  def _cfgNodeViaAstIn: overflowdb.traversal.Traversal[CfgNode] =
+  def cfgNodeViaAstIn: overflowdb.traversal.Traversal[CfgNode] =
     astIn.collectAll[CfgNode]
+
+  @deprecated("please use `cfgNodeViaAstIn`", "June 2024")
+  def _cfgNodeViaAstIn = cfgNodeViaAstIn
 
   /** Traverse to TEMPLATE_DOM via AST IN edge.
     */
-  def _templateDomViaAstIn: overflowdb.traversal.Traversal[TemplateDom] =
+  def templateDomViaAstIn: overflowdb.traversal.Traversal[TemplateDom] =
     astIn.collectAll[TemplateDom]
+
+  @deprecated("please use `templateDomViaAstIn`", "June 2024")
+  def _templateDomViaAstIn = templateDomViaAstIn
 
   def reachingDefIn: Iterator[? <: StoredNode]
 
   /** Traverse to EXPRESSION via REACHING_DEF IN edge.
     */
-  def _expressionViaReachingDefIn: overflowdb.traversal.Traversal[Expression] =
+  def expressionViaReachingDefIn: overflowdb.traversal.Traversal[Expression] =
     reachingDefIn.collectAll[Expression]
+
+  @deprecated("please use `expressionViaReachingDefIn`", "June 2024")
+  def _expressionViaReachingDefIn = expressionViaReachingDefIn
 
   /** Traverse to AST_NODE via REACHING_DEF IN edge.
     */
-  def _astNodeViaReachingDefIn: overflowdb.traversal.Traversal[AstNode] =
+  def astNodeViaReachingDefIn: overflowdb.traversal.Traversal[AstNode] =
     reachingDefIn.collectAll[AstNode]
+
+  @deprecated("please use `astNodeViaReachingDefIn`", "June 2024")
+  def _astNodeViaReachingDefIn = astNodeViaReachingDefIn
 
   /** Traverse to CFG_NODE via REACHING_DEF IN edge.
     */
-  def _cfgNodeViaReachingDefIn: overflowdb.traversal.Traversal[CfgNode] =
+  def cfgNodeViaReachingDefIn: overflowdb.traversal.Traversal[CfgNode] =
     reachingDefIn.collectAll[CfgNode]
+
+  @deprecated("please use `cfgNodeViaReachingDefIn`", "June 2024")
+  def _cfgNodeViaReachingDefIn = cfgNodeViaReachingDefIn
 
   /** Traverse to TEMPLATE_DOM via REACHING_DEF IN edge.
     */
-  def _templateDomViaReachingDefIn: overflowdb.traversal.Traversal[TemplateDom] =
+  def templateDomViaReachingDefIn: overflowdb.traversal.Traversal[TemplateDom] =
     reachingDefIn.collectAll[TemplateDom]
+
+  @deprecated("please use `templateDomViaReachingDefIn`", "June 2024")
+  def _templateDomViaReachingDefIn = templateDomViaReachingDefIn
 
 }

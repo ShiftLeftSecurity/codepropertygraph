@@ -98,6 +98,9 @@ class JumpLabel(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
     */
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
 
+  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
+  def __controlStructureViaAstIn = _controlStructureViaAstIn
+
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
   // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
@@ -186,6 +189,10 @@ class JumpLabelDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
   import overflowdb.traversal._
   def astIn: Iterator[ControlStructure] = createAdjacentNodeScalaIteratorByOffSet[ControlStructure](0)
   override def _astIn                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
+  def __controlStructureViaAstIn = _controlStructureViaAstIn
+
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
 
   override def label: String = {

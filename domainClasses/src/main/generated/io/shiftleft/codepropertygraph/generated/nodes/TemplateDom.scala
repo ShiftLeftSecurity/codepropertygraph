@@ -116,12 +116,18 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     */
   def _expressionViaAstOut: overflowdb.traversal.Traversal[Expression] = get()._expressionViaAstOut
 
+  @deprecated("please use `_expressionViaAstOut`", "June 2024")
+  def __expressionViaAstOut = _expressionViaAstOut
+
   def reachingDefOut: Iterator[Expression] = get().reachingDefOut
   override def _reachingDefOut             = get()._reachingDefOut
 
   /** Traverse to EXPRESSION via REACHING_DEF OUT edge.
     */
   def _expressionViaReachingDefOut: overflowdb.traversal.Traversal[Expression] = get()._expressionViaReachingDefOut
+
+  @deprecated("please use `_expressionViaReachingDefOut`", "June 2024")
+  def __expressionViaReachingDefOut = _expressionViaReachingDefOut
 
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
@@ -130,12 +136,18 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def argumentIn: Iterator[Expression] = get().argumentIn
   override def _argumentIn             = get()._argumentIn
 
   /** Traverse to EXPRESSION via ARGUMENT IN edge.
     */
   def _expressionViaArgumentIn: overflowdb.traversal.Traversal[Expression] = get()._expressionViaArgumentIn
+
+  @deprecated("please use `_expressionViaArgumentIn`", "June 2024")
+  def __expressionViaArgumentIn = _expressionViaArgumentIn
 
   def astIn: Iterator[TemplateDom] = get().astIn
   override def _astIn              = get()._astIn
@@ -150,9 +162,15 @@ class TemplateDom(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala
     */
   def _fileViaContainsIn: overflowdb.traversal.Traversal[File] = get()._fileViaContainsIn
 
+  @deprecated("please use `_fileViaContainsIn`", "June 2024")
+  def __fileViaContainsIn = _fileViaContainsIn
+
   /** Traverse to METHOD via CONTAINS IN edge.
     */
   def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsIn
+
+  @deprecated("please use `_methodViaContainsIn`", "June 2024")
+  def __methodViaContainsIn = _methodViaContainsIn
 
   def reachingDefIn: Iterator[TemplateDom] = get().reachingDefIn
   override def _reachingDefIn              = get()._reachingDefIn
@@ -254,18 +272,34 @@ class TemplateDomDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wi
 
   def astOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
   override def _astOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `_expressionViaAstOut`", "June 2024")
+  def __expressionViaAstOut = _expressionViaAstOut
+
   def _expressionViaAstOut: overflowdb.traversal.Traversal[Expression] = astOut.collectAll[Expression]
 
   def reachingDefOut: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](2)
   override def _reachingDefOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_expressionViaReachingDefOut`", "June 2024")
+  def __expressionViaReachingDefOut = _expressionViaReachingDefOut
+
   def _expressionViaReachingDefOut: overflowdb.traversal.Traversal[Expression] = reachingDefOut.collectAll[Expression]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](3)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](3)
+  override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
   def argumentIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](4)
   override def _argumentIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+
+  @deprecated("please use `_expressionViaArgumentIn`", "June 2024")
+  def __expressionViaArgumentIn = _expressionViaArgumentIn
+
   def _expressionViaArgumentIn: overflowdb.traversal.Traversal[Expression] = argumentIn.collectAll[Expression]
 
   def astIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](5)
@@ -274,9 +308,16 @@ class TemplateDomDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wi
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](6)
   override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](6)
 
-  def containsIn: Iterator[AstNode]                            = createAdjacentNodeScalaIteratorByOffSet[AstNode](7)
-  override def _containsIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
+  def containsIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](7)
+  override def _containsIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](7)
+
+  @deprecated("please use `_fileViaContainsIn`", "June 2024")
+  def __fileViaContainsIn = _fileViaContainsIn
+
   def _fileViaContainsIn: overflowdb.traversal.Traversal[File] = containsIn.collectAll[File]
+  @deprecated("please use `_methodViaContainsIn`", "June 2024")
+  def __methodViaContainsIn = _methodViaContainsIn
+
   def _methodViaContainsIn: overflowdb.traversal.Traversal[Method] = containsIn.collectAll[Method]
 
   def reachingDefIn: Iterator[TemplateDom] = createAdjacentNodeScalaIteratorByOffSet[TemplateDom](8)

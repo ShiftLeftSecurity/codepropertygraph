@@ -108,12 +108,18 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
     */
   def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
 
+  @deprecated("please use `_literalViaAstOut`", "June 2024")
+  def __literalViaAstOut = _literalViaAstOut
+
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
 
   /** Traverse to TYPE via EVAL_TYPE OUT edge.
     */
   def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = get()._typeViaEvalTypeOut
+
+  @deprecated("please use `_typeViaEvalTypeOut`", "June 2024")
+  def __typeViaEvalTypeOut = _typeViaEvalTypeOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -122,6 +128,9 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
     */
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     get()._annotationParameterAssignViaAstIn
+
+  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
+  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -225,14 +234,26 @@ class ArrayInitializerDb(ref: NodeRef[NodeDb])
 
   def astOut: Iterator[Literal] = createAdjacentNodeScalaIteratorByOffSet[Literal](1)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `_literalViaAstOut`", "June 2024")
+  def __literalViaAstOut = _literalViaAstOut
+
   def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = astOut.collectAll[Literal]
 
-  def evalTypeOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](2)
-  override def _evalTypeOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](2)
+  override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_typeViaEvalTypeOut`", "June 2024")
+  def __typeViaEvalTypeOut = _typeViaEvalTypeOut
+
   def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
+  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
 

@@ -87,6 +87,9 @@ class AnnotationParameter(graph_4762: Graph, id_4762: Long /*cf https://github.c
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     get()._annotationParameterAssignViaAstIn
 
+  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
+  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
   // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
@@ -167,6 +170,10 @@ class AnnotationParameterDb(ref: NodeRef[NodeDb])
   import overflowdb.traversal._
   def astIn: Iterator[AnnotationParameterAssign] = createAdjacentNodeScalaIteratorByOffSet[AnnotationParameterAssign](0)
   override def _astIn                            = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
+  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+
   def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
 

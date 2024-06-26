@@ -53,82 +53,130 @@ trait CfgNode extends StoredNode with CfgNodeBase with AstNode {
 
   /** Traverse to EXPRESSION via CFG IN edge.
     */
-  def _expressionViaCfgIn: overflowdb.traversal.Traversal[Expression] =
+  def expressionViaCfgIn: overflowdb.traversal.Traversal[Expression] =
     cfgIn.collectAll[Expression]
+
+  @deprecated("please use `expressionViaCfgIn`", "June 2024")
+  def _expressionViaCfgIn = expressionViaCfgIn
 
   /** Traverse to AST_NODE via CFG IN edge.
     */
-  def _astNodeViaCfgIn: overflowdb.traversal.Traversal[AstNode] =
+  def astNodeViaCfgIn: overflowdb.traversal.Traversal[AstNode] =
     cfgIn.collectAll[AstNode]
+
+  @deprecated("please use `astNodeViaCfgIn`", "June 2024")
+  def _astNodeViaCfgIn = astNodeViaCfgIn
 
   /** Traverse to CFG_NODE via CFG IN edge.
     */
-  def _cfgNodeViaCfgIn: overflowdb.traversal.Traversal[CfgNode] =
+  def cfgNodeViaCfgIn: overflowdb.traversal.Traversal[CfgNode] =
     cfgIn.collectAll[CfgNode]
+
+  @deprecated("please use `cfgNodeViaCfgIn`", "June 2024")
+  def _cfgNodeViaCfgIn = cfgNodeViaCfgIn
 
   /** Traverse to BLOCK via CFG IN edge.
     */
-  def _blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
+  def blockViaCfgIn: overflowdb.traversal.Traversal[Block] =
     cfgIn.collectAll[Block]
 
-  /** Traverse to CALL via CFG IN edge.
-    */
-  def _callViaCfgIn: overflowdb.traversal.Traversal[Call] =
-    cfgIn.collectAll[Call]
+  @deprecated("please use `blockViaCfgIn`", "June 2024")
+  def _blockViaCfgIn = blockViaCfgIn
 
   /** Traverse to CALL_REPR via CFG IN edge.
     */
-  def _callReprViaCfgIn: overflowdb.traversal.Traversal[CallRepr] =
+  def callReprViaCfgIn: overflowdb.traversal.Traversal[CallRepr] =
     cfgIn.collectAll[CallRepr]
+
+  @deprecated("please use `callReprViaCfgIn`", "June 2024")
+  def _callReprViaCfgIn = callReprViaCfgIn
+
+  /** Traverse to CALL via CFG IN edge.
+    */
+  def callViaCfgIn: overflowdb.traversal.Traversal[Call] =
+    cfgIn.collectAll[Call]
+
+  @deprecated("please use `callViaCfgIn`", "June 2024")
+  def _callViaCfgIn = callViaCfgIn
 
   /** Traverse to CONTROL_STRUCTURE via CFG IN edge.
     */
-  def _controlStructureViaCfgIn: overflowdb.traversal.Traversal[ControlStructure] =
+  def controlStructureViaCfgIn: overflowdb.traversal.Traversal[ControlStructure] =
     cfgIn.collectAll[ControlStructure]
+
+  @deprecated("please use `controlStructureViaCfgIn`", "June 2024")
+  def _controlStructureViaCfgIn = controlStructureViaCfgIn
 
   /** Traverse to FIELD_IDENTIFIER via CFG IN edge.
     */
-  def _fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
+  def fieldIdentifierViaCfgIn: overflowdb.traversal.Traversal[FieldIdentifier] =
     cfgIn.collectAll[FieldIdentifier]
+
+  @deprecated("please use `fieldIdentifierViaCfgIn`", "June 2024")
+  def _fieldIdentifierViaCfgIn = fieldIdentifierViaCfgIn
 
   /** Traverse to IDENTIFIER via CFG IN edge.
     */
-  def _identifierViaCfgIn: overflowdb.traversal.Traversal[Identifier] =
+  def identifierViaCfgIn: overflowdb.traversal.Traversal[Identifier] =
     cfgIn.collectAll[Identifier]
+
+  @deprecated("please use `identifierViaCfgIn`", "June 2024")
+  def _identifierViaCfgIn = identifierViaCfgIn
 
   /** Traverse to JUMP_TARGET via CFG IN edge.
     */
-  def _jumpTargetViaCfgIn: overflowdb.traversal.Traversal[JumpTarget] =
+  def jumpTargetViaCfgIn: overflowdb.traversal.Traversal[JumpTarget] =
     cfgIn.collectAll[JumpTarget]
+
+  @deprecated("please use `jumpTargetViaCfgIn`", "June 2024")
+  def _jumpTargetViaCfgIn = jumpTargetViaCfgIn
 
   /** Traverse to LITERAL via CFG IN edge.
     */
-  def _literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
+  def literalViaCfgIn: overflowdb.traversal.Traversal[Literal] =
     cfgIn.collectAll[Literal]
+
+  @deprecated("please use `literalViaCfgIn`", "June 2024")
+  def _literalViaCfgIn = literalViaCfgIn
 
   /** Traverse to DECLARATION via CFG IN edge.
     */
-  def _declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
+  def declarationViaCfgIn: overflowdb.traversal.Traversal[Declaration] =
     cfgIn.collectAll[Declaration]
+
+  @deprecated("please use `declarationViaCfgIn`", "June 2024")
+  def _declarationViaCfgIn = declarationViaCfgIn
 
   /** Traverse to METHOD via CFG IN edge.
     */
-  def _methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
+  def methodViaCfgIn: overflowdb.traversal.Traversal[Method] =
     cfgIn.collectAll[Method]
+
+  @deprecated("please use `methodViaCfgIn`", "June 2024")
+  def _methodViaCfgIn = methodViaCfgIn
 
   /** Traverse to METHOD_REF via CFG IN edge.
     */
-  def _methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
+  def methodRefViaCfgIn: overflowdb.traversal.Traversal[MethodRef] =
     cfgIn.collectAll[MethodRef]
+
+  @deprecated("please use `methodRefViaCfgIn`", "June 2024")
+  def _methodRefViaCfgIn = methodRefViaCfgIn
 
   /** Traverse to TYPE_REF via CFG IN edge.
     */
-  def _typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
+  def typeRefViaCfgIn: overflowdb.traversal.Traversal[TypeRef] =
     cfgIn.collectAll[TypeRef]
+
+  @deprecated("please use `typeRefViaCfgIn`", "June 2024")
+  def _typeRefViaCfgIn = typeRefViaCfgIn
 
   /** Traverse to UNKNOWN via CFG IN edge.
     */
-  def _unknownViaCfgIn: overflowdb.traversal.Traversal[Unknown] =
+  def unknownViaCfgIn: overflowdb.traversal.Traversal[Unknown] =
     cfgIn.collectAll[Unknown]
+
+  @deprecated("please use `unknownViaCfgIn`", "June 2024")
+  def _unknownViaCfgIn = unknownViaCfgIn
 
 }

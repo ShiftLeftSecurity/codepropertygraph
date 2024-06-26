@@ -91,6 +91,9 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _typeArgumentViaAstOut: overflowdb.traversal.Traversal[TypeArgument] = get()._typeArgumentViaAstOut
 
+  @deprecated("please use `_typeArgumentViaAstOut`", "June 2024")
+  def __typeArgumentViaAstOut = _typeArgumentViaAstOut
+
   def refOut: Iterator[TypeDecl] = get().refOut
   override def _refOut           = get()._refOut
 
@@ -99,6 +102,9 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   /** Type declaration which is referenced by this type. */
   @overflowdb.traversal.help.Doc(info = """Type declaration which is referenced by this type.""")
   def referencedTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().referencedTypeDecl
+
+  @deprecated("please use `referencedTypeDecl`", "June 2024")
+  def _referencedTypeDecl = referencedTypeDecl
 
   def aliasOfIn: Iterator[TypeDecl] = get().aliasOfIn
   override def _aliasOfIn           = get()._aliasOfIn
@@ -109,6 +115,9 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   @overflowdb.traversal.help.Doc(info = """Direct alias type declarations.""")
   def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().aliasTypeDecl
 
+  @deprecated("please use `aliasTypeDecl`", "June 2024")
+  def _aliasTypeDecl = aliasTypeDecl
+
   def evalTypeIn: Iterator[AstNode] = get().evalTypeIn
   override def _evalTypeIn          = get()._evalTypeIn
 
@@ -117,60 +126,102 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
   def _arrayInitializerViaEvalTypeIn: overflowdb.traversal.Traversal[ArrayInitializer] =
     get()._arrayInitializerViaEvalTypeIn
 
+  @deprecated("please use `_arrayInitializerViaEvalTypeIn`", "June 2024")
+  def __arrayInitializerViaEvalTypeIn = _arrayInitializerViaEvalTypeIn
+
   /** Traverse to BLOCK via EVAL_TYPE IN edge.
     */
   def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block] = get()._blockViaEvalTypeIn
 
+  @deprecated("please use `_blockViaEvalTypeIn`", "June 2024")
+  def __blockViaEvalTypeIn = _blockViaEvalTypeIn
+
   /** Traverse to CALL via EVAL_TYPE IN edge.
     */
   def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call] = get()._callViaEvalTypeIn
+
+  @deprecated("please use `_callViaEvalTypeIn`", "June 2024")
+  def __callViaEvalTypeIn = _callViaEvalTypeIn
 
   /** Traverse to CONTROL_STRUCTURE via EVAL_TYPE IN edge.
     */
   def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
     get()._controlStructureViaEvalTypeIn
 
+  @deprecated("please use `_controlStructureViaEvalTypeIn`", "June 2024")
+  def __controlStructureViaEvalTypeIn = _controlStructureViaEvalTypeIn
+
   /** Traverse to IDENTIFIER via EVAL_TYPE IN edge.
     */
   def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaEvalTypeIn
+
+  @deprecated("please use `_identifierViaEvalTypeIn`", "June 2024")
+  def __identifierViaEvalTypeIn = _identifierViaEvalTypeIn
 
   /** Traverse to LITERAL via EVAL_TYPE IN edge.
     */
   def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaEvalTypeIn
 
+  @deprecated("please use `_literalViaEvalTypeIn`", "June 2024")
+  def __literalViaEvalTypeIn = _literalViaEvalTypeIn
+
   /** Traverse to LOCAL via EVAL_TYPE IN edge.
     */
   def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local] = get()._localViaEvalTypeIn
 
+  @deprecated("please use `_localViaEvalTypeIn`", "June 2024")
+  def __localViaEvalTypeIn = _localViaEvalTypeIn
+
   /** Traverse to MEMBER via EVAL_TYPE IN edge.
     */
   def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member] = get()._memberViaEvalTypeIn
+
+  @deprecated("please use `_memberViaEvalTypeIn`", "June 2024")
+  def __memberViaEvalTypeIn = _memberViaEvalTypeIn
 
   /** Traverse to METHOD_PARAMETER_IN via EVAL_TYPE IN edge.
     */
   def _methodParameterInViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     get()._methodParameterInViaEvalTypeIn
 
+  @deprecated("please use `_methodParameterInViaEvalTypeIn`", "June 2024")
+  def __methodParameterInViaEvalTypeIn = _methodParameterInViaEvalTypeIn
+
   /** Traverse to METHOD_PARAMETER_OUT via EVAL_TYPE IN edge.
     */
   def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
     get()._methodParameterOutViaEvalTypeIn
 
+  @deprecated("please use `_methodParameterOutViaEvalTypeIn`", "June 2024")
+  def __methodParameterOutViaEvalTypeIn = _methodParameterOutViaEvalTypeIn
+
   /** Traverse to METHOD_REF via EVAL_TYPE IN edge.
     */
   def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaEvalTypeIn
+
+  @deprecated("please use `_methodRefViaEvalTypeIn`", "June 2024")
+  def __methodRefViaEvalTypeIn = _methodRefViaEvalTypeIn
 
   /** Traverse to METHOD_RETURN via EVAL_TYPE IN edge.
     */
   def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = get()._methodReturnViaEvalTypeIn
 
+  @deprecated("please use `_methodReturnViaEvalTypeIn`", "June 2024")
+  def __methodReturnViaEvalTypeIn = _methodReturnViaEvalTypeIn
+
   /** Traverse to TYPE_REF via EVAL_TYPE IN edge.
     */
   def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaEvalTypeIn
 
+  @deprecated("please use `_typeRefViaEvalTypeIn`", "June 2024")
+  def __typeRefViaEvalTypeIn = _typeRefViaEvalTypeIn
+
   /** Traverse to UNKNOWN via EVAL_TYPE IN edge.
     */
   def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaEvalTypeIn
+
+  @deprecated("please use `_unknownViaEvalTypeIn`", "June 2024")
+  def __unknownViaEvalTypeIn = _unknownViaEvalTypeIn
 
   def inheritsFromIn: Iterator[TypeDecl] = get().inheritsFromIn
   override def _inheritsFromIn           = get()._inheritsFromIn
@@ -179,12 +230,18 @@ class Type(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _typeDeclViaInheritsFromIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaInheritsFromIn
 
+  @deprecated("please use `_typeDeclViaInheritsFromIn`", "June 2024")
+  def __typeDeclViaInheritsFromIn = _typeDeclViaInheritsFromIn
+
   def refIn: Iterator[TypeArgument] = get().refIn
   override def _refIn               = get()._refIn
 
   /** Traverse to TYPE_ARGUMENT via REF IN edge.
     */
   def _typeArgumentViaRefIn: overflowdb.traversal.Traversal[TypeArgument] = get()._typeArgumentViaRefIn
+
+  @deprecated("please use `_typeArgumentViaRefIn`", "June 2024")
+  def __typeArgumentViaRefIn = _typeArgumentViaRefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -256,43 +313,106 @@ class TypeDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Type
   import overflowdb.traversal._
   def astOut: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](0)
   override def _astOut               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_typeArgumentViaAstOut`", "June 2024")
+  def __typeArgumentViaAstOut = _typeArgumentViaAstOut
+
   def _typeArgumentViaAstOut: overflowdb.traversal.Traversal[TypeArgument] = astOut.collectAll[TypeArgument]
 
   def refOut: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](1)
   override def _refOut           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `referencedTypeDecl`", "June 2024")
+  def _referencedTypeDecl = referencedTypeDecl
+
   def referencedTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = refOut.collectAll[TypeDecl]
 
-  def aliasOfIn: Iterator[TypeDecl]                           = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](2)
-  override def _aliasOfIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def aliasOfIn: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](2)
+  override def _aliasOfIn           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `aliasTypeDecl`", "June 2024")
+  def _aliasTypeDecl = aliasTypeDecl
+
   def aliasTypeDecl: overflowdb.traversal.Traversal[TypeDecl] = aliasOfIn.collectAll[TypeDecl]
 
   def evalTypeIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
   override def _evalTypeIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `_arrayInitializerViaEvalTypeIn`", "June 2024")
+  def __arrayInitializerViaEvalTypeIn = _arrayInitializerViaEvalTypeIn
+
   def _arrayInitializerViaEvalTypeIn: overflowdb.traversal.Traversal[ArrayInitializer] =
     evalTypeIn.collectAll[ArrayInitializer]
+  @deprecated("please use `_blockViaEvalTypeIn`", "June 2024")
+  def __blockViaEvalTypeIn = _blockViaEvalTypeIn
+
   def _blockViaEvalTypeIn: overflowdb.traversal.Traversal[Block] = evalTypeIn.collectAll[Block]
-  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call]   = evalTypeIn.collectAll[Call]
+  @deprecated("please use `_callViaEvalTypeIn`", "June 2024")
+  def __callViaEvalTypeIn = _callViaEvalTypeIn
+
+  def _callViaEvalTypeIn: overflowdb.traversal.Traversal[Call] = evalTypeIn.collectAll[Call]
+  @deprecated("please use `_controlStructureViaEvalTypeIn`", "June 2024")
+  def __controlStructureViaEvalTypeIn = _controlStructureViaEvalTypeIn
+
   def _controlStructureViaEvalTypeIn: overflowdb.traversal.Traversal[ControlStructure] =
     evalTypeIn.collectAll[ControlStructure]
+  @deprecated("please use `_identifierViaEvalTypeIn`", "June 2024")
+  def __identifierViaEvalTypeIn = _identifierViaEvalTypeIn
+
   def _identifierViaEvalTypeIn: overflowdb.traversal.Traversal[Identifier] = evalTypeIn.collectAll[Identifier]
-  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal]       = evalTypeIn.collectAll[Literal]
-  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local]           = evalTypeIn.collectAll[Local]
-  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member]         = evalTypeIn.collectAll[Member]
+  @deprecated("please use `_literalViaEvalTypeIn`", "June 2024")
+  def __literalViaEvalTypeIn = _literalViaEvalTypeIn
+
+  def _literalViaEvalTypeIn: overflowdb.traversal.Traversal[Literal] = evalTypeIn.collectAll[Literal]
+  @deprecated("please use `_localViaEvalTypeIn`", "June 2024")
+  def __localViaEvalTypeIn = _localViaEvalTypeIn
+
+  def _localViaEvalTypeIn: overflowdb.traversal.Traversal[Local] = evalTypeIn.collectAll[Local]
+  @deprecated("please use `_memberViaEvalTypeIn`", "June 2024")
+  def __memberViaEvalTypeIn = _memberViaEvalTypeIn
+
+  def _memberViaEvalTypeIn: overflowdb.traversal.Traversal[Member] = evalTypeIn.collectAll[Member]
+  @deprecated("please use `_methodParameterInViaEvalTypeIn`", "June 2024")
+  def __methodParameterInViaEvalTypeIn = _methodParameterInViaEvalTypeIn
+
   def _methodParameterInViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     evalTypeIn.collectAll[MethodParameterIn]
+  @deprecated("please use `_methodParameterOutViaEvalTypeIn`", "June 2024")
+  def __methodParameterOutViaEvalTypeIn = _methodParameterOutViaEvalTypeIn
+
   def _methodParameterOutViaEvalTypeIn: overflowdb.traversal.Traversal[MethodParameterOut] =
     evalTypeIn.collectAll[MethodParameterOut]
-  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef]       = evalTypeIn.collectAll[MethodRef]
+  @deprecated("please use `_methodRefViaEvalTypeIn`", "June 2024")
+  def __methodRefViaEvalTypeIn = _methodRefViaEvalTypeIn
+
+  def _methodRefViaEvalTypeIn: overflowdb.traversal.Traversal[MethodRef] = evalTypeIn.collectAll[MethodRef]
+  @deprecated("please use `_methodReturnViaEvalTypeIn`", "June 2024")
+  def __methodReturnViaEvalTypeIn = _methodReturnViaEvalTypeIn
+
   def _methodReturnViaEvalTypeIn: overflowdb.traversal.Traversal[MethodReturn] = evalTypeIn.collectAll[MethodReturn]
-  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef]           = evalTypeIn.collectAll[TypeRef]
-  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown]           = evalTypeIn.collectAll[Unknown]
+  @deprecated("please use `_typeRefViaEvalTypeIn`", "June 2024")
+  def __typeRefViaEvalTypeIn = _typeRefViaEvalTypeIn
+
+  def _typeRefViaEvalTypeIn: overflowdb.traversal.Traversal[TypeRef] = evalTypeIn.collectAll[TypeRef]
+  @deprecated("please use `_unknownViaEvalTypeIn`", "June 2024")
+  def __unknownViaEvalTypeIn = _unknownViaEvalTypeIn
+
+  def _unknownViaEvalTypeIn: overflowdb.traversal.Traversal[Unknown] = evalTypeIn.collectAll[Unknown]
 
   def inheritsFromIn: Iterator[TypeDecl] = createAdjacentNodeScalaIteratorByOffSet[TypeDecl](4)
   override def _inheritsFromIn           = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+
+  @deprecated("please use `_typeDeclViaInheritsFromIn`", "June 2024")
+  def __typeDeclViaInheritsFromIn = _typeDeclViaInheritsFromIn
+
   def _typeDeclViaInheritsFromIn: overflowdb.traversal.Traversal[TypeDecl] = inheritsFromIn.collectAll[TypeDecl]
 
   def refIn: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](5)
   override def _refIn               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](5)
+
+  @deprecated("please use `_typeArgumentViaRefIn`", "June 2024")
+  def __typeArgumentViaRefIn = _typeArgumentViaRefIn
+
   def _typeArgumentViaRefIn: overflowdb.traversal.Traversal[TypeArgument] = refIn.collectAll[TypeArgument]
 
   override def label: String = {

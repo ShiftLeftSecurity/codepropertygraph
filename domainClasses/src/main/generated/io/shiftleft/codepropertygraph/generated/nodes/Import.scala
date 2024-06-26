@@ -113,12 +113,18 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = get()._dependencyViaImportsOut
 
+  @deprecated("please use `_dependencyViaImportsOut`", "June 2024")
+  def __dependencyViaImportsOut = _dependencyViaImportsOut
+
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -127,13 +133,22 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = get()._blockViaAstIn
 
+  @deprecated("please use `_blockViaAstIn`", "June 2024")
+  def __blockViaAstIn = _blockViaAstIn
+
   /** Traverse to FILE via AST IN edge.
     */
   def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
 
+  @deprecated("please use `_fileViaAstIn`", "June 2024")
+  def __fileViaAstIn = _fileViaAstIn
+
   /** Traverse to TYPE_DECL via AST IN edge.
     */
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
+
+  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
+  def __typeDeclViaAstIn = _typeDeclViaAstIn
 
   def isCallForImportIn: Iterator[Call] = get().isCallForImportIn
   override def _isCallForImportIn       = get()._isCallForImportIn
@@ -141,6 +156,9 @@ class Import(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
     */
   def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = get()._callViaIsCallForImportIn
+
+  @deprecated("please use `_callViaIsCallForImportIn`", "June 2024")
+  def __callViaIsCallForImportIn = _callViaIsCallForImportIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -248,20 +266,42 @@ class ImportDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   import overflowdb.traversal._
   def importsOut: Iterator[Dependency] = createAdjacentNodeScalaIteratorByOffSet[Dependency](0)
   override def _importsOut             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_dependencyViaImportsOut`", "June 2024")
+  def __dependencyViaImportsOut = _dependencyViaImportsOut
+
   def _dependencyViaImportsOut: overflowdb.traversal.Traversal[Dependency] = importsOut.collectAll[Dependency]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](1)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](1)
+  override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def astIn: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
-  override def _astIn                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
+  override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_blockViaAstIn`", "June 2024")
+  def __blockViaAstIn = _blockViaAstIn
+
   def _blockViaAstIn: overflowdb.traversal.Traversal[Block] = astIn.collectAll[Block]
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File]   = astIn.collectAll[File]
+  @deprecated("please use `_fileViaAstIn`", "June 2024")
+  def __fileViaAstIn = _fileViaAstIn
+
+  def _fileViaAstIn: overflowdb.traversal.Traversal[File] = astIn.collectAll[File]
+  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
+  def __typeDeclViaAstIn = _typeDeclViaAstIn
+
   def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
 
   def isCallForImportIn: Iterator[Call] = createAdjacentNodeScalaIteratorByOffSet[Call](3)
   override def _isCallForImportIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `_callViaIsCallForImportIn`", "June 2024")
+  def __callViaIsCallForImportIn = _callViaIsCallForImportIn
+
   def _callViaIsCallForImportIn: overflowdb.traversal.Traversal[Call] = isCallForImportIn.collectAll[Call]
 
   override def label: String = {

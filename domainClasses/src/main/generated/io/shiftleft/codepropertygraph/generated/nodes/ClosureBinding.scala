@@ -82,9 +82,15 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _localViaRefOut: Option[Local] = get()._localViaRefOut
 
+  @deprecated("please use `_localViaRefOut`", "June 2024")
+  def __localViaRefOut = _localViaRefOut
+
   /** Traverse to METHOD_PARAMETER_IN via REF OUT edge.
     */
   def _methodParameterInViaRefOut: Option[MethodParameterIn] = get()._methodParameterInViaRefOut
+
+  @deprecated("please use `_methodParameterInViaRefOut`", "June 2024")
+  def __methodParameterInViaRefOut = _methodParameterInViaRefOut
 
   def captureIn: Iterator[Expression] = get().captureIn
   override def _captureIn             = get()._captureIn
@@ -93,9 +99,15 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaCaptureIn
 
+  @deprecated("please use `_methodRefViaCaptureIn`", "June 2024")
+  def __methodRefViaCaptureIn = _methodRefViaCaptureIn
+
   /** Traverse to TYPE_REF via CAPTURE IN edge.
     */
   def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = get()._typeRefViaCaptureIn
+
+  @deprecated("please use `_typeRefViaCaptureIn`", "June 2024")
+  def __typeRefViaCaptureIn = _typeRefViaCaptureIn
 
   def capturedByIn: Iterator[AstNode] = get().capturedByIn
   override def _capturedByIn          = get()._capturedByIn
@@ -104,10 +116,16 @@ class ClosureBinding(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
     */
   def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = get()._localViaCapturedByIn
 
+  @deprecated("please use `_localViaCapturedByIn`", "June 2024")
+  def __localViaCapturedByIn = _localViaCapturedByIn
+
   /** Traverse to METHOD_PARAMETER_IN via CAPTURED_BY IN edge.
     */
   def _methodParameterInViaCapturedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     get()._methodParameterInViaCapturedByIn
+
+  @deprecated("please use `_methodParameterInViaCapturedByIn`", "June 2024")
+  def __methodParameterInViaCapturedByIn = _methodParameterInViaCapturedByIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -177,19 +195,40 @@ class ClosureBindingDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   }
 
   import overflowdb.traversal._
-  def refOut: Iterator[AstNode]                              = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _refOut                                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _localViaRefOut: Option[Local]                         = refOut.collectAll[Local].nextOption()
+  def refOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _refOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_localViaRefOut`", "June 2024")
+  def __localViaRefOut = _localViaRefOut
+
+  def _localViaRefOut: Option[Local] = refOut.collectAll[Local].nextOption()
+  @deprecated("please use `_methodParameterInViaRefOut`", "June 2024")
+  def __methodParameterInViaRefOut = _methodParameterInViaRefOut
+
   def _methodParameterInViaRefOut: Option[MethodParameterIn] = refOut.collectAll[MethodParameterIn].nextOption()
 
   def captureIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](1)
   override def _captureIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `_methodRefViaCaptureIn`", "June 2024")
+  def __methodRefViaCaptureIn = _methodRefViaCaptureIn
+
   def _methodRefViaCaptureIn: overflowdb.traversal.Traversal[MethodRef] = captureIn.collectAll[MethodRef]
-  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef]     = captureIn.collectAll[TypeRef]
+  @deprecated("please use `_typeRefViaCaptureIn`", "June 2024")
+  def __typeRefViaCaptureIn = _typeRefViaCaptureIn
+
+  def _typeRefViaCaptureIn: overflowdb.traversal.Traversal[TypeRef] = captureIn.collectAll[TypeRef]
 
   def capturedByIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
   override def _capturedByIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_localViaCapturedByIn`", "June 2024")
+  def __localViaCapturedByIn = _localViaCapturedByIn
+
   def _localViaCapturedByIn: overflowdb.traversal.Traversal[Local] = capturedByIn.collectAll[Local]
+  @deprecated("please use `_methodParameterInViaCapturedByIn`", "June 2024")
+  def __methodParameterInViaCapturedByIn = _methodParameterInViaCapturedByIn
+
   def _methodParameterInViaCapturedByIn: overflowdb.traversal.Traversal[MethodParameterIn] =
     capturedByIn.collectAll[MethodParameterIn]
 

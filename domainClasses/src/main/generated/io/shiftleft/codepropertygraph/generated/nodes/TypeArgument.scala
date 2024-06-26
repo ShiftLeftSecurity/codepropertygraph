@@ -89,6 +89,9 @@ class TypeArgument(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
     */
   def _typeParameterViaBindsToOut: overflowdb.traversal.Traversal[TypeParameter] = get()._typeParameterViaBindsToOut
 
+  @deprecated("please use `_typeParameterViaBindsToOut`", "June 2024")
+  def __typeParameterViaBindsToOut = _typeParameterViaBindsToOut
+
   def refOut: Iterator[Type] = get().refOut
   override def _refOut       = get()._refOut
 
@@ -96,12 +99,18 @@ class TypeArgument(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
     */
   def _typeViaRefOut: overflowdb.traversal.Traversal[Type] = get()._typeViaRefOut
 
+  @deprecated("please use `_typeViaRefOut`", "June 2024")
+  def __typeViaRefOut = _typeViaRefOut
+
   def astIn: Iterator[Type] = get().astIn
   override def _astIn       = get()._astIn
 
   /** Traverse to TYPE via AST IN edge.
     */
   def _typeViaAstIn: overflowdb.traversal.Traversal[Type] = get()._typeViaAstIn
+
+  @deprecated("please use `_typeViaAstIn`", "June 2024")
+  def __typeViaAstIn = _typeViaAstIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -179,14 +188,26 @@ class TypeArgumentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
   import overflowdb.traversal._
   def bindsToOut: Iterator[TypeParameter] = createAdjacentNodeScalaIteratorByOffSet[TypeParameter](0)
   override def _bindsToOut                = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_typeParameterViaBindsToOut`", "June 2024")
+  def __typeParameterViaBindsToOut = _typeParameterViaBindsToOut
+
   def _typeParameterViaBindsToOut: overflowdb.traversal.Traversal[TypeParameter] = bindsToOut.collectAll[TypeParameter]
 
-  def refOut: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](1)
-  override def _refOut                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  def refOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](1)
+  override def _refOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `_typeViaRefOut`", "June 2024")
+  def __typeViaRefOut = _typeViaRefOut
+
   def _typeViaRefOut: overflowdb.traversal.Traversal[Type] = refOut.collectAll[Type]
 
-  def astIn: Iterator[Type]                               = createAdjacentNodeScalaIteratorByOffSet[Type](2)
-  override def _astIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def astIn: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](2)
+  override def _astIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_typeViaAstIn`", "June 2024")
+  def __typeViaAstIn = _typeViaAstIn
+
   def _typeViaAstIn: overflowdb.traversal.Traversal[Type] = astIn.collectAll[Type]
 
   override def label: String = {

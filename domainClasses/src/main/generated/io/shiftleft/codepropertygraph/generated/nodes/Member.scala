@@ -137,9 +137,15 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     */
   def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
 
+  @deprecated("please use `_annotationViaAstOut`", "June 2024")
+  def __annotationViaAstOut = _annotationViaAstOut
+
   /** Traverse to MODIFIER via AST OUT edge.
     */
   def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = get()._modifierViaAstOut
+
+  @deprecated("please use `_modifierViaAstOut`", "June 2024")
+  def __modifierViaAstOut = _modifierViaAstOut
 
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
@@ -150,12 +156,18 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   @overflowdb.traversal.help.Doc(info = """Traverse to member type""")
   def typ: overflowdb.traversal.Traversal[Type] = get().typ
 
+  @deprecated("please use `typ`", "June 2024")
+  def _typ = typ
+
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
@@ -166,9 +178,15 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   @overflowdb.traversal.help.Doc(info = """The type declaration this member is defined in""")
   def typeDecl: TypeDecl = get().typeDecl
 
+  @deprecated("please use `typeDecl`", "June 2024")
+  def _typeDecl = typeDecl
+
   /** Traverse to UNKNOWN via AST IN edge.
     */
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+
+  @deprecated("please use `_unknownViaAstIn`", "June 2024")
+  def __unknownViaAstIn = _unknownViaAstIn
 
   def refIn: Iterator[Call] = get().refIn
   override def _refIn       = get()._refIn
@@ -176,6 +194,9 @@ class Member(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
   /** Traverse to CALL via REF IN edge.
     */
   def _callViaRefIn: overflowdb.traversal.Traversal[Call] = get()._callViaRefIn
+
+  @deprecated("please use `_callViaRefIn`", "June 2024")
+  def __callViaRefIn = _callViaRefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -293,19 +314,38 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
   import overflowdb.traversal._
   def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
-  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier]     = astOut.collectAll[Modifier]
 
-  def evalTypeOut: Iterator[Type]               = createAdjacentNodeScalaIteratorByOffSet[Type](1)
-  override def _evalTypeOut                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+  @deprecated("please use `_annotationViaAstOut`", "June 2024")
+  def __annotationViaAstOut = _annotationViaAstOut
+
+  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
+  @deprecated("please use `_modifierViaAstOut`", "June 2024")
+  def __modifierViaAstOut = _modifierViaAstOut
+
+  def _modifierViaAstOut: overflowdb.traversal.Traversal[Modifier] = astOut.collectAll[Modifier]
+
+  def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](1)
+  override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
+
+  @deprecated("please use `typ`", "June 2024")
+  def _typ = typ
+
   def typ: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
+  override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `typeDecl`", "June 2024")
+  def _typeDecl = typeDecl
+
   def typeDecl: TypeDecl = try { astIn.collectAll[TypeDecl].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -314,10 +354,17 @@ class MemberDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with As
         e
       )
   }
+  @deprecated("please use `_unknownViaAstIn`", "June 2024")
+  def __unknownViaAstIn = _unknownViaAstIn
+
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
-  def refIn: Iterator[Call]                               = createAdjacentNodeScalaIteratorByOffSet[Call](4)
-  override def _refIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+  def refIn: Iterator[Call] = createAdjacentNodeScalaIteratorByOffSet[Call](4)
+  override def _refIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
+
+  @deprecated("please use `_callViaRefIn`", "June 2024")
+  def __callViaRefIn = _callViaRefIn
+
   def _callViaRefIn: overflowdb.traversal.Traversal[Call] = refIn.collectAll[Call]
 
   override def label: String = {

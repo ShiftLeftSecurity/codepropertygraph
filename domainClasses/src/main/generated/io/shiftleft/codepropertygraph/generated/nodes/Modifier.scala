@@ -92,21 +92,36 @@ class Modifier(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bu
     */
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
 
+  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
+  def __controlStructureViaAstIn = _controlStructureViaAstIn
+
   /** Traverse to MEMBER via AST IN edge.
     */
   def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
+
+  @deprecated("please use `_memberViaAstIn`", "June 2024")
+  def __memberViaAstIn = _memberViaAstIn
 
   /** Traverse to METHOD via AST IN edge.
     */
   def _methodViaAstIn: Method = get()._methodViaAstIn
 
+  @deprecated("please use `_methodViaAstIn`", "June 2024")
+  def __methodViaAstIn = _methodViaAstIn
+
   /** Traverse to TYPE_DECL via AST IN edge.
     */
   def _typeDeclViaAstIn: TypeDecl = get()._typeDeclViaAstIn
 
+  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
+  def __typeDeclViaAstIn = _typeDeclViaAstIn
+
   /** Traverse to UNKNOWN via AST IN edge.
     */
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+
+  @deprecated("please use `_unknownViaAstIn`", "June 2024")
+  def __unknownViaAstIn = _unknownViaAstIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -190,8 +205,18 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
   import overflowdb.traversal._
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
+  def __controlStructureViaAstIn = _controlStructureViaAstIn
+
   def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member]                     = astIn.collectAll[Member]
+  @deprecated("please use `_memberViaAstIn`", "June 2024")
+  def __memberViaAstIn = _memberViaAstIn
+
+  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
+  @deprecated("please use `_methodViaAstIn`", "June 2024")
+  def __methodViaAstIn = _methodViaAstIn
+
   def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -200,6 +225,9 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
         e
       )
   }
+  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
+  def __typeDeclViaAstIn = _typeDeclViaAstIn
+
   def _typeDeclViaAstIn: TypeDecl = try { astIn.collectAll[TypeDecl].next() }
   catch {
     case e: java.util.NoSuchElementException =>
@@ -208,6 +236,9 @@ class ModifierDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with 
         e
       )
   }
+  @deprecated("please use `_unknownViaAstIn`", "June 2024")
+  def __unknownViaAstIn = _unknownViaAstIn
+
   def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
   override def label: String = {

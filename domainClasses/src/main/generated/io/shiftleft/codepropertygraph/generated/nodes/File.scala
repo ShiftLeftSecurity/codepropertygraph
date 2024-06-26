@@ -106,13 +106,22 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def comment: overflowdb.traversal.Traversal[Comment] = get().comment
 
+  @deprecated("please use `comment`", "June 2024")
+  def _comment = comment
+
   /** Traverse to IMPORT via AST OUT edge.
     */
   def _importViaAstOut: overflowdb.traversal.Traversal[Import] = get()._importViaAstOut
 
+  @deprecated("please use `_importViaAstOut`", "June 2024")
+  def __importViaAstOut = _importViaAstOut
+
   /** Traverse to NAMESPACE_BLOCK via AST OUT edge.
     */
   def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = get()._namespaceBlockViaAstOut
+
+  @deprecated("please use `_namespaceBlockViaAstOut`", "June 2024")
+  def __namespaceBlockViaAstOut = _namespaceBlockViaAstOut
 
   def containsOut: Iterator[AstNode] = get().containsOut
   override def _containsOut          = get()._containsOut
@@ -121,13 +130,22 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = get()._methodViaContainsOut
 
+  @deprecated("please use `_methodViaContainsOut`", "June 2024")
+  def __methodViaContainsOut = _methodViaContainsOut
+
   /** Traverse to TEMPLATE_DOM via CONTAINS OUT edge.
     */
   def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = get()._templateDomViaContainsOut
 
+  @deprecated("please use `_templateDomViaContainsOut`", "June 2024")
+  def __templateDomViaContainsOut = _templateDomViaContainsOut
+
   /** Traverse to TYPE_DECL via CONTAINS OUT edge.
     */
   def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaContainsOut
+
+  @deprecated("please use `_typeDeclViaContainsOut`", "June 2024")
+  def __typeDeclViaContainsOut = _typeDeclViaContainsOut
 
   def taggedByOut: Iterator[Tag] = get().taggedByOut
   override def _taggedByOut      = get()._taggedByOut
@@ -136,6 +154,9 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
 
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def sourceFileIn: Iterator[AstNode] = get().sourceFileIn
   override def _sourceFileIn          = get()._sourceFileIn
 
@@ -143,13 +164,22 @@ class File(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/is
     */
   def method: overflowdb.traversal.Traversal[Method] = get().method
 
+  @deprecated("please use `method`", "June 2024")
+  def _method = method
+
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
   def namespaceBlock: overflowdb.traversal.Traversal[NamespaceBlock] = get().namespaceBlock
 
+  @deprecated("please use `namespaceBlock`", "June 2024")
+  def _namespaceBlock = namespaceBlock
+
   /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
     */
   def typeDecl: overflowdb.traversal.Traversal[TypeDecl] = get().typeDecl
+
+  @deprecated("please use `typeDecl`", "June 2024")
+  def _typeDecl = typeDecl
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -243,27 +273,61 @@ class FileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstN
   }
 
   import overflowdb.traversal._
-  def astOut: Iterator[AstNode]                                = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
-  override def _astOut                                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def comment: overflowdb.traversal.Traversal[Comment]         = astOut.collectAll[Comment]
+  def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
+  override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
+
+  @deprecated("please use `comment`", "June 2024")
+  def _comment = comment
+
+  def comment: overflowdb.traversal.Traversal[Comment] = astOut.collectAll[Comment]
+  @deprecated("please use `_importViaAstOut`", "June 2024")
+  def __importViaAstOut = _importViaAstOut
+
   def _importViaAstOut: overflowdb.traversal.Traversal[Import] = astOut.collectAll[Import]
+  @deprecated("please use `_namespaceBlockViaAstOut`", "June 2024")
+  def __namespaceBlockViaAstOut = _namespaceBlockViaAstOut
+
   def _namespaceBlockViaAstOut: overflowdb.traversal.Traversal[NamespaceBlock] = astOut.collectAll[NamespaceBlock]
 
   def containsOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
   override def _containsOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method]           = containsOut.collectAll[Method]
-  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = containsOut.collectAll[TemplateDom]
-  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl]       = containsOut.collectAll[TypeDecl]
 
-  def taggedByOut: Iterator[Tag]                              = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
-  override def _taggedByOut                                   = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+  @deprecated("please use `_methodViaContainsOut`", "June 2024")
+  def __methodViaContainsOut = _methodViaContainsOut
+
+  def _methodViaContainsOut: overflowdb.traversal.Traversal[Method] = containsOut.collectAll[Method]
+  @deprecated("please use `_templateDomViaContainsOut`", "June 2024")
+  def __templateDomViaContainsOut = _templateDomViaContainsOut
+
+  def _templateDomViaContainsOut: overflowdb.traversal.Traversal[TemplateDom] = containsOut.collectAll[TemplateDom]
+  @deprecated("please use `_typeDeclViaContainsOut`", "June 2024")
+  def __typeDeclViaContainsOut = _typeDeclViaContainsOut
+
+  def _typeDeclViaContainsOut: overflowdb.traversal.Traversal[TypeDecl] = containsOut.collectAll[TypeDecl]
+
+  def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
+  override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
+
+  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
+  def __tagViaTaggedByOut = _tagViaTaggedByOut
+
   def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
-  def sourceFileIn: Iterator[AstNode]                = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
-  override def _sourceFileIn                         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+  def sourceFileIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
+  override def _sourceFileIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
+
+  @deprecated("please use `method`", "June 2024")
+  def _method = method
+
   def method: overflowdb.traversal.Traversal[Method] = sourceFileIn.collectAll[Method]
+  @deprecated("please use `namespaceBlock`", "June 2024")
+  def _namespaceBlock = namespaceBlock
+
   def namespaceBlock: overflowdb.traversal.Traversal[NamespaceBlock] = sourceFileIn.collectAll[NamespaceBlock]
-  def typeDecl: overflowdb.traversal.Traversal[TypeDecl]             = sourceFileIn.collectAll[TypeDecl]
+  @deprecated("please use `typeDecl`", "June 2024")
+  def _typeDecl = typeDecl
+
+  def typeDecl: overflowdb.traversal.Traversal[TypeDecl] = sourceFileIn.collectAll[TypeDecl]
 
   override def label: String = {
     File.Label
