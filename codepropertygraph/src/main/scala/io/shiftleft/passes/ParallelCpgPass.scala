@@ -87,7 +87,7 @@ abstract class ConcurrentWriterCpgPass[T <: AnyRef](
             // todo: Verify that we get FIFO scheduling; otherwise, do something about it.
             // if this e.g. used LIFO with 4 cores and 18 size of ringbuffer, then 3 cores may idle while we block on the front item.
             completionQueue.append(Future.apply {
-              val builder = new DiffGraphBuilder
+              val builder = Cpg.newDiffGraphBuilder
               runOnPart(builder, next.asInstanceOf[T])
               builder.build()
             })

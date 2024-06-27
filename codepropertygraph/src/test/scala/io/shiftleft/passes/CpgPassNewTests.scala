@@ -17,7 +17,7 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
       val cpg = Cpg.empty
       class MyPass(cpg: Cpg) extends SimpleCpgPass(cpg, "MyPass", keyPool) {
         override def run(builder: DiffGraphBuilder): Unit = {
-          val builder2 = new DiffGraphBuilder
+          val builder2 = Cpg.newDiffGraphBuilder
           builder.addNode(NewFile().name("foo"))
           builder2.addNode(NewFile().name("bar"))
           builder.absorb(builder2)

@@ -68,7 +68,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](
     var nDiff      = -1
     var nDiffT     = -1
     try {
-      val diffGraph = new DiffGraphBuilder
+      val diffGraph = Cpg.newDiffGraphBuilder
       nParts = runWithBuilder(diffGraph)
       nanosBuilt = System.nanoTime()
       nDiff = diffGraph.size()
@@ -145,7 +145,7 @@ abstract class NewStyleCpgPassBase[T <: AnyRef] extends CpgPassBase {
           val diff = stream.collect(
             new Supplier[DiffGraphBuilder] {
               override def get(): DiffGraphBuilder =
-                new DiffGraphBuilder
+                Cpg.newDiffGraphBuilder
             },
             new BiConsumer[DiffGraphBuilder, AnyRef] {
               override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
