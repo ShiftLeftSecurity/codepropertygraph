@@ -8,7 +8,7 @@ final class AccessNeighborsForBinding(val node: nodes.Binding) extends AnyVal {
   /** Traverse to METHOD via REF OUT edge.
     */
   @deprecated("please use boundMethod instead")
-  def methodViaRefOut: nodes.Method = boundMethod
+  def _methodViaRefOut: nodes.Method = boundMethod
 
   /** Traverse to METHOD via REF OUT edge.
     */
@@ -26,7 +26,7 @@ final class AccessNeighborsForBinding(val node: nodes.Binding) extends AnyVal {
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */
   @deprecated("please use bindingTypeDecl instead")
-  def typeDeclViaBindsIn: nodes.TypeDecl = bindingTypeDecl
+  def _typeDeclViaBindsIn: nodes.TypeDecl = bindingTypeDecl
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */
@@ -55,7 +55,7 @@ final class AccessNeighborsForBindingTraversal(val traversal: Iterator[nodes.Bin
   /** Traverse to METHOD via REF OUT edge.
     */
   @deprecated("please use boundMethod instead")
-  def methodViaRefOut: Iterator[nodes.Method] = traversal.map(_.methodViaRefOut)
+  def _methodViaRefOut: Iterator[nodes.Method] = traversal.map(_._methodViaRefOut)
 
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */
@@ -64,7 +64,7 @@ final class AccessNeighborsForBindingTraversal(val traversal: Iterator[nodes.Bin
   /** Traverse to TYPE_DECL via BINDS IN edge.
     */
   @deprecated("please use bindingTypeDecl instead")
-  def typeDeclViaBindsIn: Iterator[nodes.TypeDecl] = traversal.map(_.typeDeclViaBindsIn)
+  def _typeDeclViaBindsIn: Iterator[nodes.TypeDecl] = traversal.map(_._typeDeclViaBindsIn)
 
   def bindsIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_.bindsIn)
 

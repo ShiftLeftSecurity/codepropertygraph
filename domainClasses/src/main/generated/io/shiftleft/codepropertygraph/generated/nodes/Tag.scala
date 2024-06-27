@@ -11,7 +11,7 @@ trait TagEMT extends AnyRef with HasNameEMT with HasValueEMT
 trait TagBase extends AbstractNode with StaticType[TagEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
     if (("": String) != this.value) res.put("VALUE", this.value)

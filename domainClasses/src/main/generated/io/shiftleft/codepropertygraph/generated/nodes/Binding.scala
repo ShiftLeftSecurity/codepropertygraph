@@ -11,7 +11,7 @@ trait BindingEMT extends AnyRef with HasMethodFullNameEMT with HasNameEMT with H
 trait BindingBase extends AbstractNode with StaticType[BindingEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.methodFullName) res.put("METHOD_FULL_NAME", this.methodFullName)
     if (("<empty>": String) != this.name) res.put("NAME", this.name)

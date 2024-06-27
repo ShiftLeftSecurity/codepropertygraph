@@ -1,6 +1,9 @@
 name := "codepropertygraph-domain-classes"
 
-libraryDependencies += "io.joern" %% "flatgraph-core" % Versions.flatgraph
+libraryDependencies ++= Seq(
+  "io.joern" %% "flatgraph-core" % Versions.flatgraph,
+  "io.joern" %% "flatgraph-help" % Versions.flatgraph,
+)
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 generatedSrcDir := (Compile/sourceDirectory).value / "generated"

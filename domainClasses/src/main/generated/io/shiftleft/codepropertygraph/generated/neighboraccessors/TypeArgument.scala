@@ -7,15 +7,15 @@ final class AccessNeighborsForTypeArgument(val node: nodes.TypeArgument) extends
 
   /** Traverse to TYPE via AST IN edge.
     */
-  def typeViaAstIn: Iterator[nodes.Type] = astIn.collectAll[nodes.Type]
+  def _typeViaAstIn: Iterator[nodes.Type] = astIn.collectAll[nodes.Type]
 
   /** Traverse to TYPE via REF OUT edge.
     */
-  def typeViaRefOut: Iterator[nodes.Type] = refOut.collectAll[nodes.Type]
+  def _typeViaRefOut: Iterator[nodes.Type] = refOut.collectAll[nodes.Type]
 
   /** Traverse to TYPE_PARAMETER via BINDS_TO OUT edge.
     */
-  def typeParameterViaBindsToOut: Iterator[nodes.TypeParameter] = bindsToOut.collectAll[nodes.TypeParameter]
+  def _typeParameterViaBindsToOut: Iterator[nodes.TypeParameter] = bindsToOut.collectAll[nodes.TypeParameter]
 
   def astIn: Iterator[nodes.Type] = node._astIn.cast[nodes.Type]
 
@@ -28,15 +28,15 @@ final class AccessNeighborsForTypeArgumentTraversal(val traversal: Iterator[node
 
   /** Traverse to TYPE via AST IN edge.
     */
-  def typeViaAstIn: Iterator[nodes.Type] = traversal.flatMap(_.typeViaAstIn)
+  def _typeViaAstIn: Iterator[nodes.Type] = traversal.flatMap(_._typeViaAstIn)
 
   /** Traverse to TYPE via REF OUT edge.
     */
-  def typeViaRefOut: Iterator[nodes.Type] = traversal.flatMap(_.typeViaRefOut)
+  def _typeViaRefOut: Iterator[nodes.Type] = traversal.flatMap(_._typeViaRefOut)
 
   /** Traverse to TYPE_PARAMETER via BINDS_TO OUT edge.
     */
-  def typeParameterViaBindsToOut: Iterator[nodes.TypeParameter] = traversal.flatMap(_.typeParameterViaBindsToOut)
+  def _typeParameterViaBindsToOut: Iterator[nodes.TypeParameter] = traversal.flatMap(_._typeParameterViaBindsToOut)
 
   def astIn: Iterator[nodes.Type] = traversal.flatMap(_.astIn)
 

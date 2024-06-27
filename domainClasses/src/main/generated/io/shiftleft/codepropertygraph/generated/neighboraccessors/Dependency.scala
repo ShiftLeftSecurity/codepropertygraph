@@ -7,7 +7,7 @@ final class AccessNeighborsForDependency(val node: nodes.Dependency) extends Any
 
   /** Traverse to IMPORT via IMPORTS IN edge.
     */
-  def importViaImportsIn: Iterator[nodes.Import] = importsIn.collectAll[nodes.Import]
+  def _importViaImportsIn: Iterator[nodes.Import] = importsIn.collectAll[nodes.Import]
 
   def importsIn: Iterator[nodes.Import] = node._importsIn.cast[nodes.Import]
 }
@@ -16,7 +16,7 @@ final class AccessNeighborsForDependencyTraversal(val traversal: Iterator[nodes.
 
   /** Traverse to IMPORT via IMPORTS IN edge.
     */
-  def importViaImportsIn: Iterator[nodes.Import] = traversal.flatMap(_.importViaImportsIn)
+  def _importViaImportsIn: Iterator[nodes.Import] = traversal.flatMap(_._importViaImportsIn)
 
   def importsIn: Iterator[nodes.Import] = traversal.flatMap(_.importsIn)
 }

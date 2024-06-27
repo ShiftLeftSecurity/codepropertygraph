@@ -7,7 +7,7 @@ final class AccessNeighborsForTypeParameter(val node: nodes.TypeParameter) exten
 
   /** Traverse to METHOD via AST IN edge.
     */
-  def methodViaAstIn: nodes.Method = {
+  def _methodViaAstIn: nodes.Method = {
     try { astIn.collectAll[nodes.Method].next() }
     catch {
       case e: java.util.NoSuchElementException =>
@@ -20,11 +20,11 @@ final class AccessNeighborsForTypeParameter(val node: nodes.TypeParameter) exten
 
   /** Traverse to TYPE_ARGUMENT via BINDS_TO IN edge.
     */
-  def typeArgumentViaBindsToIn: Iterator[nodes.TypeArgument] = bindsToIn.collectAll[nodes.TypeArgument]
+  def _typeArgumentViaBindsToIn: Iterator[nodes.TypeArgument] = bindsToIn.collectAll[nodes.TypeArgument]
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def typeDeclViaAstIn: Iterator[nodes.TypeDecl] = astIn.collectAll[nodes.TypeDecl]
+  def _typeDeclViaAstIn: Iterator[nodes.TypeDecl] = astIn.collectAll[nodes.TypeDecl]
 
   def astIn: Iterator[nodes.AstNode] = node._astIn.cast[nodes.AstNode]
 
@@ -35,15 +35,15 @@ final class AccessNeighborsForTypeParameterTraversal(val traversal: Iterator[nod
 
   /** Traverse to METHOD via AST IN edge.
     */
-  def methodViaAstIn: Iterator[nodes.Method] = traversal.map(_.methodViaAstIn)
+  def _methodViaAstIn: Iterator[nodes.Method] = traversal.map(_._methodViaAstIn)
 
   /** Traverse to TYPE_ARGUMENT via BINDS_TO IN edge.
     */
-  def typeArgumentViaBindsToIn: Iterator[nodes.TypeArgument] = traversal.flatMap(_.typeArgumentViaBindsToIn)
+  def _typeArgumentViaBindsToIn: Iterator[nodes.TypeArgument] = traversal.flatMap(_._typeArgumentViaBindsToIn)
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_.typeDeclViaAstIn)
+  def _typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_._typeDeclViaAstIn)
 
   def astIn: Iterator[nodes.AstNode] = traversal.flatMap(_.astIn)
 

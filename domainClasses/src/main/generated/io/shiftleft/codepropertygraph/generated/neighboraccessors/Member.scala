@@ -7,28 +7,28 @@ final class AccessNeighborsForMember(val node: nodes.Member) extends AnyVal {
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
-  def annotationViaAstOut: Iterator[nodes.Annotation] = astOut.collectAll[nodes.Annotation]
+  def _annotationViaAstOut: Iterator[nodes.Annotation] = astOut.collectAll[nodes.Annotation]
 
   /** Traverse to CALL via REF IN edge.
     */
-  def callViaRefIn: Iterator[nodes.Call] = refIn.collectAll[nodes.Call]
+  def _callViaRefIn: Iterator[nodes.Call] = refIn.collectAll[nodes.Call]
 
   /** Traverse to MODIFIER via AST OUT edge.
     */
-  def modifierViaAstOut: Iterator[nodes.Modifier] = astOut.collectAll[nodes.Modifier]
+  def _modifierViaAstOut: Iterator[nodes.Modifier] = astOut.collectAll[nodes.Modifier]
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def unknownViaAstIn: Iterator[nodes.Unknown] = astIn.collectAll[nodes.Unknown]
+  def _unknownViaAstIn: Iterator[nodes.Unknown] = astIn.collectAll[nodes.Unknown]
 
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */
   @deprecated("please use typeDecl instead")
-  def typeDeclViaAstIn: nodes.TypeDecl = typeDecl
+  def _typeDeclViaAstIn: nodes.TypeDecl = typeDecl
 
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */
@@ -46,7 +46,7 @@ final class AccessNeighborsForMember(val node: nodes.Member) extends AnyVal {
   /** Traverse to member type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
   @deprecated("please use typ instead")
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = typ
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = typ
 
   /** Traverse to member type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -67,23 +67,23 @@ final class AccessNeighborsForMemberTraversal(val traversal: Iterator[nodes.Memb
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
-  def annotationViaAstOut: Iterator[nodes.Annotation] = traversal.flatMap(_.annotationViaAstOut)
+  def _annotationViaAstOut: Iterator[nodes.Annotation] = traversal.flatMap(_._annotationViaAstOut)
 
   /** Traverse to CALL via REF IN edge.
     */
-  def callViaRefIn: Iterator[nodes.Call] = traversal.flatMap(_.callViaRefIn)
+  def _callViaRefIn: Iterator[nodes.Call] = traversal.flatMap(_._callViaRefIn)
 
   /** Traverse to MODIFIER via AST OUT edge.
     */
-  def modifierViaAstOut: Iterator[nodes.Modifier] = traversal.flatMap(_.modifierViaAstOut)
+  def _modifierViaAstOut: Iterator[nodes.Modifier] = traversal.flatMap(_._modifierViaAstOut)
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.tagViaTaggedByOut)
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def unknownViaAstIn: Iterator[nodes.Unknown] = traversal.flatMap(_.unknownViaAstIn)
+  def _unknownViaAstIn: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaAstIn)
 
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */
@@ -92,7 +92,7 @@ final class AccessNeighborsForMemberTraversal(val traversal: Iterator[nodes.Memb
   /** The type declaration this member is defined in Traverse to TYPE_DECL via AST IN edge.
     */
   @deprecated("please use typeDecl instead")
-  def typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.map(_.typeDeclViaAstIn)
+  def _typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.map(_._typeDeclViaAstIn)
 
   /** Traverse to member type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -101,7 +101,7 @@ final class AccessNeighborsForMemberTraversal(val traversal: Iterator[nodes.Memb
   /** Traverse to member type Traverse to TYPE via EVAL_TYPE OUT edge.
     */
   @deprecated("please use typ instead")
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_.typeViaEvalTypeOut)
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_._typeViaEvalTypeOut)
 
   def astIn: Iterator[nodes.AstNode] = traversal.flatMap(_.astIn)
 

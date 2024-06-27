@@ -11,7 +11,7 @@ trait ConfigFileEMT extends AnyRef with HasContentEMT with HasNameEMT
 trait ConfigFileBase extends AbstractNode with StaticType[ConfigFileEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.content) res.put("CONTENT", this.content)
     if (("<empty>": String) != this.name) res.put("NAME", this.name)

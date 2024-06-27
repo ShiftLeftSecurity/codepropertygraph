@@ -1,10 +1,11 @@
 package io.shiftleft.codepropertygraph.generated.traversals
 import io.shiftleft.codepropertygraph.generated.nodes
 
-object Lang extends ConcreteStoredConversions
+/** not supposed to be used directly by users, hence the `bootstrap` in the name */
+object languagebootstrap extends ConcreteStoredConversions
 
 object Accessors {
-  import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+  import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
 
   /* accessors for concrete stored nodes start */
   final class Traversal_Property_ALIAS_TYPE_FULL_NAME[

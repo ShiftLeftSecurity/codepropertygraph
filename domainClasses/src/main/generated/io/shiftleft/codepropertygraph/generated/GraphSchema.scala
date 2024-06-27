@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.generated
 
-import io.shiftleft.codepropertygraph.generated.nodes
-import io.shiftleft.codepropertygraph.generated.edges
 import flatgraph.FormalQtyType
 
 object GraphSchema extends flatgraph.Schema {

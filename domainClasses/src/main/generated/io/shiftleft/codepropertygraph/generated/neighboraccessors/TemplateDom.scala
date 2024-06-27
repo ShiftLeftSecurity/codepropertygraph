@@ -7,27 +7,27 @@ final class AccessNeighborsForTemplateDom(val node: nodes.TemplateDom) extends A
 
   /** Traverse to EXPRESSION via ARGUMENT IN edge.
     */
-  def expressionViaArgumentIn: Iterator[nodes.Expression] = argumentIn.collectAll[nodes.Expression]
+  def _expressionViaArgumentIn: Iterator[nodes.Expression] = argumentIn.collectAll[nodes.Expression]
 
   /** Traverse to EXPRESSION via AST OUT edge.
     */
-  def expressionViaAstOut: Iterator[nodes.Expression] = astOut.collectAll[nodes.Expression]
+  def _expressionViaAstOut: Iterator[nodes.Expression] = astOut.collectAll[nodes.Expression]
 
   /** Traverse to EXPRESSION via REACHING_DEF OUT edge.
     */
-  def expressionViaReachingDefOut: Iterator[nodes.Expression] = reachingDefOut.collectAll[nodes.Expression]
+  def _expressionViaReachingDefOut: Iterator[nodes.Expression] = reachingDefOut.collectAll[nodes.Expression]
 
   /** Traverse to FILE via CONTAINS IN edge.
     */
-  def fileViaContainsIn: Iterator[nodes.File] = containsIn.collectAll[nodes.File]
+  def _fileViaContainsIn: Iterator[nodes.File] = containsIn.collectAll[nodes.File]
 
   /** Traverse to METHOD via CONTAINS IN edge.
     */
-  def methodViaContainsIn: Iterator[nodes.Method] = containsIn.collectAll[nodes.Method]
+  def _methodViaContainsIn: Iterator[nodes.Method] = containsIn.collectAll[nodes.Method]
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
 
   def argumentIn: Iterator[nodes.Expression] = node._argumentIn.cast[nodes.Expression]
 
@@ -44,27 +44,27 @@ final class AccessNeighborsForTemplateDomTraversal(val traversal: Iterator[nodes
 
   /** Traverse to EXPRESSION via ARGUMENT IN edge.
     */
-  def expressionViaArgumentIn: Iterator[nodes.Expression] = traversal.flatMap(_.expressionViaArgumentIn)
+  def _expressionViaArgumentIn: Iterator[nodes.Expression] = traversal.flatMap(_._expressionViaArgumentIn)
 
   /** Traverse to EXPRESSION via AST OUT edge.
     */
-  def expressionViaAstOut: Iterator[nodes.Expression] = traversal.flatMap(_.expressionViaAstOut)
+  def _expressionViaAstOut: Iterator[nodes.Expression] = traversal.flatMap(_._expressionViaAstOut)
 
   /** Traverse to EXPRESSION via REACHING_DEF OUT edge.
     */
-  def expressionViaReachingDefOut: Iterator[nodes.Expression] = traversal.flatMap(_.expressionViaReachingDefOut)
+  def _expressionViaReachingDefOut: Iterator[nodes.Expression] = traversal.flatMap(_._expressionViaReachingDefOut)
 
   /** Traverse to FILE via CONTAINS IN edge.
     */
-  def fileViaContainsIn: Iterator[nodes.File] = traversal.flatMap(_.fileViaContainsIn)
+  def _fileViaContainsIn: Iterator[nodes.File] = traversal.flatMap(_._fileViaContainsIn)
 
   /** Traverse to METHOD via CONTAINS IN edge.
     */
-  def methodViaContainsIn: Iterator[nodes.Method] = traversal.flatMap(_.methodViaContainsIn)
+  def _methodViaContainsIn: Iterator[nodes.Method] = traversal.flatMap(_._methodViaContainsIn)
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.tagViaTaggedByOut)
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
 
   def argumentIn: Iterator[nodes.Expression] = traversal.flatMap(_.argumentIn)
 

@@ -17,7 +17,7 @@ trait MetaDataEMT
 trait MetaDataBase extends AbstractNode with StaticType[MetaDataEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     this.hash.foreach { p => res.put("HASH", p) }
     if (("<empty>": String) != this.language) res.put("LANGUAGE", this.language)

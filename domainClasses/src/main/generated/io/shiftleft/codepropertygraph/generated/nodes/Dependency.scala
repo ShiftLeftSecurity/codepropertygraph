@@ -11,7 +11,7 @@ trait DependencyEMT extends AnyRef with HasDependencyGroupIdEMT with HasNameEMT 
 trait DependencyBase extends AbstractNode with StaticType[DependencyEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     this.dependencyGroupId.foreach { p => res.put("DEPENDENCY_GROUP_ID", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)

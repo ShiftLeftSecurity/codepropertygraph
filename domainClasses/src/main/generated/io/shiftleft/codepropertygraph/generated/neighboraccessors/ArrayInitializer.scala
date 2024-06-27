@@ -7,16 +7,16 @@ final class AccessNeighborsForArrayInitializer(val node: nodes.ArrayInitializer)
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
+  def _annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
     astIn.collectAll[nodes.AnnotationParameterAssign]
 
   /** Traverse to LITERAL via AST OUT edge.
     */
-  def literalViaAstOut: Iterator[nodes.Literal] = astOut.collectAll[nodes.Literal]
+  def _literalViaAstOut: Iterator[nodes.Literal] = astOut.collectAll[nodes.Literal]
 
   /** Traverse to TYPE via EVAL_TYPE OUT edge.
     */
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = evalTypeOut.collectAll[nodes.Type]
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = evalTypeOut.collectAll[nodes.Type]
 
   def astIn: Iterator[nodes.AnnotationParameterAssign] = node._astIn.cast[nodes.AnnotationParameterAssign]
 
@@ -30,16 +30,16 @@ final class AccessNeighborsForArrayInitializerTraversal(val traversal: Iterator[
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
-    traversal.flatMap(_.annotationParameterAssignViaAstIn)
+  def _annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
+    traversal.flatMap(_._annotationParameterAssignViaAstIn)
 
   /** Traverse to LITERAL via AST OUT edge.
     */
-  def literalViaAstOut: Iterator[nodes.Literal] = traversal.flatMap(_.literalViaAstOut)
+  def _literalViaAstOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaAstOut)
 
   /** Traverse to TYPE via EVAL_TYPE OUT edge.
     */
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_.typeViaEvalTypeOut)
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_._typeViaEvalTypeOut)
 
   def astIn: Iterator[nodes.AnnotationParameterAssign] = traversal.flatMap(_.astIn)
 
