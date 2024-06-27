@@ -7,28 +7,28 @@ final class AccessNeighborsForLocal(val node: nodes.Local) extends AnyVal {
 
   /** Traverse to CLOSURE_BINDING via CAPTURED_BY OUT edge.
     */
-  def closureBindingViaCapturedByOut: Iterator[nodes.ClosureBinding] = capturedByOut.collectAll[nodes.ClosureBinding]
+  def _closureBindingViaCapturedByOut: Iterator[nodes.ClosureBinding] = capturedByOut.collectAll[nodes.ClosureBinding]
 
   /** Traverse to CLOSURE_BINDING via REF IN edge.
     */
-  def closureBindingViaRefIn: Iterator[nodes.ClosureBinding] = refIn.collectAll[nodes.ClosureBinding]
+  def _closureBindingViaRefIn: Iterator[nodes.ClosureBinding] = refIn.collectAll[nodes.ClosureBinding]
 
   /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def controlStructureViaAstIn: Iterator[nodes.ControlStructure] = astIn.collectAll[nodes.ControlStructure]
+  def _controlStructureViaAstIn: Iterator[nodes.ControlStructure] = astIn.collectAll[nodes.ControlStructure]
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def unknownViaAstIn: Iterator[nodes.Unknown] = astIn.collectAll[nodes.Unknown]
+  def _unknownViaAstIn: Iterator[nodes.Unknown] = astIn.collectAll[nodes.Unknown]
 
   /** Places (identifier) where this local is being referenced Traverse to IDENTIFIER via REF IN edge.
     */
   @deprecated("please use referencingIdentifiers instead")
-  def identifierViaRefIn: Iterator[nodes.Identifier] = referencingIdentifiers
+  def _identifierViaRefIn: Iterator[nodes.Identifier] = referencingIdentifiers
 
   /** Places (identifier) where this local is being referenced Traverse to IDENTIFIER via REF IN edge.
     */
@@ -37,7 +37,7 @@ final class AccessNeighborsForLocal(val node: nodes.Local) extends AnyVal {
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */
   @deprecated("please use definingBlock instead")
-  def blockViaAstIn: Iterator[nodes.Block] = definingBlock
+  def _blockViaAstIn: Iterator[nodes.Block] = definingBlock
 
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */
@@ -46,7 +46,7 @@ final class AccessNeighborsForLocal(val node: nodes.Local) extends AnyVal {
   /** The type of the local. Traverse to TYPE via EVAL_TYPE OUT edge.
     */
   @deprecated("please use typ instead")
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = typ
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = typ
 
   /** The type of the local. Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -67,24 +67,24 @@ final class AccessNeighborsForLocalTraversal(val traversal: Iterator[nodes.Local
 
   /** Traverse to CLOSURE_BINDING via CAPTURED_BY OUT edge.
     */
-  def closureBindingViaCapturedByOut: Iterator[nodes.ClosureBinding] =
-    traversal.flatMap(_.closureBindingViaCapturedByOut)
+  def _closureBindingViaCapturedByOut: Iterator[nodes.ClosureBinding] =
+    traversal.flatMap(_._closureBindingViaCapturedByOut)
 
   /** Traverse to CLOSURE_BINDING via REF IN edge.
     */
-  def closureBindingViaRefIn: Iterator[nodes.ClosureBinding] = traversal.flatMap(_.closureBindingViaRefIn)
+  def _closureBindingViaRefIn: Iterator[nodes.ClosureBinding] = traversal.flatMap(_._closureBindingViaRefIn)
 
   /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def controlStructureViaAstIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.controlStructureViaAstIn)
+  def _controlStructureViaAstIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_._controlStructureViaAstIn)
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.tagViaTaggedByOut)
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def unknownViaAstIn: Iterator[nodes.Unknown] = traversal.flatMap(_.unknownViaAstIn)
+  def _unknownViaAstIn: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaAstIn)
 
   /** Places (identifier) where this local is being referenced Traverse to IDENTIFIER via REF IN edge.
     */
@@ -93,7 +93,7 @@ final class AccessNeighborsForLocalTraversal(val traversal: Iterator[nodes.Local
   /** Places (identifier) where this local is being referenced Traverse to IDENTIFIER via REF IN edge.
     */
   @deprecated("please use referencingIdentifiers instead")
-  def identifierViaRefIn: Iterator[nodes.Identifier] = traversal.flatMap(_.identifierViaRefIn)
+  def _identifierViaRefIn: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaRefIn)
 
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */
@@ -102,7 +102,7 @@ final class AccessNeighborsForLocalTraversal(val traversal: Iterator[nodes.Local
   /** The block in which local is declared. Traverse to BLOCK via AST IN edge.
     */
   @deprecated("please use definingBlock instead")
-  def blockViaAstIn: Iterator[nodes.Block] = traversal.flatMap(_.blockViaAstIn)
+  def _blockViaAstIn: Iterator[nodes.Block] = traversal.flatMap(_._blockViaAstIn)
 
   /** The type of the local. Traverse to TYPE via EVAL_TYPE OUT edge.
     */
@@ -111,7 +111,7 @@ final class AccessNeighborsForLocalTraversal(val traversal: Iterator[nodes.Local
   /** The type of the local. Traverse to TYPE via EVAL_TYPE OUT edge.
     */
   @deprecated("please use typ instead")
-  def typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_.typeViaEvalTypeOut)
+  def _typeViaEvalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_._typeViaEvalTypeOut)
 
   def astIn: Iterator[nodes.Expression] = traversal.flatMap(_.astIn)
 

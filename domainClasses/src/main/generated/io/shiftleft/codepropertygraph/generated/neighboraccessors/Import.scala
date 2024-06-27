@@ -7,27 +7,27 @@ final class AccessNeighborsForImport(val node: nodes.Import) extends AnyVal {
 
   /** Traverse to BLOCK via AST IN edge.
     */
-  def blockViaAstIn: Iterator[nodes.Block] = astIn.collectAll[nodes.Block]
+  def _blockViaAstIn: Iterator[nodes.Block] = astIn.collectAll[nodes.Block]
 
   /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
     */
-  def callViaIsCallForImportIn: Iterator[nodes.Call] = isCallForImportIn.collectAll[nodes.Call]
+  def _callViaIsCallForImportIn: Iterator[nodes.Call] = isCallForImportIn.collectAll[nodes.Call]
 
   /** Traverse to DEPENDENCY via IMPORTS OUT edge.
     */
-  def dependencyViaImportsOut: Iterator[nodes.Dependency] = importsOut.collectAll[nodes.Dependency]
+  def _dependencyViaImportsOut: Iterator[nodes.Dependency] = importsOut.collectAll[nodes.Dependency]
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Iterator[nodes.File] = astIn.collectAll[nodes.File]
+  def _fileViaAstIn: Iterator[nodes.File] = astIn.collectAll[nodes.File]
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def typeDeclViaAstIn: Iterator[nodes.TypeDecl] = astIn.collectAll[nodes.TypeDecl]
+  def _typeDeclViaAstIn: Iterator[nodes.TypeDecl] = astIn.collectAll[nodes.TypeDecl]
 
   def astIn: Iterator[nodes.AstNode] = node._astIn.cast[nodes.AstNode]
 
@@ -42,27 +42,27 @@ final class AccessNeighborsForImportTraversal(val traversal: Iterator[nodes.Impo
 
   /** Traverse to BLOCK via AST IN edge.
     */
-  def blockViaAstIn: Iterator[nodes.Block] = traversal.flatMap(_.blockViaAstIn)
+  def _blockViaAstIn: Iterator[nodes.Block] = traversal.flatMap(_._blockViaAstIn)
 
   /** Traverse to CALL via IS_CALL_FOR_IMPORT IN edge.
     */
-  def callViaIsCallForImportIn: Iterator[nodes.Call] = traversal.flatMap(_.callViaIsCallForImportIn)
+  def _callViaIsCallForImportIn: Iterator[nodes.Call] = traversal.flatMap(_._callViaIsCallForImportIn)
 
   /** Traverse to DEPENDENCY via IMPORTS OUT edge.
     */
-  def dependencyViaImportsOut: Iterator[nodes.Dependency] = traversal.flatMap(_.dependencyViaImportsOut)
+  def _dependencyViaImportsOut: Iterator[nodes.Dependency] = traversal.flatMap(_._dependencyViaImportsOut)
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_.fileViaAstIn)
+  def _fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_._fileViaAstIn)
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.tagViaTaggedByOut)
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_.typeDeclViaAstIn)
+  def _typeDeclViaAstIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_._typeDeclViaAstIn)
 
   def astIn: Iterator[nodes.AstNode] = traversal.flatMap(_.astIn)
 

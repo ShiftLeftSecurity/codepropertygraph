@@ -21,7 +21,7 @@ trait LocationEMT
 trait LocationBase extends AbstractNode with StaticType[LocationEMT] {
   def node: Option[AbstractNode]
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.className) res.put("CLASS_NAME", this.className)
     if (("<empty>": String) != this.classShortName) res.put("CLASS_SHORT_NAME", this.classShortName)

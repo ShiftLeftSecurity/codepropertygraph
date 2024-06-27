@@ -7,7 +7,7 @@ final class AccessNeighborsForAnnotationParameter(val node: nodes.AnnotationPara
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
+  def _annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
     astIn.collectAll[nodes.AnnotationParameterAssign]
 
   def astIn: Iterator[nodes.AnnotationParameterAssign] = node._astIn.cast[nodes.AnnotationParameterAssign]
@@ -18,8 +18,8 @@ final class AccessNeighborsForAnnotationParameterTraversal(val traversal: Iterat
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
-    traversal.flatMap(_.annotationParameterAssignViaAstIn)
+  def _annotationParameterAssignViaAstIn: Iterator[nodes.AnnotationParameterAssign] =
+    traversal.flatMap(_._annotationParameterAssignViaAstIn)
 
   def astIn: Iterator[nodes.AnnotationParameterAssign] = traversal.flatMap(_.astIn)
 }

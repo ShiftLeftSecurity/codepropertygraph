@@ -11,7 +11,7 @@ trait KeyValuePairEMT extends AnyRef with HasKeyEMT with HasValueEMT
 trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.key) res.put("KEY", this.key)
     if (("": String) != this.value) res.put("VALUE", this.value)

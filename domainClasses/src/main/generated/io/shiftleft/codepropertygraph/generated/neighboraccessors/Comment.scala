@@ -7,12 +7,12 @@ final class AccessNeighborsForComment(val node: nodes.Comment) extends AnyVal {
 
   /** Traverse to COMMENT via SOURCE_FILE IN edge.
     */
-  def commentViaSourceFileIn: Iterator[nodes.Comment] = sourceFileIn.collectAll[nodes.Comment]
+  def _commentViaSourceFileIn: Iterator[nodes.Comment] = sourceFileIn.collectAll[nodes.Comment]
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
   @deprecated("please use file instead")
-  def commentViaSourceFileOut: Iterator[nodes.Comment] = file
+  def _commentViaSourceFileOut: Iterator[nodes.Comment] = file
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
@@ -20,7 +20,7 @@ final class AccessNeighborsForComment(val node: nodes.Comment) extends AnyVal {
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Iterator[nodes.File] = astIn.collectAll[nodes.File]
+  def _fileViaAstIn: Iterator[nodes.File] = astIn.collectAll[nodes.File]
 
   def astIn: Iterator[nodes.File] = node._astIn.cast[nodes.File]
 
@@ -33,7 +33,7 @@ final class AccessNeighborsForCommentTraversal(val traversal: Iterator[nodes.Com
 
   /** Traverse to COMMENT via SOURCE_FILE IN edge.
     */
-  def commentViaSourceFileIn: Iterator[nodes.Comment] = traversal.flatMap(_.commentViaSourceFileIn)
+  def _commentViaSourceFileIn: Iterator[nodes.Comment] = traversal.flatMap(_._commentViaSourceFileIn)
 
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
@@ -42,11 +42,11 @@ final class AccessNeighborsForCommentTraversal(val traversal: Iterator[nodes.Com
   /** Traverse to COMMENT via SOURCE_FILE OUT edge.
     */
   @deprecated("please use file instead")
-  def commentViaSourceFileOut: Iterator[nodes.Comment] = traversal.flatMap(_.commentViaSourceFileOut)
+  def _commentViaSourceFileOut: Iterator[nodes.Comment] = traversal.flatMap(_._commentViaSourceFileOut)
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_.fileViaAstIn)
+  def _fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_._fileViaAstIn)
 
   def astIn: Iterator[nodes.File] = traversal.flatMap(_.astIn)
 

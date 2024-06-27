@@ -7,15 +7,15 @@ final class AccessNeighborsForExpression(val node: nodes.Expression) extends Any
 
   /** Traverse to TEMPLATE_DOM via ARGUMENT OUT edge.
     */
-  def templateDomViaArgumentOut: Iterator[nodes.TemplateDom] = argumentOut.collectAll[nodes.TemplateDom]
+  def _templateDomViaArgumentOut: Iterator[nodes.TemplateDom] = argumentOut.collectAll[nodes.TemplateDom]
 
   /** Traverse to TEMPLATE_DOM via AST IN edge.
     */
-  def templateDomViaAstIn: Iterator[nodes.TemplateDom] = astIn.collectAll[nodes.TemplateDom]
+  def _templateDomViaAstIn: Iterator[nodes.TemplateDom] = astIn.collectAll[nodes.TemplateDom]
 
   /** Traverse to TEMPLATE_DOM via REACHING_DEF IN edge.
     */
-  def templateDomViaReachingDefIn: Iterator[nodes.TemplateDom] = reachingDefIn.collectAll[nodes.TemplateDom]
+  def _templateDomViaReachingDefIn: Iterator[nodes.TemplateDom] = reachingDefIn.collectAll[nodes.TemplateDom]
 
   def argumentOut: Iterator[nodes.TemplateDom] = node._argumentOut.cast[nodes.TemplateDom]
 
@@ -28,15 +28,15 @@ final class AccessNeighborsForExpressionTraversal(val traversal: Iterator[nodes.
 
   /** Traverse to TEMPLATE_DOM via ARGUMENT OUT edge.
     */
-  def templateDomViaArgumentOut: Iterator[nodes.TemplateDom] = traversal.flatMap(_.templateDomViaArgumentOut)
+  def _templateDomViaArgumentOut: Iterator[nodes.TemplateDom] = traversal.flatMap(_._templateDomViaArgumentOut)
 
   /** Traverse to TEMPLATE_DOM via AST IN edge.
     */
-  def templateDomViaAstIn: Iterator[nodes.TemplateDom] = traversal.flatMap(_.templateDomViaAstIn)
+  def _templateDomViaAstIn: Iterator[nodes.TemplateDom] = traversal.flatMap(_._templateDomViaAstIn)
 
   /** Traverse to TEMPLATE_DOM via REACHING_DEF IN edge.
     */
-  def templateDomViaReachingDefIn: Iterator[nodes.TemplateDom] = traversal.flatMap(_.templateDomViaReachingDefIn)
+  def _templateDomViaReachingDefIn: Iterator[nodes.TemplateDom] = traversal.flatMap(_._templateDomViaReachingDefIn)
 
   def argumentOut: Iterator[nodes.TemplateDom] = traversal.flatMap(_.argumentOut)
 

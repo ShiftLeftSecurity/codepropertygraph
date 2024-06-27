@@ -11,7 +11,7 @@ trait TypeEMT extends AnyRef with HasFullNameEMT with HasNameEMT with HasTypeDec
 trait TypeBase extends AbstractNode with StaticType[TypeEMT] {
 
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
     if (("<empty>": String) != this.name) res.put("NAME", this.name)

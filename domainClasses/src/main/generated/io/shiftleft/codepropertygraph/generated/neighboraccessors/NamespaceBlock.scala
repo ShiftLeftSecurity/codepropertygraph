@@ -7,23 +7,23 @@ final class AccessNeighborsForNamespaceBlock(val node: nodes.NamespaceBlock) ext
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Option[nodes.File] = astIn.collectAll[nodes.File].nextOption()
+  def _fileViaAstIn: Option[nodes.File] = astIn.collectAll[nodes.File].nextOption()
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
-  def fileViaSourceFileOut: Iterator[nodes.File] = sourceFileOut.collectAll[nodes.File]
+  def _fileViaSourceFileOut: Iterator[nodes.File] = sourceFileOut.collectAll[nodes.File]
 
   /** Traverse to METHOD via AST OUT edge.
     */
-  def methodViaAstOut: Iterator[nodes.Method] = astOut.collectAll[nodes.Method]
+  def _methodViaAstOut: Iterator[nodes.Method] = astOut.collectAll[nodes.Method]
 
   /** Traverse to NAMESPACE via REF OUT edge.
     */
-  def namespaceViaRefOut: Iterator[nodes.Namespace] = refOut.collectAll[nodes.Namespace]
+  def _namespaceViaRefOut: Iterator[nodes.Namespace] = refOut.collectAll[nodes.Namespace]
 
   /** Traverse to TYPE_DECL via AST OUT edge.
     */
-  def typeDeclViaAstOut: Iterator[nodes.TypeDecl] = astOut.collectAll[nodes.TypeDecl]
+  def _typeDeclViaAstOut: Iterator[nodes.TypeDecl] = astOut.collectAll[nodes.TypeDecl]
 
   def astIn: Iterator[nodes.File] = node._astIn.cast[nodes.File]
 
@@ -38,23 +38,23 @@ final class AccessNeighborsForNamespaceBlockTraversal(val traversal: Iterator[no
 
   /** Traverse to FILE via AST IN edge.
     */
-  def fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_.fileViaAstIn)
+  def _fileViaAstIn: Iterator[nodes.File] = traversal.flatMap(_._fileViaAstIn)
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
-  def fileViaSourceFileOut: Iterator[nodes.File] = traversal.flatMap(_.fileViaSourceFileOut)
+  def _fileViaSourceFileOut: Iterator[nodes.File] = traversal.flatMap(_._fileViaSourceFileOut)
 
   /** Traverse to METHOD via AST OUT edge.
     */
-  def methodViaAstOut: Iterator[nodes.Method] = traversal.flatMap(_.methodViaAstOut)
+  def _methodViaAstOut: Iterator[nodes.Method] = traversal.flatMap(_._methodViaAstOut)
 
   /** Traverse to NAMESPACE via REF OUT edge.
     */
-  def namespaceViaRefOut: Iterator[nodes.Namespace] = traversal.flatMap(_.namespaceViaRefOut)
+  def _namespaceViaRefOut: Iterator[nodes.Namespace] = traversal.flatMap(_._namespaceViaRefOut)
 
   /** Traverse to TYPE_DECL via AST OUT edge.
     */
-  def typeDeclViaAstOut: Iterator[nodes.TypeDecl] = traversal.flatMap(_.typeDeclViaAstOut)
+  def _typeDeclViaAstOut: Iterator[nodes.TypeDecl] = traversal.flatMap(_._typeDeclViaAstOut)
 
   def astIn: Iterator[nodes.File] = traversal.flatMap(_.astIn)
 

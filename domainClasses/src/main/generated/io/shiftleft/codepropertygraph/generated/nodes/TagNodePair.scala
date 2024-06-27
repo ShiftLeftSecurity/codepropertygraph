@@ -12,7 +12,7 @@ trait TagNodePairBase extends AbstractNode with StaticType[TagNodePairEMT] {
   def node: AbstractNode
   def tag: TagBase
   override def propertiesMap: java.util.Map[String, Any] = {
-    import io.shiftleft.codepropertygraph.generated.accessors.Lang.*
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     res.put("node", this.node)
     res.put("tag", this.tag)

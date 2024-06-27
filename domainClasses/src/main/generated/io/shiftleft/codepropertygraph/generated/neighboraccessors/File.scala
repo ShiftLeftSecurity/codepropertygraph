@@ -8,7 +8,7 @@ final class AccessNeighborsForFile(val node: nodes.File) extends AnyVal {
   /** Traverse to COMMENT via AST OUT edge.
     */
   @deprecated("please use comment instead")
-  def commentViaAstOut: Iterator[nodes.Comment] = comment
+  def _commentViaAstOut: Iterator[nodes.Comment] = comment
 
   /** Traverse to COMMENT via AST OUT edge.
     */
@@ -16,16 +16,16 @@ final class AccessNeighborsForFile(val node: nodes.File) extends AnyVal {
 
   /** Traverse to IMPORT via AST OUT edge.
     */
-  def importViaAstOut: Iterator[nodes.Import] = astOut.collectAll[nodes.Import]
+  def _importViaAstOut: Iterator[nodes.Import] = astOut.collectAll[nodes.Import]
 
   /** Traverse to METHOD via CONTAINS OUT edge.
     */
-  def methodViaContainsOut: Iterator[nodes.Method] = containsOut.collectAll[nodes.Method]
+  def _methodViaContainsOut: Iterator[nodes.Method] = containsOut.collectAll[nodes.Method]
 
   /** Traverse to METHOD via SOURCE_FILE IN edge.
     */
   @deprecated("please use method instead")
-  def methodViaSourceFileIn: Iterator[nodes.Method] = method
+  def _methodViaSourceFileIn: Iterator[nodes.Method] = method
 
   /** Traverse to METHOD via SOURCE_FILE IN edge.
     */
@@ -33,12 +33,12 @@ final class AccessNeighborsForFile(val node: nodes.File) extends AnyVal {
 
   /** Traverse to NAMESPACE_BLOCK via AST OUT edge.
     */
-  def namespaceBlockViaAstOut: Iterator[nodes.NamespaceBlock] = astOut.collectAll[nodes.NamespaceBlock]
+  def _namespaceBlockViaAstOut: Iterator[nodes.NamespaceBlock] = astOut.collectAll[nodes.NamespaceBlock]
 
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
   @deprecated("please use namespaceBlock instead")
-  def namespaceBlockViaSourceFileIn: Iterator[nodes.NamespaceBlock] = namespaceBlock
+  def _namespaceBlockViaSourceFileIn: Iterator[nodes.NamespaceBlock] = namespaceBlock
 
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
@@ -46,20 +46,20 @@ final class AccessNeighborsForFile(val node: nodes.File) extends AnyVal {
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
 
   /** Traverse to TEMPLATE_DOM via CONTAINS OUT edge.
     */
-  def templateDomViaContainsOut: Iterator[nodes.TemplateDom] = containsOut.collectAll[nodes.TemplateDom]
+  def _templateDomViaContainsOut: Iterator[nodes.TemplateDom] = containsOut.collectAll[nodes.TemplateDom]
 
   /** Traverse to TYPE_DECL via CONTAINS OUT edge.
     */
-  def typeDeclViaContainsOut: Iterator[nodes.TypeDecl] = containsOut.collectAll[nodes.TypeDecl]
+  def _typeDeclViaContainsOut: Iterator[nodes.TypeDecl] = containsOut.collectAll[nodes.TypeDecl]
 
   /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
     */
   @deprecated("please use typeDecl instead")
-  def typeDeclViaSourceFileIn: Iterator[nodes.TypeDecl] = typeDecl
+  def _typeDeclViaSourceFileIn: Iterator[nodes.TypeDecl] = typeDecl
 
   /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
     */
@@ -83,15 +83,15 @@ final class AccessNeighborsForFileTraversal(val traversal: Iterator[nodes.File])
   /** Traverse to COMMENT via AST OUT edge.
     */
   @deprecated("please use comment instead")
-  def commentViaAstOut: Iterator[nodes.Comment] = traversal.flatMap(_.commentViaAstOut)
+  def _commentViaAstOut: Iterator[nodes.Comment] = traversal.flatMap(_._commentViaAstOut)
 
   /** Traverse to IMPORT via AST OUT edge.
     */
-  def importViaAstOut: Iterator[nodes.Import] = traversal.flatMap(_.importViaAstOut)
+  def _importViaAstOut: Iterator[nodes.Import] = traversal.flatMap(_._importViaAstOut)
 
   /** Traverse to METHOD via CONTAINS OUT edge.
     */
-  def methodViaContainsOut: Iterator[nodes.Method] = traversal.flatMap(_.methodViaContainsOut)
+  def _methodViaContainsOut: Iterator[nodes.Method] = traversal.flatMap(_._methodViaContainsOut)
 
   /** Traverse to METHOD via SOURCE_FILE IN edge.
     */
@@ -100,11 +100,11 @@ final class AccessNeighborsForFileTraversal(val traversal: Iterator[nodes.File])
   /** Traverse to METHOD via SOURCE_FILE IN edge.
     */
   @deprecated("please use method instead")
-  def methodViaSourceFileIn: Iterator[nodes.Method] = traversal.flatMap(_.methodViaSourceFileIn)
+  def _methodViaSourceFileIn: Iterator[nodes.Method] = traversal.flatMap(_._methodViaSourceFileIn)
 
   /** Traverse to NAMESPACE_BLOCK via AST OUT edge.
     */
-  def namespaceBlockViaAstOut: Iterator[nodes.NamespaceBlock] = traversal.flatMap(_.namespaceBlockViaAstOut)
+  def _namespaceBlockViaAstOut: Iterator[nodes.NamespaceBlock] = traversal.flatMap(_._namespaceBlockViaAstOut)
 
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
@@ -113,19 +113,20 @@ final class AccessNeighborsForFileTraversal(val traversal: Iterator[nodes.File])
   /** Traverse to NAMESPACE_BLOCK via SOURCE_FILE IN edge.
     */
   @deprecated("please use namespaceBlock instead")
-  def namespaceBlockViaSourceFileIn: Iterator[nodes.NamespaceBlock] = traversal.flatMap(_.namespaceBlockViaSourceFileIn)
+  def _namespaceBlockViaSourceFileIn: Iterator[nodes.NamespaceBlock] =
+    traversal.flatMap(_._namespaceBlockViaSourceFileIn)
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.tagViaTaggedByOut)
+  def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
 
   /** Traverse to TEMPLATE_DOM via CONTAINS OUT edge.
     */
-  def templateDomViaContainsOut: Iterator[nodes.TemplateDom] = traversal.flatMap(_.templateDomViaContainsOut)
+  def _templateDomViaContainsOut: Iterator[nodes.TemplateDom] = traversal.flatMap(_._templateDomViaContainsOut)
 
   /** Traverse to TYPE_DECL via CONTAINS OUT edge.
     */
-  def typeDeclViaContainsOut: Iterator[nodes.TypeDecl] = traversal.flatMap(_.typeDeclViaContainsOut)
+  def _typeDeclViaContainsOut: Iterator[nodes.TypeDecl] = traversal.flatMap(_._typeDeclViaContainsOut)
 
   /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
     */
@@ -134,7 +135,7 @@ final class AccessNeighborsForFileTraversal(val traversal: Iterator[nodes.File])
   /** Traverse to TYPE_DECL via SOURCE_FILE IN edge.
     */
   @deprecated("please use typeDecl instead")
-  def typeDeclViaSourceFileIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_.typeDeclViaSourceFileIn)
+  def _typeDeclViaSourceFileIn: Iterator[nodes.TypeDecl] = traversal.flatMap(_._typeDeclViaSourceFileIn)
 
   def astOut: Iterator[nodes.AstNode] = traversal.flatMap(_.astOut)
 
