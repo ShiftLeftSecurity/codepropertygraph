@@ -84,42 +84,42 @@ class AnnotationParameterAssign(graph_4762: Graph, id_4762: Long /*cf https://gi
 
   /** Traverse to ANNOTATION via AST OUT edge.
     */
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstOut
+  def annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = get().annotationViaAstOut
 
-  @deprecated("please use `_annotationViaAstOut`", "June 2024")
-  def __annotationViaAstOut = _annotationViaAstOut
+  @deprecated("please use `annotationViaAstOut`", "June 2024")
+  def _annotationViaAstOut = annotationViaAstOut
 
   /** Traverse to ANNOTATION_LITERAL via AST OUT edge.
     */
-  def _annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] = get()._annotationLiteralViaAstOut
+  def annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] = get().annotationLiteralViaAstOut
 
-  @deprecated("please use `_annotationLiteralViaAstOut`", "June 2024")
-  def __annotationLiteralViaAstOut = _annotationLiteralViaAstOut
+  @deprecated("please use `annotationLiteralViaAstOut`", "June 2024")
+  def _annotationLiteralViaAstOut = annotationLiteralViaAstOut
 
   /** Traverse to ANNOTATION_PARAMETER via AST OUT edge.
     */
-  def _annotationParameterViaAstOut: overflowdb.traversal.Traversal[AnnotationParameter] =
-    get()._annotationParameterViaAstOut
+  def annotationParameterViaAstOut: overflowdb.traversal.Traversal[AnnotationParameter] =
+    get().annotationParameterViaAstOut
 
-  @deprecated("please use `_annotationParameterViaAstOut`", "June 2024")
-  def __annotationParameterViaAstOut = _annotationParameterViaAstOut
+  @deprecated("please use `annotationParameterViaAstOut`", "June 2024")
+  def _annotationParameterViaAstOut = annotationParameterViaAstOut
 
   /** Traverse to ARRAY_INITIALIZER via AST OUT edge.
     */
-  def _arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = get()._arrayInitializerViaAstOut
+  def arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = get().arrayInitializerViaAstOut
 
-  @deprecated("please use `_arrayInitializerViaAstOut`", "June 2024")
-  def __arrayInitializerViaAstOut = _arrayInitializerViaAstOut
+  @deprecated("please use `arrayInitializerViaAstOut`", "June 2024")
+  def _arrayInitializerViaAstOut = arrayInitializerViaAstOut
 
   def astIn: Iterator[Annotation] = get().astIn
   override def _astIn             = get()._astIn
 
   /** Traverse to ANNOTATION via AST IN edge.
     */
-  def _annotationViaAstIn: overflowdb.traversal.Traversal[Annotation] = get()._annotationViaAstIn
+  def annotationViaAstIn: overflowdb.traversal.Traversal[Annotation] = get().annotationViaAstIn
 
-  @deprecated("please use `_annotationViaAstIn`", "June 2024")
-  def __annotationViaAstIn = _annotationViaAstIn
+  @deprecated("please use `annotationViaAstIn`", "June 2024")
+  def _annotationViaAstIn = annotationViaAstIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -202,32 +202,32 @@ class AnnotationParameterAssignDb(ref: NodeRef[NodeDb])
   def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_annotationViaAstOut`", "June 2024")
-  def __annotationViaAstOut = _annotationViaAstOut
+  @deprecated("please use `annotationViaAstOut`", "June 2024")
+  def _annotationViaAstOut = annotationViaAstOut
 
-  def _annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
-  @deprecated("please use `_annotationLiteralViaAstOut`", "June 2024")
-  def __annotationLiteralViaAstOut = _annotationLiteralViaAstOut
+  def annotationViaAstOut: overflowdb.traversal.Traversal[Annotation] = astOut.collectAll[Annotation]
+  @deprecated("please use `annotationLiteralViaAstOut`", "June 2024")
+  def _annotationLiteralViaAstOut = annotationLiteralViaAstOut
 
-  def _annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] =
+  def annotationLiteralViaAstOut: overflowdb.traversal.Traversal[AnnotationLiteral] =
     astOut.collectAll[AnnotationLiteral]
-  @deprecated("please use `_annotationParameterViaAstOut`", "June 2024")
-  def __annotationParameterViaAstOut = _annotationParameterViaAstOut
+  @deprecated("please use `annotationParameterViaAstOut`", "June 2024")
+  def _annotationParameterViaAstOut = annotationParameterViaAstOut
 
-  def _annotationParameterViaAstOut: overflowdb.traversal.Traversal[AnnotationParameter] =
+  def annotationParameterViaAstOut: overflowdb.traversal.Traversal[AnnotationParameter] =
     astOut.collectAll[AnnotationParameter]
-  @deprecated("please use `_arrayInitializerViaAstOut`", "June 2024")
-  def __arrayInitializerViaAstOut = _arrayInitializerViaAstOut
+  @deprecated("please use `arrayInitializerViaAstOut`", "June 2024")
+  def _arrayInitializerViaAstOut = arrayInitializerViaAstOut
 
-  def _arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = astOut.collectAll[ArrayInitializer]
+  def arrayInitializerViaAstOut: overflowdb.traversal.Traversal[ArrayInitializer] = astOut.collectAll[ArrayInitializer]
 
   def astIn: Iterator[Annotation] = createAdjacentNodeScalaIteratorByOffSet[Annotation](1)
   override def _astIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_annotationViaAstIn`", "June 2024")
-  def __annotationViaAstIn = _annotationViaAstIn
+  @deprecated("please use `annotationViaAstIn`", "June 2024")
+  def _annotationViaAstIn = annotationViaAstIn
 
-  def _annotationViaAstIn: overflowdb.traversal.Traversal[Annotation] = astIn.collectAll[Annotation]
+  def annotationViaAstIn: overflowdb.traversal.Traversal[Annotation] = astIn.collectAll[Annotation]
 
   override def label: String = {
     AnnotationParameterAssign.Label

@@ -93,27 +93,27 @@ class TypeParameter(graph_4762: Graph, id_4762: Long /*cf https://github.com/sca
 
   /** Traverse to METHOD via AST IN edge.
     */
-  def _methodViaAstIn: Method = get()._methodViaAstIn
+  def methodViaAstIn: Method = get().methodViaAstIn
 
-  @deprecated("please use `_methodViaAstIn`", "June 2024")
-  def __methodViaAstIn = _methodViaAstIn
+  @deprecated("please use `methodViaAstIn`", "June 2024")
+  def _methodViaAstIn = methodViaAstIn
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
+  def typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get().typeDeclViaAstIn
 
-  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
-  def __typeDeclViaAstIn = _typeDeclViaAstIn
+  @deprecated("please use `typeDeclViaAstIn`", "June 2024")
+  def _typeDeclViaAstIn = typeDeclViaAstIn
 
   def bindsToIn: Iterator[TypeArgument] = get().bindsToIn
   override def _bindsToIn               = get()._bindsToIn
 
   /** Traverse to TYPE_ARGUMENT via BINDS_TO IN edge.
     */
-  def _typeArgumentViaBindsToIn: overflowdb.traversal.Traversal[TypeArgument] = get()._typeArgumentViaBindsToIn
+  def typeArgumentViaBindsToIn: overflowdb.traversal.Traversal[TypeArgument] = get().typeArgumentViaBindsToIn
 
-  @deprecated("please use `_typeArgumentViaBindsToIn`", "June 2024")
-  def __typeArgumentViaBindsToIn = _typeArgumentViaBindsToIn
+  @deprecated("please use `typeArgumentViaBindsToIn`", "June 2024")
+  def _typeArgumentViaBindsToIn = typeArgumentViaBindsToIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -198,10 +198,10 @@ class TypeParameterDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_methodViaAstIn`", "June 2024")
-  def __methodViaAstIn = _methodViaAstIn
+  @deprecated("please use `methodViaAstIn`", "June 2024")
+  def _methodViaAstIn = methodViaAstIn
 
-  def _methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
+  def methodViaAstIn: Method = try { astIn.collectAll[Method].next() }
   catch {
     case e: java.util.NoSuchElementException =>
       throw new overflowdb.SchemaViolationException(
@@ -209,18 +209,18 @@ class TypeParameterDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode 
         e
       )
   }
-  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
-  def __typeDeclViaAstIn = _typeDeclViaAstIn
+  @deprecated("please use `typeDeclViaAstIn`", "June 2024")
+  def _typeDeclViaAstIn = typeDeclViaAstIn
 
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
+  def typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
 
   def bindsToIn: Iterator[TypeArgument] = createAdjacentNodeScalaIteratorByOffSet[TypeArgument](1)
   override def _bindsToIn               = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_typeArgumentViaBindsToIn`", "June 2024")
-  def __typeArgumentViaBindsToIn = _typeArgumentViaBindsToIn
+  @deprecated("please use `typeArgumentViaBindsToIn`", "June 2024")
+  def _typeArgumentViaBindsToIn = typeArgumentViaBindsToIn
 
-  def _typeArgumentViaBindsToIn: overflowdb.traversal.Traversal[TypeArgument] = bindsToIn.collectAll[TypeArgument]
+  def typeArgumentViaBindsToIn: overflowdb.traversal.Traversal[TypeArgument] = bindsToIn.collectAll[TypeArgument]
 
   override def label: String = {
     TypeParameter.Label

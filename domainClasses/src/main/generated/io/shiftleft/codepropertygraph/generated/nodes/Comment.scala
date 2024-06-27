@@ -103,20 +103,20 @@ class Comment(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug
 
   /** Traverse to FILE via AST IN edge.
     */
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
+  def fileViaAstIn: overflowdb.traversal.Traversal[File] = get().fileViaAstIn
 
-  @deprecated("please use `_fileViaAstIn`", "June 2024")
-  def __fileViaAstIn = _fileViaAstIn
+  @deprecated("please use `fileViaAstIn`", "June 2024")
+  def _fileViaAstIn = fileViaAstIn
 
   def sourceFileIn: Iterator[Comment] = get().sourceFileIn
   override def _sourceFileIn          = get()._sourceFileIn
 
   /** Traverse to COMMENT via SOURCE_FILE IN edge.
     */
-  def _commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = get()._commentViaSourceFileIn
+  def commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = get().commentViaSourceFileIn
 
-  @deprecated("please use `_commentViaSourceFileIn`", "June 2024")
-  def __commentViaSourceFileIn = _commentViaSourceFileIn
+  @deprecated("please use `commentViaSourceFileIn`", "June 2024")
+  def _commentViaSourceFileIn = commentViaSourceFileIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -209,18 +209,18 @@ class CommentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with A
   def astIn: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](1)
   override def _astIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_fileViaAstIn`", "June 2024")
-  def __fileViaAstIn = _fileViaAstIn
+  @deprecated("please use `fileViaAstIn`", "June 2024")
+  def _fileViaAstIn = fileViaAstIn
 
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File] = astIn.collectAll[File]
+  def fileViaAstIn: overflowdb.traversal.Traversal[File] = astIn.collectAll[File]
 
   def sourceFileIn: Iterator[Comment] = createAdjacentNodeScalaIteratorByOffSet[Comment](2)
   override def _sourceFileIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  @deprecated("please use `_commentViaSourceFileIn`", "June 2024")
-  def __commentViaSourceFileIn = _commentViaSourceFileIn
+  @deprecated("please use `commentViaSourceFileIn`", "June 2024")
+  def _commentViaSourceFileIn = commentViaSourceFileIn
 
-  def _commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = sourceFileIn.collectAll[Comment]
+  def commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = sourceFileIn.collectAll[Comment]
 
   override def label: String = {
     Comment.Label

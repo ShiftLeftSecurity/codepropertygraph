@@ -116,78 +116,78 @@ class Annotation(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST OUT edge.
     */
-  def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
-    get()._annotationParameterAssignViaAstOut
+  def annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+    get().annotationParameterAssignViaAstOut
 
-  @deprecated("please use `_annotationParameterAssignViaAstOut`", "June 2024")
-  def __annotationParameterAssignViaAstOut = _annotationParameterAssignViaAstOut
+  @deprecated("please use `annotationParameterAssignViaAstOut`", "June 2024")
+  def _annotationParameterAssignViaAstOut = annotationParameterAssignViaAstOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
-    get()._annotationParameterAssignViaAstIn
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+    get().annotationParameterAssignViaAstIn
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
   /** Traverse to IDENTIFIER via AST IN edge.
     */
-  def _identifierViaAstIn: overflowdb.traversal.Traversal[Identifier] = get()._identifierViaAstIn
+  def identifierViaAstIn: overflowdb.traversal.Traversal[Identifier] = get().identifierViaAstIn
 
-  @deprecated("please use `_identifierViaAstIn`", "June 2024")
-  def __identifierViaAstIn = _identifierViaAstIn
+  @deprecated("please use `identifierViaAstIn`", "June 2024")
+  def _identifierViaAstIn = identifierViaAstIn
 
   /** Traverse to LITERAL via AST IN edge.
     */
-  def _literalViaAstIn: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstIn
+  def literalViaAstIn: overflowdb.traversal.Traversal[Literal] = get().literalViaAstIn
 
-  @deprecated("please use `_literalViaAstIn`", "June 2024")
-  def __literalViaAstIn = _literalViaAstIn
+  @deprecated("please use `literalViaAstIn`", "June 2024")
+  def _literalViaAstIn = literalViaAstIn
 
   /** Traverse to MEMBER via AST IN edge.
     */
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = get()._memberViaAstIn
+  def memberViaAstIn: overflowdb.traversal.Traversal[Member] = get().memberViaAstIn
 
-  @deprecated("please use `_memberViaAstIn`", "June 2024")
-  def __memberViaAstIn = _memberViaAstIn
+  @deprecated("please use `memberViaAstIn`", "June 2024")
+  def _memberViaAstIn = memberViaAstIn
 
   /** Traverse to METHOD via AST IN edge.
     */
-  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = get()._methodViaAstIn
+  def methodViaAstIn: overflowdb.traversal.Traversal[Method] = get().methodViaAstIn
 
-  @deprecated("please use `_methodViaAstIn`", "June 2024")
-  def __methodViaAstIn = _methodViaAstIn
+  @deprecated("please use `methodViaAstIn`", "June 2024")
+  def _methodViaAstIn = methodViaAstIn
 
   /** Traverse to METHOD_PARAMETER_IN via AST IN edge.
     */
-  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] = get()._methodParameterInViaAstIn
+  def methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] = get().methodParameterInViaAstIn
 
-  @deprecated("please use `_methodParameterInViaAstIn`", "June 2024")
-  def __methodParameterInViaAstIn = _methodParameterInViaAstIn
+  @deprecated("please use `methodParameterInViaAstIn`", "June 2024")
+  def _methodParameterInViaAstIn = methodParameterInViaAstIn
 
   /** Traverse to METHOD_REF via AST IN edge.
     */
-  def _methodRefViaAstIn: overflowdb.traversal.Traversal[MethodRef] = get()._methodRefViaAstIn
+  def methodRefViaAstIn: overflowdb.traversal.Traversal[MethodRef] = get().methodRefViaAstIn
 
-  @deprecated("please use `_methodRefViaAstIn`", "June 2024")
-  def __methodRefViaAstIn = _methodRefViaAstIn
+  @deprecated("please use `methodRefViaAstIn`", "June 2024")
+  def _methodRefViaAstIn = methodRefViaAstIn
 
   /** Traverse to TYPE_DECL via AST IN edge.
     */
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstIn
+  def typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = get().typeDeclViaAstIn
 
-  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
-  def __typeDeclViaAstIn = _typeDeclViaAstIn
+  @deprecated("please use `typeDeclViaAstIn`", "June 2024")
+  def _typeDeclViaAstIn = typeDeclViaAstIn
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+  def unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get().unknownViaAstIn
 
-  @deprecated("please use `_unknownViaAstIn`", "June 2024")
-  def __unknownViaAstIn = _unknownViaAstIn
+  @deprecated("please use `unknownViaAstIn`", "June 2024")
+  def _unknownViaAstIn = unknownViaAstIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -300,53 +300,52 @@ class AnnotationDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
     createAdjacentNodeScalaIteratorByOffSet[AnnotationParameterAssign](1)
   override def _astOut = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_annotationParameterAssignViaAstOut`", "June 2024")
-  def __annotationParameterAssignViaAstOut = _annotationParameterAssignViaAstOut
+  @deprecated("please use `annotationParameterAssignViaAstOut`", "June 2024")
+  def _annotationParameterAssignViaAstOut = annotationParameterAssignViaAstOut
 
-  def _annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+  def annotationParameterAssignViaAstOut: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astOut.collectAll[AnnotationParameterAssign]
 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](2)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
-  @deprecated("please use `_identifierViaAstIn`", "June 2024")
-  def __identifierViaAstIn = _identifierViaAstIn
+  @deprecated("please use `identifierViaAstIn`", "June 2024")
+  def _identifierViaAstIn = identifierViaAstIn
 
-  def _identifierViaAstIn: overflowdb.traversal.Traversal[Identifier] = astIn.collectAll[Identifier]
-  @deprecated("please use `_literalViaAstIn`", "June 2024")
-  def __literalViaAstIn = _literalViaAstIn
+  def identifierViaAstIn: overflowdb.traversal.Traversal[Identifier] = astIn.collectAll[Identifier]
+  @deprecated("please use `literalViaAstIn`", "June 2024")
+  def _literalViaAstIn = literalViaAstIn
 
-  def _literalViaAstIn: overflowdb.traversal.Traversal[Literal] = astIn.collectAll[Literal]
-  @deprecated("please use `_memberViaAstIn`", "June 2024")
-  def __memberViaAstIn = _memberViaAstIn
+  def literalViaAstIn: overflowdb.traversal.Traversal[Literal] = astIn.collectAll[Literal]
+  @deprecated("please use `memberViaAstIn`", "June 2024")
+  def _memberViaAstIn = memberViaAstIn
 
-  def _memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
-  @deprecated("please use `_methodViaAstIn`", "June 2024")
-  def __methodViaAstIn = _methodViaAstIn
+  def memberViaAstIn: overflowdb.traversal.Traversal[Member] = astIn.collectAll[Member]
+  @deprecated("please use `methodViaAstIn`", "June 2024")
+  def _methodViaAstIn = methodViaAstIn
 
-  def _methodViaAstIn: overflowdb.traversal.Traversal[Method] = astIn.collectAll[Method]
-  @deprecated("please use `_methodParameterInViaAstIn`", "June 2024")
-  def __methodParameterInViaAstIn = _methodParameterInViaAstIn
+  def methodViaAstIn: overflowdb.traversal.Traversal[Method] = astIn.collectAll[Method]
+  @deprecated("please use `methodParameterInViaAstIn`", "June 2024")
+  def _methodParameterInViaAstIn = methodParameterInViaAstIn
 
-  def _methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] =
-    astIn.collectAll[MethodParameterIn]
-  @deprecated("please use `_methodRefViaAstIn`", "June 2024")
-  def __methodRefViaAstIn = _methodRefViaAstIn
+  def methodParameterInViaAstIn: overflowdb.traversal.Traversal[MethodParameterIn] = astIn.collectAll[MethodParameterIn]
+  @deprecated("please use `methodRefViaAstIn`", "June 2024")
+  def _methodRefViaAstIn = methodRefViaAstIn
 
-  def _methodRefViaAstIn: overflowdb.traversal.Traversal[MethodRef] = astIn.collectAll[MethodRef]
-  @deprecated("please use `_typeDeclViaAstIn`", "June 2024")
-  def __typeDeclViaAstIn = _typeDeclViaAstIn
+  def methodRefViaAstIn: overflowdb.traversal.Traversal[MethodRef] = astIn.collectAll[MethodRef]
+  @deprecated("please use `typeDeclViaAstIn`", "June 2024")
+  def _typeDeclViaAstIn = typeDeclViaAstIn
 
-  def _typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
-  @deprecated("please use `_unknownViaAstIn`", "June 2024")
-  def __unknownViaAstIn = _unknownViaAstIn
+  def typeDeclViaAstIn: overflowdb.traversal.Traversal[TypeDecl] = astIn.collectAll[TypeDecl]
+  @deprecated("please use `unknownViaAstIn`", "June 2024")
+  def _unknownViaAstIn = unknownViaAstIn
 
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
+  def unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](3)
   override def _cfgIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)

@@ -126,11 +126,11 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
 
   /** Traverse to CLOSURE_BINDING via CAPTURED_BY OUT edge.
     */
-  def _closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
-    get()._closureBindingViaCapturedByOut
+  def closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
+    get().closureBindingViaCapturedByOut
 
-  @deprecated("please use `_closureBindingViaCapturedByOut`", "June 2024")
-  def __closureBindingViaCapturedByOut = _closureBindingViaCapturedByOut
+  @deprecated("please use `closureBindingViaCapturedByOut`", "June 2024")
+  def _closureBindingViaCapturedByOut = closureBindingViaCapturedByOut
 
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
@@ -149,10 +149,10 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
 
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get()._tagViaTaggedByOut
+  def tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = get().tagViaTaggedByOut
 
-  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
-  def __tagViaTaggedByOut = _tagViaTaggedByOut
+  @deprecated("please use `tagViaTaggedByOut`", "June 2024")
+  def _tagViaTaggedByOut = tagViaTaggedByOut
 
   def astIn: Iterator[Expression] = get().astIn
   override def _astIn             = get()._astIn
@@ -168,27 +168,27 @@ class Local(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/i
 
   /** Traverse to CONTROL_STRUCTURE via AST IN edge.
     */
-  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get()._controlStructureViaAstIn
+  def controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = get().controlStructureViaAstIn
 
-  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
-  def __controlStructureViaAstIn = _controlStructureViaAstIn
+  @deprecated("please use `controlStructureViaAstIn`", "June 2024")
+  def _controlStructureViaAstIn = controlStructureViaAstIn
 
   /** Traverse to UNKNOWN via AST IN edge.
     */
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get()._unknownViaAstIn
+  def unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = get().unknownViaAstIn
 
-  @deprecated("please use `_unknownViaAstIn`", "June 2024")
-  def __unknownViaAstIn = _unknownViaAstIn
+  @deprecated("please use `unknownViaAstIn`", "June 2024")
+  def _unknownViaAstIn = unknownViaAstIn
 
   def refIn: Iterator[StoredNode] = get().refIn
   override def _refIn             = get()._refIn
 
   /** Traverse to CLOSURE_BINDING via REF IN edge.
     */
-  def _closureBindingViaRefIn: overflowdb.traversal.Traversal[ClosureBinding] = get()._closureBindingViaRefIn
+  def closureBindingViaRefIn: overflowdb.traversal.Traversal[ClosureBinding] = get().closureBindingViaRefIn
 
-  @deprecated("please use `_closureBindingViaRefIn`", "June 2024")
-  def __closureBindingViaRefIn = _closureBindingViaRefIn
+  @deprecated("please use `closureBindingViaRefIn`", "June 2024")
+  def _closureBindingViaRefIn = closureBindingViaRefIn
 
   /** Places (identifier) where this local is being referenced Traverse to IDENTIFIER via REF IN edge.
     */
@@ -310,10 +310,10 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
   def capturedByOut: Iterator[ClosureBinding] = createAdjacentNodeScalaIteratorByOffSet[ClosureBinding](0)
   override def _capturedByOut                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_closureBindingViaCapturedByOut`", "June 2024")
-  def __closureBindingViaCapturedByOut = _closureBindingViaCapturedByOut
+  @deprecated("please use `closureBindingViaCapturedByOut`", "June 2024")
+  def _closureBindingViaCapturedByOut = closureBindingViaCapturedByOut
 
-  def _closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
+  def closureBindingViaCapturedByOut: overflowdb.traversal.Traversal[ClosureBinding] =
     capturedByOut.collectAll[ClosureBinding]
 
   def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](1)
@@ -327,10 +327,10 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
   def taggedByOut: Iterator[Tag] = createAdjacentNodeScalaIteratorByOffSet[Tag](2)
   override def _taggedByOut      = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  @deprecated("please use `_tagViaTaggedByOut`", "June 2024")
-  def __tagViaTaggedByOut = _tagViaTaggedByOut
+  @deprecated("please use `tagViaTaggedByOut`", "June 2024")
+  def _tagViaTaggedByOut = tagViaTaggedByOut
 
-  def _tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
+  def tagViaTaggedByOut: overflowdb.traversal.Traversal[Tag] = taggedByOut.collectAll[Tag]
 
   def astIn: Iterator[Expression] = createAdjacentNodeScalaIteratorByOffSet[Expression](3)
   override def _astIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
@@ -339,22 +339,22 @@ class LocalDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with Ast
   def _definingBlock = definingBlock
 
   def definingBlock: overflowdb.traversal.Traversal[Block] = astIn.collectAll[Block]
-  @deprecated("please use `_controlStructureViaAstIn`", "June 2024")
-  def __controlStructureViaAstIn = _controlStructureViaAstIn
+  @deprecated("please use `controlStructureViaAstIn`", "June 2024")
+  def _controlStructureViaAstIn = controlStructureViaAstIn
 
-  def _controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
-  @deprecated("please use `_unknownViaAstIn`", "June 2024")
-  def __unknownViaAstIn = _unknownViaAstIn
+  def controlStructureViaAstIn: overflowdb.traversal.Traversal[ControlStructure] = astIn.collectAll[ControlStructure]
+  @deprecated("please use `unknownViaAstIn`", "June 2024")
+  def _unknownViaAstIn = unknownViaAstIn
 
-  def _unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
+  def unknownViaAstIn: overflowdb.traversal.Traversal[Unknown] = astIn.collectAll[Unknown]
 
   def refIn: Iterator[StoredNode] = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
   override def _refIn             = createAdjacentNodeScalaIteratorByOffSet[StoredNode](4)
 
-  @deprecated("please use `_closureBindingViaRefIn`", "June 2024")
-  def __closureBindingViaRefIn = _closureBindingViaRefIn
+  @deprecated("please use `closureBindingViaRefIn`", "June 2024")
+  def _closureBindingViaRefIn = closureBindingViaRefIn
 
-  def _closureBindingViaRefIn: overflowdb.traversal.Traversal[ClosureBinding] = refIn.collectAll[ClosureBinding]
+  def closureBindingViaRefIn: overflowdb.traversal.Traversal[ClosureBinding] = refIn.collectAll[ClosureBinding]
   @deprecated("please use `referencingIdentifiers`", "June 2024")
   def _referencingIdentifiers = referencingIdentifiers
 

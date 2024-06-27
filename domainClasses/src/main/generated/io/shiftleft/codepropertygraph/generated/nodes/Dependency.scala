@@ -79,10 +79,10 @@ class Dependency(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/
 
   /** Traverse to IMPORT via IMPORTS IN edge.
     */
-  def _importViaImportsIn: overflowdb.traversal.Traversal[Import] = get()._importViaImportsIn
+  def importViaImportsIn: overflowdb.traversal.Traversal[Import] = get().importViaImportsIn
 
-  @deprecated("please use `_importViaImportsIn`", "June 2024")
-  def __importViaImportsIn = _importViaImportsIn
+  @deprecated("please use `importViaImportsIn`", "June 2024")
+  def _importViaImportsIn = importViaImportsIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -155,10 +155,10 @@ class DependencyDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode wit
   def importsIn: Iterator[Import] = createAdjacentNodeScalaIteratorByOffSet[Import](0)
   override def _importsIn         = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_importViaImportsIn`", "June 2024")
-  def __importViaImportsIn = _importViaImportsIn
+  @deprecated("please use `importViaImportsIn`", "June 2024")
+  def _importViaImportsIn = importViaImportsIn
 
-  def _importViaImportsIn: overflowdb.traversal.Traversal[Import] = importsIn.collectAll[Import]
+  def importViaImportsIn: overflowdb.traversal.Traversal[Import] = importsIn.collectAll[Import]
 
   override def label: String = {
     Dependency.Label

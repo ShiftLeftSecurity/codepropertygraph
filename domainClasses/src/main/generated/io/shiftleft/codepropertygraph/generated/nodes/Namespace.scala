@@ -90,10 +90,10 @@ class Namespace(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
 
   /** Traverse to NAMESPACE_BLOCK via REF IN edge.
     */
-  def _namespaceBlockViaRefIn: overflowdb.traversal.Traversal[NamespaceBlock] = get()._namespaceBlockViaRefIn
+  def namespaceBlockViaRefIn: overflowdb.traversal.Traversal[NamespaceBlock] = get().namespaceBlockViaRefIn
 
-  @deprecated("please use `_namespaceBlockViaRefIn`", "June 2024")
-  def __namespaceBlockViaRefIn = _namespaceBlockViaRefIn
+  @deprecated("please use `namespaceBlockViaRefIn`", "June 2024")
+  def _namespaceBlockViaRefIn = namespaceBlockViaRefIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -178,10 +178,10 @@ class NamespaceDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
   def refIn: Iterator[NamespaceBlock] = createAdjacentNodeScalaIteratorByOffSet[NamespaceBlock](0)
   override def _refIn                 = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_namespaceBlockViaRefIn`", "June 2024")
-  def __namespaceBlockViaRefIn = _namespaceBlockViaRefIn
+  @deprecated("please use `namespaceBlockViaRefIn`", "June 2024")
+  def _namespaceBlockViaRefIn = namespaceBlockViaRefIn
 
-  def _namespaceBlockViaRefIn: overflowdb.traversal.Traversal[NamespaceBlock] = refIn.collectAll[NamespaceBlock]
+  def namespaceBlockViaRefIn: overflowdb.traversal.Traversal[NamespaceBlock] = refIn.collectAll[NamespaceBlock]
 
   override def label: String = {
     Namespace.Label

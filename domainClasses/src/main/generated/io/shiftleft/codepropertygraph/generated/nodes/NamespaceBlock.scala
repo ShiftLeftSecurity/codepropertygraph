@@ -106,47 +106,47 @@ class NamespaceBlock(graph_4762: Graph, id_4762: Long /*cf https://github.com/sc
 
   /** Traverse to METHOD via AST OUT edge.
     */
-  def _methodViaAstOut: overflowdb.traversal.Traversal[Method] = get()._methodViaAstOut
+  def methodViaAstOut: overflowdb.traversal.Traversal[Method] = get().methodViaAstOut
 
-  @deprecated("please use `_methodViaAstOut`", "June 2024")
-  def __methodViaAstOut = _methodViaAstOut
+  @deprecated("please use `methodViaAstOut`", "June 2024")
+  def _methodViaAstOut = methodViaAstOut
 
   /** Traverse to TYPE_DECL via AST OUT edge.
     */
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get()._typeDeclViaAstOut
+  def typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = get().typeDeclViaAstOut
 
-  @deprecated("please use `_typeDeclViaAstOut`", "June 2024")
-  def __typeDeclViaAstOut = _typeDeclViaAstOut
+  @deprecated("please use `typeDeclViaAstOut`", "June 2024")
+  def _typeDeclViaAstOut = typeDeclViaAstOut
 
   def refOut: Iterator[Namespace] = get().refOut
   override def _refOut            = get()._refOut
 
   /** Traverse to NAMESPACE via REF OUT edge.
     */
-  def _namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = get()._namespaceViaRefOut
+  def namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = get().namespaceViaRefOut
 
-  @deprecated("please use `_namespaceViaRefOut`", "June 2024")
-  def __namespaceViaRefOut = _namespaceViaRefOut
+  @deprecated("please use `namespaceViaRefOut`", "June 2024")
+  def _namespaceViaRefOut = namespaceViaRefOut
 
   def sourceFileOut: Iterator[File] = get().sourceFileOut
   override def _sourceFileOut       = get()._sourceFileOut
 
   /** Traverse to FILE via SOURCE_FILE OUT edge.
     */
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get()._fileViaSourceFileOut
+  def fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = get().fileViaSourceFileOut
 
-  @deprecated("please use `_fileViaSourceFileOut`", "June 2024")
-  def __fileViaSourceFileOut = _fileViaSourceFileOut
+  @deprecated("please use `fileViaSourceFileOut`", "June 2024")
+  def _fileViaSourceFileOut = fileViaSourceFileOut
 
   def astIn: Iterator[File] = get().astIn
   override def _astIn       = get()._astIn
 
   /** Traverse to FILE via AST IN edge.
     */
-  def _fileViaAstIn: Option[File] = get()._fileViaAstIn
+  def fileViaAstIn: Option[File] = get().fileViaAstIn
 
-  @deprecated("please use `_fileViaAstIn`", "June 2024")
-  def __fileViaAstIn = _fileViaAstIn
+  @deprecated("please use `fileViaAstIn`", "June 2024")
+  def _fileViaAstIn = fileViaAstIn
 
   // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
   // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
@@ -243,38 +243,38 @@ class NamespaceBlockDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode
   def astOut: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](0)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
 
-  @deprecated("please use `_methodViaAstOut`", "June 2024")
-  def __methodViaAstOut = _methodViaAstOut
+  @deprecated("please use `methodViaAstOut`", "June 2024")
+  def _methodViaAstOut = methodViaAstOut
 
-  def _methodViaAstOut: overflowdb.traversal.Traversal[Method] = astOut.collectAll[Method]
-  @deprecated("please use `_typeDeclViaAstOut`", "June 2024")
-  def __typeDeclViaAstOut = _typeDeclViaAstOut
+  def methodViaAstOut: overflowdb.traversal.Traversal[Method] = astOut.collectAll[Method]
+  @deprecated("please use `typeDeclViaAstOut`", "June 2024")
+  def _typeDeclViaAstOut = typeDeclViaAstOut
 
-  def _typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = astOut.collectAll[TypeDecl]
+  def typeDeclViaAstOut: overflowdb.traversal.Traversal[TypeDecl] = astOut.collectAll[TypeDecl]
 
   def refOut: Iterator[Namespace] = createAdjacentNodeScalaIteratorByOffSet[Namespace](1)
   override def _refOut            = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_namespaceViaRefOut`", "June 2024")
-  def __namespaceViaRefOut = _namespaceViaRefOut
+  @deprecated("please use `namespaceViaRefOut`", "June 2024")
+  def _namespaceViaRefOut = namespaceViaRefOut
 
-  def _namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = refOut.collectAll[Namespace]
+  def namespaceViaRefOut: overflowdb.traversal.Traversal[Namespace] = refOut.collectAll[Namespace]
 
   def sourceFileOut: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](2)
   override def _sourceFileOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  @deprecated("please use `_fileViaSourceFileOut`", "June 2024")
-  def __fileViaSourceFileOut = _fileViaSourceFileOut
+  @deprecated("please use `fileViaSourceFileOut`", "June 2024")
+  def _fileViaSourceFileOut = fileViaSourceFileOut
 
-  def _fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
+  def fileViaSourceFileOut: overflowdb.traversal.Traversal[File] = sourceFileOut.collectAll[File]
 
   def astIn: Iterator[File] = createAdjacentNodeScalaIteratorByOffSet[File](3)
   override def _astIn       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
 
-  @deprecated("please use `_fileViaAstIn`", "June 2024")
-  def __fileViaAstIn = _fileViaAstIn
+  @deprecated("please use `fileViaAstIn`", "June 2024")
+  def _fileViaAstIn = fileViaAstIn
 
-  def _fileViaAstIn: Option[File] = astIn.collectAll[File].nextOption()
+  def fileViaAstIn: Option[File] = astIn.collectAll[File].nextOption()
 
   override def label: String = {
     NamespaceBlock.Label

@@ -107,11 +107,11 @@ class AnnotationLiteral(graph_4762: Graph, id_4762: Long /*cf https://github.com
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
-    get()._annotationParameterAssignViaAstIn
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+    get().annotationParameterAssignViaAstIn
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -221,10 +221,10 @@ class AnnotationLiteralDb(ref: NodeRef[NodeDb])
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](1)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
 
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](2)

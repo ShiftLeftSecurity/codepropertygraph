@@ -106,31 +106,31 @@ class ArrayInitializer(graph_4762: Graph, id_4762: Long /*cf https://github.com/
 
   /** Traverse to LITERAL via AST OUT edge.
     */
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get()._literalViaAstOut
+  def literalViaAstOut: overflowdb.traversal.Traversal[Literal] = get().literalViaAstOut
 
-  @deprecated("please use `_literalViaAstOut`", "June 2024")
-  def __literalViaAstOut = _literalViaAstOut
+  @deprecated("please use `literalViaAstOut`", "June 2024")
+  def _literalViaAstOut = literalViaAstOut
 
   def evalTypeOut: Iterator[Type] = get().evalTypeOut
   override def _evalTypeOut       = get()._evalTypeOut
 
   /** Traverse to TYPE via EVAL_TYPE OUT edge.
     */
-  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = get()._typeViaEvalTypeOut
+  def typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = get().typeViaEvalTypeOut
 
-  @deprecated("please use `_typeViaEvalTypeOut`", "June 2024")
-  def __typeViaEvalTypeOut = _typeViaEvalTypeOut
+  @deprecated("please use `typeViaEvalTypeOut`", "June 2024")
+  def _typeViaEvalTypeOut = typeViaEvalTypeOut
 
   def astIn: Iterator[AstNode] = get().astIn
   override def _astIn          = get()._astIn
 
   /** Traverse to ANNOTATION_PARAMETER_ASSIGN via AST IN edge.
     */
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
-    get()._annotationParameterAssignViaAstIn
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+    get().annotationParameterAssignViaAstIn
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
   def cfgIn: Iterator[CfgNode] = get().cfgIn
   override def _cfgIn          = get()._cfgIn
@@ -235,26 +235,26 @@ class ArrayInitializerDb(ref: NodeRef[NodeDb])
   def astOut: Iterator[Literal] = createAdjacentNodeScalaIteratorByOffSet[Literal](1)
   override def _astOut          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
 
-  @deprecated("please use `_literalViaAstOut`", "June 2024")
-  def __literalViaAstOut = _literalViaAstOut
+  @deprecated("please use `literalViaAstOut`", "June 2024")
+  def _literalViaAstOut = literalViaAstOut
 
-  def _literalViaAstOut: overflowdb.traversal.Traversal[Literal] = astOut.collectAll[Literal]
+  def literalViaAstOut: overflowdb.traversal.Traversal[Literal] = astOut.collectAll[Literal]
 
   def evalTypeOut: Iterator[Type] = createAdjacentNodeScalaIteratorByOffSet[Type](2)
   override def _evalTypeOut       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
 
-  @deprecated("please use `_typeViaEvalTypeOut`", "June 2024")
-  def __typeViaEvalTypeOut = _typeViaEvalTypeOut
+  @deprecated("please use `typeViaEvalTypeOut`", "June 2024")
+  def _typeViaEvalTypeOut = typeViaEvalTypeOut
 
-  def _typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
+  def typeViaEvalTypeOut: overflowdb.traversal.Traversal[Type] = evalTypeOut.collectAll[Type]
 
   def astIn: Iterator[AstNode] = createAdjacentNodeScalaIteratorByOffSet[AstNode](3)
   override def _astIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](3)
 
-  @deprecated("please use `_annotationParameterAssignViaAstIn`", "June 2024")
-  def __annotationParameterAssignViaAstIn = _annotationParameterAssignViaAstIn
+  @deprecated("please use `annotationParameterAssignViaAstIn`", "June 2024")
+  def _annotationParameterAssignViaAstIn = annotationParameterAssignViaAstIn
 
-  def _annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
+  def annotationParameterAssignViaAstIn: overflowdb.traversal.Traversal[AnnotationParameterAssign] =
     astIn.collectAll[AnnotationParameterAssign]
 
   def cfgIn: Iterator[CfgNode] = createAdjacentNodeScalaIteratorByOffSet[CfgNode](4)
