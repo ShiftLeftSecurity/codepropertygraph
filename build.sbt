@@ -1,14 +1,14 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val overflowdbVersion = "1.192"
+val overflowdbVersion = "0.1.4"
 val overflowdbCodegenVersion = "2.110"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
     scalaVersion       := "3.4.2",
-    resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
+    resolvers ++= Seq("Github Package Registry" at "https://maven.pkg.github.com/Privado-Inc/overflowdb", Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
     scmInfo := Some(
@@ -75,3 +75,13 @@ Global / onLoad := {
   assert(GitLFSUtils.isGitLFSEnabled(), "You need to install git-lfs and run 'git lfs pull'")
   (Global / onLoad).value
 }
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )

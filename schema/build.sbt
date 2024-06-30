@@ -34,3 +34,13 @@ generateProtobuf := Def.taskDyn {
 lazy val schemaMd5File                 = file("target/schema-src.md5")
 def lastSchemaMd5: Option[String]      = scala.util.Try(IO.read(schemaMd5File)).toOption
 def lastSchemaMd5(value: String): Unit = IO.write(schemaMd5File, value)
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )
