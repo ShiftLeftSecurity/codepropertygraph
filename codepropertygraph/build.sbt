@@ -8,7 +8,8 @@ libraryDependencies ++= Seq(
   "com.github.scopt"      %% "scopt"                 % "4.0.1",
   "com.github.pathikrit"  %% "better-files"          % "3.9.2",
   "org.slf4j"              % "slf4j-api"             % "2.0.6",
-  "io.joern"              %% "flatgraph-formats"     % Versions.flatgraph,
-  "io.joern"              %% "flatgraph-odb-convert" % Versions.flatgraph,
+  // TODO change org back to io.joern, only changed temporarily so I can debug something on jenkins
+  "com.michaelpollmeier"              %% "flatgraph-formats"     % Versions.flatgraph,
+  "com.michaelpollmeier"              %% "flatgraph-odb-convert" % Versions.flatgraph,
   "org.scalatest"         %% "scalatest"             % Versions.scalatest % Test
 )
