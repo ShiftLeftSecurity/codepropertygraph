@@ -19,8 +19,8 @@ object TypeArgument {
 
   object Properties {
     val Code         = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val LineNumber   = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val ColumnNumber = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val LineNumber   = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Order        = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
   }
@@ -59,8 +59,8 @@ trait TypeArgumentBase extends AbstractNode with AstNodeBase {
   def asStored: StoredNode = this.asInstanceOf[StoredNode]
 
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
 
 }
@@ -70,10 +70,10 @@ class TypeArgument(graph_4762: Graph, id_4762: Long /*cf https://github.com/scal
     with TypeArgumentBase
     with StoredNode
     with AstNode {
-  override def code: String                  = get().code
-  override def columnNumber: Option[Integer] = get().columnNumber
-  override def lineNumber: Option[Integer]   = get().lineNumber
-  override def order: scala.Int              = get().order
+  override def code: String                    = get().code
+  override def columnNumber: Option[scala.Int] = get().columnNumber
+  override def lineNumber: Option[scala.Int]   = get().lineNumber
+  override def order: scala.Int                = get().order
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "CODE"  => TypeArgument.PropertyDefaults.Code
@@ -145,14 +145,14 @@ class TypeArgumentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
 
   override def layoutInformation: NodeLayoutInformation = TypeArgument.layoutInformation
 
-  private var _code: String          = TypeArgument.PropertyDefaults.Code
-  def code: String                   = _code
-  private var _columnNumber: Integer = null
-  def columnNumber: Option[Integer]  = Option(_columnNumber)
-  private var _lineNumber: Integer   = null
-  def lineNumber: Option[Integer]    = Option(_lineNumber)
-  private var _order: scala.Int      = TypeArgument.PropertyDefaults.Order
-  def order: scala.Int               = _order
+  private var _code: String           = TypeArgument.PropertyDefaults.Code
+  def code: String                    = _code
+  private var _columnNumber: Integer  = null
+  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  private var _lineNumber: Integer    = null
+  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _order: Integer         = TypeArgument.PropertyDefaults.Order
+  def order: scala.Int                = _order
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -230,8 +230,8 @@ class TypeArgumentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
   override protected def updateSpecificProperty(key: String, value: Object): Unit = {
     key match {
       case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[Integer]
-      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[scala.Int]
       case "ORDER"         => this._order = value.asInstanceOf[scala.Int]
 
       case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
@@ -249,8 +249,12 @@ class TypeArgumentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode w
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._code = newNode.asInstanceOf[NewTypeArgument].code
-    this._columnNumber = newNode.asInstanceOf[NewTypeArgument].columnNumber.orNull
-    this._lineNumber = newNode.asInstanceOf[NewTypeArgument].lineNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewTypeArgument].columnNumber match {
+      case None => null; case Some(value) => value
+    }
+    this._lineNumber = newNode.asInstanceOf[NewTypeArgument].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._order = newNode.asInstanceOf[NewTypeArgument].order
 
   }

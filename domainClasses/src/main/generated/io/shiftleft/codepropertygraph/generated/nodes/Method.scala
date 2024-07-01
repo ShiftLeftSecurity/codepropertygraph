@@ -50,17 +50,17 @@ object Method {
     val AstParentFullName = new overflowdb.PropertyKey[String]("AST_PARENT_FULL_NAME")
     val AstParentType     = new overflowdb.PropertyKey[String]("AST_PARENT_TYPE")
     val Code              = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber      = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val ColumnNumberEnd   = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER_END")
+    val ColumnNumber      = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val ColumnNumberEnd   = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER_END")
     val Filename          = new overflowdb.PropertyKey[String]("FILENAME")
     val FullName          = new overflowdb.PropertyKey[String]("FULL_NAME")
     val Hash              = new overflowdb.PropertyKey[String]("HASH")
     val IsExternal        = new overflowdb.PropertyKey[Boolean]("IS_EXTERNAL")
-    val LineNumber        = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
-    val LineNumberEnd     = new overflowdb.PropertyKey[Integer]("LINE_NUMBER_END")
+    val LineNumber        = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
+    val LineNumberEnd     = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER_END")
     val Name              = new overflowdb.PropertyKey[String]("NAME")
-    val Offset            = new overflowdb.PropertyKey[Integer]("OFFSET")
-    val OffsetEnd         = new overflowdb.PropertyKey[Integer]("OFFSET_END")
+    val Offset            = new overflowdb.PropertyKey[scala.Int]("OFFSET")
+    val OffsetEnd         = new overflowdb.PropertyKey[scala.Int]("OFFSET_END")
     val Order             = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val Signature         = new overflowdb.PropertyKey[String]("SIGNATURE")
 
@@ -121,17 +121,17 @@ trait MethodBase extends AbstractNode with AstNodeBase with CfgNodeBase with Dec
   def astParentFullName: String
   def astParentType: String
   def code: String
-  def columnNumber: Option[Integer]
-  def columnNumberEnd: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def columnNumberEnd: Option[scala.Int]
   def filename: String
   def fullName: String
   def hash: Option[String]
   def isExternal: Boolean
-  def lineNumber: Option[Integer]
-  def lineNumberEnd: Option[Integer]
+  def lineNumber: Option[scala.Int]
+  def lineNumberEnd: Option[scala.Int]
   def name: String
-  def offset: Option[Integer]
-  def offsetEnd: Option[Integer]
+  def offset: Option[scala.Int]
+  def offsetEnd: Option[scala.Int]
   def order: scala.Int
   def signature: String
 
@@ -144,22 +144,22 @@ class Method(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/
     with AstNode
     with CfgNode
     with Declaration {
-  override def astParentFullName: String        = get().astParentFullName
-  override def astParentType: String            = get().astParentType
-  override def code: String                     = get().code
-  override def columnNumber: Option[Integer]    = get().columnNumber
-  override def columnNumberEnd: Option[Integer] = get().columnNumberEnd
-  override def filename: String                 = get().filename
-  override def fullName: String                 = get().fullName
-  override def hash: Option[String]             = get().hash
-  override def isExternal: Boolean              = get().isExternal
-  override def lineNumber: Option[Integer]      = get().lineNumber
-  override def lineNumberEnd: Option[Integer]   = get().lineNumberEnd
-  override def name: String                     = get().name
-  override def offset: Option[Integer]          = get().offset
-  override def offsetEnd: Option[Integer]       = get().offsetEnd
-  override def order: scala.Int                 = get().order
-  override def signature: String                = get().signature
+  override def astParentFullName: String          = get().astParentFullName
+  override def astParentType: String              = get().astParentType
+  override def code: String                       = get().code
+  override def columnNumber: Option[scala.Int]    = get().columnNumber
+  override def columnNumberEnd: Option[scala.Int] = get().columnNumberEnd
+  override def filename: String                   = get().filename
+  override def fullName: String                   = get().fullName
+  override def hash: Option[String]               = get().hash
+  override def isExternal: Boolean                = get().isExternal
+  override def lineNumber: Option[scala.Int]      = get().lineNumber
+  override def lineNumberEnd: Option[scala.Int]   = get().lineNumberEnd
+  override def name: String                       = get().name
+  override def offset: Option[scala.Int]          = get().offset
+  override def offsetEnd: Option[scala.Int]       = get().offsetEnd
+  override def order: scala.Int                   = get().order
+  override def signature: String                  = get().signature
   override def propertyDefaultValue(propertyKey: String) = {
     propertyKey match {
       case "AST_PARENT_FULL_NAME" => Method.PropertyDefaults.AstParentFullName
@@ -553,38 +553,38 @@ class MethodDb(ref: NodeRef[NodeDb])
 
   override def layoutInformation: NodeLayoutInformation = Method.layoutInformation
 
-  private var _astParentFullName: String = Method.PropertyDefaults.AstParentFullName
-  def astParentFullName: String          = _astParentFullName
-  private var _astParentType: String     = Method.PropertyDefaults.AstParentType
-  def astParentType: String              = _astParentType
-  private var _code: String              = Method.PropertyDefaults.Code
-  def code: String                       = _code
-  private var _columnNumber: Integer     = null
-  def columnNumber: Option[Integer]      = Option(_columnNumber)
-  private var _columnNumberEnd: Integer  = null
-  def columnNumberEnd: Option[Integer]   = Option(_columnNumberEnd)
-  private var _filename: String          = Method.PropertyDefaults.Filename
-  def filename: String                   = _filename
-  private var _fullName: String          = Method.PropertyDefaults.FullName
-  def fullName: String                   = _fullName
-  private var _hash: String              = null
-  def hash: Option[String]               = Option(_hash)
-  private var _isExternal: Boolean       = Method.PropertyDefaults.IsExternal
-  def isExternal: Boolean                = _isExternal
-  private var _lineNumber: Integer       = null
-  def lineNumber: Option[Integer]        = Option(_lineNumber)
-  private var _lineNumberEnd: Integer    = null
-  def lineNumberEnd: Option[Integer]     = Option(_lineNumberEnd)
-  private var _name: String              = Method.PropertyDefaults.Name
-  def name: String                       = _name
-  private var _offset: Integer           = null
-  def offset: Option[Integer]            = Option(_offset)
-  private var _offsetEnd: Integer        = null
-  def offsetEnd: Option[Integer]         = Option(_offsetEnd)
-  private var _order: scala.Int          = Method.PropertyDefaults.Order
-  def order: scala.Int                   = _order
-  private var _signature: String         = Method.PropertyDefaults.Signature
-  def signature: String                  = _signature
+  private var _astParentFullName: String     = Method.PropertyDefaults.AstParentFullName
+  def astParentFullName: String              = _astParentFullName
+  private var _astParentType: String         = Method.PropertyDefaults.AstParentType
+  def astParentType: String                  = _astParentType
+  private var _code: String                  = Method.PropertyDefaults.Code
+  def code: String                           = _code
+  private var _columnNumber: Integer         = null
+  def columnNumber: Option[scala.Int]        = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
+  private var _columnNumberEnd: Integer      = null
+  def columnNumberEnd: Option[scala.Int]     = Option(_columnNumberEnd).asInstanceOf[Option[scala.Int]]
+  private var _filename: String              = Method.PropertyDefaults.Filename
+  def filename: String                       = _filename
+  private var _fullName: String              = Method.PropertyDefaults.FullName
+  def fullName: String                       = _fullName
+  private var _hash: String                  = null
+  def hash: Option[String]                   = Option(_hash).asInstanceOf[Option[String]]
+  private var _isExternal: java.lang.Boolean = Method.PropertyDefaults.IsExternal
+  def isExternal: Boolean                    = _isExternal
+  private var _lineNumber: Integer           = null
+  def lineNumber: Option[scala.Int]          = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
+  private var _lineNumberEnd: Integer        = null
+  def lineNumberEnd: Option[scala.Int]       = Option(_lineNumberEnd).asInstanceOf[Option[scala.Int]]
+  private var _name: String                  = Method.PropertyDefaults.Name
+  def name: String                           = _name
+  private var _offset: Integer               = null
+  def offset: Option[scala.Int]              = Option(_offset).asInstanceOf[Option[scala.Int]]
+  private var _offsetEnd: Integer            = null
+  def offsetEnd: Option[scala.Int]           = Option(_offsetEnd).asInstanceOf[Option[scala.Int]]
+  private var _order: Integer                = Method.PropertyDefaults.Order
+  def order: scala.Int                       = _order
+  private var _signature: String             = Method.PropertyDefaults.Signature
+  def signature: String                      = _signature
 
   /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
@@ -836,17 +836,17 @@ class MethodDb(ref: NodeRef[NodeDb])
       case "AST_PARENT_FULL_NAME" => this._astParentFullName = value.asInstanceOf[String]
       case "AST_PARENT_TYPE"      => this._astParentType = value.asInstanceOf[String]
       case "CODE"                 => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[Integer]
-      case "COLUMN_NUMBER_END"    => this._columnNumberEnd = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"        => this._columnNumber = value.asInstanceOf[scala.Int]
+      case "COLUMN_NUMBER_END"    => this._columnNumberEnd = value.asInstanceOf[scala.Int]
       case "FILENAME"             => this._filename = value.asInstanceOf[String]
       case "FULL_NAME"            => this._fullName = value.asInstanceOf[String]
       case "HASH"                 => this._hash = value.asInstanceOf[String]
       case "IS_EXTERNAL"          => this._isExternal = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER"          => this._lineNumber = value.asInstanceOf[Integer]
-      case "LINE_NUMBER_END"      => this._lineNumberEnd = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"          => this._lineNumber = value.asInstanceOf[scala.Int]
+      case "LINE_NUMBER_END"      => this._lineNumberEnd = value.asInstanceOf[scala.Int]
       case "NAME"                 => this._name = value.asInstanceOf[String]
-      case "OFFSET"               => this._offset = value.asInstanceOf[Integer]
-      case "OFFSET_END"           => this._offsetEnd = value.asInstanceOf[Integer]
+      case "OFFSET"               => this._offset = value.asInstanceOf[scala.Int]
+      case "OFFSET_END"           => this._offsetEnd = value.asInstanceOf[scala.Int]
       case "ORDER"                => this._order = value.asInstanceOf[scala.Int]
       case "SIGNATURE"            => this._signature = value.asInstanceOf[String]
 
@@ -867,17 +867,23 @@ class MethodDb(ref: NodeRef[NodeDb])
     this._astParentFullName = newNode.asInstanceOf[NewMethod].astParentFullName
     this._astParentType = newNode.asInstanceOf[NewMethod].astParentType
     this._code = newNode.asInstanceOf[NewMethod].code
-    this._columnNumber = newNode.asInstanceOf[NewMethod].columnNumber.orNull
-    this._columnNumberEnd = newNode.asInstanceOf[NewMethod].columnNumberEnd.orNull
+    this._columnNumber = newNode.asInstanceOf[NewMethod].columnNumber match {
+      case None => null; case Some(value) => value
+    }
+    this._columnNumberEnd = newNode.asInstanceOf[NewMethod].columnNumberEnd match {
+      case None => null; case Some(value) => value
+    }
     this._filename = newNode.asInstanceOf[NewMethod].filename
     this._fullName = newNode.asInstanceOf[NewMethod].fullName
-    this._hash = newNode.asInstanceOf[NewMethod].hash.orNull
+    this._hash = newNode.asInstanceOf[NewMethod].hash match { case None => null; case Some(value) => value }
     this._isExternal = newNode.asInstanceOf[NewMethod].isExternal
-    this._lineNumber = newNode.asInstanceOf[NewMethod].lineNumber.orNull
-    this._lineNumberEnd = newNode.asInstanceOf[NewMethod].lineNumberEnd.orNull
+    this._lineNumber = newNode.asInstanceOf[NewMethod].lineNumber match { case None => null; case Some(value) => value }
+    this._lineNumberEnd = newNode.asInstanceOf[NewMethod].lineNumberEnd match {
+      case None => null; case Some(value) => value
+    }
     this._name = newNode.asInstanceOf[NewMethod].name
-    this._offset = newNode.asInstanceOf[NewMethod].offset.orNull
-    this._offsetEnd = newNode.asInstanceOf[NewMethod].offsetEnd.orNull
+    this._offset = newNode.asInstanceOf[NewMethod].offset match { case None => null; case Some(value) => value }
+    this._offsetEnd = newNode.asInstanceOf[NewMethod].offsetEnd match { case None => null; case Some(value) => value }
     this._order = newNode.asInstanceOf[NewMethod].order
     this._signature = newNode.asInstanceOf[NewMethod].signature
 

@@ -38,9 +38,9 @@ object MethodRef {
     val ArgumentIndex           = new overflowdb.PropertyKey[scala.Int]("ARGUMENT_INDEX")
     val ArgumentName            = new overflowdb.PropertyKey[String]("ARGUMENT_NAME")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val MethodFullName          = new overflowdb.PropertyKey[String]("METHOD_FULL_NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
@@ -130,9 +130,9 @@ trait MethodRefBase extends AbstractNode with ExpressionBase {
   def argumentIndex: scala.Int
   def argumentName: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dynamicTypeHintFullName: IndexedSeq[String]
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def methodFullName: String
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
@@ -148,9 +148,9 @@ class MethodRef(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/b
   override def argumentIndex: scala.Int                    = get().argumentIndex
   override def argumentName: Option[String]                = get().argumentName
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def methodFullName: String                      = get().methodFullName
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
@@ -719,21 +719,21 @@ class MethodRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
 
   override def layoutInformation: NodeLayoutInformation = MethodRef.layoutInformation
 
-  private var _argumentIndex: scala.Int                    = MethodRef.PropertyDefaults.ArgumentIndex
+  private var _argumentIndex: Integer                      = MethodRef.PropertyDefaults.ArgumentIndex
   def argumentIndex: scala.Int                             = _argumentIndex
   private var _argumentName: String                        = null
-  def argumentName: Option[String]                         = Option(_argumentName)
+  def argumentName: Option[String]                         = Option(_argumentName).asInstanceOf[Option[String]]
   private var _code: String                                = MethodRef.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _methodFullName: String                      = MethodRef.PropertyDefaults.MethodFullName
   def methodFullName: String                               = _methodFullName
-  private var _order: scala.Int                            = MethodRef.PropertyDefaults.Order
+  private var _order: Integer                              = MethodRef.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -1037,7 +1037,7 @@ class MethodRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
       case "ARGUMENT_INDEX" => this._argumentIndex = value.asInstanceOf[scala.Int]
       case "ARGUMENT_NAME"  => this._argumentName = value.asInstanceOf[String]
       case "CODE"           => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"  => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -1056,7 +1056,7 @@ class MethodRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
               collection.immutable.ArraySeq.unsafeWrapArray(iter.asInstanceOf[Iterable[String]].toArray)
             } else collection.immutable.ArraySeq.empty
         }
-      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"      => this._lineNumber = value.asInstanceOf[scala.Int]
       case "METHOD_FULL_NAME" => this._methodFullName = value.asInstanceOf[String]
       case "ORDER"            => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
@@ -1094,14 +1094,20 @@ class MethodRefDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
     this._argumentIndex = newNode.asInstanceOf[NewMethodRef].argumentIndex
-    this._argumentName = newNode.asInstanceOf[NewMethodRef].argumentName.orNull
+    this._argumentName = newNode.asInstanceOf[NewMethodRef].argumentName match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewMethodRef].code
-    this._columnNumber = newNode.asInstanceOf[NewMethodRef].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewMethodRef].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewMethodRef].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewMethodRef].dynamicTypeHintFullName
       else collection.immutable.ArraySeq.empty
-    this._lineNumber = newNode.asInstanceOf[NewMethodRef].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewMethodRef].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._methodFullName = newNode.asInstanceOf[NewMethodRef].methodFullName
     this._order = newNode.asInstanceOf[NewMethodRef].order
     this._possibleTypes =

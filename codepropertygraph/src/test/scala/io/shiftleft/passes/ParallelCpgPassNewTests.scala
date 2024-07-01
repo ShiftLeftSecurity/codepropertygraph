@@ -2,7 +2,7 @@ package io.shiftleft.passes
 
 import better.files.File
 import io.shiftleft.SerializedCpg
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.generated.Properties
 import io.shiftleft.codepropertygraph.generated.nodes.{NewCall, NewFile}
 import org.scalatest.matchers.should.Matchers
@@ -16,7 +16,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
 
   private object Fixture {
     def apply(keyPools: Option[Iterator[KeyPool]] = None)(f: (Cpg, CpgPassBase) => Unit): Unit = {
-      val cpg  = Cpg.emptyCpg
+      val cpg  = Cpg.empty
       val pool = keyPools.flatMap(_.nextOption())
       class MyPass(cpg: Cpg) extends ConcurrentWriterCpgPass[String](cpg, "MyPass", pool) {
         override def generateParts(): Array[String] = Array("foo", "bar")
@@ -33,7 +33,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
   "ConcurrentWriterCpgPass" should {
     "allow creating and applying result of pass" in Fixture() { (cpg, pass) =>
       pass.createAndApply()
-      cpg.graph.nodes.map(_.property(Properties.NAME)).toSetMutable shouldBe Set("foo", "bar")
+      cpg.graph.nodes.map(_.property(Properties.Name)).toSetMutable shouldBe Set("foo", "bar")
     }
 
     "produce a serialized CPG file" in Fixture() { (_, pass) =>
@@ -56,7 +56,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
     }
 
     "fail for schema violations" in {
-      val cpg = Cpg.emptyCpg
+      val cpg = Cpg.empty
       val pass = new ConcurrentWriterCpgPass[String](cpg, "pass2") {
         override def generateParts() = Array("a", "b")
         override def runOnPart(diffGraph: DiffGraphBuilder, part: String): Unit =
@@ -83,7 +83,7 @@ class ParallelCpgPassNewTests extends AnyWordSpec with Matchers {
     }
 
     "add NewNodes that are referenced in different parts only once" in {
-      val cpg = Cpg.emptyCpg
+      val cpg = Cpg.empty
       val pass = new ConcurrentWriterCpgPass[String](cpg, "pass2") {
         val call1 = NewCall().name("call1")
         val call2 = NewCall().name("call2")

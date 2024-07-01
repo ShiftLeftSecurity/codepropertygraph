@@ -41,12 +41,12 @@ object MethodParameterIn {
   object Properties {
     val ClosureBindingId        = new overflowdb.PropertyKey[String]("CLOSURE_BINDING_ID")
     val Code                    = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber            = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
+    val ColumnNumber            = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
     val DynamicTypeHintFullName = new overflowdb.PropertyKey[IndexedSeq[String]]("DYNAMIC_TYPE_HINT_FULL_NAME")
     val EvaluationStrategy      = new overflowdb.PropertyKey[String]("EVALUATION_STRATEGY")
     val Index                   = new overflowdb.PropertyKey[scala.Int]("INDEX")
     val IsVariadic              = new overflowdb.PropertyKey[Boolean]("IS_VARIADIC")
-    val LineNumber              = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val LineNumber              = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Name                    = new overflowdb.PropertyKey[String]("NAME")
     val Order                   = new overflowdb.PropertyKey[scala.Int]("ORDER")
     val PossibleTypes           = new overflowdb.PropertyKey[IndexedSeq[String]]("POSSIBLE_TYPES")
@@ -103,12 +103,12 @@ trait MethodParameterInBase extends AbstractNode with AstNodeBase with CfgNodeBa
 
   def closureBindingId: Option[String]
   def code: String
-  def columnNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
   def dynamicTypeHintFullName: IndexedSeq[String]
   def evaluationStrategy: String
   def index: scala.Int
   def isVariadic: Boolean
-  def lineNumber: Option[Integer]
+  def lineNumber: Option[scala.Int]
   def name: String
   def order: scala.Int
   def possibleTypes: IndexedSeq[String]
@@ -125,12 +125,12 @@ class MethodParameterIn(graph_4762: Graph, id_4762: Long /*cf https://github.com
     with Declaration {
   override def closureBindingId: Option[String]            = get().closureBindingId
   override def code: String                                = get().code
-  override def columnNumber: Option[Integer]               = get().columnNumber
+  override def columnNumber: Option[scala.Int]             = get().columnNumber
   override def dynamicTypeHintFullName: IndexedSeq[String] = get().dynamicTypeHintFullName
   override def evaluationStrategy: String                  = get().evaluationStrategy
   override def index: scala.Int                            = get().index
   override def isVariadic: Boolean                         = get().isVariadic
-  override def lineNumber: Option[Integer]                 = get().lineNumber
+  override def lineNumber: Option[scala.Int]               = get().lineNumber
   override def name: String                                = get().name
   override def order: scala.Int                            = get().order
   override def possibleTypes: IndexedSeq[String]           = get().possibleTypes
@@ -321,24 +321,24 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
   override def layoutInformation: NodeLayoutInformation = MethodParameterIn.layoutInformation
 
   private var _closureBindingId: String                    = null
-  def closureBindingId: Option[String]                     = Option(_closureBindingId)
+  def closureBindingId: Option[String]                     = Option(_closureBindingId).asInstanceOf[Option[String]]
   private var _code: String                                = MethodParameterIn.PropertyDefaults.Code
   def code: String                                         = _code
   private var _columnNumber: Integer                       = null
-  def columnNumber: Option[Integer]                        = Option(_columnNumber)
+  def columnNumber: Option[scala.Int]                      = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
   private var _dynamicTypeHintFullName: IndexedSeq[String] = collection.immutable.ArraySeq.empty
   def dynamicTypeHintFullName: IndexedSeq[String]          = _dynamicTypeHintFullName
   private var _evaluationStrategy: String                  = MethodParameterIn.PropertyDefaults.EvaluationStrategy
   def evaluationStrategy: String                           = _evaluationStrategy
-  private var _index: scala.Int                            = MethodParameterIn.PropertyDefaults.Index
+  private var _index: Integer                              = MethodParameterIn.PropertyDefaults.Index
   def index: scala.Int                                     = _index
-  private var _isVariadic: Boolean                         = MethodParameterIn.PropertyDefaults.IsVariadic
+  private var _isVariadic: java.lang.Boolean               = MethodParameterIn.PropertyDefaults.IsVariadic
   def isVariadic: Boolean                                  = _isVariadic
   private var _lineNumber: Integer                         = null
-  def lineNumber: Option[Integer]                          = Option(_lineNumber)
+  def lineNumber: Option[scala.Int]                        = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
   private var _name: String                                = MethodParameterIn.PropertyDefaults.Name
   def name: String                                         = _name
-  private var _order: scala.Int                            = MethodParameterIn.PropertyDefaults.Order
+  private var _order: Integer                              = MethodParameterIn.PropertyDefaults.Order
   def order: scala.Int                                     = _order
   private var _possibleTypes: IndexedSeq[String]           = collection.immutable.ArraySeq.empty
   def possibleTypes: IndexedSeq[String]                    = _possibleTypes
@@ -517,7 +517,7 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
     key match {
       case "CLOSURE_BINDING_ID" => this._closureBindingId = value.asInstanceOf[String]
       case "CODE"               => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER"      => this._columnNumber = value.asInstanceOf[Integer]
+      case "COLUMN_NUMBER"      => this._columnNumber = value.asInstanceOf[scala.Int]
       case "DYNAMIC_TYPE_HINT_FULL_NAME" =>
         this._dynamicTypeHintFullName = value match {
           case null                                             => collection.immutable.ArraySeq.empty
@@ -539,7 +539,7 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
       case "EVALUATION_STRATEGY" => this._evaluationStrategy = value.asInstanceOf[String]
       case "INDEX"               => this._index = value.asInstanceOf[scala.Int]
       case "IS_VARIADIC"         => this._isVariadic = value.asInstanceOf[Boolean]
-      case "LINE_NUMBER"         => this._lineNumber = value.asInstanceOf[Integer]
+      case "LINE_NUMBER"         => this._lineNumber = value.asInstanceOf[scala.Int]
       case "NAME"                => this._name = value.asInstanceOf[String]
       case "ORDER"               => this._order = value.asInstanceOf[scala.Int]
       case "POSSIBLE_TYPES" =>
@@ -576,9 +576,13 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
     fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
 
   override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._closureBindingId = newNode.asInstanceOf[NewMethodParameterIn].closureBindingId.orNull
+    this._closureBindingId = newNode.asInstanceOf[NewMethodParameterIn].closureBindingId match {
+      case None => null; case Some(value) => value
+    }
     this._code = newNode.asInstanceOf[NewMethodParameterIn].code
-    this._columnNumber = newNode.asInstanceOf[NewMethodParameterIn].columnNumber.orNull
+    this._columnNumber = newNode.asInstanceOf[NewMethodParameterIn].columnNumber match {
+      case None => null; case Some(value) => value
+    }
     this._dynamicTypeHintFullName =
       if (newNode.asInstanceOf[NewMethodParameterIn].dynamicTypeHintFullName != null)
         newNode.asInstanceOf[NewMethodParameterIn].dynamicTypeHintFullName
@@ -586,7 +590,9 @@ class MethodParameterInDb(ref: NodeRef[NodeDb])
     this._evaluationStrategy = newNode.asInstanceOf[NewMethodParameterIn].evaluationStrategy
     this._index = newNode.asInstanceOf[NewMethodParameterIn].index
     this._isVariadic = newNode.asInstanceOf[NewMethodParameterIn].isVariadic
-    this._lineNumber = newNode.asInstanceOf[NewMethodParameterIn].lineNumber.orNull
+    this._lineNumber = newNode.asInstanceOf[NewMethodParameterIn].lineNumber match {
+      case None => null; case Some(value) => value
+    }
     this._name = newNode.asInstanceOf[NewMethodParameterIn].name
     this._order = newNode.asInstanceOf[NewMethodParameterIn].order
     this._possibleTypes =

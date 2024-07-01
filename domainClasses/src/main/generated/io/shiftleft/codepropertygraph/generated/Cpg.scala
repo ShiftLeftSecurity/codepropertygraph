@@ -47,6 +47,7 @@ object Cpg {
       case other                                            => other
     }
 
+  def newDiffGraphBuilder: DiffGraphBuilder = new DiffGraphBuilder
 }
 
 /** Domain-specific wrapper for graph, starting point for traversals.

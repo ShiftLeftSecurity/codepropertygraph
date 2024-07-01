@@ -11,8 +11,8 @@ object CfgNode {
 
   object Properties {
     val Code         = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber = new overflowdb.PropertyKey[Integer]("COLUMN_NUMBER")
-    val LineNumber   = new overflowdb.PropertyKey[Integer]("LINE_NUMBER")
+    val ColumnNumber = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
+    val LineNumber   = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
     val Order        = new overflowdb.PropertyKey[scala.Int]("ORDER")
   }
 
@@ -30,19 +30,19 @@ object CfgNode {
 
 trait CfgNodeBase extends AbstractNode with AstNodeBase {
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
 }
 
 trait CfgNodeNew extends NewNode with AstNodeNew {
   def code_=(value: String): Unit
-  def columnNumber_=(value: Option[Integer]): Unit
-  def lineNumber_=(value: Option[Integer]): Unit
+  def columnNumber_=(value: Option[scala.Int]): Unit
+  def lineNumber_=(value: Option[scala.Int]): Unit
   def order_=(value: scala.Int): Unit
   def code: String
-  def columnNumber: Option[Integer]
-  def lineNumber: Option[Integer]
+  def columnNumber: Option[scala.Int]
+  def lineNumber: Option[scala.Int]
   def order: scala.Int
 }
 

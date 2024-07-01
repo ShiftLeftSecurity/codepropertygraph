@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.cpgloading
 
 import com.google.protobuf.GeneratedMessageV3
-import io.shiftleft.codepropertygraph.Cpg
+import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge
 import io.shiftleft.proto.cpg.Cpg.CpgStruct.Edge.EdgeType
 import io.shiftleft.proto.cpg.Cpg.{CpgOverlay, CpgStruct}
