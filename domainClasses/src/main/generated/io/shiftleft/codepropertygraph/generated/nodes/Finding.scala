@@ -2,6 +2,7 @@ package io.shiftleft.codepropertygraph.generated.nodes
 
 import io.shiftleft.codepropertygraph.generated.language.*
 import scala.collection.immutable.{IndexedSeq, ArraySeq}
+import scala.collection.mutable
 
 /** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
   * erased at runtime
@@ -62,7 +63,71 @@ object NewFinding {
   def apply(): NewFinding                            = new NewFinding
   private val outNeighbors: Map[String, Set[String]] = Map()
   private val inNeighbors: Map[String, Set[String]]  = Map()
+
+  object InsertionHelpers {
+    object NewNodeInserter_Finding_evidence extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[flatgraph.GNode]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewFinding =>
+              for (item <- generated.evidence) {
+                dstCast(offset) = item match {
+                  case newV: flatgraph.DNode => newV.storedRef.get; case oldV: flatgraph.GNode => oldV;
+                  case null                  => null
+                }
+                offset += 1
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Finding_keyValuePairs extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[flatgraph.GNode]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewFinding =>
+              for (item <- generated.keyValuePairs) {
+                dstCast(offset) = item match {
+                  case newV: flatgraph.DNode => newV.storedRef.get; case oldV: flatgraph.GNode => oldV;
+                  case null                  => null
+                }
+                offset += 1
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+  }
 }
+
 class NewFinding extends NewNode(15.toShort) with FindingBase {
   override type StoredNodeType = Finding
   override def label: String = "FINDING"
@@ -80,9 +145,11 @@ class NewFinding extends NewNode(15.toShort) with FindingBase {
   def keyValuePairs(value: IterableOnce[KeyValuePairBase]): this.type = {
     this.keyValuePairs = value.iterator.to(ArraySeq); this
   }
-  override def flattenProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    if (evidence.nonEmpty) interface.insertProperty(this, 55, this.evidence)
-    if (keyValuePairs.nonEmpty) interface.insertProperty(this, 56, this.keyValuePairs)
+  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.countProperty(this, 55, evidence.size)
+    evidence.foreach(interface.visitContainedNode)
+    interface.countProperty(this, 56, keyValuePairs.size)
+    keyValuePairs.foreach(interface.visitContainedNode)
   }
 
   override def copy(): this.type = {
