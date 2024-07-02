@@ -30,7 +30,7 @@ object Tag {
     /** This property denotes a string value as used in a key-value pair. */
     val Value = "VALUE"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")

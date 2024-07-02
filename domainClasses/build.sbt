@@ -1,9 +1,8 @@
 name := "codepropertygraph-domain-classes"
 
 libraryDependencies ++= Seq(
-  // TODO change org back to io.joern, only changed temporarily so I can debug something on jenkins
-  "com.michaelpollmeier" %% "flatgraph-core" % Versions.flatgraph,
-  "com.michaelpollmeier" %% "flatgraph-help" % Versions.flatgraph,
+  "io.joern" %% "flatgraph-core" % Versions.flatgraph,
+  "io.joern" %% "flatgraph-help" % Versions.flatgraph,
 )
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")

@@ -38,7 +38,7 @@ object Type {
       */
     val TypeDeclFullName = "TYPE_DECL_FULL_NAME"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.

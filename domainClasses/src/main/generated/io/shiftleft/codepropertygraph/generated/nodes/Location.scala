@@ -71,7 +71,7 @@ object Location {
     val Symbol = "SYMBOL"
     val Node   = "node"
   }
-  object PropertyKeys {
+  object Properties {
     val ClassName      = flatgraph.SinglePropertyKey[String](kind = 6, name = "CLASS_NAME", default = "<empty>")
     val ClassShortName = flatgraph.SinglePropertyKey[String](kind = 7, name = "CLASS_SHORT_NAME", default = "<empty>")
 

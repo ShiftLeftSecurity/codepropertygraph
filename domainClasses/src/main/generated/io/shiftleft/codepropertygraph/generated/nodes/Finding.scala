@@ -27,7 +27,7 @@ object Finding {
     val Evidence      = "evidence"
     val Keyvaluepairs = "keyValuePairs"
   }
-  object PropertyKeys     {}
+  object Properties       {}
   object PropertyDefaults {}
 }
 

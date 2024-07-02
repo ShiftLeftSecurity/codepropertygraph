@@ -36,7 +36,7 @@ object Dependency {
       */
     val Version = "VERSION"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** The group ID for a dependency */
     val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 16, name = "DEPENDENCY_GROUP_ID")

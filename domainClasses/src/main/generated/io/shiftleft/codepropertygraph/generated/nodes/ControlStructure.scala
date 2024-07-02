@@ -69,7 +69,7 @@ object ControlStructure {
     /** AST node type name emitted by parser. */
     val ParserTypeName = "PARSER_TYPE_NAME"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
       * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this

@@ -1,7 +1,6 @@
 name := "codepropertygraph-schema"
 
-// TODO change org back to io.joern, only changed temporarily so I can debug something on jenkins
-libraryDependencies += "com.michaelpollmeier" %% "flatgraph-domain-classes-generator" % Versions.flatgraph
+libraryDependencies += "io.joern" %% "flatgraph-domain-classes-generator" % Versions.flatgraph
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 enablePlugins(FlatgraphCodegenSbtPlugin)

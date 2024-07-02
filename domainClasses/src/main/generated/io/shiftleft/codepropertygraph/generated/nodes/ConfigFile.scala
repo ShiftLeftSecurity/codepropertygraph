@@ -32,7 +32,7 @@ object ConfigFile {
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = "NAME"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
       * contains the files content.

@@ -27,7 +27,7 @@ object TagNodePair {
     val Node = "node"
     val Tag  = "tag"
   }
-  object PropertyKeys     {}
+  object Properties       {}
   object PropertyDefaults {}
 }
 

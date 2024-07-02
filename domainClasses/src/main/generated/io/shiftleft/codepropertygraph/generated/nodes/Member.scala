@@ -83,7 +83,7 @@ object Member {
       */
     val TypeFullName = "TYPE_FULL_NAME"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** This field holds the FULL_NAME of the AST parent of an entity. */
     val AstParentFullName =

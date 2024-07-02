@@ -4,5 +4,4 @@ addSbtPlugin("com.github.sbt"    % "sbt-findbugs"         % "2.0.0")
 addSbtPlugin("io.shiftleft"      % "sbt-ci-release-early" % "2.0.18")
 addSbtPlugin("com.dwijnand"      % "sbt-dynver"           % "4.1.1")
 addSbtPlugin("com.typesafe.sbt"  % "sbt-native-packager"  % "1.3.5")
-// TODO change org back to io.joern, only changed temporarily so I can debug something on jenkins
-addSbtPlugin("com.michaelpollmeier"          % "sbt-flatgraph"        % Versions.flatgraph)
+addSbtPlugin("io.joern"          % "sbt-flatgraph"        % Versions.flatgraph)
