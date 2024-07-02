@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{SchemaBuilder, SchemaInfo}
 
 object Pdg extends SchemaBase {
 
@@ -50,7 +50,7 @@ object Pdg extends SchemaBase {
             |""".stripMargin
       )
       .protoId(137)
-      .addProperties(variable)
+      .withProperty(variable)
 
     literal
       .addOutEdge(edge = cdg, inNode = callNode)

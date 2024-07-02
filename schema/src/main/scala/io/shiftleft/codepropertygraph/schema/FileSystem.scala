@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object FileSystem extends SchemaBase {
 
@@ -106,6 +106,7 @@ object FileSystem extends SchemaBase {
       )
       .protoId(38)
       .addProperties(name, hash, content)
+      .primaryKey(name)
 
     val offset = builder
       .addProperty(

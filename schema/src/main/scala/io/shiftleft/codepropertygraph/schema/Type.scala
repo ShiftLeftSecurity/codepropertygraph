@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{NodeType, SchemaBuilder, SchemaInfo}
 
 object Type extends SchemaBase {
 
@@ -112,6 +112,7 @@ object Type extends SchemaBase {
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .addProperties(astParentType, astParentFullName)
       .addProperties(offset, offsetEnd)
+      .primaryKey(name)
 
     val typeParameter: NodeType = builder
       .addNodeType(
@@ -150,6 +151,7 @@ object Type extends SchemaBase {
       .addProperties(typeFullName)
       .addProperties(astParentType, astParentFullName)
       .extendz(declaration)
+      .primaryKey(name)
 
     val tpe: NodeType = builder
       .addNodeType(
@@ -160,6 +162,7 @@ object Type extends SchemaBase {
       .protoId(45)
       .addProperties(name, fullName, typeDeclFullName)
       .starterName("typ")
+      .primaryKey(name)
 
     // edges
 

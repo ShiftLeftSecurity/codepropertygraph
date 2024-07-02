@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +13,6 @@ public static final String BY_SHARING = "BY_SHARING";
 
 /** A parameter or return of a function passed by value which means a flat copy is used */
 public static final String BY_VALUE = "BY_VALUE";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(BY_REFERENCE);

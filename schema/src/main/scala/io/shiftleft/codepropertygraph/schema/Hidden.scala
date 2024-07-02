@@ -1,7 +1,7 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
 
 object Hidden extends SchemaBase {
   override def docIndex: Int = -1
@@ -148,6 +148,7 @@ object Hidden extends SchemaBase {
       .addNodeType(name = "DEPENDENCY", comment = "This node represents a dependency")
       .protoId(35)
       .addProperties(version, name, dependencyGroupId)
+      .primaryKey(name)
 
     /*
      * Type hints
@@ -278,6 +279,14 @@ object Hidden extends SchemaBase {
     block.addOutEdge(edge = ast, inNode = importNode)
     file.addOutEdge(edge = ast, inNode = importNode)
     typeDecl.addOutEdge(edge = ast, inNode = importNode)
+
+    val secondaryId = builder.addProperty(
+      name = "SECONDARY_ID",
+      ValueType.String,
+      comment = """ID from a different context, e.g. if the graph was imported from a different format,
+        |we can use this to preserve the link to the original""".stripMargin
+    )
+
   }
 
 }

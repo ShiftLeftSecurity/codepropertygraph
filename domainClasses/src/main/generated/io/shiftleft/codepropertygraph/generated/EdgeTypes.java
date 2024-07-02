@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -106,7 +103,6 @@ public static final String SOURCE_FILE = "SOURCE_FILE";
 
 /** Edges from nodes to the tags they are tagged by. */
 public static final String TAGGED_BY = "TAGGED_BY";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(ALIAS_OF);
