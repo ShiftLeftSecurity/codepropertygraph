@@ -30,7 +30,7 @@ object KeyValuePair {
     /** This property denotes a string value as used in a key-value pair. */
     val Value = "VALUE"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** This property denotes a key of a key-value pair. */
     val Key = flatgraph.SinglePropertyKey[String](kind = 32, name = "KEY", default = "<empty>")

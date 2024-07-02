@@ -40,7 +40,7 @@ object Binding {
       */
     val Signature = "SIGNATURE"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
       * for each METHOD_FULL_NAME

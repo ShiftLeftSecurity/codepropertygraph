@@ -50,7 +50,7 @@ object JumpLabel {
     /** AST node type name emitted by parser. */
     val ParserTypeName = "PARSER_TYPE_NAME"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** This field holds the code snippet that the node represents. */
     val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")

@@ -45,7 +45,7 @@ object ClosureBinding {
       */
     val EvaluationStrategy = "EVALUATION_STRATEGY"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
       * the corresponding CLOSURE_BINDING nodes

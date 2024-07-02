@@ -60,7 +60,7 @@ object File {
       */
     val Order = "ORDER"
   }
-  object PropertyKeys {
+  object Properties {
 
     /** This field holds the code snippet that the node represents. */
     val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")

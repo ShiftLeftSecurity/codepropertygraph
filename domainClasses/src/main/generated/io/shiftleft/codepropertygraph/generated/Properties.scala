@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.generated
 
-object PropertyKeys {
+object Properties {
 
   /** This property holds the fully qualified name of the type that the node is a type alias of.
     */
