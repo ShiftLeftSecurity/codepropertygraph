@@ -3,8 +3,8 @@ package io.shiftleft.codepropertygraph
 import flatgraph.help.DocSearchPackages
 import flatgraph.help.Table.{AvailableWidthProvider, ConstantWidth}
 import io.shiftleft.codepropertygraph.generated
-import io.shiftleft.codepropertygraph.generated.nodes.*
 import io.shiftleft.codepropertygraph.generated.language.*
+import io.shiftleft.codepropertygraph.generated.nodes.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
