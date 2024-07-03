@@ -1,7 +1,6 @@
 name := "codepropertygraph-schema"
 
-// TODO change back to io.shiftleft after official releases are fixed, this is only temporary!
-libraryDependencies += "com.michaelpollmeier" %% "overflowdb-codegen" % Versions.overflowdbCodegen
+libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % Versions.overflowdbCodegen
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
 enablePlugins(OdbCodegenSbtPlugin)
