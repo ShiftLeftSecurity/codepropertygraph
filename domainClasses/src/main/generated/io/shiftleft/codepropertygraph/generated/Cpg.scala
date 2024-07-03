@@ -64,6 +64,11 @@ class CpgNodeStarters(val wrappedCpg: Cpg) {
   @flatgraph.help.Doc(info = "all nodes")
   def all: Iterator[nodes.StoredNode] = wrappedCpg.graph.allNodes.asInstanceOf[Iterator[nodes.StoredNode]]
 
+  def id(nodeId: Long): Iterator[nodes.StoredNode] =
+    Option(wrappedCpg.graph.node(nodeId)).iterator.asInstanceOf[Iterator[nodes.StoredNode]]
+
+  def ids(nodeIds: Long*): Iterator[nodes.StoredNode] = nodeIds.iterator.flatMap(id)
+
   /** A method annotation. The semantics of the FULL_NAME property on this node differ from the usual FULL_NAME
     * semantics in the sense that FULL_NAME describes the represented annotation class/interface itself and not the
     * ANNOTATION node.
