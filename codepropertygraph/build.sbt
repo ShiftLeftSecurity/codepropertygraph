@@ -4,6 +4,7 @@ dependsOn(Projects.protoBindings, Projects.domainClasses)
 
 libraryDependencies ++= Seq(
   "io.joern"              %% "flatgraph-formats"     % Versions.flatgraph,
+  "io.joern"              %% "flatgraph-help"        % Versions.flatgraph,
   "io.joern"              %% "flatgraph-odb-convert" % Versions.flatgraph,
   "com.github.scopt"      %% "scopt"                % "4.0.1",
   "com.github.pathikrit"  %% "better-files"         % "3.9.2",
