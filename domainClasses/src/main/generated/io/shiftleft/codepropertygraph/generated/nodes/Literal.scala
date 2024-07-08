@@ -1703,7 +1703,7 @@ class NewLiteral extends NewNode(21.toShort) with LiteralBase with ExpressionNew
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewLiteral
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

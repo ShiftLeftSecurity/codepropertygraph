@@ -1514,7 +1514,7 @@ class NewModifier extends NewNode(31.toShort) with ModifierBase with AstNodeNew 
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewModifier
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

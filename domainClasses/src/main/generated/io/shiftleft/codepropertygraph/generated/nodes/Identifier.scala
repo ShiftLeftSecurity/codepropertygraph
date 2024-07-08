@@ -1742,7 +1742,7 @@ class NewIdentifier extends NewNode(16.toShort) with IdentifierBase with Express
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewIdentifier
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

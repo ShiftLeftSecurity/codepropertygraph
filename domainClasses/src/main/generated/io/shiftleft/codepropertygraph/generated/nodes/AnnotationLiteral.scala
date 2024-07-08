@@ -1606,7 +1606,7 @@ class NewAnnotationLiteral extends NewNode(1.toShort) with AnnotationLiteralBase
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewAnnotationLiteral
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

@@ -1472,7 +1472,7 @@ class NewTypeArgument extends NewNode(39.toShort) with TypeArgumentBase with Ast
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewTypeArgument
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

@@ -1510,7 +1510,7 @@ class NewNamespace extends NewNode(32.toShort) with NamespaceBase with AstNodeNe
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewNamespace
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

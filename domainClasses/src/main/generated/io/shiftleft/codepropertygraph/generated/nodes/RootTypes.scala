@@ -140,5 +140,5 @@ abstract class NewNode(val nodeKind: Short) extends AbstractNode with flatgraph.
     stored.orNull.asInstanceOf[StoredNodeType]
   def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean
   def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean
-  def copy(): this.type
+  def copy: this.type
 }

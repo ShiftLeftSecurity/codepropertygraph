@@ -1602,7 +1602,7 @@ class NewFile extends NewNode(14.toShort) with FileBase with AstNodeNew {
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewFile
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

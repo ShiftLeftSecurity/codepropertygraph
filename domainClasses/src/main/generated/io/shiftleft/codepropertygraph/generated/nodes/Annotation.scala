@@ -1648,7 +1648,7 @@ class NewAnnotation extends NewNode(0.toShort) with AnnotationBase with Expressi
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewAnnotation
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

@@ -1548,7 +1548,7 @@ class NewJumpLabel extends NewNode(18.toShort) with JumpLabelBase with AstNodeNe
     interface.countProperty(this, 46, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewJumpLabel
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

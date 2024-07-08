@@ -1746,7 +1746,7 @@ class NewMethodRef extends NewNode(29.toShort) with MethodRefBase with Expressio
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewMethodRef
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

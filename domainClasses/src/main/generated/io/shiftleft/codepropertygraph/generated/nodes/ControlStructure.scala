@@ -1651,7 +1651,7 @@ class NewControlStructure extends NewNode(11.toShort) with ControlStructureBase 
     interface.countProperty(this, 46, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewControlStructure
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

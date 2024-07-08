@@ -1518,7 +1518,7 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewComment
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

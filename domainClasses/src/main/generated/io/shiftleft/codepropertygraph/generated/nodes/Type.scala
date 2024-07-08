@@ -215,7 +215,7 @@ class NewType extends NewNode(38.toShort) with TypeBase {
     interface.countProperty(this, 51, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewType
     newInstance.fullName = this.fullName
     newInstance.name = this.name

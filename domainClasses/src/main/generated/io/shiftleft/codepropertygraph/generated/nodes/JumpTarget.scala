@@ -1598,7 +1598,7 @@ class NewJumpTarget extends NewNode(19.toShort) with JumpTargetBase with AstNode
     interface.countProperty(this, 46, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewJumpTarget
     newInstance.argumentIndex = this.argumentIndex
     newInstance.code = this.code

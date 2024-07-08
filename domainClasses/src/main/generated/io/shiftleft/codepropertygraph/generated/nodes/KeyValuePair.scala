@@ -148,7 +148,7 @@ class NewKeyValuePair extends NewNode(20.toShort) with KeyValuePairBase {
     interface.countProperty(this, 53, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewKeyValuePair
     newInstance.key = this.key
     newInstance.value = this.value

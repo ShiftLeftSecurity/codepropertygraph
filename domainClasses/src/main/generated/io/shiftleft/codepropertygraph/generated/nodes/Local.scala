@@ -1694,7 +1694,7 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewLocal
     newInstance.closureBindingId = this.closureBindingId
     newInstance.code = this.code

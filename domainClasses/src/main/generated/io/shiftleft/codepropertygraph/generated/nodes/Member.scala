@@ -1730,7 +1730,7 @@ class NewMember extends NewNode(24.toShort) with MemberBase with AstNodeNew with
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewMember
     newInstance.astParentFullName = this.astParentFullName
     newInstance.astParentType = this.astParentType

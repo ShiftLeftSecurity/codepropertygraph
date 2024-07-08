@@ -467,7 +467,7 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
     node.foreach(interface.visitContainedNode)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewLocation
     newInstance.className = this.className
     newInstance.classShortName = this.classShortName

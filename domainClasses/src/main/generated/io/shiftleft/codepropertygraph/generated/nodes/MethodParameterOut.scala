@@ -1704,7 +1704,7 @@ class NewMethodParameterOut
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewMethodParameterOut
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

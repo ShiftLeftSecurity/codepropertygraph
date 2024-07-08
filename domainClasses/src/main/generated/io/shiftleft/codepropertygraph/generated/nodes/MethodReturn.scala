@@ -1657,7 +1657,7 @@ class NewMethodReturn extends NewNode(30.toShort) with MethodReturnBase with Cfg
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewMethodReturn
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

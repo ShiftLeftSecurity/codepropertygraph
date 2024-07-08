@@ -1568,7 +1568,7 @@ class NewArrayInitializer extends NewNode(4.toShort) with ArrayInitializerBase w
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewArrayInitializer
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

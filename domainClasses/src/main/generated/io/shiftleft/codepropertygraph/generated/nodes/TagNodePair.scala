@@ -143,7 +143,7 @@ class NewTagNodePair extends NewNode(36.toShort) with TagNodePairBase {
     interface.visitContainedNode(tag)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewTagNodePair
     newInstance.node = this.node
     newInstance.tag = this.tag

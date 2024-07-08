@@ -198,7 +198,7 @@ class NewBinding extends NewNode(5.toShort) with BindingBase {
     interface.countProperty(this, 49, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewBinding
     newInstance.methodFullName = this.methodFullName
     newInstance.name = this.name

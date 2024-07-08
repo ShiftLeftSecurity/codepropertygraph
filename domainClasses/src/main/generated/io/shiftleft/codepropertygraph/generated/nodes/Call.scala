@@ -1879,7 +1879,7 @@ class NewCall extends NewNode(7.toShort) with CallBase with CallReprNew with Exp
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewCall
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

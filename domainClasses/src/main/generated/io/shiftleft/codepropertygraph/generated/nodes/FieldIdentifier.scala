@@ -1616,7 +1616,7 @@ class NewFieldIdentifier extends NewNode(13.toShort) with FieldIdentifierBase wi
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewFieldIdentifier
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

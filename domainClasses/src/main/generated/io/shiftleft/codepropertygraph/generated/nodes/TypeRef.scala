@@ -1703,7 +1703,7 @@ class NewTypeRef extends NewNode(42.toShort) with TypeRefBase with ExpressionNew
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewTypeRef
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

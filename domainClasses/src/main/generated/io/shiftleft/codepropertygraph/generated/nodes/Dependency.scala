@@ -194,7 +194,7 @@ class NewDependency extends NewNode(12.toShort) with DependencyBase {
     interface.countProperty(this, 54, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewDependency
     newInstance.dependencyGroupId = this.dependencyGroupId
     newInstance.name = this.name

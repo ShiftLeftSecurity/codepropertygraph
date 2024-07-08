@@ -152,7 +152,7 @@ class NewConfigFile extends NewNode(10.toShort) with ConfigFileBase {
     interface.countProperty(this, 39, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewConfigFile
     newInstance.content = this.content
     newInstance.name = this.name

@@ -1703,7 +1703,7 @@ class NewBlock extends NewNode(6.toShort) with BlockBase with ExpressionNew {
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewBlock
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

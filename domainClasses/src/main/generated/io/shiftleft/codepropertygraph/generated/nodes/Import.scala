@@ -1713,7 +1713,7 @@ class NewImport extends NewNode(17.toShort) with ImportBase with AstNodeNew {
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewImport
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber

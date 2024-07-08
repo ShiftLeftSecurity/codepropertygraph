@@ -1839,7 +1839,7 @@ class NewMethodParameterIn
     interface.countProperty(this, 52, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewMethodParameterIn
     newInstance.closureBindingId = this.closureBindingId
     newInstance.code = this.code

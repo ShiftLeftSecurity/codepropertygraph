@@ -1568,7 +1568,7 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewReturn
     newInstance.argumentIndex = this.argumentIndex
     newInstance.argumentName = this.argumentName

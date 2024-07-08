@@ -173,7 +173,7 @@ class NewTag extends NewNode(35.toShort) with TagBase {
     interface.countProperty(this, 53, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewTag
     newInstance.name = this.name
     newInstance.value = this.value

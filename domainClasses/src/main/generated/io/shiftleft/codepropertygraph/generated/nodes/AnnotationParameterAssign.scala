@@ -1475,7 +1475,7 @@ class NewAnnotationParameterAssign extends NewNode(3.toShort) with AnnotationPar
     interface.countProperty(this, 43, 1)
   }
 
-  override def copy(): this.type = {
+  override def copy: this.type = {
     val newInstance = new NewAnnotationParameterAssign
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
