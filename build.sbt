@@ -5,9 +5,7 @@ val flatgraphVersion = "0.0.77"
 
 inThisBuild(
   List(
-    // TODO back to shiftleft, only changed temporarily so I can debug something on jenkins
-    // organization       := "io.shiftleft",
-    organization       := "com.michaelpollmeier",
+    organization       := "io.shiftleft",
     scalaVersion       := "3.4.2",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
