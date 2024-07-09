@@ -4,6 +4,12 @@ trait StaticType[+T]
 
 trait AbstractNode extends flatgraph.DNodeOrNode with StaticType[AnyRef] with Product {
   def label: String
+
+  def properties: Map[String, Any] = {
+    scala.jdk.CollectionConverters.MapHasAsScala(propertiesMap).asScala.toMap
+  }
+
+  /** TODO deprecate and phase out */
   def propertiesMap: java.util.Map[String, Any]
 }
 
