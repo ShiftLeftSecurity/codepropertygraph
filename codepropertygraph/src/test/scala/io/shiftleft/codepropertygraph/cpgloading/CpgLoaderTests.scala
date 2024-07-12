@@ -46,7 +46,8 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
   "allow loading of CPG in flatgraph format" in {
     val flatgraphCpg = ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.fg")
     Using.resource(CpgLoader.load(flatgraphCpg)) { cpg =>
-      cpg.graph.nodes("METHOD").size shouldBe 7
+      // the test graph was created by c2cpg for https://github.com/joernio/joern/blob/master/tests/code/c/test.c
+      cpg.graph.nodes("METHOD").size shouldBe 4
     }
   }
 
@@ -59,12 +60,12 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     }
 
     Using.resource(CpgLoader.load(persistTo)) { cpg =>
-      cpg.graph.nodes("METHOD").size shouldBe 8
+      cpg.graph.nodes("METHOD").size shouldBe 5
     }
 
     Using.resource(CpgLoader.load(flatgraphCpg)) { cpg =>
       // original cpg should be unchanged
-      cpg.graph.nodes("METHOD").size shouldBe 7
+      cpg.graph.nodes("METHOD").size shouldBe 4
     }
   }
 

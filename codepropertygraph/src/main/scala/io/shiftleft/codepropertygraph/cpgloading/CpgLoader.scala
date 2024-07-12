@@ -65,10 +65,13 @@ object CpgLoader {
       ProtoCpgLoader.loadFromProtoZip(absolutePath.toString, Option(persistTo))
     } else if (isOverflowDbFormat(absolutePath)) {
       loadFromOverflowDb(absolutePath, persistTo)
-    } else {
-      // assuming it's flatgraph format
+    } else if (isFlatgraphFormat(absolutePath)) {
       Files.copy(absolutePath, persistTo)
       Cpg.withStorage(persistTo)
+    } else {
+      throw new AssertionError(
+        s"unknown file format - we probed the first bytes but it didn't look like one of our known formats (proto.zip, flatgraph, overflowdb)"
+      )
     }
   }
 
@@ -83,10 +86,13 @@ object CpgLoader {
   def isOverflowDbFormat(path: Path): Boolean =
     probeFirstBytes(path, "H:2")
 
+  def isFlatgraphFormat(path: Path): Boolean =
+    probeFirstBytes(path, "FLT GRPH") // flatgraph.storage.MagicBytesString
+
   /** Load Code Property Graph from an overflow DB file, by first converting it into a flatgraph binary */
   def loadFromOverflowDb(path: Path, persistTo: Path): Cpg = {
     logger.info(s"Converting $path from overflowdb to new flatgraph storage: $persistTo")
-    flatgraph.convert.Convert(overflowDbFile = path, outputFile = persistTo)
+    flatgraph.convert.Convert.convertOdbToFlatgraph(overflowDbFile = path, outputFile = persistTo)
     Cpg.withStorage(persistTo)
   }
 
