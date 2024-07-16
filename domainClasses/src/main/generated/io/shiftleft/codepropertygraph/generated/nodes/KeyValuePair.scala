@@ -1,187 +1,175 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+import scala.collection.mutable
+
+/** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
+  * erased at runtime
+  */
+trait KeyValuePairEMT extends AnyRef with HasKeyEMT with HasValueEMT
+
+trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
+    val res = new java.util.HashMap[String, Any]()
+    if (("<empty>": String) != this.key) res.put("KEY", this.key)
+    if (("": String) != this.value) res.put("VALUE", this.value)
+    res
+  }
+}
 
 object KeyValuePair {
-  def apply(graph: Graph, id: Long) = new KeyValuePair(graph, id)
-
   val Label = "KEY_VALUE_PAIR"
-
   object PropertyNames {
-    val Key                              = "KEY"
-    val Value                            = "VALUE"
-    val all: Set[String]                 = Set(Key, Value)
-    val allAsJava: java.util.Set[String] = all.asJava
-  }
 
+    /** This property denotes a key of a key-value pair. */
+    val Key = "KEY"
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = "VALUE"
+  }
   object Properties {
-    val Key   = new overflowdb.PropertyKey[String]("KEY")
-    val Value = new overflowdb.PropertyKey[String]("VALUE")
 
+    /** This property denotes a key of a key-value pair. */
+    val Key = flatgraph.SinglePropertyKey[String](kind = 32, name = "KEY", default = "<empty>")
+
+    /** This property denotes a string value as used in a key-value pair. */
+    val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
   }
-
   object PropertyDefaults {
     val Key   = "<empty>"
     val Value = ""
   }
-
-  val layoutInformation = new NodeLayoutInformation(Label, PropertyNames.allAsJava, List().asJava, List().asJava)
-
-  object Edges {
-    val Out: Array[String] = Array()
-    val In: Array[String]  = Array()
-  }
-
-  val factory = new NodeFactory[KeyValuePairDb] {
-    override val forLabel = KeyValuePair.Label
-
-    override def createNode(ref: NodeRef[KeyValuePairDb]) =
-      new KeyValuePairDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = KeyValuePair(graph, id)
-  }
 }
 
-trait KeyValuePairBase extends AbstractNode {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def key: String
-  def value: String
-
-}
-
-class KeyValuePair(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[KeyValuePairDb](graph_4762, id_4762)
+class KeyValuePair(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 20.toShort, seq_4762)
     with KeyValuePairBase
-    with StoredNode {
-  override def key: String   = get().key
-  override def value: String = get().value
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "KEY"   => KeyValuePair.PropertyDefaults.Key
-      case "VALUE" => KeyValuePair.PropertyDefaults.Value
-      case _       => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    KeyValuePair.Label
-  }
+    with StaticType[KeyValuePairEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "key"
-      case 2 => "value"
+      case 0 => "key"
+      case 1 => "value"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => key
-      case 2 => value
-    }
-
-  override def productPrefix = "KeyValuePair"
-  override def productArity  = 3
-}
-
-class KeyValuePairDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with KeyValuePairBase {
-
-  override def layoutInformation: NodeLayoutInformation = KeyValuePair.layoutInformation
-
-  private var _key: String   = KeyValuePair.PropertyDefaults.Key
-  def key: String            = _key
-  private var _value: String = KeyValuePair.PropertyDefaults.Value
-  def value: String          = _value
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    properties.put("KEY", key)
-    properties.put("VALUE", value)
-
-    properties
-  }
-
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    if (!(("<empty>") == key)) { properties.put("KEY", key) }
-    if (!(("") == value)) { properties.put("VALUE", value) }
-
-    properties
-  }
-
-  import overflowdb.traversal._
-
-  override def label: String = {
-    KeyValuePair.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "key"
-      case 2 => "value"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => key
-      case 2 => value
-    }
-
-  override def productPrefix = "KeyValuePair"
-  override def productArity  = 3
-
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[KeyValuePairDb]
-
-  override def property(key: String): Any = {
-    key match {
-      case "KEY"   => this._key
-      case "VALUE" => this._value
-
+      case 0 => this.key
+      case 1 => this.value
       case _ => null
     }
-  }
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "KEY"   => this._key = value.asInstanceOf[String]
-      case "VALUE" => this._value = value.asInstanceOf[String]
+  override def productPrefix = "KeyValuePair"
+  override def productArity  = 2
 
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[KeyValuePair]
+}
+
+object NewKeyValuePair {
+  def apply(): NewKeyValuePair                       = new NewKeyValuePair
+  private val outNeighbors: Map[String, Set[String]] = Map()
+  private val inNeighbors: Map[String, Set[String]]  = Map()
+
+  object InsertionHelpers {
+    object NewNodeInserter_KeyValuePair_key extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewKeyValuePair =>
+              dstCast(offset) = generated.key
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_KeyValuePair_value extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewKeyValuePair =>
+              dstCast(offset) = generated.value
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
     }
   }
+}
 
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
+class NewKeyValuePair extends NewNode(20.toShort) with KeyValuePairBase {
+  override type StoredNodeType = KeyValuePair
+  override def label: String = "KEY_VALUE_PAIR"
 
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._key = newNode.asInstanceOf[NewKeyValuePair].key
-    this._value = newNode.asInstanceOf[NewKeyValuePair].value
-
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewKeyValuePair.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewKeyValuePair.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
+  var key: String                     = "<empty>": String
+  var value: String                   = "": String
+  def key(value: String): this.type   = { this.key = value; this }
+  def value(value: String): this.type = { this.value = value; this }
+  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.countProperty(this, 32, 1)
+    interface.countProperty(this, 53, 1)
+  }
+
+  override def copy: this.type = {
+    val newInstance = new NewKeyValuePair
+    newInstance.key = this.key
+    newInstance.value = this.value
+    newInstance.asInstanceOf[this.type]
+  }
+
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "key"
+      case 1 => "value"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.key
+      case 1 => this.value
+      case _ => null
+    }
+
+  override def productPrefix                = "NewKeyValuePair"
+  override def productArity                 = 2
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewKeyValuePair]
 }

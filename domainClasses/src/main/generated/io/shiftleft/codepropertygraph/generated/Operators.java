@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -226,7 +223,6 @@ public static final String tryCatch = "<operator>.tryCatch";
 
 /** Allocates memory for an object of a specific type */
 public static final String alloc = "<operator>.alloc";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(addition);

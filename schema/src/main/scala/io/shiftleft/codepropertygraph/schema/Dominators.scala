@@ -1,6 +1,6 @@
 package io.shiftleft.codepropertygraph.schema
 
-import overflowdb.schema.{SchemaBuilder, SchemaInfo}
+import flatgraph.schema.{SchemaBuilder, SchemaInfo}
 
 object Dominators extends SchemaBase {
 

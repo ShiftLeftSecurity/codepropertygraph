@@ -1,187 +1,179 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+import scala.collection.mutable
+
+/** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
+  * erased at runtime
+  */
+trait ConfigFileEMT extends AnyRef with HasContentEMT with HasNameEMT
+
+trait ConfigFileBase extends AbstractNode with StaticType[ConfigFileEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
+    val res = new java.util.HashMap[String, Any]()
+    if (("<empty>": String) != this.content) res.put("CONTENT", this.content)
+    if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    res
+  }
+}
 
 object ConfigFile {
-  def apply(graph: Graph, id: Long) = new ConfigFile(graph, id)
-
   val Label = "CONFIG_FILE"
-
   object PropertyNames {
-    val Content                          = "CONTENT"
-    val Name                             = "NAME"
-    val all: Set[String]                 = Set(Content, Name)
-    val allAsJava: java.util.Set[String] = all.asJava
-  }
 
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = "CONTENT"
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = "NAME"
+  }
   object Properties {
-    val Content = new overflowdb.PropertyKey[String]("CONTENT")
-    val Name    = new overflowdb.PropertyKey[String]("NAME")
 
+    /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
+      * contains the files content.
+      */
+    val Content = flatgraph.SinglePropertyKey[String](kind = 14, name = "CONTENT", default = "<empty>")
+
+    /** Name of represented object, e.g., method name (e.g. "run") */
+    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
   }
-
   object PropertyDefaults {
     val Content = "<empty>"
     val Name    = "<empty>"
   }
-
-  val layoutInformation = new NodeLayoutInformation(Label, PropertyNames.allAsJava, List().asJava, List().asJava)
-
-  object Edges {
-    val Out: Array[String] = Array()
-    val In: Array[String]  = Array()
-  }
-
-  val factory = new NodeFactory[ConfigFileDb] {
-    override val forLabel = ConfigFile.Label
-
-    override def createNode(ref: NodeRef[ConfigFileDb]) =
-      new ConfigFileDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = ConfigFile(graph, id)
-  }
 }
 
-trait ConfigFileBase extends AbstractNode {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def content: String
-  def name: String
-
-}
-
-class ConfigFile(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[ConfigFileDb](graph_4762, id_4762)
+class ConfigFile(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 10.toShort, seq_4762)
     with ConfigFileBase
-    with StoredNode {
-  override def content: String = get().content
-  override def name: String    = get().name
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "CONTENT" => ConfigFile.PropertyDefaults.Content
-      case "NAME"    => ConfigFile.PropertyDefaults.Name
-      case _         => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    ConfigFile.Label
-  }
+    with StaticType[ConfigFileEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "content"
-      case 2 => "name"
+      case 0 => "content"
+      case 1 => "name"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => content
-      case 2 => name
-    }
-
-  override def productPrefix = "ConfigFile"
-  override def productArity  = 3
-}
-
-class ConfigFileDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with ConfigFileBase {
-
-  override def layoutInformation: NodeLayoutInformation = ConfigFile.layoutInformation
-
-  private var _content: String = ConfigFile.PropertyDefaults.Content
-  def content: String          = _content
-  private var _name: String    = ConfigFile.PropertyDefaults.Name
-  def name: String             = _name
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    properties.put("CONTENT", content)
-    properties.put("NAME", name)
-
-    properties
-  }
-
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    if (!(("<empty>") == content)) { properties.put("CONTENT", content) }
-    if (!(("<empty>") == name)) { properties.put("NAME", name) }
-
-    properties
-  }
-
-  import overflowdb.traversal._
-
-  override def label: String = {
-    ConfigFile.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "content"
-      case 2 => "name"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => content
-      case 2 => name
-    }
-
-  override def productPrefix = "ConfigFile"
-  override def productArity  = 3
-
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[ConfigFileDb]
-
-  override def property(key: String): Any = {
-    key match {
-      case "CONTENT" => this._content
-      case "NAME"    => this._name
-
+      case 0 => this.content
+      case 1 => this.name
       case _ => null
     }
-  }
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "CONTENT" => this._content = value.asInstanceOf[String]
-      case "NAME"    => this._name = value.asInstanceOf[String]
+  override def productPrefix = "ConfigFile"
+  override def productArity  = 2
 
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[ConfigFile]
+}
+
+object NewConfigFile {
+  def apply(): NewConfigFile                         = new NewConfigFile
+  private val outNeighbors: Map[String, Set[String]] = Map()
+  private val inNeighbors: Map[String, Set[String]]  = Map()
+
+  object InsertionHelpers {
+    object NewNodeInserter_ConfigFile_content extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewConfigFile =>
+              dstCast(offset) = generated.content
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_ConfigFile_name extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewConfigFile =>
+              dstCast(offset) = generated.name
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
     }
   }
+}
 
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
+class NewConfigFile extends NewNode(10.toShort) with ConfigFileBase {
+  override type StoredNodeType = ConfigFile
+  override def label: String = "CONFIG_FILE"
 
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._content = newNode.asInstanceOf[NewConfigFile].content
-    this._name = newNode.asInstanceOf[NewConfigFile].name
-
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewConfigFile.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewConfigFile.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
+  var content: String                   = "<empty>": String
+  var name: String                      = "<empty>": String
+  def content(value: String): this.type = { this.content = value; this }
+  def name(value: String): this.type    = { this.name = value; this }
+  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.countProperty(this, 14, 1)
+    interface.countProperty(this, 39, 1)
+  }
+
+  override def copy: this.type = {
+    val newInstance = new NewConfigFile
+    newInstance.content = this.content
+    newInstance.name = this.name
+    newInstance.asInstanceOf[this.type]
+  }
+
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "content"
+      case 1 => "name"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.content
+      case 1 => this.name
+      case _ => null
+    }
+
+  override def productPrefix                = "NewConfigFile"
+  override def productArity                 = 2
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewConfigFile]
 }

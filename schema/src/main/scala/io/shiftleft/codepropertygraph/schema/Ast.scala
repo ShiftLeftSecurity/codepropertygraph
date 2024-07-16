@@ -1,9 +1,9 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.EdgeType.Cardinality
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.EdgeType.Cardinality
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 
 object Ast extends SchemaBase {
 
@@ -47,11 +47,11 @@ object Ast extends SchemaBase {
     fs: FileSystem.Schema
   ) {
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
-    import base.*
-    import fs.*
-    import methodSchema.*
-    import namespaces.*
-    import typeSchema.*
+    import base._
+    import fs._
+    import methodSchema._
+    import namespaces._
+    import typeSchema._
 
     // Base types
 
@@ -130,6 +130,7 @@ object Ast extends SchemaBase {
       )
       .protoId(8)
       .addProperties(typeFullName)
+      .primaryKey(code)
 
     val local: NodeType = builder
       .addNodeType(
@@ -143,6 +144,7 @@ object Ast extends SchemaBase {
       .protoId(23)
       .addProperties(typeFullName)
       .extendz(declaration, astNode)
+      .primaryKey(name)
 
     val identifier: NodeType = builder
       .addNodeType(
@@ -154,6 +156,7 @@ object Ast extends SchemaBase {
       )
       .protoId(27)
       .addProperties(typeFullName, name)
+      .primaryKey(name)
 
     val canonicalName = builder
       .addProperty(
@@ -314,6 +317,7 @@ object Ast extends SchemaBase {
       )
       .protoId(30)
       .starterName("ret")
+      .primaryKey(code)
 
     val controlStructureType = builder
       .addProperty(
@@ -577,6 +581,7 @@ object Ast extends SchemaBase {
       .protoId(15)
       .extendz(callRepr)
       .addProperties(typeFullName)
+      .primaryKey(name)
 
     val expression = builder
       .addNodeBaseType(

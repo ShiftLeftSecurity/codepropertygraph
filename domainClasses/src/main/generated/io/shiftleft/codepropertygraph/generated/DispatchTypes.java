@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +13,6 @@ public static final String DYNAMIC_DISPATCH = "DYNAMIC_DISPATCH";
 
 /** For macro expansions, code is inlined. */
 public static final String INLINED = "INLINED";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(STATIC_DISPATCH);

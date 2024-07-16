@@ -1,279 +1,1554 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+import scala.collection.mutable
+
+/** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
+  * erased at runtime
+  */
+trait CommentEMT extends AnyRef with AstNodeEMT with HasFilenameEMT
+
+trait CommentBase extends AbstractNode with AstNodeBase with StaticType[CommentEMT] {
+
+  override def propertiesMap: java.util.Map[String, Any] = {
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
+    val res = new java.util.HashMap[String, Any]()
+    if (("<empty>": String) != this.code) res.put("CODE", this.code)
+    this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
+    if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
+    this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    if ((-1: Int) != this.order) res.put("ORDER", this.order)
+    res
+  }
+}
 
 object Comment {
-  def apply(graph: Graph, id: Long) = new Comment(graph, id)
-
   val Label = "COMMENT"
-
   object PropertyNames {
-    val Code                             = "CODE"
-    val ColumnNumber                     = "COLUMN_NUMBER"
-    val Filename                         = "FILENAME"
-    val LineNumber                       = "LINE_NUMBER"
-    val Order                            = "ORDER"
-    val all: Set[String]                 = Set(Code, ColumnNumber, Filename, LineNumber, Order)
-    val allAsJava: java.util.Set[String] = all.asJava
-  }
 
+    /** This field holds the code snippet that the node represents. */
+    val Code = "CODE"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = "FILENAME"
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = "LINE_NUMBER"
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = "ORDER"
+  }
   object Properties {
-    val Code         = new overflowdb.PropertyKey[String]("CODE")
-    val ColumnNumber = new overflowdb.PropertyKey[scala.Int]("COLUMN_NUMBER")
-    val Filename     = new overflowdb.PropertyKey[String]("FILENAME")
-    val LineNumber   = new overflowdb.PropertyKey[scala.Int]("LINE_NUMBER")
-    val Order        = new overflowdb.PropertyKey[scala.Int]("ORDER")
 
+    /** This field holds the code snippet that the node represents. */
+    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+
+    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
+      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
+      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
+      * file that is is declared in is unknown.
+      */
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+
+    /** This optional field provides the line number of the program construct represented by the node.
+      */
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+
+    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
+      * of 0.
+      */
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
   }
-
   object PropertyDefaults {
     val Code     = "<empty>"
     val Filename = "<empty>"
     val Order    = -1: Int
   }
-
-  val layoutInformation = new NodeLayoutInformation(
-    Label,
-    PropertyNames.allAsJava,
-    List(io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation).asJava,
-    List(
-      io.shiftleft.codepropertygraph.generated.edges.Ast.layoutInformation,
-      io.shiftleft.codepropertygraph.generated.edges.SourceFile.layoutInformation
-    ).asJava
-  )
-
-  object Edges {
-    val Out: Array[String] = Array("SOURCE_FILE")
-    val In: Array[String]  = Array("AST", "SOURCE_FILE")
-  }
-
-  val factory = new NodeFactory[CommentDb] {
-    override val forLabel = Comment.Label
-
-    override def createNode(ref: NodeRef[CommentDb]) =
-      new CommentDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = Comment(graph, id)
-  }
 }
 
-trait CommentBase extends AbstractNode with AstNodeBase {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
-  def code: String
-  def columnNumber: Option[scala.Int]
-  def filename: String
-  def lineNumber: Option[scala.Int]
-  def order: scala.Int
-
-}
-
-class Comment(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[CommentDb](graph_4762, id_4762)
+class Comment(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 9.toShort, seq_4762)
     with CommentBase
-    with StoredNode
-    with AstNode {
-  override def code: String                    = get().code
-  override def columnNumber: Option[scala.Int] = get().columnNumber
-  override def filename: String                = get().filename
-  override def lineNumber: Option[scala.Int]   = get().lineNumber
-  override def order: scala.Int                = get().order
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-      case "CODE"     => Comment.PropertyDefaults.Code
-      case "FILENAME" => Comment.PropertyDefaults.Filename
-      case "ORDER"    => Comment.PropertyDefaults.Order
-      case _          => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  def sourceFileOut: Iterator[Comment] = get().sourceFileOut
-  override def _sourceFileOut          = get()._sourceFileOut
-
-  /** Traverse to COMMENT via SOURCE_FILE OUT edge.
-    */
-  def file: overflowdb.traversal.Traversal[Comment] = get().file
-
-  def astIn: Iterator[File] = get().astIn
-  override def _astIn       = get()._astIn
-
-  /** Traverse to FILE via AST IN edge.
-    */
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File] = get()._fileViaAstIn
-
-  def sourceFileIn: Iterator[Comment] = get().sourceFileIn
-  override def _sourceFileIn          = get()._sourceFileIn
-
-  /** Traverse to COMMENT via SOURCE_FILE IN edge.
-    */
-  def _commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = get()._commentViaSourceFileIn
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    Comment.Label
-  }
+    with AstNode
+    with StaticType[CommentEMT] {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "filename"
-      case 4 => "lineNumber"
-      case 5 => "order"
+      case 0 => "code"
+      case 1 => "columnNumber"
+      case 2 => "filename"
+      case 3 => "lineNumber"
+      case 4 => "order"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => filename
-      case 4 => lineNumber
-      case 5 => order
-    }
-
-  override def productPrefix = "Comment"
-  override def productArity  = 6
-}
-
-class CommentDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with AstNode with CommentBase {
-
-  override def layoutInformation: NodeLayoutInformation = Comment.layoutInformation
-
-  private var _code: String           = Comment.PropertyDefaults.Code
-  def code: String                    = _code
-  private var _columnNumber: Integer  = null
-  def columnNumber: Option[scala.Int] = Option(_columnNumber).asInstanceOf[Option[scala.Int]]
-  private var _filename: String       = Comment.PropertyDefaults.Filename
-  def filename: String                = _filename
-  private var _lineNumber: Integer    = null
-  def lineNumber: Option[scala.Int]   = Option(_lineNumber).asInstanceOf[Option[scala.Int]]
-  private var _order: Integer         = Comment.PropertyDefaults.Order
-  def order: scala.Int                = _order
-
-  /** faster than the default implementation */
-  override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    properties.put("CODE", code)
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    properties.put("FILENAME", filename)
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    properties.put("ORDER", order)
-
-    properties
-  }
-
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-    if (!(("<empty>") == code)) { properties.put("CODE", code) }
-    columnNumber.map { value => properties.put("COLUMN_NUMBER", value) }
-    if (!(("<empty>") == filename)) { properties.put("FILENAME", filename) }
-    lineNumber.map { value => properties.put("LINE_NUMBER", value) }
-    if (!((-1: Int) == order)) { properties.put("ORDER", order) }
-
-    properties
-  }
-
-  import overflowdb.traversal._
-  def sourceFileOut: Iterator[Comment]              = createAdjacentNodeScalaIteratorByOffSet[Comment](0)
-  override def _sourceFileOut                       = createAdjacentNodeScalaIteratorByOffSet[StoredNode](0)
-  def file: overflowdb.traversal.Traversal[Comment] = sourceFileOut.collectAll[Comment]
-
-  def astIn: Iterator[File]                               = createAdjacentNodeScalaIteratorByOffSet[File](1)
-  override def _astIn                                     = createAdjacentNodeScalaIteratorByOffSet[StoredNode](1)
-  def _fileViaAstIn: overflowdb.traversal.Traversal[File] = astIn.collectAll[File]
-
-  def sourceFileIn: Iterator[Comment] = createAdjacentNodeScalaIteratorByOffSet[Comment](2)
-  override def _sourceFileIn          = createAdjacentNodeScalaIteratorByOffSet[StoredNode](2)
-  def _commentViaSourceFileIn: overflowdb.traversal.Traversal[Comment] = sourceFileIn.collectAll[Comment]
-
-  override def label: String = {
-    Comment.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "code"
-      case 2 => "columnNumber"
-      case 3 => "filename"
-      case 4 => "lineNumber"
-      case 5 => "order"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => code
-      case 2 => columnNumber
-      case 3 => filename
-      case 4 => lineNumber
-      case 5 => order
-    }
-
-  override def productPrefix = "Comment"
-  override def productArity  = 6
-
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[CommentDb]
-
-  override def property(key: String): Any = {
-    key match {
-      case "CODE"          => this._code
-      case "COLUMN_NUMBER" => this._columnNumber
-      case "FILENAME"      => this._filename
-      case "LINE_NUMBER"   => this._lineNumber
-      case "ORDER"         => this._order
-
+      case 0 => this.code
+      case 1 => this.columnNumber
+      case 2 => this.filename
+      case 3 => this.lineNumber
+      case 4 => this.order
       case _ => null
     }
-  }
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
-      case "CODE"          => this._code = value.asInstanceOf[String]
-      case "COLUMN_NUMBER" => this._columnNumber = value.asInstanceOf[scala.Int]
-      case "FILENAME"      => this._filename = value.asInstanceOf[String]
-      case "LINE_NUMBER"   => this._lineNumber = value.asInstanceOf[scala.Int]
-      case "ORDER"         => this._order = value.asInstanceOf[scala.Int]
+  override def productPrefix = "Comment"
+  override def productArity  = 5
 
-      case _ => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Comment]
+}
+
+object NewComment {
+  def apply(): NewComment = new NewComment
+  private val outNeighbors: Map[String, Set[String]] = Map(
+    "ALIAS_OF" -> Set("TYPE"),
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS" -> Set("BINDING"),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CAPTURE"     -> Set("CLOSURE_BINDING"),
+    "CAPTURED_BY" -> Set("CLOSURE_BINDING"),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "EVAL_TYPE"     -> Set("TYPE"),
+    "IMPORTS"       -> Set("DEPENDENCY"),
+    "INHERITS_FROM" -> Set("TYPE"),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "TAGGED_BY" -> Set("TAG")
+  )
+  private val inNeighbors: Map[String, Set[String]] = Map(
+    "ARGUMENT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "AST" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "BINDS_TO" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CALL" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CDG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CFG" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONDITION" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "CONTAINS" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "IS_CALL_FOR_IMPORT" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "PARAMETER_LINK" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "POST_DOMINATE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REACHING_DEF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "RECEIVER" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "REF" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BINDING",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "CLOSURE_BINDING",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    ),
+    "SOURCE_FILE" -> Set(
+      "ANNOTATION",
+      "ANNOTATION_LITERAL",
+      "ANNOTATION_PARAMETER",
+      "ANNOTATION_PARAMETER_ASSIGN",
+      "ARRAY_INITIALIZER",
+      "BLOCK",
+      "CALL",
+      "CALL_REPR",
+      "CFG_NODE",
+      "COMMENT",
+      "CONTROL_STRUCTURE",
+      "EXPRESSION",
+      "FIELD_IDENTIFIER",
+      "FILE",
+      "IDENTIFIER",
+      "IMPORT",
+      "JUMP_LABEL",
+      "JUMP_TARGET",
+      "LITERAL",
+      "LOCAL",
+      "MEMBER",
+      "METHOD",
+      "METHOD_PARAMETER_IN",
+      "METHOD_PARAMETER_OUT",
+      "METHOD_REF",
+      "METHOD_RETURN",
+      "MODIFIER",
+      "NAMESPACE",
+      "NAMESPACE_BLOCK",
+      "RETURN",
+      "TEMPLATE_DOM",
+      "TYPE_ARGUMENT",
+      "TYPE_DECL",
+      "TYPE_PARAMETER",
+      "TYPE_REF",
+      "UNKNOWN"
+    )
+  )
+
+  object InsertionHelpers {
+    object NewNodeInserter_Comment_code extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              dstCast(offset) = generated.code
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Comment_columnNumber extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              generated.columnNumber match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Comment_filename extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              dstCast(offset) = generated.filename
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Comment_lineNumber extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              generated.lineNumber match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Comment_order extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              dstCast(offset) = generated.order
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
     }
   }
+}
 
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
+class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
+  override type StoredNodeType = Comment
+  override def label: String = "COMMENT"
 
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-    this._code = newNode.asInstanceOf[NewComment].code
-    this._columnNumber = newNode.asInstanceOf[NewComment].columnNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._filename = newNode.asInstanceOf[NewComment].filename
-    this._lineNumber = newNode.asInstanceOf[NewComment].lineNumber match {
-      case None => null; case Some(value) => value
-    }
-    this._order = newNode.asInstanceOf[NewComment].order
-
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewComment.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewComment.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
+  var code: String                                = "<empty>": String
+  var columnNumber: Option[Int]                   = None
+  var filename: String                            = "<empty>": String
+  var lineNumber: Option[Int]                     = None
+  var order: Int                                  = -1: Int
+  def code(value: String): this.type              = { this.code = value; this }
+  def columnNumber(value: Int): this.type         = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type = { this.columnNumber = value; this }
+  def filename(value: String): this.type          = { this.filename = value; this }
+  def lineNumber(value: Int): this.type           = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type   = { this.lineNumber = value; this }
+  def order(value: Int): this.type                = { this.order = value; this }
+  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.countProperty(this, 10, 1)
+    interface.countProperty(this, 11, columnNumber.size)
+    interface.countProperty(this, 21, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 43, 1)
+  }
+
+  override def copy: this.type = {
+    val newInstance = new NewComment
+    newInstance.code = this.code
+    newInstance.columnNumber = this.columnNumber
+    newInstance.filename = this.filename
+    newInstance.lineNumber = this.lineNumber
+    newInstance.order = this.order
+    newInstance.asInstanceOf[this.type]
+  }
+
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "code"
+      case 1 => "columnNumber"
+      case 2 => "filename"
+      case 3 => "lineNumber"
+      case 4 => "order"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.code
+      case 1 => this.columnNumber
+      case 2 => this.filename
+      case 3 => this.lineNumber
+      case 4 => this.order
+      case _ => null
+    }
+
+  override def productPrefix                = "NewComment"
+  override def productArity                 = 5
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewComment]
 }

@@ -1,9 +1,9 @@
 name := "codepropertygraph-schema"
 
-libraryDependencies += "io.shiftleft" %% "overflowdb-codegen" % Versions.overflowdbCodegen
+libraryDependencies += "io.joern" %% "flatgraph-domain-classes-generator" % Versions.flatgraph
 
 lazy val generatedSrcDir = settingKey[File]("root for generated sources - we want to check those in")
-enablePlugins(OdbCodegenSbtPlugin)
+enablePlugins(FlatgraphCodegenSbtPlugin)
 generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
 generateDomainClasses/fieldName       := "instance"
 generateDomainClasses/outputDir       := (Projects.domainClasses / generatedSrcDir).value
