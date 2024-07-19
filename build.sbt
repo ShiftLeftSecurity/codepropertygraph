@@ -4,9 +4,13 @@ name := "codepropertygraph"
 val overflowdbVersion = "1.193"
 val overflowdbCodegenVersion = "2.112"
 
+// only temporarily
+sonatypeCredentialHost := "s01.oss.sonatype.org"
+
 inThisBuild(
   List(
-    organization       := "com.michaelpollmeier",
+    // only temporarily
+    organization       := "io.joern",
     scalaVersion       := "3.4.2",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
