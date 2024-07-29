@@ -388,7 +388,7 @@ object Ast extends SchemaBase {
         valueType = ValueType.String,
         comment = "Represents a throw statement"
       )
-        .protoId(15)
+        .protoId(16)
     )
 
     val controlStructure: NodeType = builder
