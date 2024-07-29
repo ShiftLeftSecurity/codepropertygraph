@@ -381,6 +381,13 @@ object Ast extends SchemaBase {
         valueType = ValueType.String,
         comment = "Represents a finally clause"
       )
+        .protoId(15),
+      Constant(
+        name = "THROW",
+        value = "THROW",
+        valueType = ValueType.String,
+        comment = "Represents a throw statement"
+      )
         .protoId(15)
     )
 
