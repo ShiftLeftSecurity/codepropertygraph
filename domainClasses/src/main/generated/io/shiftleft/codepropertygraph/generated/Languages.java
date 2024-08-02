@@ -50,9 +50,6 @@ public static final String PYTHONSRC = "PYTHONSRC";
 /** Source-based JS frontend based on Babel */
 public static final String JSSRC = "JSSRC";
 
-/** Solidity language frontend */
-public static final String SOLIDITY = "SOLIDITY";
-
 /** Source-based frontend for Ruby */
 public static final String RUBYSRC = "RUBYSRC";
 
@@ -78,7 +75,6 @@ add(NEWC);
 add(JAVASRC);
 add(PYTHONSRC);
 add(JSSRC);
-add(SOLIDITY);
 add(RUBYSRC);
 add(SWIFTSRC);
 add(CSHARPSRC);
