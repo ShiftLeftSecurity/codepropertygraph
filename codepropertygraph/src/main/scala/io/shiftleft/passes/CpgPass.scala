@@ -62,7 +62,43 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
   // Override this to disable parallelism of passes. Useful for debugging.
   def isParallel: Boolean = true
 
-  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+  override def createAndApply(): Unit = {
+    baseLogger.info(s"Start of pass: $name")
+    val nanosStart = System.nanoTime()
+    var nParts     = 0
+    var nanosBuilt = -1L
+    var nDiff      = -1
+    var nDiffT     = -1
+    try {
+      val diffGraph = Cpg.newDiffGraphBuilder
+      nParts = runWithBuilder(diffGraph)
+      nanosBuilt = System.nanoTime()
+      nDiff = diffGraph.size
+
+      // TODO how about `nDiffT` which seems to count the number of modifications..
+      //      nDiffT = overflowdb.BatchedUpdate
+      //        .applyDiff(cpg.graph, diffGraph, null)
+      //        .transitiveModifications()
+
+      flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+    } catch {
+      case exc: Exception =>
+        baseLogger.error(s"Pass ${name} failed", exc)
+        throw exc
+    } finally {
+      try {
+        finish()
+      } finally {
+        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
+        // in the reported timings, and we must have our final log message if finish() throws
+        val nanosStop = System.nanoTime()
+        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+        baseLogger.info(
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
+        )
+      }
+    }
+  }
 
   override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
     try {
@@ -105,45 +141,9 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
     }
   }
 
+  @deprecated("Please use createAndApply")
   override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
-    baseLogger.info(s"Start of pass: $name")
-    val nanosStart = System.nanoTime()
-    var nParts     = 0
-    var nanosBuilt = -1L
-    var nDiff      = -1
-    var nDiffT     = -1
-    try {
-      val diffGraph = Cpg.newDiffGraphBuilder
-      nParts = runWithBuilder(diffGraph)
-      nanosBuilt = System.nanoTime()
-      nDiff = diffGraph.size
-
-      // TODO how about `nDiffT` which seems to count the number of modifications..
-//      nDiffT = overflowdb.BatchedUpdate
-//        .applyDiff(cpg.graph, diffGraph, null)
-//        .transitiveModifications()
-
-      flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
-    } catch {
-      case exc: Exception =>
-        baseLogger.error(s"Pass ${name} failed", exc)
-        throw exc
-    } finally {
-      try {
-        finish()
-      } finally {
-        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
-        // in the reported timings, and we must have our final log message if finish() throws
-        val nanosStop = System.nanoTime()
-        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
-        val serializationString = if (serializedCpg != null && !serializedCpg.isEmpty) {
-          " Diff serialized and stored."
-        } else ""
-        baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts.${serializationString}%s"
-        )
-      }
-    }
+    createAndApply()
   }
 
 }
@@ -154,6 +154,7 @@ trait CpgPassBase {
 
   def createAndApply(): Unit
 
+  @deprecated("Please use createAndApply")
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit
 
   /** Name of the pass. By default it is inferred from the name of the class, override if needed.
@@ -196,11 +197,8 @@ trait CpgPassBase {
     prefix + "_" + outputName + "_" + index
   }
 
-  protected def store(overlay: GeneratedMessageV3, name: String, serializedCpg: SerializedCpg): Unit = {
-    if (overlay.getSerializedSize > 0) {
-      serializedCpg.addOverlay(overlay, name)
-    }
-  }
+  @deprecated
+  protected def store(overlay: GeneratedMessageV3, name: String, serializedCpg: SerializedCpg): Unit = {}
 
   protected def withStartEndTimesLogged[A](fun: => A): A = {
     baseLogger.info(s"Running pass: $name")

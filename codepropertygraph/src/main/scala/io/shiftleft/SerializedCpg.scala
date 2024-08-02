@@ -7,6 +7,7 @@ import java.net.{URI, URISyntaxException}
 import java.nio.file.{FileSystem, FileSystems, Files}
 import java.util
 
+@deprecated("New API functions do not use this class anymore")
 class SerializedCpg extends AutoCloseable {
 
   /** We allow creating a dummy serialized CPG that does not do anything.
