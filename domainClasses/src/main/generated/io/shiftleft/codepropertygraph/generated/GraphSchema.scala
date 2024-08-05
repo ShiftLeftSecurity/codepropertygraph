@@ -50,7 +50,7 @@ object GraphSchema extends flatgraph.Schema {
     "UNKNOWN"
   )
   val nodeKindByLabel = nodeLabels.zipWithIndex.toMap
-  val edgeLabels = Array(
+  val edgeLabels: Array[String] = Array(
     "ALIAS_OF",
     "ARGUMENT",
     "AST",
@@ -236,7 +236,7 @@ object GraphSchema extends flatgraph.Schema {
     size => new Array[flatgraph.GNode](size),
     size => new Array[flatgraph.GNode](size)
   )
-  val normalNodePropertyNames = Array(
+  val normalNodePropertyNames: Array[String] = Array(
     "ALIAS_TYPE_FULL_NAME",
     "ARGUMENT_INDEX",
     "ARGUMENT_NAME",
