@@ -46,6 +46,7 @@ object Cfg extends SchemaBase {
     // to the actual out.
     methodParameterIn.extendz(cfgNode)
     methodParameterOut.extendz(cfgNode)
+    println("Custom cpg")
 
     expression.extendz(cfgNode)
     callRepr.extendz(cfgNode)

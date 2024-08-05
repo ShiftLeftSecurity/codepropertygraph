@@ -11,3 +11,13 @@ libraryDependencies ++= Seq(
   "org.slf4j"              % "slf4j-api"            % "2.0.6",
   "org.scalatest"         %% "scalatest"            % Versions.scalatest % Test
 )
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )

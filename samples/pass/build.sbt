@@ -15,3 +15,13 @@ ThisBuild / resolvers ++= Seq(
 )
 
 enablePlugins(JavaAppPackaging)
+
+githubOwner      := "Privado-Inc"
+githubRepository := "codepropertygraph"
+credentials +=
+  Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "Privado-Inc",
+    sys.env.getOrElse("GITHUB_TOKEN", "N/A")
+  )
