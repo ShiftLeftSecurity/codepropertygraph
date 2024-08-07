@@ -51,23 +51,9 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends CpgPassBase {
-  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
-  // generate Array of parts that can be processed in parallel
-  def generateParts(): Array[? <: AnyRef]
-  // setup large data structures, acquire external resources
-  def init(): Unit = {}
-  // release large data structures and external resources
-  def finish(): Unit = {}
-  // main function: add desired changes to builder
-  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
-  // Override this to disable parallelism of passes. Useful for debugging.
-  def isParallel: Boolean = true
-
 abstract class ForkJoinParallelCpgPassWithTimeout[T <: AnyRef](
   cpg: Cpg,
   @nowarn outName: String = "",
-  keyPool: Option[KeyPool] = None,
   timeout: Long = -1
 ) extends NewStyleCpgPassBaseWithTimeout[T](timeout) {
 
@@ -109,6 +95,11 @@ abstract class ForkJoinParallelCpgPassWithTimeout[T <: AnyRef](
         StatsLogger.endLastStage()
       }
     }
+  }
+
+  @deprecated("Please use createAndApply")
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
+    createAndApply()
   }
 
 }
@@ -213,7 +204,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
 }
 
 abstract class NewStyleCpgPassBaseWithTimeout[T <: AnyRef](timeout: Long) extends CpgPassBase {
-  type DiffGraphBuilder = overflowdb.BatchedUpdate.DiffGraphBuilder
+  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
 
   // generate Array of parts that can be processed in parallel
   def generateParts(): Array[? <: AnyRef]
@@ -232,7 +223,7 @@ abstract class NewStyleCpgPassBaseWithTimeout[T <: AnyRef](timeout: Long) extend
 
   override def createAndApply(): Unit = createApplySerializeAndStore(null)
 
-  override def runWithBuilder(externalBuilder: BatchedUpdate.DiffGraphBuilder): Int = {
+  override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
     try {
       init()
       val parts  = generateParts()
