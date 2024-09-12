@@ -9,6 +9,16 @@ check_installed() {
   fi
 }
 
+function sedi() {
+  if sed --version 2> /dev/null | grep -q 'GNU' ; then
+    # GNU sed does not like a second argument for -i
+    sed -i "$@"
+  else
+    # but macOS (FreeBSD) sed needs it
+    sed -i '' "$@"
+  fi
+}
+
 check_installed curl
 
 # check if xmllint is installed
@@ -57,13 +67,13 @@ function update {
     if [ "$NON_INTERACTIVE_OPTION" == "--non-interactive" ]
     then
       echo "non-interactive mode, auto-updating $NAME: $OLD_VERSION -> $VERSION"
-      sed -i "s/$SEARCH/$REPLACE/" build.sbt
+      sedi "s/$SEARCH/$REPLACE/" build.sbt
     else
       echo "update $NAME: $OLD_VERSION -> $VERSION? [Y/n]"
       read ANSWER
       if [ -z $ANSWER ] || [ "y" == $ANSWER ] || [ "Y" == $ANSWER ]
       then
-        sed -i "s/$SEARCH/$REPLACE/" build.sbt
+        sedi "s/$SEARCH/$REPLACE/" build.sbt
       fi
     fi
   fi
