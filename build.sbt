@@ -32,9 +32,10 @@ inThisBuild(
   )
 )
 
-ThisBuild / publishTo             := sonatypePublishToBundle.value
-ThisBuild / sonatypeTimeoutMillis := 7200000 // double the default close timeout
-ThisBuild / Test / fork           := true
+ThisBuild / publishTo              := sonatypePublishToBundle.value
+ThisBuild / sonatypeCredentialHost := xerial.sbt.Sonatype.sonatypeCentralHost
+ThisBuild / sonatypeTimeoutMillis  := 7200000 // double the default close timeout
+ThisBuild / Test / fork            := true
 ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild / baseDirectory).value}/resources/log4j2-test.xml"
 // If we fork we immediately stumble upon https://github.com/sbt/sbt/issues/3892 and https://github.com/sbt/sbt/issues/3892
 ThisBuild / Test / javaOptions += s"-Duser.dir=${(ThisBuild / baseDirectory).value}"
