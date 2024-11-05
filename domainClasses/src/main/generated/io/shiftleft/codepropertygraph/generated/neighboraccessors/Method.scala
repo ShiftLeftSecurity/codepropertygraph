@@ -257,8 +257,9 @@ final class AccessNeighborsForMethod(val node: nodes.Method) extends AnyVal {
     try { astOut.collectAll[nodes.MethodReturn].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label AST to an adjacent METHOD_RETURN is mandatory, but not defined for this METHOD node with seq=" + node.seq,
+          "OUT edge with label AST to an adjacent METHOD_RETURN is mandatory, but not defined for this METHOD node with " + nodeInfo,
           e
         )
     }
@@ -293,8 +294,9 @@ final class AccessNeighborsForMethod(val node: nodes.Method) extends AnyVal {
     try { astOut.collectAll[nodes.Block].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label AST to an adjacent BLOCK is mandatory, but not defined for this METHOD node with seq=" + node.seq,
+          "OUT edge with label AST to an adjacent BLOCK is mandatory, but not defined for this METHOD node with " + nodeInfo,
           e
         )
     }

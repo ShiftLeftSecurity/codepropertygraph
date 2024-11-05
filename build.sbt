@@ -1,12 +1,12 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val flatgraphVersion = "0.0.90"
+val flatgraphVersion = "0.0.97"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "3.4.2",
+    scalaVersion       := "3.4.3",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,

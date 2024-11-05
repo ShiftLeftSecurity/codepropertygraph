@@ -16,8 +16,9 @@ final class AccessNeighborsForBinding(val node: nodes.Binding) extends AnyVal {
     try { refOut.collectAll[nodes.Method].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label REF to an adjacent METHOD is mandatory, but not defined for this BINDING node with seq=" + node.seq,
+          "OUT edge with label REF to an adjacent METHOD is mandatory, but not defined for this BINDING node with " + nodeInfo,
           e
         )
     }
@@ -34,8 +35,9 @@ final class AccessNeighborsForBinding(val node: nodes.Binding) extends AnyVal {
     try { bindsIn.collectAll[nodes.TypeDecl].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label BINDS to an adjacent TYPE_DECL is mandatory, but not defined for this BINDING node with seq=" + node.seq,
+          "IN edge with label BINDS to an adjacent TYPE_DECL is mandatory, but not defined for this BINDING node with " + nodeInfo,
           e
         )
     }

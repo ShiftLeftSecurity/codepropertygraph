@@ -35,8 +35,9 @@ final class AccessNeighborsForFieldIdentifier(val node: nodes.FieldIdentifier) e
     try { argumentIn.collectAll[nodes.Call].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label ARGUMENT to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with seq=" + node.seq,
+          "IN edge with label ARGUMENT to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with " + nodeInfo,
           e
         )
     }
@@ -48,8 +49,9 @@ final class AccessNeighborsForFieldIdentifier(val node: nodes.FieldIdentifier) e
     try { astIn.collectAll[nodes.Call].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with " + nodeInfo,
           e
         )
     }
@@ -69,8 +71,9 @@ final class AccessNeighborsForFieldIdentifier(val node: nodes.FieldIdentifier) e
     try { cfgOut.collectAll[nodes.Call].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label CFG to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with seq=" + node.seq,
+          "OUT edge with label CFG to an adjacent CALL is mandatory, but not defined for this FIELD_IDENTIFIER node with " + nodeInfo,
           e
         )
     }

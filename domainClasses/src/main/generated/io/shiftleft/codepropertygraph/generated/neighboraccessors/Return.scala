@@ -311,8 +311,9 @@ final class AccessNeighborsForReturn(val node: nodes.Return) extends AnyVal {
     try { cfgOut.collectAll[nodes.MethodReturn].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label CFG to an adjacent METHOD_RETURN is mandatory, but not defined for this RETURN node with seq=" + node.seq,
+          "OUT edge with label CFG to an adjacent METHOD_RETURN is mandatory, but not defined for this RETURN node with " + nodeInfo,
           e
         )
     }
