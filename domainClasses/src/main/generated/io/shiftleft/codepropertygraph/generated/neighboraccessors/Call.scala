@@ -119,8 +119,9 @@ final class AccessNeighborsForCall(val node: nodes.Call) extends AnyVal {
     try { astIn.collectAll[nodes.ControlStructure].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent CONTROL_STRUCTURE is mandatory, but not defined for this CALL node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent CONTROL_STRUCTURE is mandatory, but not defined for this CALL node with " + nodeInfo,
           e
         )
     }

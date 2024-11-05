@@ -99,8 +99,9 @@ final class AccessNeighborsForMethodRef(val node: nodes.MethodRef) extends AnyVa
     try { astIn.collectAll[nodes.ControlStructure].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent CONTROL_STRUCTURE is mandatory, but not defined for this METHOD_REF node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent CONTROL_STRUCTURE is mandatory, but not defined for this METHOD_REF node with " + nodeInfo,
           e
         )
     }
@@ -449,8 +450,9 @@ final class AccessNeighborsForMethodRef(val node: nodes.MethodRef) extends AnyVa
     try { refOut.collectAll[nodes.Method].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label REF to an adjacent METHOD is mandatory, but not defined for this METHOD_REF node with seq=" + node.seq,
+          "OUT edge with label REF to an adjacent METHOD is mandatory, but not defined for this METHOD_REF node with " + nodeInfo,
           e
         )
     }

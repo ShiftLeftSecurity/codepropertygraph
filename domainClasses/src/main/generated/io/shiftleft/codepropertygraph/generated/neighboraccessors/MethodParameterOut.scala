@@ -49,8 +49,9 @@ final class AccessNeighborsForMethodParameterOut(val node: nodes.MethodParameter
     try { astIn.collectAll[nodes.Method].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this METHOD_PARAMETER_OUT node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this METHOD_PARAMETER_OUT node with " + nodeInfo,
           e
         )
     }

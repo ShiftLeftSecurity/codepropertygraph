@@ -87,8 +87,9 @@ final class AccessNeighborsForMethodParameterIn(val node: nodes.MethodParameterI
     try { astIn.collectAll[nodes.Method].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this METHOD_PARAMETER_IN node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent METHOD is mandatory, but not defined for this METHOD_PARAMETER_IN node with " + nodeInfo,
           e
         )
     }
@@ -105,8 +106,9 @@ final class AccessNeighborsForMethodParameterIn(val node: nodes.MethodParameterI
     try { evalTypeOut.collectAll[nodes.Type].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "OUT edge with label EVAL_TYPE to an adjacent TYPE is mandatory, but not defined for this METHOD_PARAMETER_IN node with seq=" + node.seq,
+          "OUT edge with label EVAL_TYPE to an adjacent TYPE is mandatory, but not defined for this METHOD_PARAMETER_IN node with " + nodeInfo,
           e
         )
     }

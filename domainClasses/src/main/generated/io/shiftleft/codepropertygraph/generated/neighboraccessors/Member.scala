@@ -36,8 +36,9 @@ final class AccessNeighborsForMember(val node: nodes.Member) extends AnyVal {
     try { astIn.collectAll[nodes.TypeDecl].next() }
     catch {
       case e: java.util.NoSuchElementException =>
+        val nodeInfo = String.format("id=%d, (seq=%d)", node.id, node.seq)
         throw new flatgraph.SchemaViolationException(
-          "IN edge with label AST to an adjacent TYPE_DECL is mandatory, but not defined for this MEMBER node with seq=" + node.seq,
+          "IN edge with label AST to an adjacent TYPE_DECL is mandatory, but not defined for this MEMBER node with " + nodeInfo,
           e
         )
     }
