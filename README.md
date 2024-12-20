@@ -4,7 +4,6 @@
 # Code Property Graph - Specification and Tooling 
 
 You can find a clickable specification at:
-
 https://cpg.joern.io
 
 **Note: for first-time users, we recommend building "joern" at https://github.com/joernio/joern/ instead. It combines this repo with a C/C++ language frontend to construct a complete code analysis platform.**
