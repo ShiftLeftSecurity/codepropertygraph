@@ -119,6 +119,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
 
   override def createAndApply(): Unit = {
     baseLogger.info(s"Start of pass: $name")
+    StatsLogger.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nanosBuilt = -1L
@@ -151,6 +152,7 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
         baseLogger.info(
           f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
         )
+        StatsLogger.endLastStage()
       }
     }
   }
