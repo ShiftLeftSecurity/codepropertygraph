@@ -1,7 +1,7 @@
 [![CI pipeline](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/release.yml/badge.svg)](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/release.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_3)
 
-# Code Property Graph - Specification and Tooling
+# Code Property Graph - Specification and Tooling 
 
 You can find a clickable specification at:
 
