@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,9 +50,6 @@ public static final String PYTHONSRC = "PYTHONSRC";
 /** Source-based JS frontend based on Babel */
 public static final String JSSRC = "JSSRC";
 
-/** Solidity language frontend */
-public static final String SOLIDITY = "SOLIDITY";
-
 /** Source-based frontend for Ruby */
 public static final String RUBYSRC = "RUBYSRC";
 
@@ -64,7 +58,6 @@ public static final String SWIFTSRC = "SWIFTSRC";
 
 /** Source-based frontend for C# and .NET */
 public static final String CSHARPSRC = "CSHARPSRC";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(JAVA);
@@ -82,7 +75,6 @@ add(NEWC);
 add(JAVASRC);
 add(PYTHONSRC);
 add(JSSRC);
-add(SOLIDITY);
 add(RUBYSRC);
 add(SWIFTSRC);
 add(CSHARPSRC);

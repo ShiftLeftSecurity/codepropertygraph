@@ -1,8 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
 import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import overflowdb.schema.Property.ValueType
-import overflowdb.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
+import flatgraph.schema.Property.ValueType
+import flatgraph.schema.{Constant, NodeType, SchemaBuilder, SchemaInfo}
 
 object MetaData extends SchemaBase {
 
@@ -118,12 +118,7 @@ object MetaData extends SchemaBase {
         valueType = ValueType.String,
         comment = "Source-based JS frontend based on Babel"
       ).protoId(15),
-      Constant(
-        name = "SOLIDITY",
-        value = "SOLIDITY",
-        valueType = ValueType.String,
-        comment = "Solidity language frontend"
-      ).protoId(16),
+      // Removed protoId 16. Used to be "Solidity".
       Constant(
         name = "RUBYSRC",
         value = "RUBYSRC",

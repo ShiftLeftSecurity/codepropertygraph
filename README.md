@@ -1,10 +1,9 @@
 [![CI pipeline](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/release.yml/badge.svg)](https://github.com/ShiftLeftSecurity/codepropertygraph/actions/workflows/release.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.shiftleft/codepropertygraph_3)
 
-# Code Property Graph - Specification and Tooling
+# Code Property Graph - Specification and Tooling 
 
 You can find a clickable specification at:
-
 https://cpg.joern.io
 
 **Note: for first-time users, we recommend building "joern" at https://github.com/joernio/joern/ instead. It combines this repo with a C/C++ language frontend to construct a complete code analysis platform.**

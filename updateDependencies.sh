@@ -20,8 +20,7 @@ else
 fi
 
 declare -A repos=(
-  [overflowdb]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-core_3
-  [overflowdbCodegen]=https://repo1.maven.org/maven2/io/shiftleft/overflowdb-codegen_2.12
+  [flatgraph]=https://repo1.maven.org/maven2/io/joern/flatgraph-core_3
 )
 
 function latest_version {
@@ -71,8 +70,7 @@ function update {
 }
 
 if [ "$DEPENDENCY" == "" ]; then
-  update overflowdb
-  update overflowdbCodegen
+  update flatgraph
 else
   DEPENDENCY="${DEPENDENCY#--only=}"
   update $DEPENDENCY

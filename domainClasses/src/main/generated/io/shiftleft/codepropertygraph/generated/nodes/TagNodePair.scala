@@ -1,197 +1,170 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-import overflowdb._
-import scala.jdk.CollectionConverters._
+import io.shiftleft.codepropertygraph.generated.language.*
+import scala.collection.immutable.{IndexedSeq, ArraySeq}
+import scala.collection.mutable
 
-object TagNodePair {
-  def apply(graph: Graph, id: Long) = new TagNodePair(graph, id)
+/** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
+  * erased at runtime
+  */
+trait TagNodePairEMT extends AnyRef
 
-  val Label = "TAG_NODE_PAIR"
-
-  object PropertyNames {
-    val Node                             = "node"
-    val Tag                              = "tag"
-    val all: Set[String]                 = Set(Node, Tag)
-    val allAsJava: java.util.Set[String] = all.asJava
-  }
-
-  object Properties {
-
-    val Node = new overflowdb.PropertyKey[StoredNode]("node")
-    val Tag  = new overflowdb.PropertyKey[Tag]("tag")
-  }
-
-  object PropertyDefaults {}
-
-  val layoutInformation = new NodeLayoutInformation(Label, PropertyNames.allAsJava, List().asJava, List().asJava)
-
-  object Edges {
-    val Out: Array[String] = Array()
-    val In: Array[String]  = Array()
-  }
-
-  val factory = new NodeFactory[TagNodePairDb] {
-    override val forLabel = TagNodePair.Label
-
-    override def createNode(ref: NodeRef[TagNodePairDb]) =
-      new TagNodePairDb(ref.asInstanceOf[NodeRef[NodeDb]])
-
-    override def createNodeRef(graph: Graph, id: Long) = TagNodePair(graph, id)
-  }
-}
-
-trait TagNodePairBase extends AbstractNode {
-  def asStored: StoredNode = this.asInstanceOf[StoredNode]
-
+trait TagNodePairBase extends AbstractNode with StaticType[TagNodePairEMT] {
   def node: AbstractNode
   def tag: TagBase
-}
-
-class TagNodePair(graph_4762: Graph, id_4762: Long /*cf https://github.com/scala/bug/issues/4762 */ )
-    extends NodeRef[TagNodePairDb](graph_4762, id_4762)
-    with TagNodePairBase
-    with StoredNode {
-
-  override def propertyDefaultValue(propertyKey: String) = {
-    propertyKey match {
-
-      case _ => super.propertyDefaultValue(propertyKey)
-    }
-  }
-
-  def node: StoredNode = get().node
-
-  def tag: Tag = get().tag
-
-  // In view of https://github.com/scala/bug/issues/4762 it is advisable to use different variable names in
-  // patterns like `class Base(x:Int)` and `class Derived(x:Int) extends Base(x)`.
-  // This must become `class Derived(x_4762:Int) extends Base(x_4762)`.
-  // Otherwise, it is very hard to figure out whether uses of the identifier `x` refer to the base class x
-  // or the derived class x.
-  // When using that pattern, the class parameter `x_47672` should only be used in the `extends Base(x_4762)`
-  // clause and nowhere else. Otherwise, the compiler may well decide that this is not just a constructor
-  // parameter but also a field of the class, and we end up with two `x` fields. At best, this wastes memory;
-  // at worst both fields go out-of-sync for hard-to-debug correctness bugs.
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = get().fromNewNode(newNode, mapping)
-  override def canEqual(that: Any): Boolean                                        = get.canEqual(that)
-  override def label: String = {
-    TagNodePair.Label
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "id"
-      case 1 => "node"
-      case 2 => "tag"
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => id
-      case 1 => node
-      case 2 => tag
-    }
-
-  override def productPrefix = "TagNodePair"
-  override def productArity  = 3
-}
-
-class TagNodePairDb(ref: NodeRef[NodeDb]) extends NodeDb(ref) with StoredNode with TagNodePairBase {
-
-  override def layoutInformation: NodeLayoutInformation = TagNodePair.layoutInformation
-
-  private var _node: StoredNode = null
-  def node: StoredNode          = this._node
-
-  private var _tag: Tag = null
-  def tag: Tag          = this._tag
-
-  /** faster than the default implementation */
   override def propertiesMap: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-
-    properties.put("node", this._node)
-    properties.put("tag", this._tag)
-    properties
+    import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
+    val res = new java.util.HashMap[String, Any]()
+    res.put("node", this.node)
+    res.put("tag", this.tag)
+    res
   }
+}
 
-  /** faster than the default implementation */
-  override def propertiesMapForStorage: java.util.Map[String, Any] = {
-    val properties = new java.util.HashMap[String, Any]
-
-    if (!((null) == this._node)) { properties.put("node", this._node) }
-    if (!((null) == this._tag)) { properties.put("tag", this._tag) }
-    properties
+object TagNodePair {
+  val Label = "TAG_NODE_PAIR"
+  object PropertyNames {
+    val Node = "node"
+    val Tag  = "tag"
   }
+  object Properties       {}
+  object PropertyDefaults {}
+}
 
-  import overflowdb.traversal._
-
-  override def label: String = {
-    TagNodePair.Label
-  }
+class TagNodePair(graph_4762: flatgraph.Graph, seq_4762: Int)
+    extends StoredNode(graph_4762, 36.toShort, seq_4762)
+    with TagNodePairBase
+    with StaticType[TagNodePairEMT] {
+  def node: StoredNode = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 57, seq, null: StoredNode)
+  def tag: Tag         = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 58, seq, null: Tag)
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "id"
-      case 1 => "node"
-      case 2 => "tag"
+      case 0 => "node"
+      case 1 => "tag"
+      case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => id
-      case 1 => node
-      case 2 => tag
+      case 0 => this.node
+      case 1 => this.tag
+      case _ => null
     }
 
   override def productPrefix = "TagNodePair"
-  override def productArity  = 3
+  override def productArity  = 2
 
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[TagNodePairDb]
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[TagNodePair]
+}
 
-  override def property(key: String): Any = {
-    key match {
+object NewTagNodePair {
+  def apply(): NewTagNodePair                        = new NewTagNodePair
+  private val outNeighbors: Map[String, Set[String]] = Map()
+  private val inNeighbors: Map[String, Set[String]]  = Map()
 
-      case "node" => this._node
-      case "tag"  => this._tag
-      case _      => null
+  object InsertionHelpers {
+    object NewNodeInserter_TagNodePair_node extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[flatgraph.GNode]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewTagNodePair =>
+              dstCast(offset) = generated.node match {
+                case newV: flatgraph.DNode => newV.storedRef.get; case oldV: flatgraph.GNode => oldV; case null => null
+              }
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_TagNodePair_tag extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[flatgraph.GNode]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewTagNodePair =>
+              dstCast(offset) = generated.tag match {
+                case newV: flatgraph.DNode => newV.storedRef.get; case oldV: flatgraph.GNode => oldV; case null => null
+              }
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
     }
   }
+}
 
-  override protected def updateSpecificProperty(key: String, value: Object): Unit = {
-    key match {
+class NewTagNodePair extends NewNode(36.toShort) with TagNodePairBase {
+  override type StoredNodeType = TagNodePair
+  override def label: String = "TAG_NODE_PAIR"
 
-      case "node" => this._node = value.asInstanceOf[StoredNode]
-      case "tag"  => this._tag = value.asInstanceOf[Tag]
-      case _      => PropertyErrorRegister.logPropertyErrorIfFirst(getClass, key)
-    }
+  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewTagNodePair.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
+  }
+  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
+    NewTagNodePair.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  override def removeSpecificProperty(key: String): Unit =
-    this.updateSpecificProperty(key, null)
-
-  override def _initializeFromDetached(
-    data: overflowdb.DetachedNodeData,
-    mapper: java.util.function.Function[overflowdb.DetachedNodeData, Node]
-  ) =
-    fromNewNode(data.asInstanceOf[NewNode], nn => mapper.apply(nn).asInstanceOf[StoredNode])
-
-  override def fromNewNode(newNode: NewNode, mapping: NewNode => StoredNode): Unit = {
-
-    this._node = newNode.asInstanceOf[NewTagNodePair].node match {
-      case null                => null
-      case newNode: NewNode    => mapping(newNode).asInstanceOf[StoredNode]
-      case oldNode: StoredNode => oldNode.asInstanceOf[StoredNode]
-      case _                   => throw new MatchError("unreachable")
-    }
-    this._tag = newNode.asInstanceOf[NewTagNodePair].tag match {
-      case null                => null
-      case newNode: NewNode    => mapping(newNode).asInstanceOf[Tag]
-      case oldNode: StoredNode => oldNode.asInstanceOf[Tag]
-      case _                   => throw new MatchError("unreachable")
-    }
-
+  var node: AbstractNode                   = null
+  var tag: TagBase                         = null
+  def node(value: AbstractNode): this.type = { this.node = value; this }
+  def tag(value: TagBase): this.type       = { this.tag = value; this }
+  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
+    interface.countProperty(this, 57, 1)
+    interface.visitContainedNode(node)
+    interface.countProperty(this, 58, 1)
+    interface.visitContainedNode(tag)
   }
 
+  override def copy: this.type = {
+    val newInstance = new NewTagNodePair
+    newInstance.node = this.node
+    newInstance.tag = this.tag
+    newInstance.asInstanceOf[this.type]
+  }
+
+  override def productElementName(n: Int): String =
+    n match {
+      case 0 => "node"
+      case 1 => "tag"
+      case _ => ""
+    }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => this.node
+      case 1 => this.tag
+      case _ => null
+    }
+
+  override def productPrefix                = "NewTagNodePair"
+  override def productArity                 = 2
+  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewTagNodePair]
 }

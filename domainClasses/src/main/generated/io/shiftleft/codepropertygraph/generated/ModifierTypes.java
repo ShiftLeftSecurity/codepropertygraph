@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +43,6 @@ public static final String MODULE = "MODULE";
 
 /** Indicate that a method is an anonymous function, lambda, or closure */
 public static final String LAMBDA = "LAMBDA";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(STATIC);

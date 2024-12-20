@@ -1,8 +1,5 @@
 package io.shiftleft.codepropertygraph.generated;
 
-import overflowdb.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +51,6 @@ public static final String CATCH = "CATCH";
 
 /** Represents a finally clause */
 public static final String FINALLY = "FINALLY";
-
 
 public static Set<String> ALL = new HashSet<String>() {{
 add(BREAK);
