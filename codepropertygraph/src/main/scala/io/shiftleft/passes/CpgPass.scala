@@ -3,11 +3,14 @@ package io.shiftleft.passes
 import com.google.protobuf.GeneratedMessageV3
 import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.{Cpg, DiffGraphBuilder}
+import io.shiftleft.utils.StatsLogger
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
+import java.util.concurrent.{TimeUnit, TimeoutException}
 import java.util.function.{BiConsumer, Supplier}
 import scala.annotation.nowarn
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.{Duration, DurationLong}
 import scala.util.{Failure, Success, Try}
 
 /* CpgPass
@@ -19,7 +22,6 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
   def run(builder: DiffGraphBuilder): Unit
 
   final override def generateParts(): Array[? <: AnyRef] = Array[AnyRef](null)
-
   final override def runOnPart(builder: DiffGraphBuilder, part: AnyRef): Unit =
     run(builder)
 
@@ -49,21 +51,15 @@ abstract class CpgPass(cpg: Cpg, outName: String = "") extends ForkJoinParallelC
  * methods. This may be better than using the constructor or GC, because e.g. SCPG chains of passes construct
  * passes eagerly, and releases them only when the entire chain has run.
  * */
-abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends CpgPassBase {
-  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
-  // generate Array of parts that can be processed in parallel
-  def generateParts(): Array[? <: AnyRef]
-  // setup large data structures, acquire external resources
-  def init(): Unit = {}
-  // release large data structures and external resources
-  def finish(): Unit = {}
-  // main function: add desired changes to builder
-  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
-  // Override this to disable parallelism of passes. Useful for debugging.
-  def isParallel: Boolean = true
+abstract class ForkJoinParallelCpgPassWithTimeout[T <: AnyRef](
+  cpg: Cpg,
+  @nowarn outName: String = "",
+  timeout: Long = -1
+) extends NewStyleCpgPassBaseWithTimeout[T](timeout) {
 
   override def createAndApply(): Unit = {
     baseLogger.info(s"Start of pass: $name")
+    StatsLogger.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
     val nanosStart = System.nanoTime()
     var nParts     = 0
     var nanosBuilt = -1L
@@ -91,6 +87,67 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
         baseLogger.info(
           f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
         )
+        StatsLogger.endLastStage()
+      }
+    }
+  }
+
+  @deprecated("Please use createAndApply")
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
+    createAndApply()
+  }
+
+}
+
+abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: String = "") extends CpgPassBase {
+  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
+  // generate Array of parts that can be processed in parallel
+  def generateParts(): Array[? <: AnyRef]
+  // setup large data structures, acquire external resources
+  def init(): Unit = {}
+  // release large data structures and external resources
+  def finish(): Unit = {}
+  // main function: add desired changes to builder
+  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
+  // Override this to disable parallelism of passes. Useful for debugging.
+  def isParallel: Boolean = true
+
+  override def createAndApply(): Unit = {
+    baseLogger.info(s"Start of pass: $name")
+    StatsLogger.initiateNewStage(getClass.getSimpleName, Some(name), getClass.getSuperclass.getSimpleName)
+    val nanosStart = System.nanoTime()
+    var nParts     = 0
+    var nanosBuilt = -1L
+    var nDiff      = -1
+    var nDiffT     = -1
+    try {
+      val diffGraph = Cpg.newDiffGraphBuilder
+      nParts = runWithBuilder(diffGraph)
+      nanosBuilt = System.nanoTime()
+      nDiff = diffGraph.size
+
+      // TODO how about `nDiffT` which seems to count the number of modifications..
+      //      nDiffT = overflowdb.BatchedUpdate
+      //        .applyDiff(cpg.graph, diffGraph, null)
+      //        .transitiveModifications()
+
+      flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+    } catch {
+      case exc: Exception =>
+        baseLogger.error(s"Pass ${name} failed", exc)
+        throw exc
+    } finally {
+      try {
+        finish()
+      } finally {
+        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
+        // in the reported timings, and we must have our final log message if finish() throws
+        val nanosStop = System.nanoTime()
+        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+        baseLogger.info(
+          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
+        )
+        StatsLogger.endLastStage()
       }
     }
   }
@@ -141,6 +198,95 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
     createAndApply()
   }
 
+}
+
+abstract class NewStyleCpgPassBaseWithTimeout[T <: AnyRef](timeout: Long) extends CpgPassBase {
+  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
+
+  // generate Array of parts that can be processed in parallel
+  def generateParts(): Array[? <: AnyRef]
+
+  // setup large data structures, acquire external resources
+  def init(): Unit = {}
+
+  // release large data structures and external resources
+  def finish(): Unit = {}
+
+  // main function: add desired changes to builder
+  def runOnPart(builder: DiffGraphBuilder, part: T): Unit
+
+  // Override this to disable parallelism of passes. Useful for debugging.
+  def isParallel: Boolean = true
+
+  override def createAndApply(): Unit = createApplySerializeAndStore(null)
+
+  override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
+    try {
+      init()
+      val parts  = generateParts()
+      val nParts = parts.size
+      nParts match {
+        case 0 =>
+        case 1 =>
+          runOnPart(externalBuilder, parts(0).asInstanceOf[T])
+        case _ =>
+          if (!isParallel) {
+            val diff = java.util.Arrays
+              .stream(parts)
+              .sequential()
+              .collect(
+                new Supplier[DiffGraphBuilder] {
+                  override def get(): DiffGraphBuilder =
+                    Cpg.newDiffGraphBuilder
+                },
+                new BiConsumer[DiffGraphBuilder, AnyRef] {
+                  override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
+                    runOnPart(builder, part.asInstanceOf[T])
+                },
+                new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
+                  override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
+                    leftBuilder.absorb(rightBuilder)
+                }
+              )
+            externalBuilder.absorb(diff)
+          } else {
+            implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+            val stopAt                                         = System.currentTimeMillis() + timeout * 1000
+            var exitByTimeout                                  = false
+            val diffGraphAccumulator                           = Cpg.newDiffGraphBuilder
+
+            val futures = parts.map { part =>
+              val future = Future {
+                val diffGraphBuilder = Cpg.newDiffGraphBuilder
+                runOnPart(diffGraphBuilder, part.asInstanceOf[T])
+                diffGraphBuilder
+              }
+              future
+            }
+
+            futures.foreach { future =>
+              val currentTimeInMs = System.currentTimeMillis()
+              val duration =
+                if timeout == -1 then Duration.Inf else Duration(stopAt - currentTimeInMs, TimeUnit.MILLISECONDS)
+              Try(Await.result(future, duration)) match
+                case Failure(exception: TimeoutException) =>
+                  baseLogger.debug(s"Timeout occurred for passed timeout value of ${timeout} seconds")
+                case Failure(e) => throw e
+                case Success(diffGraphBuilder) =>
+                  diffGraphAccumulator.absorb(diffGraphBuilder)
+            }
+            externalBuilder.absorb(diffGraphAccumulator)
+          }
+      }
+      nParts
+    } finally {
+      finish()
+    }
+  }
+}
+
+object CpgPassBase {
+  private val baseLogger: Logger = LoggerFactory.getLogger(classOf[CpgPassBase])
 }
 
 trait CpgPassBase {

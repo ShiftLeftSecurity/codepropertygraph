@@ -6,7 +6,7 @@ on:
 
 jobs:
   test-codepropertygraph:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
@@ -23,13 +23,19 @@ jobs:
         java-version: 19
     - name: Compile and run tests
       run: sbt +test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Check formatting
       run: sbt scalafmtCheck Test/scalafmtCheck
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: echo "Previous step failed because code is not formatted. Run 'sbt scalafmt'"
       if: ${{ failure() }}
     - name: Check if there are changes
       uses: NathanielHill/fail-if-changes@master
     - name: Check domain classes
       run: sbt generateDomainClassesCheck
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: echo "Previous step failed because latest domain classes are not committed. Run 'sbt generateDomainClasses' (should be triggered automatically by `sbt compile`, so maybe you just forgot to commit?)"
       if: ${{ failure() }}
