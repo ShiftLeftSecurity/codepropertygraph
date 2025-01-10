@@ -19,8 +19,9 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        distribution: 'adopt'
-        java-version: 19
+        distribution: temurin
+        java-version: 21
+        cache: sbt
     - uses: sbt/setup-sbt@v1
     - name: Compile and run tests
       run: sbt +test
