@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-codepropertygraph:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -22,6 +22,7 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: 19
+    - uses: sbt/setup-sbt@v1
     - name: Check formatting
       run: sbt scalafmtCheck Test/scalafmtCheck
     - run: echo "Previous step failed because code is not formatted. Run 'sbt scalafmt'"
@@ -36,7 +37,7 @@ jobs:
   release:
     concurrency: release
     needs: [test-codepropertygraph]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,6 +58,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: 11
+      - uses: sbt/setup-sbt@v1
       - name: Release to Sonatype
         run: sbt ciReleaseTagNextVersion ciReleaseSonatype
         env:
