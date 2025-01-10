@@ -2,10 +2,11 @@ package io.shiftleft.codepropertygraph.cpgloading
 
 import java.io.Closeable
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{FileSystem, FileSystems, FileVisitResult, Files, Path, Paths, SimpleFileVisitor}
-import java.util.{Collection => JCollection}
+import java.nio.file.{FileSystem, FileSystems, FileVisitOption, FileVisitResult, Files, Path, Paths, SimpleFileVisitor}
+import java.util.Collection as JCollection
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable.ArrayBuffer
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class ZipArchive(inputFile: String) extends Closeable {
   private val zipFileSystem: FileSystem = FileSystems.newFileSystem(Paths.get(inputFile), null: ClassLoader)
@@ -13,7 +14,7 @@ class ZipArchive(inputFile: String) extends Closeable {
   private def root: Path = zipFileSystem.getRootDirectories.iterator.next
 
   private def walk(rootPath: Path): Seq[Path] = {
-    val entries = ArrayBuffer[Path]()
+    val entries = ArraySeq.newBuilder[Path]()
     Files.walkFileTree(
       rootPath,
       new SimpleFileVisitor[Path]() {
@@ -24,7 +25,7 @@ class ZipArchive(inputFile: String) extends Closeable {
         }
       }
     )
-    entries.toSeq
+    entries.result()
   }
 
   def entries: Seq[Path] = walk(root)
