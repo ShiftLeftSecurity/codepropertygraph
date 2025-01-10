@@ -21,6 +21,7 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: 19
+    - uses: sbt/setup-sbt@v1
     - name: Compile and run tests
       run: sbt +test
     - name: Check formatting
