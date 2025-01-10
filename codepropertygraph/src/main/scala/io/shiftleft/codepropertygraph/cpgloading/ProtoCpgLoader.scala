@@ -43,9 +43,7 @@ object ProtoCpgLoader {
     val cpg                               = openOrCreateCpg(storagePath)
 
     // first pass: add the raw nodes without any properties or edges
-    protoCpgs().foreach { cpgProto =>
-      addNodesRaw(nodesIter(cpgProto), cpg.graph, protoToGraphNodeMappings)
-    }
+    addNodesRaw(protoCpgs().flatMap(cpgProto => nodesIter(cpgProto)), cpg.graph, protoToGraphNodeMappings)
 
     // second pass: set node properties and add edges
     val diffGraph = Cpg.newDiffGraphBuilder
