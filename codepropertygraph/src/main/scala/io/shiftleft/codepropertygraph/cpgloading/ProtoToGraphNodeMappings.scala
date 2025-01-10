@@ -3,36 +3,21 @@ package io.shiftleft.codepropertygraph.cpgloading
 import flatgraph.*
 import io.shiftleft.proto.cpg.Cpg.CpgStruct
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
-/** Mutable datastructure to preserve mapping between proto and cpg nodes during ProtoToCpg import.
+/** Mutable data structure to preserve mapping between proto and cpg nodes during ProtoToCpg import.
   *
   * Context: we need to run two passes: 1) add nodes and 2) set node properties and add edges (this is due to
   * flatgraph-specific implementation details)
   *
-  * Because of that, we need to remember the mapping from proto node id to gnode. Typically that's just a plain mapping,
-  * but there's one special case for TYPE nodes: some (parallel) frontends create duplicate TYPE nodes which we need to
-  * deduplicate...
+  * Because of that, we need to remember the mapping from proto node id to gnode. Typically, that's just a plain
+  * mapping. But there's one special case for TYPE nodes: some (parallel) frontends create duplicate TYPE nodes which we
+  * need to deduplicate...
   */
 class ProtoToGraphNodeMappings {
-  private var protoNodeIdToGNode  = Map.empty[Long, DNode]
-  private var typeFullNameToGNode = Map.empty[String, DNode]
-
-  def addAll(other: ProtoToGraphNodeMappings): Unit = {
-    val intersection1 = this.protoNodeIdToGNode.keySet.intersect(other.protoNodeIdToGNode.keySet)
-    val intersection2 = this.typeFullNameToGNode.keySet.intersect(other.typeFullNameToGNode.keySet)
-    assert(
-      intersection1.isEmpty,
-      s"unexpected duplicate entries in protoNodeIdToGNode mappings. protoNodeIds: $intersection1"
-    )
-    assert(
-      intersection2.isEmpty,
-      s"unexpected duplicate entries in typeFullNameToGNode mappings. FullNames: $intersection2"
-    )
-
-    this.protoNodeIdToGNode = this.protoNodeIdToGNode ++ other.protoNodeIdToGNode
-    this.typeFullNameToGNode = this.typeFullNameToGNode ++ other.typeFullNameToGNode
-  }
+  private val protoNodeIdToGNode  = mutable.LongMap.empty[DNode]
+  private val typeFullNameToGNode = mutable.Map.empty[String, DNode]
 
   def add(protoNode: CpgStruct.Node, node: DNode): Unit = {
     protoNodeIdToGNode += protoNode.getKey -> node
@@ -48,7 +33,7 @@ class ProtoToGraphNodeMappings {
     }
   }
 
-  /** This will fail hard if the DiffGraph hasn't been applied yet, which is the assumption for it's use case. In other
+  /** This will fail hard if the DiffGraph hasn't been applied yet, which is the assumption for its use case. In other
     * words, we specifically don't want to invoke `find(protoNode).flatMap(_.storedRef)` here
     */
   def findGNode(protoNode: CpgStruct.Node): Option[GNode] =
