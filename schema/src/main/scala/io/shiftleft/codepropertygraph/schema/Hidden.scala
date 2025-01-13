@@ -2,6 +2,7 @@ package io.shiftleft.codepropertygraph.schema
 
 import flatgraph.schema.Property.ValueType
 import flatgraph.schema.{EdgeType, NodeType, SchemaBuilder, SchemaInfo}
+import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 
 object Hidden extends SchemaBase {
   override def docIndex: Int = -1
@@ -287,6 +288,23 @@ object Hidden extends SchemaBase {
         |we can use this to preserve the link to the original""".stripMargin
     )
 
+    val genericSignature = builder
+      .addProperty(
+        name = "GENERIC_SIGNATURE",
+        valueType = ValueType.String,
+        comment = """This field is experimental. It will likely be removed in the future without any notice.
+                    |It stores type information for generic types and methods as well as type information
+                    |for members and locals where the type either contains a type parameter reference or
+                    |an instantiated type reference.
+                    |""".stripMargin
+      )
+      .mandatory(PropertyDefaults.String)
+      .protoId(251)
+
+    method.addProperty(genericSignature)
+    typeDecl.addProperty(genericSignature)
+    member.addProperty(genericSignature)
+    local.addProperty(genericSignature)
   }
 
 }
