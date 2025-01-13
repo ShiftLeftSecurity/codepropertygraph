@@ -35,7 +35,7 @@ final class TraversalPropertyTypeDeclFullName[
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 51, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 52, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.typeDeclFullName == value }
   }

@@ -32,7 +32,7 @@ final class TraversalJumplabelBase[NodeType <: nodes.JumpLabelBase](val traversa
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 40, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.name == value }
   }
@@ -91,7 +91,7 @@ final class TraversalJumplabelBase[NodeType <: nodes.JumpLabelBase](val traversa
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 46, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 47, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.parserTypeName == value }
   }

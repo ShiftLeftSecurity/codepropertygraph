@@ -13,6 +13,7 @@ trait LocalEMT
     with DeclarationEMT
     with HasClosureBindingIdEMT
     with HasDynamicTypeHintFullNameEMT
+    with HasGenericSignatureEMT
     with HasPossibleTypesEMT
     with HasTypeFullNameEMT
 
@@ -26,6 +27,7 @@ trait LocalBase extends AbstractNode with AstNodeBase with DeclarationBase with 
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
+    if (("<empty>": String) != this.genericSignature) res.put("GENERIC_SIGNATURE", this.genericSignature)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
@@ -54,6 +56,12 @@ object Local {
 
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
     val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
+
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature = "GENERIC_SIGNATURE"
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
@@ -95,34 +103,42 @@ object Local {
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
     val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
 
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature =
+      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 48, name = "POSSIBLE_TYPES")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
-    val Code         = "<empty>"
-    val Name         = "<empty>"
-    val Order        = -1: Int
-    val TypeFullName = "<empty>"
+    val Code             = "<empty>"
+    val GenericSignature = "<empty>"
+    val Name             = "<empty>"
+    val Order            = -1: Int
+    val TypeFullName     = "<empty>"
   }
 }
 
@@ -139,11 +155,12 @@ class Local(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 1 => "code"
       case 2 => "columnNumber"
       case 3 => "dynamicTypeHintFullName"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
-      case 7 => "possibleTypes"
-      case 8 => "typeFullName"
+      case 4 => "genericSignature"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
       case _ => ""
     }
 
@@ -153,16 +170,17 @@ class Local(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 1 => this.code
       case 2 => this.columnNumber
       case 3 => this.dynamicTypeHintFullName
-      case 4 => this.lineNumber
-      case 5 => this.name
-      case 6 => this.order
-      case 7 => this.possibleTypes
-      case 8 => this.typeFullName
+      case 4 => this.genericSignature
+      case 5 => this.lineNumber
+      case 6 => this.name
+      case 7 => this.order
+      case 8 => this.possibleTypes
+      case 9 => this.typeFullName
       case _ => null
     }
 
   override def productPrefix = "Local"
-  override def productArity  = 9
+  override def productArity  = 10
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Local]
 }
@@ -1514,6 +1532,31 @@ object NewLocal {
         }
       }
     }
+    object NewNodeInserter_Local_genericSignature extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewLocal =>
+              dstCast(offset) = generated.genericSignature
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Local_lineNumber extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1663,6 +1706,7 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
   var code: String                                       = "<empty>": String
   var columnNumber: Option[Int]                          = None
   var dynamicTypeHintFullName: IndexedSeq[String]        = ArraySeq.empty
+  var genericSignature: String                           = "<empty>": String
   var lineNumber: Option[Int]                            = None
   var name: String                                       = "<empty>": String
   var order: Int                                         = -1: Int
@@ -1676,6 +1720,7 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(ArraySeq); this
   }
+  def genericSignature(value: String): this.type            = { this.genericSignature = value; this }
   def lineNumber(value: Int): this.type                     = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type             = { this.lineNumber = value; this }
   def name(value: String): this.type                        = { this.name = value; this }
@@ -1687,11 +1732,12 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 47, possibleTypes.size)
-    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 23, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 48, possibleTypes.size)
+    interface.countProperty(this, 53, 1)
   }
 
   override def copy: this.type = {
@@ -1700,6 +1746,7 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
+    newInstance.genericSignature = this.genericSignature
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
     newInstance.order = this.order
@@ -1714,11 +1761,12 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
       case 1 => "code"
       case 2 => "columnNumber"
       case 3 => "dynamicTypeHintFullName"
-      case 4 => "lineNumber"
-      case 5 => "name"
-      case 6 => "order"
-      case 7 => "possibleTypes"
-      case 8 => "typeFullName"
+      case 4 => "genericSignature"
+      case 5 => "lineNumber"
+      case 6 => "name"
+      case 7 => "order"
+      case 8 => "possibleTypes"
+      case 9 => "typeFullName"
       case _ => ""
     }
 
@@ -1728,15 +1776,16 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
       case 1 => this.code
       case 2 => this.columnNumber
       case 3 => this.dynamicTypeHintFullName
-      case 4 => this.lineNumber
-      case 5 => this.name
-      case 6 => this.order
-      case 7 => this.possibleTypes
-      case 8 => this.typeFullName
+      case 4 => this.genericSignature
+      case 5 => this.lineNumber
+      case 6 => this.name
+      case 7 => this.order
+      case 8 => this.possibleTypes
+      case 9 => this.typeFullName
       case _ => null
     }
 
   override def productPrefix                = "NewLocal"
-  override def productArity                 = 9
+  override def productArity                 = 10
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewLocal]
 }

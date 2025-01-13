@@ -35,7 +35,7 @@ final class TraversalPropertyMethodShortName[
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 37, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 38, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.methodShortName == value }
   }

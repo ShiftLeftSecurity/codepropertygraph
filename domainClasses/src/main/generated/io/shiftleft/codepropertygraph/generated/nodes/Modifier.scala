@@ -59,17 +59,17 @@ object Modifier {
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** The modifier type is a free-form string. The following are known modifier types: `STATIC`, `PUBLIC`,
       * `PROTECTED`, `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`.
       */
-    val ModifierType = flatgraph.SinglePropertyKey[String](kind = 38, name = "MODIFIER_TYPE", default = "<empty>")
+    val ModifierType = flatgraph.SinglePropertyKey[String](kind = 39, name = "MODIFIER_TYPE", default = "<empty>")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code         = "<empty>"
@@ -1509,9 +1509,9 @@ class NewModifier extends NewNode(31.toShort) with ModifierBase with AstNodeNew 
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 44, 1)
   }
 
   override def copy: this.type = {

@@ -16,6 +16,7 @@ trait MethodEMT
     with HasColumnNumberEndEMT
     with HasFilenameEMT
     with HasFullNameEMT
+    with HasGenericSignatureEMT
     with HasHashEMT
     with HasIsExternalEMT
     with HasLineNumberEndEMT
@@ -35,6 +36,7 @@ trait MethodBase extends AbstractNode with CfgNodeBase with DeclarationBase with
     this.columnNumberEnd.foreach { p => res.put("COLUMN_NUMBER_END", p) }
     if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
     if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.genericSignature) res.put("GENERIC_SIGNATURE", this.genericSignature)
     this.hash.foreach { p => res.put("HASH", p) }
     if ((false: Boolean) != this.isExternal) res.put("IS_EXTERNAL", this.isExternal)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
@@ -82,6 +84,12 @@ object Method {
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
     val FullName = "FULL_NAME"
+
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature = "GENERIC_SIGNATURE"
 
     /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
       * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
@@ -166,28 +174,35 @@ object Method {
       */
     val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
 
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature =
+      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+
     /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
       * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
       * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
       * be deferred or skipped if the hash is not needed.
       */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
+    val Hash = flatgraph.OptionalPropertyKey[String](kind = 24, name = "HASH")
 
     /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
       * code (applies both to insular parsing and to library functions where we have header files only)
       */
-    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 29, name = "IS_EXTERNAL", default = false)
+    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_EXTERNAL", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** This optional fields provides the line number at which the program construct represented by the node ends.
       */
-    val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER_END")
+    val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER_END")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -195,25 +210,25 @@ object Method {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 41, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
       * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
       * function overloading. The present specification does not enforce a strict format for the signature, that is, it
       * can be chosen by the frontend implementor to fit the source language.
       */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 50, name = "SIGNATURE", default = "")
   }
   object PropertyDefaults {
     val AstParentFullName = "<empty>"
@@ -221,6 +236,7 @@ object Method {
     val Code              = "<empty>"
     val Filename          = "<empty>"
     val FullName          = "<empty>"
+    val GenericSignature  = "<empty>"
     val IsExternal        = false
     val Name              = "<empty>"
     val Order             = -1: Int
@@ -244,15 +260,16 @@ class Method(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => "columnNumberEnd"
       case 5  => "filename"
       case 6  => "fullName"
-      case 7  => "hash"
-      case 8  => "isExternal"
-      case 9  => "lineNumber"
-      case 10 => "lineNumberEnd"
-      case 11 => "name"
-      case 12 => "offset"
-      case 13 => "offsetEnd"
-      case 14 => "order"
-      case 15 => "signature"
+      case 7  => "genericSignature"
+      case 8  => "hash"
+      case 9  => "isExternal"
+      case 10 => "lineNumber"
+      case 11 => "lineNumberEnd"
+      case 12 => "name"
+      case 13 => "offset"
+      case 14 => "offsetEnd"
+      case 15 => "order"
+      case 16 => "signature"
       case _  => ""
     }
 
@@ -265,20 +282,21 @@ class Method(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => this.columnNumberEnd
       case 5  => this.filename
       case 6  => this.fullName
-      case 7  => this.hash
-      case 8  => this.isExternal
-      case 9  => this.lineNumber
-      case 10 => this.lineNumberEnd
-      case 11 => this.name
-      case 12 => this.offset
-      case 13 => this.offsetEnd
-      case 14 => this.order
-      case 15 => this.signature
+      case 7  => this.genericSignature
+      case 8  => this.hash
+      case 9  => this.isExternal
+      case 10 => this.lineNumber
+      case 11 => this.lineNumberEnd
+      case 12 => this.name
+      case 13 => this.offset
+      case 14 => this.offsetEnd
+      case 15 => this.order
+      case 16 => this.signature
       case _  => null
     }
 
   override def productPrefix = "Method"
-  override def productArity  = 16
+  override def productArity  = 17
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Method]
 }
@@ -1703,6 +1721,31 @@ object NewMethod {
         }
       }
     }
+    object NewNodeInserter_Method_genericSignature extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewMethod =>
+              dstCast(offset) = generated.genericSignature
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Method_hash extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1969,6 +2012,7 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
   var columnNumberEnd: Option[Int]                   = None
   var filename: String                               = "<empty>": String
   var fullName: String                               = "<empty>": String
+  var genericSignature: String                       = "<empty>": String
   var hash: Option[String]                           = None
   var isExternal: Boolean                            = false: Boolean
   var lineNumber: Option[Int]                        = None
@@ -1987,6 +2031,7 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
   def columnNumberEnd(value: Option[Int]): this.type = { this.columnNumberEnd = value; this }
   def filename(value: String): this.type             = { this.filename = value; this }
   def fullName(value: String): this.type             = { this.fullName = value; this }
+  def genericSignature(value: String): this.type     = { this.genericSignature = value; this }
   def hash(value: Option[String]): this.type         = { this.hash = value; this }
   def hash(value: String): this.type                 = { this.hash = Option(value); this }
   def isExternal(value: Boolean): this.type          = { this.isExternal = value; this }
@@ -2009,15 +2054,16 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
     interface.countProperty(this, 12, columnNumberEnd.size)
     interface.countProperty(this, 21, 1)
     interface.countProperty(this, 22, 1)
-    interface.countProperty(this, 23, hash.size)
-    interface.countProperty(this, 29, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 35, lineNumberEnd.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 41, offset.size)
-    interface.countProperty(this, 42, offsetEnd.size)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 23, 1)
+    interface.countProperty(this, 24, hash.size)
+    interface.countProperty(this, 30, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 36, lineNumberEnd.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {
@@ -2029,6 +2075,7 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
     newInstance.columnNumberEnd = this.columnNumberEnd
     newInstance.filename = this.filename
     newInstance.fullName = this.fullName
+    newInstance.genericSignature = this.genericSignature
     newInstance.hash = this.hash
     newInstance.isExternal = this.isExternal
     newInstance.lineNumber = this.lineNumber
@@ -2050,15 +2097,16 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
       case 4  => "columnNumberEnd"
       case 5  => "filename"
       case 6  => "fullName"
-      case 7  => "hash"
-      case 8  => "isExternal"
-      case 9  => "lineNumber"
-      case 10 => "lineNumberEnd"
-      case 11 => "name"
-      case 12 => "offset"
-      case 13 => "offsetEnd"
-      case 14 => "order"
-      case 15 => "signature"
+      case 7  => "genericSignature"
+      case 8  => "hash"
+      case 9  => "isExternal"
+      case 10 => "lineNumber"
+      case 11 => "lineNumberEnd"
+      case 12 => "name"
+      case 13 => "offset"
+      case 14 => "offsetEnd"
+      case 15 => "order"
+      case 16 => "signature"
       case _  => ""
     }
 
@@ -2071,19 +2119,20 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
       case 4  => this.columnNumberEnd
       case 5  => this.filename
       case 6  => this.fullName
-      case 7  => this.hash
-      case 8  => this.isExternal
-      case 9  => this.lineNumber
-      case 10 => this.lineNumberEnd
-      case 11 => this.name
-      case 12 => this.offset
-      case 13 => this.offsetEnd
-      case 14 => this.order
-      case 15 => this.signature
+      case 7  => this.genericSignature
+      case 8  => this.hash
+      case 9  => this.isExternal
+      case 10 => this.lineNumber
+      case 11 => this.lineNumberEnd
+      case 12 => this.name
+      case 13 => this.offset
+      case 14 => this.offsetEnd
+      case 15 => this.order
+      case 16 => this.signature
       case _  => null
     }
 
   override def productPrefix                = "NewMethod"
-  override def productArity                 = 16
+  override def productArity                 = 17
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethod]
 }

@@ -15,6 +15,7 @@ trait TypeDeclEMT
     with HasAstParentTypeEMT
     with HasFilenameEMT
     with HasFullNameEMT
+    with HasGenericSignatureEMT
     with HasInheritsFromTypeFullNameEMT
     with HasIsExternalEMT
     with HasNameEMT
@@ -33,6 +34,7 @@ trait TypeDeclBase extends AbstractNode with AstNodeBase with StaticType[TypeDec
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
     if (("<empty>": String) != this.fullName) res.put("FULL_NAME", this.fullName)
+    if (("<empty>": String) != this.genericSignature) res.put("GENERIC_SIGNATURE", this.genericSignature)
     val tmpInheritsFromTypeFullName = this.inheritsFromTypeFullName;
     if (tmpInheritsFromTypeFullName.nonEmpty) res.put("INHERITS_FROM_TYPE_FULL_NAME", tmpInheritsFromTypeFullName)
     if ((false: Boolean) != this.isExternal) res.put("IS_EXTERNAL", this.isExternal)
@@ -79,6 +81,12 @@ object TypeDecl {
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
     val FullName = "FULL_NAME"
+
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature = "GENERIC_SIGNATURE"
 
     /** The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and
       * thus it is required to have at least one TYPE node for each TYPE_FULL_NAME
@@ -150,22 +158,29 @@ object TypeDecl {
       */
     val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
 
+    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
+      * information for generic types and methods as well as type information for members and locals where the type
+      * either contains a type parameter reference or an instantiated type reference.
+      */
+    val GenericSignature =
+      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+
     /** The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and
       * thus it is required to have at least one TYPE node for each TYPE_FULL_NAME
       */
-    val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 27, name = "INHERITS_FROM_TYPE_FULL_NAME")
+    val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 28, name = "INHERITS_FROM_TYPE_FULL_NAME")
 
     /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
       * code (applies both to insular parsing and to library functions where we have header files only)
       */
-    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 29, name = "IS_EXTERNAL", default = false)
+    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_EXTERNAL", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -173,18 +188,18 @@ object TypeDecl {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 41, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val AstParentFullName = "<empty>"
@@ -192,6 +207,7 @@ object TypeDecl {
     val Code              = "<empty>"
     val Filename          = "<empty>"
     val FullName          = "<empty>"
+    val GenericSignature  = "<empty>"
     val IsExternal        = false
     val Name              = "<empty>"
     val Order             = -1: Int
@@ -213,13 +229,14 @@ class TypeDecl(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => "columnNumber"
       case 5  => "filename"
       case 6  => "fullName"
-      case 7  => "inheritsFromTypeFullName"
-      case 8  => "isExternal"
-      case 9  => "lineNumber"
-      case 10 => "name"
-      case 11 => "offset"
-      case 12 => "offsetEnd"
-      case 13 => "order"
+      case 7  => "genericSignature"
+      case 8  => "inheritsFromTypeFullName"
+      case 9  => "isExternal"
+      case 10 => "lineNumber"
+      case 11 => "name"
+      case 12 => "offset"
+      case 13 => "offsetEnd"
+      case 14 => "order"
       case _  => ""
     }
 
@@ -232,18 +249,19 @@ class TypeDecl(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => this.columnNumber
       case 5  => this.filename
       case 6  => this.fullName
-      case 7  => this.inheritsFromTypeFullName
-      case 8  => this.isExternal
-      case 9  => this.lineNumber
-      case 10 => this.name
-      case 11 => this.offset
-      case 12 => this.offsetEnd
-      case 13 => this.order
+      case 7  => this.genericSignature
+      case 8  => this.inheritsFromTypeFullName
+      case 9  => this.isExternal
+      case 10 => this.lineNumber
+      case 11 => this.name
+      case 12 => this.offset
+      case 13 => this.offsetEnd
+      case 14 => this.order
       case _  => null
     }
 
   override def productPrefix = "TypeDecl"
-  override def productArity  = 14
+  override def productArity  = 15
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[TypeDecl]
 }
@@ -1668,6 +1686,31 @@ object NewTypeDecl {
         }
       }
     }
+    object NewNodeInserter_TypeDecl_genericSignature extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewTypeDecl =>
+              dstCast(offset) = generated.genericSignature
+              offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_TypeDecl_inheritsFromTypeFullName extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1878,6 +1921,7 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
   var columnNumber: Option[Int]                           = None
   var filename: String                                    = "<empty>": String
   var fullName: String                                    = "<empty>": String
+  var genericSignature: String                            = "<empty>": String
   var inheritsFromTypeFullName: IndexedSeq[String]        = ArraySeq.empty
   var isExternal: Boolean                                 = false: Boolean
   var lineNumber: Option[Int]                             = None
@@ -1894,6 +1938,7 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
   def columnNumber(value: Option[Int]): this.type         = { this.columnNumber = value; this }
   def filename(value: String): this.type                  = { this.filename = value; this }
   def fullName(value: String): this.type                  = { this.fullName = value; this }
+  def genericSignature(value: String): this.type          = { this.genericSignature = value; this }
   def inheritsFromTypeFullName(value: IterableOnce[String]): this.type = {
     this.inheritsFromTypeFullName = value.iterator.to(ArraySeq); this
   }
@@ -1914,13 +1959,14 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 21, 1)
     interface.countProperty(this, 22, 1)
-    interface.countProperty(this, 27, inheritsFromTypeFullName.size)
-    interface.countProperty(this, 29, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 41, offset.size)
-    interface.countProperty(this, 42, offsetEnd.size)
-    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 23, 1)
+    interface.countProperty(this, 28, inheritsFromTypeFullName.size)
+    interface.countProperty(this, 30, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
+    interface.countProperty(this, 44, 1)
   }
 
   override def copy: this.type = {
@@ -1932,6 +1978,7 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
     newInstance.columnNumber = this.columnNumber
     newInstance.filename = this.filename
     newInstance.fullName = this.fullName
+    newInstance.genericSignature = this.genericSignature
     newInstance.inheritsFromTypeFullName = this.inheritsFromTypeFullName
     newInstance.isExternal = this.isExternal
     newInstance.lineNumber = this.lineNumber
@@ -1951,13 +1998,14 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
       case 4  => "columnNumber"
       case 5  => "filename"
       case 6  => "fullName"
-      case 7  => "inheritsFromTypeFullName"
-      case 8  => "isExternal"
-      case 9  => "lineNumber"
-      case 10 => "name"
-      case 11 => "offset"
-      case 12 => "offsetEnd"
-      case 13 => "order"
+      case 7  => "genericSignature"
+      case 8  => "inheritsFromTypeFullName"
+      case 9  => "isExternal"
+      case 10 => "lineNumber"
+      case 11 => "name"
+      case 12 => "offset"
+      case 13 => "offsetEnd"
+      case 14 => "order"
       case _  => ""
     }
 
@@ -1970,17 +2018,18 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
       case 4  => this.columnNumber
       case 5  => this.filename
       case 6  => this.fullName
-      case 7  => this.inheritsFromTypeFullName
-      case 8  => this.isExternal
-      case 9  => this.lineNumber
-      case 10 => this.name
-      case 11 => this.offset
-      case 12 => this.offsetEnd
-      case 13 => this.order
+      case 7  => this.genericSignature
+      case 8  => this.inheritsFromTypeFullName
+      case 9  => this.isExternal
+      case 10 => this.lineNumber
+      case 11 => this.name
+      case 12 => this.offset
+      case 13 => this.offsetEnd
+      case 14 => this.order
       case _  => null
     }
 
   override def productPrefix                = "NewTypeDecl"
-  override def productArity                 = 14
+  override def productArity                 = 15
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewTypeDecl]
 }

@@ -106,30 +106,30 @@ object MethodParameterOut {
     /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
       * 0 is reserved for implicit self / this parameter.
       */
-    val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
+    val Index = flatgraph.SinglePropertyKey[Int](kind = 27, name = "INDEX", default = -1: Int)
 
     /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
       * parameter of a method is allowed to have this property set to true.
       */
-    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_VARIADIC", default = false)
+    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 31, name = "IS_VARIADIC", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code               = "<empty>"
@@ -1696,12 +1696,12 @@ class NewMethodParameterOut
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 19, 1)
-    interface.countProperty(this, 26, 1)
-    interface.countProperty(this, 30, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 27, 1)
+    interface.countProperty(this, 31, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 53, 1)
   }
 
   override def copy: this.type = {

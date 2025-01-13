@@ -100,31 +100,31 @@ object Import {
       * identical to the class name. But e.g. for a Kotlin import like "import java.nio.ByteBuffer as BBuffer" this
       * would be "BBuffer". This property is ignored if IS_WILDCARD is true.
       */
-    val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 24, name = "IMPORTED_AS")
+    val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_AS")
 
     /** The identifying string of the imported entity. For a Java import like "import java.nio.ByteBuffer;" this would
       * be "java.nio.ByteBuffer".
       */
-    val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_ENTITY")
+    val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 26, name = "IMPORTED_ENTITY")
 
     /** Specifies whether this is an explicit import. Most languages have implicit default imports of some standard
       * library elements and this flag is used to distinguish those from explicit imports found in the code base.
       */
-    val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 28, name = "IS_EXPLICIT")
+    val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 29, name = "IS_EXPLICIT")
 
     /** Specifies whether this is a wildcard import. For a Java import like "import java.nio.*;" IS_WILDCARD would be
       * "true" and IMPORTED_ENTITY would be "java.nio". For wildcard imports the IMPORTED_AS property is ignored.
       */
-    val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 31, name = "IS_WILDCARD")
+    val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 32, name = "IS_WILDCARD")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code  = "<empty>"
@@ -1705,12 +1705,12 @@ class NewImport extends NewNode(17.toShort) with ImportBase with AstNodeNew {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 20, explicitAs.size)
-    interface.countProperty(this, 24, importedAs.size)
-    interface.countProperty(this, 25, importedEntity.size)
-    interface.countProperty(this, 28, isExplicit.size)
-    interface.countProperty(this, 31, isWildcard.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 25, importedAs.size)
+    interface.countProperty(this, 26, importedEntity.size)
+    interface.countProperty(this, 29, isExplicit.size)
+    interface.countProperty(this, 32, isWildcard.size)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 44, 1)
   }
 
   override def copy: this.type = {

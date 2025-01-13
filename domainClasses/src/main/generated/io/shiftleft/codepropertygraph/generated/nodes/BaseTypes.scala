@@ -234,6 +234,11 @@ trait HasFilenameEMT
   */
 trait HasFullNameEMT
 
+/** Node types with this marker trait are guaranteed to have the GENERIC_SIGNATURE property. EMT stands for: "erased
+  * marker trait", it exists only at compile time in order to improve type safety.
+  */
+trait HasGenericSignatureEMT
+
 /** Node types with this marker trait are guaranteed to have the HASH property. EMT stands for: "erased marker trait",
   * it exists only at compile time in order to improve type safety.
   */

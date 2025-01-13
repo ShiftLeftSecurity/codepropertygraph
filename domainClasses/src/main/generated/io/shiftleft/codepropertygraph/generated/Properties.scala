@@ -117,87 +117,93 @@ object Properties {
     */
   val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
 
+  /** This field is experimental. It will likely be removed in the future without any notice. It stores type information
+    * for generic types and methods as well as type information for members and locals where the type either contains a
+    * type parameter reference or an instantiated type reference.
+    */
+  val GenericSignature = flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+
   /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
     * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
     * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to be
     * deferred or skipped if the hash is not needed.
     */
-  val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
+  val Hash = flatgraph.OptionalPropertyKey[String](kind = 24, name = "HASH")
 
   /** The identifier under which the import can be accessed in the importing context. For a Java import this is always
     * identical to the class name. But e.g. for a Kotlin import like "import java.nio.ByteBuffer as BBuffer" this would
     * be "BBuffer". This property is ignored if IS_WILDCARD is true.
     */
-  val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 24, name = "IMPORTED_AS")
+  val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_AS")
 
   /** The identifying string of the imported entity. For a Java import like "import java.nio.ByteBuffer;" this would be
     * "java.nio.ByteBuffer".
     */
-  val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_ENTITY")
+  val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 26, name = "IMPORTED_ENTITY")
 
   /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index 0
     * is reserved for implicit self / this parameter.
     */
-  val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
+  val Index = flatgraph.SinglePropertyKey[Int](kind = 27, name = "INDEX", default = -1: Int)
 
   /** The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus
     * it is required to have at least one TYPE node for each TYPE_FULL_NAME
     */
-  val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 27, name = "INHERITS_FROM_TYPE_FULL_NAME")
+  val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 28, name = "INHERITS_FROM_TYPE_FULL_NAME")
 
   /** Specifies whether this is an explicit import. Most languages have implicit default imports of some standard
     * library elements and this flag is used to distinguish those from explicit imports found in the code base.
     */
-  val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 28, name = "IS_EXPLICIT")
+  val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 29, name = "IS_EXPLICIT")
 
   /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
     * code (applies both to insular parsing and to library functions where we have header files only)
     */
-  val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 29, name = "IS_EXTERNAL", default = false)
+  val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_EXTERNAL", default = false)
 
   /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one parameter
     * of a method is allowed to have this property set to true.
     */
-  val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_VARIADIC", default = false)
+  val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 31, name = "IS_VARIADIC", default = false)
 
   /** Specifies whether this is a wildcard import. For a Java import like "import java.nio.*;" IS_WILDCARD would be
     * "true" and IMPORTED_ENTITY would be "java.nio". For wildcard imports the IMPORTED_AS property is ignored.
     */
-  val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 31, name = "IS_WILDCARD")
+  val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 32, name = "IS_WILDCARD")
 
   /** This property denotes a key of a key-value pair. */
-  val Key = flatgraph.SinglePropertyKey[String](kind = 32, name = "KEY", default = "<empty>")
+  val Key = flatgraph.SinglePropertyKey[String](kind = 33, name = "KEY", default = "<empty>")
 
   /** This field indicates which CPG language frontend generated the CPG. Frontend developers may freely choose a value
     * that describes their frontend so long as it is not used by an existing frontend. Reserved values are to date: C,
     * LLVM, GHIDRA, PHP.
     */
-  val Language = flatgraph.SinglePropertyKey[String](kind = 33, name = "LANGUAGE", default = "<empty>")
+  val Language = flatgraph.SinglePropertyKey[String](kind = 34, name = "LANGUAGE", default = "<empty>")
 
   /** This optional field provides the line number of the program construct represented by the node.
     */
-  val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+  val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
   /** This optional fields provides the line number at which the program construct represented by the node ends.
     */
-  val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER_END")
+  val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER_END")
 
   /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node for
     * each METHOD_FULL_NAME
     */
-  val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+  val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_FULL_NAME", default = "<empty>")
 
-  val MethodShortName = flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_SHORT_NAME", default = "<empty>")
+  val MethodShortName = flatgraph.SinglePropertyKey[String](kind = 38, name = "METHOD_SHORT_NAME", default = "<empty>")
 
   /** The modifier type is a free-form string. The following are known modifier types: `STATIC`, `PUBLIC`, `PROTECTED`,
     * `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`.
     */
-  val ModifierType = flatgraph.SinglePropertyKey[String](kind = 38, name = "MODIFIER_TYPE", default = "<empty>")
+  val ModifierType = flatgraph.SinglePropertyKey[String](kind = 39, name = "MODIFIER_TYPE", default = "<empty>")
 
   /** Name of represented object, e.g., method name (e.g. "run") */
-  val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+  val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
-  val NodeLabel = flatgraph.SinglePropertyKey[String](kind = 40, name = "NODE_LABEL", default = "<empty>")
+  val NodeLabel = flatgraph.SinglePropertyKey[String](kind = 41, name = "NODE_LABEL", default = "<empty>")
 
   /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
     * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -205,64 +211,64 @@ object Properties {
     * for METHOD nodes this start offset points to the start of the methods source code in the string holding the source
     * code of the entire file.
     */
-  val Offset = flatgraph.OptionalPropertyKey[Int](kind = 41, name = "OFFSET")
+  val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
 
   /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
     * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
     * method.
     */
-  val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET_END")
+  val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
 
   /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order of
     * 0.
     */
-  val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+  val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
   /** The field contains the names of the overlays applied to this CPG, in order of their application. Names are
     * free-form strings, that is, this specification does not dictate them but rather requires tool producers and
     * consumers to communicate them between each other.
     */
-  val Overlays = flatgraph.MultiPropertyKey[String](kind = 44, name = "OVERLAYS")
+  val Overlays = flatgraph.MultiPropertyKey[String](kind = 45, name = "OVERLAYS")
 
-  val PackageName = flatgraph.SinglePropertyKey[String](kind = 45, name = "PACKAGE_NAME", default = "<empty>")
+  val PackageName = flatgraph.SinglePropertyKey[String](kind = 46, name = "PACKAGE_NAME", default = "<empty>")
 
   /** AST node type name emitted by parser. */
-  val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 46, name = "PARSER_TYPE_NAME", default = "<empty>")
+  val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 47, name = "PARSER_TYPE_NAME", default = "<empty>")
 
   /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
     * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
     */
-  val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+  val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 48, name = "POSSIBLE_TYPES")
 
   /** The path to the root directory of the source/binary this CPG is generated from. */
-  val Root = flatgraph.SinglePropertyKey[String](kind = 48, name = "ROOT", default = "<empty>")
+  val Root = flatgraph.SinglePropertyKey[String](kind = 49, name = "ROOT", default = "<empty>")
 
   /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and suitable
     * for differentiating methods with different parameter types sufficiently to allow for resolving of function
     * overloading. The present specification does not enforce a strict format for the signature, that is, it can be
     * chosen by the frontend implementor to fit the source language.
     */
-  val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
+  val Signature = flatgraph.SinglePropertyKey[String](kind = 50, name = "SIGNATURE", default = "")
 
-  val Symbol = flatgraph.SinglePropertyKey[String](kind = 50, name = "SYMBOL", default = "<empty>")
+  val Symbol = flatgraph.SinglePropertyKey[String](kind = 51, name = "SYMBOL", default = "<empty>")
 
   /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required
     * to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
     */
   val TypeDeclFullName =
-    flatgraph.SinglePropertyKey[String](kind = 51, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
+    flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
 
   /** This field contains the fully-qualified static type name of the program construct represented by a node. It is the
     * name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type cannot
     * be determined, this field should be set to the empty string.
     */
-  val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
+  val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
 
   /** This property denotes a string value as used in a key-value pair. */
-  val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
+  val Value = flatgraph.SinglePropertyKey[String](kind = 54, name = "VALUE", default = "")
 
   /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
     * this CPG conforms to
     */
-  val Version = flatgraph.SinglePropertyKey[String](kind = 54, name = "VERSION", default = "<empty>")
+  val Version = flatgraph.SinglePropertyKey[String](kind = 55, name = "VERSION", default = "<empty>")
 }

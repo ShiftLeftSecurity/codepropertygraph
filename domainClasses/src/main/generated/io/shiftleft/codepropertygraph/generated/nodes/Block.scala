@@ -110,23 +110,23 @@ object Block {
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 48, name = "POSSIBLE_TYPES")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex = -1: Int
@@ -1697,10 +1697,10 @@ class NewBlock extends NewNode(6.toShort) with BlockBase with ExpressionNew {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 47, possibleTypes.size)
-    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 48, possibleTypes.size)
+    interface.countProperty(this, 53, 1)
   }
 
   override def copy: this.type = {

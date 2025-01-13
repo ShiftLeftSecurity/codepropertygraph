@@ -67,27 +67,27 @@ object MetaData {
       * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
       * be deferred or skipped if the hash is not needed.
       */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
+    val Hash = flatgraph.OptionalPropertyKey[String](kind = 24, name = "HASH")
 
     /** This field indicates which CPG language frontend generated the CPG. Frontend developers may freely choose a
       * value that describes their frontend so long as it is not used by an existing frontend. Reserved values are to
       * date: C, LLVM, GHIDRA, PHP.
       */
-    val Language = flatgraph.SinglePropertyKey[String](kind = 33, name = "LANGUAGE", default = "<empty>")
+    val Language = flatgraph.SinglePropertyKey[String](kind = 34, name = "LANGUAGE", default = "<empty>")
 
     /** The field contains the names of the overlays applied to this CPG, in order of their application. Names are
       * free-form strings, that is, this specification does not dictate them but rather requires tool producers and
       * consumers to communicate them between each other.
       */
-    val Overlays = flatgraph.MultiPropertyKey[String](kind = 44, name = "OVERLAYS")
+    val Overlays = flatgraph.MultiPropertyKey[String](kind = 45, name = "OVERLAYS")
 
     /** The path to the root directory of the source/binary this CPG is generated from. */
-    val Root = flatgraph.SinglePropertyKey[String](kind = 48, name = "ROOT", default = "<empty>")
+    val Root = flatgraph.SinglePropertyKey[String](kind = 49, name = "ROOT", default = "<empty>")
 
     /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
       * this CPG conforms to
       */
-    val Version = flatgraph.SinglePropertyKey[String](kind = 54, name = "VERSION", default = "<empty>")
+    val Version = flatgraph.SinglePropertyKey[String](kind = 55, name = "VERSION", default = "<empty>")
   }
   object PropertyDefaults {
     val Language = "<empty>"
@@ -290,11 +290,11 @@ class NewMetaData extends NewNode(25.toShort) with MetaDataBase {
   def root(value: String): this.type                   = { this.root = value; this }
   def version(value: String): this.type                = { this.version = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 23, hash.size)
-    interface.countProperty(this, 33, 1)
-    interface.countProperty(this, 44, overlays.size)
-    interface.countProperty(this, 48, 1)
-    interface.countProperty(this, 54, 1)
+    interface.countProperty(this, 24, hash.size)
+    interface.countProperty(this, 34, 1)
+    interface.countProperty(this, 45, overlays.size)
+    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 55, 1)
   }
 
   override def copy: this.type = {

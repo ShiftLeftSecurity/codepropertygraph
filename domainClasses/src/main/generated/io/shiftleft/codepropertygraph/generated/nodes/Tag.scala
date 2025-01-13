@@ -33,10 +33,10 @@ object Tag {
   object Properties {
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** This property denotes a string value as used in a key-value pair. */
-    val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
+    val Value = flatgraph.SinglePropertyKey[String](kind = 54, name = "VALUE", default = "")
   }
   object PropertyDefaults {
     val Name  = "<empty>"
@@ -169,8 +169,8 @@ class NewTag extends NewNode(35.toShort) with TagBase {
   def name(value: String): this.type  = { this.name = value; this }
   def value(value: String): this.type = { this.value = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 53, 1)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 54, 1)
   }
 
   override def copy: this.type = {
