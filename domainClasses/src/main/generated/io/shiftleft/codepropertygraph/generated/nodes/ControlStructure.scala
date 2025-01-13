@@ -101,15 +101,15 @@ object ControlStructure {
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** AST node type name emitted by parser. */
-    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 46, name = "PARSER_TYPE_NAME", default = "<empty>")
+    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 47, name = "PARSER_TYPE_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex        = -1: Int
@@ -1646,9 +1646,9 @@ class NewControlStructure extends NewNode(11.toShort) with ControlStructureBase 
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 15, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 46, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 47, 1)
   }
 
   override def copy: this.type = {

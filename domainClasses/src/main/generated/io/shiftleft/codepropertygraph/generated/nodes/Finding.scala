@@ -35,9 +35,9 @@ class Finding(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 15.toShort, seq_4762)
     with FindingBase
     with StaticType[FindingEMT] {
-  def evidence: IndexedSeq[StoredNode] = flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind, 55, seq)
+  def evidence: IndexedSeq[StoredNode] = flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind, 56, seq)
   def keyValuePairs: IndexedSeq[KeyValuePair] =
-    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind, 56, seq)
+    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind, 57, seq)
 
   override def productElementName(n: Int): String =
     n match {
@@ -146,9 +146,9 @@ class NewFinding extends NewNode(15.toShort) with FindingBase {
     this.keyValuePairs = value.iterator.to(ArraySeq); this
   }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 55, evidence.size)
+    interface.countProperty(this, 56, evidence.size)
     evidence.foreach(interface.visitContainedNode)
-    interface.countProperty(this, 56, keyValuePairs.size)
+    interface.countProperty(this, 57, keyValuePairs.size)
     keyValuePairs.foreach(interface.visitContainedNode)
   }
 

@@ -42,12 +42,12 @@ object Dependency {
     val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 16, name = "DEPENDENCY_GROUP_ID")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
       * this CPG conforms to
       */
-    val Version = flatgraph.SinglePropertyKey[String](kind = 54, name = "VERSION", default = "<empty>")
+    val Version = flatgraph.SinglePropertyKey[String](kind = 55, name = "VERSION", default = "<empty>")
   }
   object PropertyDefaults {
     val Name    = "<empty>"
@@ -190,8 +190,8 @@ class NewDependency extends NewNode(12.toShort) with DependencyBase {
   def version(value: String): this.type                   = { this.version = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 16, dependencyGroupId.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 54, 1)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 55, 1)
   }
 
   override def copy: this.type = {

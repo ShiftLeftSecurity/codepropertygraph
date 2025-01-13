@@ -35,8 +35,8 @@ class TagNodePair(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 36.toShort, seq_4762)
     with TagNodePairBase
     with StaticType[TagNodePairEMT] {
-  def node: StoredNode = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 57, seq, null: StoredNode)
-  def tag: Tag         = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 58, seq, null: Tag)
+  def node: StoredNode = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 58, seq, null: StoredNode)
+  def tag: Tag         = flatgraph.Accessors.getNodePropertySingle(graph, nodeKind, 59, seq, null: Tag)
 
   override def productElementName(n: Int): String =
     n match {
@@ -137,9 +137,9 @@ class NewTagNodePair extends NewNode(36.toShort) with TagNodePairBase {
   def node(value: AbstractNode): this.type = { this.node = value; this }
   def tag(value: TagBase): this.type       = { this.tag = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 57, 1)
-    interface.visitContainedNode(node)
     interface.countProperty(this, 58, 1)
+    interface.visitContainedNode(node)
+    interface.countProperty(this, 59, 1)
     interface.visitContainedNode(tag)
   }
 

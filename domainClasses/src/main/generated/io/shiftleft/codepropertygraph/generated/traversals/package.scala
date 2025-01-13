@@ -105,6 +105,10 @@ package object traversals {
     implicit def accessPropertyFullNameTraversal[NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasFullNameEMT]](
       traversal: IterableOnce[NodeType]
     ): TraversalPropertyFullName[NodeType] = new TraversalPropertyFullName(traversal.iterator)
+    implicit def accessPropertyGenericSignatureTraversal[
+      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasGenericSignatureEMT]
+    ](traversal: IterableOnce[NodeType]): TraversalPropertyGenericSignature[NodeType] =
+      new TraversalPropertyGenericSignature(traversal.iterator)
     implicit def accessPropertyHashTraversal[NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasHashEMT]](
       traversal: IterableOnce[NodeType]
     ): TraversalPropertyHash[NodeType] = new TraversalPropertyHash(traversal.iterator)

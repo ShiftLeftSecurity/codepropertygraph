@@ -115,6 +115,12 @@ name of a method or type. The details of what constitutes a fully-qualified
 name are language specific. This field SHOULD be human readable. */
 public static final String FULL_NAME = "FULL_NAME";
 
+/** This field is experimental. It will likely be removed in the future without any notice.
+It stores type information for generic types and methods as well as type information
+for members and locals where the type either contains a type parameter reference or
+an instantiated type reference. */
+public static final String GENERIC_SIGNATURE = "GENERIC_SIGNATURE";
+
 /** This property contains a hash value in the form of a string.
 Hashes can be used to summarize data, e.g., to summarize the
 contents of source files or sub graphs. Such summaries are useful
@@ -297,6 +303,7 @@ add(EVALUATION_STRATEGY);
 add(EXPLICIT_AS);
 add(FILENAME);
 add(FULL_NAME);
+add(GENERIC_SIGNATURE);
 add(HASH);
 add(IMPORTED_AS);
 add(IMPORTED_ENTITY);

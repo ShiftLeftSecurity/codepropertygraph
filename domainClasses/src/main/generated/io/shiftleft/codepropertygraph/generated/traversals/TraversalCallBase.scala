@@ -95,7 +95,7 @@ final class TraversalCallBase[NodeType <: nodes.CallBase](val traversal: Iterato
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 36, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 37, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.methodFullName == value }
   }
@@ -158,7 +158,7 @@ final class TraversalCallBase[NodeType <: nodes.CallBase](val traversal: Iterato
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 52, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 53, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.typeFullName == value }
   }

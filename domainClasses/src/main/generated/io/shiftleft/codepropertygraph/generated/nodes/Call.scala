@@ -146,38 +146,38 @@ object Call {
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
       * for each METHOD_FULL_NAME
       */
-    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_FULL_NAME", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 47, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 48, name = "POSSIBLE_TYPES")
 
     /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
       * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
       * function overloading. The present specification does not enforce a strict format for the signature, that is, it
       * can be chosen by the frontend implementor to fit the source language.
       */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 50, name = "SIGNATURE", default = "")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex  = -1: Int
@@ -1870,13 +1870,13 @@ class NewCall extends NewNode(7.toShort) with CallBase with CallReprNew with Exp
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 17, 1)
     interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 36, 1)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 43, 1)
-    interface.countProperty(this, 47, possibleTypes.size)
-    interface.countProperty(this, 49, 1)
-    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 48, possibleTypes.size)
+    interface.countProperty(this, 50, 1)
+    interface.countProperty(this, 53, 1)
   }
 
   override def copy: this.type = {

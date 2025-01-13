@@ -45,17 +45,17 @@ object Binding {
     /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
       * for each METHOD_FULL_NAME
       */
-    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_FULL_NAME", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
       * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
       * function overloading. The present specification does not enforce a strict format for the signature, that is, it
       * can be chosen by the frontend implementor to fit the source language.
       */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 49, name = "SIGNATURE", default = "")
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 50, name = "SIGNATURE", default = "")
   }
   object PropertyDefaults {
     val MethodFullName = "<empty>"
@@ -193,9 +193,9 @@ class NewBinding extends NewNode(5.toShort) with BindingBase {
   def name(value: String): this.type           = { this.name = value; this }
   def signature(value: String): this.type      = { this.signature = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 36, 1)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {

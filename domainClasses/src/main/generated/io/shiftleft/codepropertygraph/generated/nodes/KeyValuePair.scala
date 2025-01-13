@@ -33,10 +33,10 @@ object KeyValuePair {
   object Properties {
 
     /** This property denotes a key of a key-value pair. */
-    val Key = flatgraph.SinglePropertyKey[String](kind = 32, name = "KEY", default = "<empty>")
+    val Key = flatgraph.SinglePropertyKey[String](kind = 33, name = "KEY", default = "<empty>")
 
     /** This property denotes a string value as used in a key-value pair. */
-    val Value = flatgraph.SinglePropertyKey[String](kind = 53, name = "VALUE", default = "")
+    val Value = flatgraph.SinglePropertyKey[String](kind = 54, name = "VALUE", default = "")
   }
   object PropertyDefaults {
     val Key   = "<empty>"
@@ -144,8 +144,8 @@ class NewKeyValuePair extends NewNode(20.toShort) with KeyValuePairBase {
   def key(value: String): this.type   = { this.key = value; this }
   def value(value: String): this.type = { this.value = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 32, 1)
-    interface.countProperty(this, 53, 1)
+    interface.countProperty(this, 33, 1)
+    interface.countProperty(this, 54, 1)
   }
 
   override def copy: this.type = {

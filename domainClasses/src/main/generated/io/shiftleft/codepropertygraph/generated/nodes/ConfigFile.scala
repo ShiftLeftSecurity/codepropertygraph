@@ -40,7 +40,7 @@ object ConfigFile {
     val Content = flatgraph.SinglePropertyKey[String](kind = 14, name = "CONTENT", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Content = "<empty>"
@@ -149,7 +149,7 @@ class NewConfigFile extends NewNode(10.toShort) with ConfigFileBase {
   def name(value: String): this.type    = { this.name = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 14, 1)
-    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 40, 1)
   }
 
   override def copy: this.type = {

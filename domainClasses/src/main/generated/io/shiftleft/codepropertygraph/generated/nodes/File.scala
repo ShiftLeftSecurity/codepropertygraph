@@ -79,19 +79,19 @@ object File {
       * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
       * be deferred or skipped if the hash is not needed.
       */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
+    val Hash = flatgraph.OptionalPropertyKey[String](kind = 24, name = "HASH")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 39, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 43, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code    = "<empty>"
@@ -1596,10 +1596,10 @@ class NewFile extends NewNode(14.toShort) with FileBase with AstNodeNew {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 14, 1)
-    interface.countProperty(this, 23, hash.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, 1)
-    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 24, hash.size)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 44, 1)
   }
 
   override def copy: this.type = {
