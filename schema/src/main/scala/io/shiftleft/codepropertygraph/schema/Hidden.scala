@@ -299,7 +299,7 @@ object Hidden extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(251)
+      .protoId(3000)
 
     method.addProperty(genericSignature)
     typeDecl.addProperty(genericSignature)
