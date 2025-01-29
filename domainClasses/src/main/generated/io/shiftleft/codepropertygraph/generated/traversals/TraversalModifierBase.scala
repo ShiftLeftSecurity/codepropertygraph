@@ -39,12 +39,21 @@ final class TraversalModifierBase[NodeType <: nodes.ModifierBase](val traversal:
 
   /** Traverse to nodes where modifierType matches one of the elements in `values` exactly.
     */
-  def modifierTypeExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) modifierTypeExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.modifierType) }
+  def modifierTypeExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return modifierTypeExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.modifierType) }
     }
+  }
 
   /** Traverse to nodes where modifierType does not match the regular expression `value`.
     */

@@ -41,12 +41,21 @@ final class TraversalPropertyNodeLabel[NodeType <: nodes.StoredNode & nodes.Stat
 
   /** Traverse to nodes where nodeLabel matches one of the elements in `values` exactly.
     */
-  def nodeLabelExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) nodeLabelExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.nodeLabel) }
+  def nodeLabelExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return nodeLabelExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 41, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.nodeLabel) }
     }
+  }
 
   /** Traverse to nodes where nodeLabel does not match the regular expression `value`.
     */

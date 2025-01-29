@@ -40,12 +40,21 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
 
   /** Traverse to nodes where controlStructureType matches one of the elements in `values` exactly.
     */
-  def controlStructureTypeExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) controlStructureTypeExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.controlStructureType) }
+  def controlStructureTypeExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return controlStructureTypeExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 15, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.controlStructureType) }
     }
+  }
 
   /** Traverse to nodes where controlStructureType does not match the regular expression `value`.
     */
@@ -99,12 +108,21 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
 
   /** Traverse to nodes where parserTypeName matches one of the elements in `values` exactly.
     */
-  def parserTypeNameExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) parserTypeNameExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.parserTypeName) }
+  def parserTypeNameExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return parserTypeNameExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 47, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.parserTypeName) }
     }
+  }
 
   /** Traverse to nodes where parserTypeName does not match the regular expression `value`.
     */
