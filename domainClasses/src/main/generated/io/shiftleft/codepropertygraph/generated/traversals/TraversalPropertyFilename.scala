@@ -41,12 +41,21 @@ final class TraversalPropertyFilename[NodeType <: nodes.StoredNode & nodes.Stati
 
   /** Traverse to nodes where filename matches one of the elements in `values` exactly.
     */
-  def filenameExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) filenameExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.filename) }
+  def filenameExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return filenameExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 21, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.filename) }
     }
+  }
 
   /** Traverse to nodes where filename does not match the regular expression `value`.
     */

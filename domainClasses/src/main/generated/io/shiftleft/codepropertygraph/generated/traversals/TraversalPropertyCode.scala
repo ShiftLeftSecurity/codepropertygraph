@@ -41,12 +41,21 @@ final class TraversalPropertyCode[NodeType <: nodes.StoredNode & nodes.StaticTyp
 
   /** Traverse to nodes where code matches one of the elements in `values` exactly.
     */
-  def codeExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) codeExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.code) }
+  def codeExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return codeExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 10, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.code) }
     }
+  }
 
   /** Traverse to nodes where code does not match the regular expression `value`.
     */

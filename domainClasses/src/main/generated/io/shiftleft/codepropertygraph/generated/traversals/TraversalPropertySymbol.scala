@@ -41,12 +41,21 @@ final class TraversalPropertySymbol[NodeType <: nodes.StoredNode & nodes.StaticT
 
   /** Traverse to nodes where symbol matches one of the elements in `values` exactly.
     */
-  def symbolExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) symbolExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.symbol) }
+  def symbolExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return symbolExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 51, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.symbol) }
     }
+  }
 
   /** Traverse to nodes where symbol does not match the regular expression `value`.
     */

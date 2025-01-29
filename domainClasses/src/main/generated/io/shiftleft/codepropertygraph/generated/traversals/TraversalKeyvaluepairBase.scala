@@ -40,12 +40,21 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
 
   /** Traverse to nodes where key matches one of the elements in `values` exactly.
     */
-  def keyExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) keyExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.key) }
+  def keyExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return keyExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 33, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.key) }
     }
+  }
 
   /** Traverse to nodes where key does not match the regular expression `value`.
     */
@@ -99,12 +108,21 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
 
   /** Traverse to nodes where value matches one of the elements in `values` exactly.
     */
-  def valueExact(values: String*): Iterator[NodeType] =
-    if (values.length == 1) valueExact(values.head)
-    else {
-      val valueSet = values.toSet
-      traversal.filter { item => valueSet.contains(item.value) }
+  def valueExact(values: String*): Iterator[NodeType] = {
+    if (values.length == 1) return valueExact(values.head)
+    traversal match {
+      case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
+        val someNode = init.next
+        values.iterator.flatMap { value =>
+          flatgraph.Accessors
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 54, value)
+            .asInstanceOf[Iterator[NodeType]]
+        }
+      case _ =>
+        val valueSet = values.toSet
+        traversal.filter { item => valueSet.contains(item.value) }
     }
+  }
 
   /** Traverse to nodes where value does not match the regular expression `value`.
     */
