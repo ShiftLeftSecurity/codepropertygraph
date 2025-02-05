@@ -47,7 +47,7 @@ object Annotation extends SchemaBase {
           |itself and not the ANNOTATION node.
           |""".stripMargin
       )
-      .protoId(5)
+      .protoId(ProtoIds.Annotation)
       .addProperties(name, fullName)
       .extendz(expression)
 
@@ -56,23 +56,23 @@ object Annotation extends SchemaBase {
         name = "ANNOTATION_PARAMETER_ASSIGN",
         comment = "Assignment of annotation argument to annotation parameter"
       )
-      .protoId(6)
+      .protoId(ProtoIds.AnnotationParameterAssign)
       .extendz(astNode)
 
     val annotationParameter: NodeType = builder
       .addNodeType(name = "ANNOTATION_PARAMETER", comment = "Formal annotation parameter")
-      .protoId(7)
+      .protoId(ProtoIds.AnnotationParameter)
       .extendz(astNode)
 
     val annotationLiteral: NodeType = builder
       .addNodeType(name = "ANNOTATION_LITERAL", comment = "A literal value assigned to an ANNOTATION_PARAMETER")
-      .protoId(49)
+      .protoId(ProtoIds.AnnotationLiteral)
       .addProperties(name)
       .extendz(expression)
 
     val arrayInitializer: NodeType = builder
       .addNodeType(name = "ARRAY_INITIALIZER", comment = "Initialization construct for arrays")
-      .protoId(14)
+      .protoId(ProtoIds.ArrayInitializer)
       .extendz(astNode)
 
     arrayInitializer

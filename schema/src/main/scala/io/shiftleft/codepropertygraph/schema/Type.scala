@@ -37,7 +37,7 @@ object Type extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(51)
+      .protoId(ProtoIds.TypeFullName)
 
     val aliasTypeFullName = builder
       .addProperty(
@@ -47,7 +47,7 @@ object Type extends SchemaBase {
             |a type alias of.
             |""".stripMargin
       )
-      .protoId(158)
+      .protoId(ProtoIds.AliasTypeFullName)
 
     val inheritsFromTypeFullName = builder
       .addProperty(
@@ -58,7 +58,7 @@ object Type extends SchemaBase {
                     |for each TYPE_FULL_NAME""".stripMargin
       )
       .asList()
-      .protoId(53)
+      .protoId(ProtoIds.InheritsFromTypeFullName)
 
     val typeDeclFullName = builder
       .addProperty(
@@ -69,7 +69,7 @@ object Type extends SchemaBase {
                     |different TYPE_DECL_FULL_NAME""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(52)
+      .protoId(ProtoIds.TypeDeclFullName)
 
     // Nodes
 
@@ -108,7 +108,7 @@ object Type extends SchemaBase {
             |
             |""".stripMargin
       )
-      .protoId(46)
+      .protoId(ProtoIds.TypeDecl)
       .addProperties(name, fullName, isExternal, inheritsFromTypeFullName, aliasTypeFullName, filename)
       .addProperties(astParentType, astParentFullName)
       .addProperties(offset, offsetEnd)
@@ -124,7 +124,7 @@ object Type extends SchemaBase {
                     |parameter carries only a `NAME` field that holds the parameters name.
                     |""".stripMargin
       )
-      .protoId(47)
+      .protoId(ProtoIds.TypeParameter)
       .addProperties(name)
 
     val typeArgument: NodeType = builder
@@ -137,7 +137,7 @@ object Type extends SchemaBase {
                     |`CODE` field.
                     |""".stripMargin
       )
-      .protoId(48)
+      .protoId(ProtoIds.TypeArgument)
 
     val member: NodeType = builder
       .addNodeType(
@@ -147,7 +147,7 @@ object Type extends SchemaBase {
                     | variable `i`.
                     |""".stripMargin
       )
-      .protoId(9)
+      .protoId(ProtoIds.Member)
       .addProperties(typeFullName)
       .addProperties(astParentType, astParentFullName)
       .extendz(declaration)
@@ -159,7 +159,7 @@ object Type extends SchemaBase {
         comment = """This node represents a type instance, that is, a concrete instantiation
                     |of a type declaration.""".stripMargin
       )
-      .protoId(45)
+      .protoId(ProtoIds.Type)
       .addProperties(name, fullName, typeDeclFullName)
       .starterName("typ")
       .primaryKey(name)
@@ -173,7 +173,7 @@ object Type extends SchemaBase {
             |that the type argument is used to instantiate the type parameter.
             |""".stripMargin
       )
-      .protoId(22)
+      .protoId(ProtoIds.BindsTo)
 
     val aliasOf = builder
       .addEdgeType(
@@ -183,7 +183,7 @@ object Type extends SchemaBase {
             |automatically based on `ALIAS_TYPE_FULL_NAME` fields when the CPG is first loaded.
             |""".stripMargin
       )
-      .protoId(138)
+      .protoId(ProtoIds.AliasOf)
 
     val inheritsFrom = builder
       .addEdgeType(
@@ -193,7 +193,7 @@ object Type extends SchemaBase {
             | `INHERITS_FROM_TYPE_FULL_NAME` fields then the CPG is first loaded.
             |""".stripMargin
       )
-      .protoId(23)
+      .protoId(ProtoIds.InheritsFrom)
 
     typeDecl
       .addOutEdge(edge = inheritsFrom, inNode = tpe)

@@ -65,7 +65,7 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(-1)
-      .protoId(4)
+      .protoId(ProtoIds.Order)
 
     val astNode = builder
       .addNodeBaseType(
@@ -116,7 +116,7 @@ object Ast extends SchemaBase {
                     |"block expression") to describe what in the CPG we call "Block".
                     |""".stripMargin
       )
-      .protoId(31)
+      .protoId(ProtoIds.Block)
       .addProperties(typeFullName)
 
     val literal: NodeType = builder
@@ -128,7 +128,7 @@ object Ast extends SchemaBase {
             |e.g., `java.lang.Integer`.
             |""".stripMargin
       )
-      .protoId(8)
+      .protoId(ProtoIds.Literal)
       .addProperties(typeFullName)
       .primaryKey(code)
 
@@ -141,7 +141,7 @@ object Ast extends SchemaBase {
             |`int x = 10;`, it contains `int x`.
             |""".stripMargin
       )
-      .protoId(23)
+      .protoId(ProtoIds.Local)
       .addProperties(typeFullName)
       .extendz(declaration, astNode)
       .primaryKey(name)
@@ -154,7 +154,7 @@ object Ast extends SchemaBase {
             |name in `TYPE_FULL_NAME`.
             |""".stripMargin
       )
-      .protoId(27)
+      .protoId(ProtoIds.Identifier)
       .addProperties(typeFullName, name)
       .primaryKey(name)
 
@@ -172,7 +172,7 @@ object Ast extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2001092)
+      .protoId(ProtoIds.CanonicalName)
 
     val fieldIdentifier: NodeType = builder
       .addNodeType(
@@ -189,7 +189,7 @@ object Ast extends SchemaBase {
                     |it.
                     |""".stripMargin
       )
-      .protoId(2001081)
+      .protoId(ProtoIds.FieldIdentifier)
       .addProperties(canonicalName)
 
     val modifierType = builder
@@ -201,40 +201,40 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(26)
+      .protoId(ProtoIds.ModifierType)
 
     val modifierTypes = builder.addConstants(
       category = "ModifierTypes",
       Constant(name = "STATIC", value = "STATIC", valueType = ValueType.String, comment = "The static modifier")
-        .protoId(1),
+        .protoId(ProtoIds.Static),
       Constant(name = "PUBLIC", value = "PUBLIC", valueType = ValueType.String, comment = "The public modifier")
-        .protoId(2),
+        .protoId(ProtoIds.Public),
       Constant(
         name = "PROTECTED",
         value = "PROTECTED",
         valueType = ValueType.String,
         comment = "The protected modifier"
-      ).protoId(3),
+      ).protoId(ProtoIds.Protected),
       Constant(name = "PRIVATE", value = "PRIVATE", valueType = ValueType.String, comment = "The private modifier")
-        .protoId(4),
+        .protoId(ProtoIds.Private),
       Constant(name = "ABSTRACT", value = "ABSTRACT", valueType = ValueType.String, comment = "The abstract modifier")
-        .protoId(5),
+        .protoId(ProtoIds.Abstract),
       Constant(name = "NATIVE", value = "NATIVE", valueType = ValueType.String, comment = "The native modifier")
-        .protoId(6),
+        .protoId(ProtoIds.Native),
       Constant(
         name = "CONSTRUCTOR",
         value = "CONSTRUCTOR",
         valueType = ValueType.String,
         comment = "The constructor modifier"
-      ).protoId(7),
+      ).protoId(ProtoIds.Constructor),
       Constant(name = "VIRTUAL", value = "VIRTUAL", valueType = ValueType.String, comment = "The virtual modifier")
-        .protoId(8),
+        .protoId(ProtoIds.Virtual),
       Constant(name = "INTERNAL", value = "INTERNAL", valueType = ValueType.String, comment = "The internal modifier")
-        .protoId(9),
+        .protoId(ProtoIds.Internal),
       Constant(name = "FINAL", value = "FINAL", valueType = ValueType.String, comment = "The final modifier")
-        .protoId(10),
+        .protoId(ProtoIds.Final),
       Constant(name = "READONLY", value = "READONLY", valueType = ValueType.String, comment = "The readonly modifier")
-        .protoId(11),
+        .protoId(ProtoIds.ReadOnly),
       Constant(
         name = "MODULE",
         value = "MODULE",
@@ -242,14 +242,14 @@ object Ast extends SchemaBase {
         comment =
           "Indicate that a method defines a module in the sense e.g. a python module does with the creation of a module object"
       )
-        .protoId(12),
+        .protoId(ProtoIds.Module),
       Constant(
         name = "LAMBDA",
         value = "LAMBDA",
         valueType = ValueType.String,
         comment = "Indicate that a method is an anonymous function, lambda, or closure"
       )
-        .protoId(13)
+        .protoId(ProtoIds.Lambda)
     )
 
     val modifier: NodeType = builder
@@ -260,7 +260,7 @@ object Ast extends SchemaBase {
             |cannot be evaluated and cannot be passed as an argument in function calls.
             |""".stripMargin
       )
-      .protoId(300)
+      .protoId(ProtoIds.Modifier)
       .addProperties(modifierType)
       .extendz(astNode)
 
@@ -273,7 +273,7 @@ object Ast extends SchemaBase {
             |that this jump target is created from, e.g., "Label".
             |""".stripMargin
       )
-      .protoId(340)
+      .protoId(ProtoIds.JumpTarget)
       .addProperties(name, parserTypeName)
       .extendz(astNode)
 
@@ -286,7 +286,7 @@ object Ast extends SchemaBase {
                     |label is created from, e.g., "Label".
                     |""".stripMargin
       )
-      .protoId(341)
+      .protoId(ProtoIds.JumpLabel)
       .addProperties(name, parserTypeName)
       .extendz(astNode)
 
@@ -299,12 +299,12 @@ object Ast extends SchemaBase {
             |`TYPE_FULL_NAME` holds its fully-qualified type name.
             |""".stripMargin
       )
-      .protoId(333)
+      .protoId(ProtoIds.MethodRef)
       .addProperties(typeFullName)
 
     val typeRef: NodeType = builder
       .addNodeType(name = "TYPE_REF", comment = "Reference to a type/class")
-      .protoId(335)
+      .protoId(ProtoIds.TypeRef)
       .addProperties(typeFullName)
 
     val ret: NodeType = builder
@@ -315,7 +315,7 @@ object Ast extends SchemaBase {
             |represented via `METHOD_RETURN` nodes.
             |""".stripMargin
       )
-      .protoId(30)
+      .protoId(ProtoIds.Return)
       .starterName("ret")
       .primaryKey(code)
 
@@ -329,7 +329,7 @@ object Ast extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(27)
+      .protoId(ProtoIds.ControlStructureType)
 
     val controlStructureTypes = builder.addConstants(
       category = "ControlStructureTypes",
@@ -339,49 +339,49 @@ object Ast extends SchemaBase {
         valueType = ValueType.String,
         comment = """Represents a break statement. Labeled breaks are expected to have a JUMP_LABEL
             |node AST child with ORDER 1""".stripMargin
-      ).protoId(1),
+      ).protoId(ProtoIds.Break),
       Constant(
         name = "CONTINUE",
         value = "CONTINUE",
         valueType = ValueType.String,
         comment = """Represents a continue statement. Labeled continues are expected to have a JUMP_LABEL
                            |node AST child with ORDER 1""".stripMargin
-      ).protoId(2),
+      ).protoId(ProtoIds.Continue),
       Constant(name = "WHILE", value = "WHILE", valueType = ValueType.String, comment = "Represents a while statement")
-        .protoId(3),
+        .protoId(ProtoIds.While),
       Constant(name = "DO", value = "DO", valueType = ValueType.String, comment = "Represents a do statement")
-        .protoId(4),
+        .protoId(ProtoIds.Do),
       Constant(name = "FOR", value = "FOR", valueType = ValueType.String, comment = "Represents a for statement")
-        .protoId(5),
+        .protoId(ProtoIds.For),
       Constant(name = "GOTO", value = "GOTO", valueType = ValueType.String, comment = "Represents a goto statement")
-        .protoId(6),
+        .protoId(ProtoIds.Goto),
       Constant(name = "IF", value = "IF", valueType = ValueType.String, comment = "Represents an if statement")
-        .protoId(7),
+        .protoId(ProtoIds.If),
       Constant(name = "ELSE", value = "ELSE", valueType = ValueType.String, comment = "Represents an else statement")
-        .protoId(8),
+        .protoId(ProtoIds.Else),
       Constant(
         name = "SWITCH",
         value = "SWITCH",
         valueType = ValueType.String,
         comment = "Represents a switch statement"
-      ).protoId(9),
+      ).protoId(ProtoIds.Switch),
       Constant(name = "TRY", value = "TRY", valueType = ValueType.String, comment = "Represents a try statement")
-        .protoId(10),
+        .protoId(ProtoIds.Try),
       Constant(name = "THROW", value = "THROW", valueType = ValueType.String, comment = "Represents a throw statement")
-        .protoId(11),
+        .protoId(ProtoIds.Throw),
       Constant(name = "MATCH", value = "MATCH", valueType = ValueType.String, comment = "Represents a match expression")
-        .protoId(12),
+        .protoId(ProtoIds.Match),
       Constant(name = "YIELD", value = "YIELD", valueType = ValueType.String, comment = "Represents a yield expression")
-        .protoId(13),
+        .protoId(ProtoIds.Yield),
       Constant(name = "CATCH", value = "CATCH", valueType = ValueType.String, comment = "Represents a catch clause")
-        .protoId(14),
+        .protoId(ProtoIds.Catch),
       Constant(
         name = "FINALLY",
         value = "FINALLY",
         valueType = ValueType.String,
         comment = "Represents a finally clause"
       )
-        .protoId(15)
+        .protoId(ProtoIds.Finally)
     )
 
     val controlStructure: NodeType = builder
@@ -399,7 +399,7 @@ object Ast extends SchemaBase {
             |for construction of the control flow layer.
             |""".stripMargin
       )
-      .protoId(339)
+      .protoId(ProtoIds.ControlStructure)
       .addProperties(parserTypeName, controlStructureType)
 
     val unknown: NodeType = builder
@@ -410,21 +410,21 @@ object Ast extends SchemaBase {
             |included using a node of type `UNKNOWN`.
             |""".stripMargin
       )
-      .protoId(44)
+      .protoId(ProtoIds.Unknown)
       .addProperties(parserTypeName, typeFullName)
 
     // Edge types
 
     val ast = builder
       .addEdgeType(name = "AST", comment = "This edge connects a parent node to its child in the syntax tree.")
-      .protoId(3)
+      .protoId(ProtoIds.Ast)
 
     val condition = builder
       .addEdgeType(
         name = "CONDITION",
         comment = "The edge connects control structure nodes to the expressions that holds their conditions."
       )
-      .protoId(56)
+      .protoId(ProtoIds.Condition)
 
     file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
@@ -578,7 +578,7 @@ object Ast extends SchemaBase {
                     |any information we may have about the types of arguments and return value.
                     |""".stripMargin
       )
-      .protoId(15)
+      .protoId(ProtoIds.CallNode)
       .extendz(callRepr)
       .addProperties(typeFullName)
       .primaryKey(name)

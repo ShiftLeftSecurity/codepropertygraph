@@ -29,7 +29,7 @@ object Finding extends SchemaBase {
         comment = "This property denotes a key of a key-value pair."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(131)
+      .protoId(ProtoIds.Key)
 
 // node types
     val finding: NodeType = builder
@@ -43,7 +43,7 @@ object Finding extends SchemaBase {
             |serve as evidence for the finding.
             |""".stripMargin
       )
-      .protoId(214)
+      .protoId(ProtoIds.Finding)
       .addProperties()
 
     val keyValuePair: NodeType = builder
@@ -51,7 +51,7 @@ object Finding extends SchemaBase {
         name = "KEY_VALUE_PAIR",
         comment = "This node represents a key value pair, where both the key and the value are strings."
       )
-      .protoId(217)
+      .protoId(ProtoIds.KeyValuePair)
       .addProperties(key, value)
 
 // node relations

@@ -26,7 +26,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(13)
+      .protoId(ProtoIds.Version)
 
     val hash = builder
       .addProperty(
@@ -40,7 +40,7 @@ object Base extends SchemaBase {
                     |to be deferred or skipped if the hash is not needed.
                     |""".stripMargin
       )
-      .protoId(120)
+      .protoId(ProtoIds.Hash)
 
     val code = builder
       .addProperty(
@@ -49,7 +49,7 @@ object Base extends SchemaBase {
         comment = "This field holds the code snippet that the node represents."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(21)
+      .protoId(ProtoIds.Code)
 
     val isExternal = builder
       .addProperty(
@@ -61,7 +61,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(false)
-      .protoId(7)
+      .protoId(ProtoIds.IsExternal)
 
     val index = builder
       .addProperty(
@@ -74,7 +74,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.Int)
-      .protoId(2223)
+      .protoId(ProtoIds.Index)
 
     val name = builder
       .addProperty(
@@ -83,7 +83,7 @@ object Base extends SchemaBase {
         comment = "Name of represented object, e.g., method name (e.g. \"run\")"
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(5)
+      .protoId(ProtoIds.Name)
 
     val fullName = builder
       .addProperty(
@@ -95,7 +95,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(6)
+      .protoId(ProtoIds.FullName)
 
     val parserTypeName = builder
       .addProperty(
@@ -104,7 +104,7 @@ object Base extends SchemaBase {
         comment = "AST node type name emitted by parser."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(3)
+      .protoId(ProtoIds.ParserTypeName)
 
     val value = builder
       .addProperty(
@@ -113,7 +113,7 @@ object Base extends SchemaBase {
         comment = "This property denotes a string value as used in a key-value pair."
       )
       .mandatory("")
-      .protoId(8)
+      .protoId(ProtoIds.Value)
 
     val content = builder
       .addProperty(
@@ -124,7 +124,7 @@ object Base extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(CpgSchema.PropertyDefaults.String)
-      .protoId(20)
+      .protoId(ProtoIds.Content)
 
     // The following fields are used to create edges between nodes in later processing stages.
 
@@ -138,7 +138,7 @@ object Base extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(56)
+      .protoId(ProtoIds.AstParentType)
 
     val astParentFullName = builder
       .addProperty(
@@ -147,7 +147,7 @@ object Base extends SchemaBase {
         comment = "This field holds the FULL_NAME of the AST parent of an entity."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(57)
+      .protoId(ProtoIds.AstParentFullName)
     // node base types
 
     val declaration = builder
@@ -164,7 +164,7 @@ object Base extends SchemaBase {
             |a local variable.
             |""".stripMargin
       )
-      .protoId(10)
+      .protoId(ProtoIds.Ref)
 
   }
 

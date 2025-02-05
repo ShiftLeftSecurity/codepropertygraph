@@ -32,7 +32,7 @@ object Configuration extends SchemaBase {
                     |the corresponding configuration files.
                     |""".stripMargin
       )
-      .protoId(50)
+      .protoId(ProtoIds.ConfigFile)
       .addProperties(name, content)
   }
 }
