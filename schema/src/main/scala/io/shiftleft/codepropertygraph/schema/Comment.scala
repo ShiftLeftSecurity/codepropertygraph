@@ -19,7 +19,7 @@ object Comment extends SchemaBase {
 
     val comment: NodeType = builder
       .addNodeType(name = "COMMENT", comment = "A source code comment")
-      .protoId(511)
+      .protoId(ProtoIds.Comment)
       .addProperties(filename)
       .extendz(astNode)
       .primaryKey(code)

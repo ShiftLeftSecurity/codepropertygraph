@@ -42,11 +42,11 @@ object Shortcuts extends SchemaBase {
 
     val evalType = builder
       .addEdgeType(name = "EVAL_TYPE", comment = "This edge connects a node to its evaluation type.")
-      .protoId(21)
+      .protoId(ProtoIds.EvalType)
 
     val contains = builder
       .addEdgeType(name = "CONTAINS", comment = "This edge connects a node to the method that contains it.")
-      .protoId(28)
+      .protoId(ProtoIds.Contains)
 
     val parameterLink = builder
       .addEdgeType(
@@ -55,7 +55,7 @@ object Shortcuts extends SchemaBase {
             |method output parameter.
             |""".stripMargin
       )
-      .protoId(12)
+      .protoId(ProtoIds.ParameterLink)
 
     methodParameterIn.addOutEdge(
       edge = parameterLink,

@@ -31,14 +31,14 @@ object Pdg extends SchemaBase {
         comment = "This edge property represents the variable propagated by a reaching definition edge."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(11)
+      .protoId(ProtoIds.Variable)
 
     val cdg = builder
       .addEdgeType(
         name = "CDG",
         comment = "A CDG edge expresses that the destination node is control dependent on the source node."
       )
-      .protoId(183)
+      .protoId(ProtoIds.Cdg)
 
     val reachingDef = builder
       .addEdgeType(
@@ -49,7 +49,7 @@ object Pdg extends SchemaBase {
             |which variable is propagated.
             |""".stripMargin
       )
-      .protoId(137)
+      .protoId(ProtoIds.ReachingDef)
       .withProperty(variable)
 
     literal

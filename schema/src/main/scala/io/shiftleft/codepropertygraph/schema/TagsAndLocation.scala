@@ -48,48 +48,48 @@ object TagsAndLocation extends SchemaBase {
     val symbol = builder
       .addProperty(name = "SYMBOL", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(100)
+      .protoId(ProtoIds.Symbol)
 
     val methodShortName = builder
       .addProperty(name = "METHOD_SHORT_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(102)
+      .protoId(ProtoIds.MethodShortName)
 
     val packageName = builder
       .addProperty(name = "PACKAGE_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(103)
+      .protoId(ProtoIds.PackageName)
 
     val className = builder
       .addProperty(name = "CLASS_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(104)
+      .protoId(ProtoIds.ClassName)
 
     val classShortName = builder
       .addProperty(name = "CLASS_SHORT_NAME", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(132)
+      .protoId(ProtoIds.ClassShortName)
 
     val nodeLabel = builder
       .addProperty(name = "NODE_LABEL", valueType = ValueType.String, comment = "")
       .mandatory(PropertyDefaults.String)
-      .protoId(105)
+      .protoId(ProtoIds.NodeLabel)
 
     val taggedBy = builder
       .addEdgeType(name = "TAGGED_BY", comment = "Edges from nodes to the tags they are tagged by.")
-      .protoId(11)
+      .protoId(ProtoIds.TaggedBy)
 
     // node types
 
     val tag: NodeType = builder
       .addNodeType(name = "TAG", comment = "This node represents a tag.")
-      .protoId(24)
+      .protoId(ProtoIds.Tag)
       .addProperties(name, value)
       .primaryKey(name)
 
     val location: NodeType = builder
       .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")
-      .protoId(25)
+      .protoId(ProtoIds.Location)
       .addProperties(
         symbol,
         methodFullName,
@@ -104,7 +104,7 @@ object TagsAndLocation extends SchemaBase {
 
     val tagNodePair: NodeType = builder
       .addNodeType(name = "TAG_NODE_PAIR", comment = "This node contains an arbitrary node and an associated tag node.")
-      .protoId(208)
+      .protoId(ProtoIds.TagNodePair)
       .addProperties()
 
 // node relations

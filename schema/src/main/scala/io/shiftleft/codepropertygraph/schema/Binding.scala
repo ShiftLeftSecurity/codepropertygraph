@@ -48,7 +48,7 @@ object Binding extends SchemaBase {
             |if present has priority.
             |""".stripMargin
       )
-      .protoId(146)
+      .protoId(ProtoIds.Binding)
       .addProperties(name, signature, methodFullName)
 
     val binds = builder
@@ -60,7 +60,7 @@ object Binding extends SchemaBase {
             |declaration as stored in the binding node.
             |""".stripMargin
       )
-      .protoId(155)
+      .protoId(ProtoIds.Binds)
 
     typeDecl.addOutEdge(
       edge = binds,

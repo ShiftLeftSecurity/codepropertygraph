@@ -36,7 +36,7 @@ object MetaData extends SchemaBase {
             |""".stripMargin
       )
       .asList()
-      .protoId(118)
+      .protoId(ProtoIds.Overlays)
 
     val language = builder
       .addProperty(
@@ -49,7 +49,7 @@ object MetaData extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(19)
+      .protoId(ProtoIds.Language)
 
     val root = builder
       .addProperty(
@@ -57,7 +57,7 @@ object MetaData extends SchemaBase {
         valueType = ValueType.String,
         comment = "The path to the root directory of the source/binary this CPG is generated from."
       )
-      .protoId(1199)
+      .protoId(ProtoIds.Root)
       .mandatory(PropertyDefaults.String)
 
     val metaData: NodeType = builder
@@ -72,71 +72,72 @@ object MetaData extends SchemaBase {
                     |`OVERLAYS` specifies which overlays have been applied to the CPG.
                     | """.stripMargin
       )
-      .protoId(39)
+      .protoId(ProtoIds.MetaData)
       .addProperties(language, version, overlays, hash, root)
 
     val languages = builder.addConstants(
       category = "Languages",
-      Constant(name = "JAVA", value = "JAVA", valueType = ValueType.String, comment = "").protoId(1),
-      Constant(name = "JAVASCRIPT", value = "JAVASCRIPT", valueType = ValueType.String, comment = "").protoId(2),
-      Constant(name = "GOLANG", value = "GOLANG", valueType = ValueType.String, comment = "").protoId(3),
-      Constant(name = "CSHARP", value = "CSHARP", valueType = ValueType.String, comment = "").protoId(4),
-      Constant(name = "C", value = "C", valueType = ValueType.String, comment = "").protoId(5),
-      Constant(name = "PYTHON", value = "PYTHON", valueType = ValueType.String, comment = "").protoId(6),
-      Constant(name = "LLVM", value = "LLVM", valueType = ValueType.String, comment = "").protoId(7),
-      Constant(name = "PHP", value = "PHP", valueType = ValueType.String, comment = "").protoId(8),
+      Constant(name = "JAVA", value = "JAVA", valueType = ValueType.String, comment = "").protoId(ProtoIds.Java),
+      Constant(name = "JAVASCRIPT", value = "JAVASCRIPT", valueType = ValueType.String, comment = "")
+        .protoId(ProtoIds.JavaScript),
+      Constant(name = "GOLANG", value = "GOLANG", valueType = ValueType.String, comment = "").protoId(ProtoIds.Golang),
+      Constant(name = "CSHARP", value = "CSHARP", valueType = ValueType.String, comment = "").protoId(ProtoIds.CSharp),
+      Constant(name = "C", value = "C", valueType = ValueType.String, comment = "").protoId(ProtoIds.C),
+      Constant(name = "PYTHON", value = "PYTHON", valueType = ValueType.String, comment = "").protoId(ProtoIds.Python),
+      Constant(name = "LLVM", value = "LLVM", valueType = ValueType.String, comment = "").protoId(ProtoIds.LLVM),
+      Constant(name = "PHP", value = "PHP", valueType = ValueType.String, comment = "").protoId(ProtoIds.PHP),
       Constant(name = "FUZZY_TEST_LANG", value = "FUZZY_TEST_LANG", valueType = ValueType.String, comment = "")
-        .protoId(9),
+        .protoId(ProtoIds.FuzzyTestLang),
       Constant(
         name = "GHIDRA",
         value = "GHIDRA",
         valueType = ValueType.String,
         comment = "generic reverse engineering framework"
-      ).protoId(10),
+      ).protoId(ProtoIds.Ghidra),
       Constant(name = "KOTLIN", value = "KOTLIN", valueType = ValueType.String, comment = "").protoId(11),
       Constant(
         name = "NEWC",
         value = "NEWC",
         valueType = ValueType.String,
         comment = "Eclipse CDT based parser for C/C++"
-      ).protoId(12),
+      ).protoId(ProtoIds.NewC),
       Constant(
         name = "JAVASRC",
         value = "JAVASRC",
         valueType = ValueType.String,
         comment = "Source-based front-end for Java"
-      ).protoId(13),
+      ).protoId(ProtoIds.JavaSrc),
       Constant(
         name = "PYTHONSRC",
         value = "PYTHONSRC",
         valueType = ValueType.String,
         comment = "Source-based front-end for Python"
-      ).protoId(14),
+      ).protoId(ProtoIds.PythonSrc),
       Constant(
         "JSSRC",
         value = "JSSRC",
         valueType = ValueType.String,
         comment = "Source-based JS frontend based on Babel"
-      ).protoId(15),
+      ).protoId(ProtoIds.JsSrc),
       // Removed protoId 16. Used to be "Solidity".
       Constant(
         name = "RUBYSRC",
         value = "RUBYSRC",
         valueType = ValueType.String,
         comment = "Source-based frontend for Ruby"
-      ).protoId(17),
+      ).protoId(ProtoIds.RubySrc),
       Constant(
         name = "SWIFTSRC",
         value = "SWIFTSRC",
         valueType = ValueType.String,
         comment = "Source-based frontend for Swift"
-      ).protoId(18),
+      ).protoId(ProtoIds.SwiftSrc),
       Constant(
         name = "CSHARPSRC",
         value = "CSHARPSRC",
         valueType = ValueType.String,
         comment = "Source-based frontend for C# and .NET"
-      ).protoId(19)
+      ).protoId(ProtoIds.CSharpSrc)
     )
   }
 }

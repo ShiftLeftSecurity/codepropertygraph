@@ -41,7 +41,7 @@ object Namespace extends SchemaBase {
                     |
                     |""".stripMargin
       )
-      .protoId(41)
+      .protoId(ProtoIds.NamespaceBlock)
       .addProperties(name, fullName, filename)
       .primaryKey(name)
 
@@ -57,7 +57,7 @@ object Namespace extends SchemaBase {
                     |first loading of the CPG.
                     |""".stripMargin
       )
-      .protoId(40)
+      .protoId(ProtoIds.Namespace)
       .addProperties(name)
       .primaryKey(name)
 

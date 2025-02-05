@@ -26,14 +26,14 @@ object Dominators extends SchemaBase {
         name = "DOMINATE",
         comment = "This edge indicates that the source node immediately dominates the destination node."
       )
-      .protoId(181)
+      .protoId(ProtoIds.Dominate)
 
     val postDominate = builder
       .addEdgeType(
         name = "POST_DOMINATE",
         comment = "This edge indicates that the source node immediately post dominates the destination node."
       )
-      .protoId(182)
+      .protoId(ProtoIds.PostDominate)
 
     method
       .addOutEdge(edge = dominate, inNode = callNode)

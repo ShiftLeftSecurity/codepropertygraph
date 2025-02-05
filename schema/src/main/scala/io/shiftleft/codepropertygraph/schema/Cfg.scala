@@ -53,7 +53,7 @@ object Cfg extends SchemaBase {
 
     val cfg = builder
       .addEdgeType(name = "CFG", comment = "This edge indicates control flow from the source to the destination node.")
-      .protoId(19)
+      .protoId(ProtoIds.Cfg)
 
     method
       .addOutEdge(

@@ -28,7 +28,7 @@ object ProtoSerialize extends SchemaBase {
           "References to other nodes. This is not a real property; it exists here for the sake of proto serialization only. valueType and cardinality are meaningless."
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(2007161)
+      .protoId(ProtoIds.ContainedRef)
 
     unknown.addProperty(containedRef)
   }

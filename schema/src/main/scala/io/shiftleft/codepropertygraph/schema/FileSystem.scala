@@ -35,7 +35,7 @@ object FileSystem extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(106)
+      .protoId(ProtoIds.FileName)
 
     val lineNumber = builder
       .addProperty(
@@ -45,7 +45,7 @@ object FileSystem extends SchemaBase {
             |represented by the node.
             |""".stripMargin
       )
-      .protoId(2)
+      .protoId(ProtoIds.LineNumber)
 
     val columnNumber = builder
       .addProperty(
@@ -56,7 +56,7 @@ object FileSystem extends SchemaBase {
             |represented by the node.
             |""".stripMargin
       )
-      .protoId(11)
+      .protoId(ProtoIds.ColumnNumber)
 
     val lineNumberEnd = builder
       .addProperty(
@@ -67,7 +67,7 @@ object FileSystem extends SchemaBase {
         |represented by the node ends.
         """.stripMargin
       )
-      .protoId(12)
+      .protoId(ProtoIds.LineNumberEnd)
 
     val columnNumberEnd = builder
       .addProperty(
@@ -78,7 +78,7 @@ object FileSystem extends SchemaBase {
             |represented by the node ends.
         """.stripMargin
       )
-      .protoId(16)
+      .protoId(ProtoIds.ColumnNumberEnd)
 
     val sourceFile = builder
       .addEdgeType(
@@ -88,7 +88,7 @@ object FileSystem extends SchemaBase {
             |created based on `FILENAME` fields.
             |""".stripMargin
       )
-      .protoId(157)
+      .protoId(ProtoIds.SourceFile)
 
     val file: NodeType = builder
       .addNodeType(
@@ -104,7 +104,7 @@ object FileSystem extends SchemaBase {
                     |not because they are the first node of the AST.
                     |""".stripMargin
       )
-      .protoId(38)
+      .protoId(ProtoIds.File)
       .addProperties(name, hash, content)
       .primaryKey(name)
 
@@ -122,7 +122,7 @@ object FileSystem extends SchemaBase {
             |source code in the string holding the source code of the entire file.
         """.stripMargin
       )
-      .protoId(3812)
+      .protoId(ProtoIds.Offset)
 
     val offsetEnd = builder
       .addProperty(
@@ -135,7 +135,7 @@ object FileSystem extends SchemaBase {
           |not part of the method.
         """.stripMargin
       )
-      .protoId(3813)
+      .protoId(ProtoIds.OffsetEnd)
 
   }
 

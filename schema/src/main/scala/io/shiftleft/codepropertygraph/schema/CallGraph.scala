@@ -37,7 +37,7 @@ object CallGraph extends SchemaBase {
                     |""".stripMargin
       )
       .mandatory(-1)
-      .protoId(40)
+      .protoId(ProtoIds.ArgumentIndex)
 
     val argumentName = builder
       .addProperty(
@@ -49,7 +49,7 @@ object CallGraph extends SchemaBase {
             |this field is unset.
             |""".stripMargin
       )
-      .protoId(130)
+      .protoId(ProtoIds.ArgumentName)
 
     val methodFullName = builder
       .addProperty(
@@ -59,7 +59,7 @@ object CallGraph extends SchemaBase {
                     |to have exactly one METHOD node for each METHOD_FULL_NAME""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(54)
+      .protoId(ProtoIds.MethodFullName)
 
     expression.addProperties(argumentIndex, argumentName)
 
@@ -77,7 +77,7 @@ object CallGraph extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(15)
+      .protoId(ProtoIds.EvaluationStrategy)
 
     val evaluationStrategies = builder.addConstants(
       category = "EvaluationStrategies",
@@ -87,20 +87,20 @@ object CallGraph extends SchemaBase {
         valueType = ValueType.String,
         comment =
           "A parameter or return of a function is passed by reference which means an address is used behind the scenes"
-      ).protoId(1),
+      ).protoId(ProtoIds.ByReference),
       Constant(
         name = "BY_SHARING",
         value = "BY_SHARING",
         valueType = ValueType.String,
         comment =
           "Only applicable to object parameter or return values. The pointer to the object is passed by value but the object itself is not copied and changes to it are thus propagated out of the method context"
-      ).protoId(2),
+      ).protoId(ProtoIds.BySharing),
       Constant(
         name = "BY_VALUE",
         value = "BY_VALUE",
         valueType = ValueType.String,
         comment = "A parameter or return of a function passed by value which means a flat copy is used"
-      ).protoId(3)
+      ).protoId(ProtoIds.ByValue)
     )
 
     methodParameterIn.addProperties(evaluationStrategy)
@@ -119,7 +119,7 @@ object CallGraph extends SchemaBase {
             |""".stripMargin
       )
       .mandatory(PropertyDefaults.String)
-      .protoId(25)
+      .protoId(ProtoIds.DispatchType)
 
     val call = builder
       .addEdgeType(
@@ -131,7 +131,7 @@ object CallGraph extends SchemaBase {
             |automatically as the CPG is first loaded.
             |""".stripMargin
       )
-      .protoId(6)
+      .protoId(ProtoIds.CallEdge)
 
     val argument = builder
       .addEdgeType(
@@ -141,7 +141,7 @@ object CallGraph extends SchemaBase {
             |that return.
             |""".stripMargin
       )
-      .protoId(156)
+      .protoId(ProtoIds.Argument)
 
     val receiver = builder
       .addEdgeType(
@@ -152,7 +152,7 @@ object CallGraph extends SchemaBase {
             |assigned to the `this` pointer as control is transferred to the method.
             |""".stripMargin
       )
-      .protoId(55)
+      .protoId(ProtoIds.Receiver)
 
     val dispatchTypes = builder.addConstants(
       category = "DispatchTypes",
@@ -161,19 +161,19 @@ object CallGraph extends SchemaBase {
         value = "STATIC_DISPATCH",
         valueType = ValueType.String,
         comment = "For statically dispatched calls the call target is known before program execution"
-      ).protoId(1),
+      ).protoId(ProtoIds.StaticDispatch),
       Constant(
         name = "DYNAMIC_DISPATCH",
         value = "DYNAMIC_DISPATCH",
         valueType = ValueType.String,
         comment = "For dynamically dispatched calls the target is determined during runtime"
-      ).protoId(2),
+      ).protoId(ProtoIds.DynamicDispatch),
       Constant(
         name = "INLINED",
         value = "INLINED",
         valueType = ValueType.String,
         comment = "For macro expansions, code is inlined."
-      ).protoId(3)
+      ).protoId(ProtoIds.Inlined)
     )
 
     callNode
