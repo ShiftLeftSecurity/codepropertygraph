@@ -20,8 +20,6 @@ trait MethodEMT
     with HasHashEMT
     with HasIsExternalEMT
     with HasLineNumberEndEMT
-    with HasOffsetEMT
-    with HasOffsetEndEMT
     with HasSignatureEMT
 
 trait MethodBase extends AbstractNode with CfgNodeBase with DeclarationBase with StaticType[MethodEMT] {

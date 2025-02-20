@@ -19,8 +19,6 @@ trait TypeDeclEMT
     with HasInheritsFromTypeFullNameEMT
     with HasIsExternalEMT
     with HasNameEMT
-    with HasOffsetEMT
-    with HasOffsetEndEMT
 
 trait TypeDeclBase extends AbstractNode with AstNodeBase with StaticType[TypeDeclEMT] {
 

@@ -606,14 +606,6 @@ object Accessors {
       case stored: nodes.StoredNode => new AccessPropertyLineNumberEnd(stored).lineNumberEnd
       case newNode: nodes.NewMethod => newNode.lineNumberEnd
     }
-    def offset: Option[Int] = node match {
-      case stored: nodes.StoredNode => new AccessPropertyOffset(stored).offset
-      case newNode: nodes.NewMethod => newNode.offset
-    }
-    def offsetEnd: Option[Int] = node match {
-      case stored: nodes.StoredNode => new AccessPropertyOffsetEnd(stored).offsetEnd
-      case newNode: nodes.NewMethod => newNode.offsetEnd
-    }
     def signature: String = node match {
       case stored: nodes.StoredNode => new AccessPropertySignature(stored).signature
       case newNode: nodes.NewMethod => newNode.signature
@@ -799,14 +791,6 @@ object Accessors {
       case stored: nodes.StoredNode   => new AccessPropertyName(stored).name
       case newNode: nodes.NewTypeDecl => newNode.name
     }
-    def offset: Option[Int] = node match {
-      case stored: nodes.StoredNode   => new AccessPropertyOffset(stored).offset
-      case newNode: nodes.NewTypeDecl => newNode.offset
-    }
-    def offsetEnd: Option[Int] = node match {
-      case stored: nodes.StoredNode   => new AccessPropertyOffsetEnd(stored).offsetEnd
-      case newNode: nodes.NewTypeDecl => newNode.offsetEnd
-    }
   }
   final class AccessTypeparameterBase(val node: nodes.TypeParameterBase) extends AnyVal {
     def name: String = node match {
@@ -862,6 +846,14 @@ object Accessors {
     def lineNumber: Option[Int] = node match {
       case stored: nodes.StoredNode  => new AccessPropertyLineNumber(stored).lineNumber
       case newNode: nodes.AstNodeNew => newNode.lineNumber
+    }
+    def offset: Option[Int] = node match {
+      case stored: nodes.StoredNode  => new AccessPropertyOffset(stored).offset
+      case newNode: nodes.AstNodeNew => newNode.offset
+    }
+    def offsetEnd: Option[Int] = node match {
+      case stored: nodes.StoredNode  => new AccessPropertyOffsetEnd(stored).offsetEnd
+      case newNode: nodes.AstNodeNew => newNode.offsetEnd
     }
     def order: Int = node match {
       case stored: nodes.StoredNode  => new AccessPropertyOrder(stored).order

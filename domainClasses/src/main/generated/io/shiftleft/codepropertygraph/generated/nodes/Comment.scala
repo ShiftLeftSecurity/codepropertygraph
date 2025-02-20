@@ -18,6 +18,8 @@ trait CommentBase extends AbstractNode with AstNodeBase with StaticType[CommentE
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
     res
   }
@@ -45,6 +47,20 @@ object Comment {
       */
     val LineNumber = "LINE_NUMBER"
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = "OFFSET"
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = "OFFSET_END"
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -70,6 +86,20 @@ object Comment {
       */
     val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -94,7 +124,9 @@ class Comment(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 1 => "columnNumber"
       case 2 => "filename"
       case 3 => "lineNumber"
-      case 4 => "order"
+      case 4 => "offset"
+      case 5 => "offsetEnd"
+      case 6 => "order"
       case _ => ""
     }
 
@@ -104,12 +136,14 @@ class Comment(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 1 => this.columnNumber
       case 2 => this.filename
       case 3 => this.lineNumber
-      case 4 => this.order
+      case 4 => this.offset
+      case 5 => this.offsetEnd
+      case 6 => this.order
       case _ => null
     }
 
   override def productPrefix = "Comment"
-  override def productArity  = 5
+  override def productArity  = 7
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Comment]
 }
@@ -1459,6 +1493,64 @@ object NewComment {
         }
       }
     }
+    object NewNodeInserter_Comment_offset extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              generated.offset match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Comment_offsetEnd extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewComment =>
+              generated.offsetEnd match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Comment_order extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1502,6 +1594,8 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
   var columnNumber: Option[Int]                   = None
   var filename: String                            = "<empty>": String
   var lineNumber: Option[Int]                     = None
+  var offset: Option[Int]                         = None
+  var offsetEnd: Option[Int]                      = None
   var order: Int                                  = -1: Int
   def code(value: String): this.type              = { this.code = value; this }
   def columnNumber(value: Int): this.type         = { this.columnNumber = Option(value); this }
@@ -1509,12 +1603,18 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
   def filename(value: String): this.type          = { this.filename = value; this }
   def lineNumber(value: Int): this.type           = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type   = { this.lineNumber = value; this }
+  def offset(value: Int): this.type               = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type       = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type            = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type    = { this.offsetEnd = value; this }
   def order(value: Int): this.type                = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 21, 1)
     interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
     interface.countProperty(this, 44, 1)
   }
 
@@ -1524,6 +1624,8 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
     newInstance.columnNumber = this.columnNumber
     newInstance.filename = this.filename
     newInstance.lineNumber = this.lineNumber
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.asInstanceOf[this.type]
   }
@@ -1534,7 +1636,9 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
       case 1 => "columnNumber"
       case 2 => "filename"
       case 3 => "lineNumber"
-      case 4 => "order"
+      case 4 => "offset"
+      case 5 => "offsetEnd"
+      case 6 => "order"
       case _ => ""
     }
 
@@ -1544,11 +1648,13 @@ class NewComment extends NewNode(9.toShort) with CommentBase with AstNodeNew {
       case 1 => this.columnNumber
       case 2 => this.filename
       case 3 => this.lineNumber
-      case 4 => this.order
+      case 4 => this.offset
+      case 5 => this.offsetEnd
+      case 6 => this.order
       case _ => null
     }
 
   override def productPrefix                = "NewComment"
-  override def productArity                 = 5
+  override def productArity                 = 7
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewComment]
 }
