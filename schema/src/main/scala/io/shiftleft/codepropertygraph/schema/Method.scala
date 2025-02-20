@@ -61,10 +61,6 @@ object Method extends SchemaBase {
             |the name of the source file is specified in `FILENAME`. An optional hash value
             |MAY be calculated over the function contents and included in the `HASH` field.
             |
-            |The optional `OFFSET` and `OFFSET_END` specify the start
-            |and exclusive end position of the code belonging to a method within the corresponding
-            |`FILE` nodes `CONTENT` property.
-            |
             |Finally, the fully qualified name of the program constructs that the method
             |is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
             |and its type is indicated in the `AST_PARENT_TYPE` field to be one of
@@ -74,7 +70,6 @@ object Method extends SchemaBase {
       .protoId(ProtoIds.Method)
       .addProperties(fullName, isExternal, signature, lineNumberEnd, columnNumberEnd, filename, hash)
       .addProperties(astParentType, astParentFullName)
-      .addProperties(offset, offsetEnd)
       .extendz(declaration)
       .primaryKey(name)
 

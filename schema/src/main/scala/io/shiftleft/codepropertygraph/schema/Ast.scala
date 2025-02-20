@@ -81,10 +81,14 @@ object Ast extends SchemaBase {
                     |start column number of the code represented by the node.
                     |For machine-code-based and bytecode-based frontends, `LINE_NUMBER` contains
                     |the address at which the code starts while `COLUMN_NUMBER` is undefined.
+                    |
+                    |The optional `OFFSET` and `OFFSET_END` specify the start
+                    |and exclusive end position of the code belonging to a node within the corresponding
+                    |`FILE` nodes `CONTENT` property.
                     |""".stripMargin
       )
       .addProperties(order, code)
-      .addProperties(lineNumber, columnNumber)
+      .addProperties(lineNumber, columnNumber, offset, offsetEnd)
 
     // The following nodes from other schemas are AST nodes
 
