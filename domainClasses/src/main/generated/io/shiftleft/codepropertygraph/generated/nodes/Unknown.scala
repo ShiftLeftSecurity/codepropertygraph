@@ -29,6 +29,8 @@ trait UnknownBase extends AbstractNode with ExpressionBase with StaticType[Unkno
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
     if (("<empty>": String) != this.parserTypeName) res.put("PARSER_TYPE_NAME", this.parserTypeName)
     val tmpPossibleTypes = this.possibleTypes;
@@ -74,6 +76,20 @@ object Unknown {
     /** This optional field provides the line number of the program construct represented by the node.
       */
     val LineNumber = "LINE_NUMBER"
+
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = "OFFSET"
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = "OFFSET_END"
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
@@ -129,6 +145,20 @@ object Unknown {
       */
     val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -173,10 +203,12 @@ class Unknown(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => "containedRef"
       case 5  => "dynamicTypeHintFullName"
       case 6  => "lineNumber"
-      case 7  => "order"
-      case 8  => "parserTypeName"
-      case 9  => "possibleTypes"
-      case 10 => "typeFullName"
+      case 7  => "offset"
+      case 8  => "offsetEnd"
+      case 9  => "order"
+      case 10 => "parserTypeName"
+      case 11 => "possibleTypes"
+      case 12 => "typeFullName"
       case _  => ""
     }
 
@@ -189,15 +221,17 @@ class Unknown(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 4  => this.containedRef
       case 5  => this.dynamicTypeHintFullName
       case 6  => this.lineNumber
-      case 7  => this.order
-      case 8  => this.parserTypeName
-      case 9  => this.possibleTypes
-      case 10 => this.typeFullName
+      case 7  => this.offset
+      case 8  => this.offsetEnd
+      case 9  => this.order
+      case 10 => this.parserTypeName
+      case 11 => this.possibleTypes
+      case 12 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix = "Unknown"
-  override def productArity  = 11
+  override def productArity  = 13
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Unknown]
 }
@@ -1628,6 +1662,64 @@ object NewUnknown {
         }
       }
     }
+    object NewNodeInserter_Unknown_offset extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewUnknown =>
+              generated.offset match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Unknown_offsetEnd extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewUnknown =>
+              generated.offsetEnd match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Unknown_order extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1751,6 +1843,8 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
   var containedRef: String                           = "<empty>": String
   var dynamicTypeHintFullName: IndexedSeq[String]    = ArraySeq.empty
   var lineNumber: Option[Int]                        = None
+  var offset: Option[Int]                            = None
+  var offsetEnd: Option[Int]                         = None
   var order: Int                                     = -1: Int
   var parserTypeName: String                         = "<empty>": String
   var possibleTypes: IndexedSeq[String]              = ArraySeq.empty
@@ -1767,6 +1861,10 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
   }
   def lineNumber(value: Int): this.type                     = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type             = { this.lineNumber = value; this }
+  def offset(value: Int): this.type                         = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type                 = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type                      = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type              = { this.offsetEnd = value; this }
   def order(value: Int): this.type                          = { this.order = value; this }
   def parserTypeName(value: String): this.type              = { this.parserTypeName = value; this }
   def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
@@ -1779,6 +1877,8 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
     interface.countProperty(this, 13, 1)
     interface.countProperty(this, 18, dynamicTypeHintFullName.size)
     interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
     interface.countProperty(this, 44, 1)
     interface.countProperty(this, 47, 1)
     interface.countProperty(this, 48, possibleTypes.size)
@@ -1794,6 +1894,8 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
     newInstance.containedRef = this.containedRef
     newInstance.dynamicTypeHintFullName = this.dynamicTypeHintFullName
     newInstance.lineNumber = this.lineNumber
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.parserTypeName = this.parserTypeName
     newInstance.possibleTypes = this.possibleTypes
@@ -1810,10 +1912,12 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
       case 4  => "containedRef"
       case 5  => "dynamicTypeHintFullName"
       case 6  => "lineNumber"
-      case 7  => "order"
-      case 8  => "parserTypeName"
-      case 9  => "possibleTypes"
-      case 10 => "typeFullName"
+      case 7  => "offset"
+      case 8  => "offsetEnd"
+      case 9  => "order"
+      case 10 => "parserTypeName"
+      case 11 => "possibleTypes"
+      case 12 => "typeFullName"
       case _  => ""
     }
 
@@ -1826,14 +1930,16 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
       case 4  => this.containedRef
       case 5  => this.dynamicTypeHintFullName
       case 6  => this.lineNumber
-      case 7  => this.order
-      case 8  => this.parserTypeName
-      case 9  => this.possibleTypes
-      case 10 => this.typeFullName
+      case 7  => this.offset
+      case 8  => this.offsetEnd
+      case 9  => this.order
+      case 10 => this.parserTypeName
+      case 11 => this.possibleTypes
+      case 12 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix                = "NewUnknown"
-  override def productArity                 = 11
+  override def productArity                 = 13
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewUnknown]
 }

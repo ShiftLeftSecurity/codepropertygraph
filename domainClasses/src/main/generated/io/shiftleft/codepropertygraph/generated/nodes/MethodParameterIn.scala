@@ -38,6 +38,8 @@ trait MethodParameterInBase
     if ((false: Boolean) != this.isVariadic) res.put("IS_VARIADIC", this.isVariadic)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
     val tmpPossibleTypes = this.possibleTypes;
     if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
@@ -89,6 +91,20 @@ object MethodParameterIn {
 
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = "NAME"
+
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = "OFFSET"
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = "OFFSET_END"
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
@@ -149,6 +165,20 @@ object MethodParameterIn {
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -194,9 +224,11 @@ class MethodParameterIn(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 6  => "isVariadic"
       case 7  => "lineNumber"
       case 8  => "name"
-      case 9  => "order"
-      case 10 => "possibleTypes"
-      case 11 => "typeFullName"
+      case 9  => "offset"
+      case 10 => "offsetEnd"
+      case 11 => "order"
+      case 12 => "possibleTypes"
+      case 13 => "typeFullName"
       case _  => ""
     }
 
@@ -211,14 +243,16 @@ class MethodParameterIn(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 6  => this.isVariadic
       case 7  => this.lineNumber
       case 8  => this.name
-      case 9  => this.order
-      case 10 => this.possibleTypes
-      case 11 => this.typeFullName
+      case 9  => this.offset
+      case 10 => this.offsetEnd
+      case 11 => this.order
+      case 12 => this.possibleTypes
+      case 13 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix = "MethodParameterIn"
-  override def productArity  = 12
+  override def productArity  = 14
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodParameterIn]
 }
@@ -1699,6 +1733,64 @@ object NewMethodParameterIn {
         }
       }
     }
+    object NewNodeInserter_MethodParameterIn_offset extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewMethodParameterIn =>
+              generated.offset match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_MethodParameterIn_offsetEnd extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewMethodParameterIn =>
+              generated.offsetEnd match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_MethodParameterIn_order extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1804,6 +1896,8 @@ class NewMethodParameterIn
   var isVariadic: Boolean                                = false: Boolean
   var lineNumber: Option[Int]                            = None
   var name: String                                       = "<empty>": String
+  var offset: Option[Int]                                = None
+  var offsetEnd: Option[Int]                             = None
   var order: Int                                         = -1: Int
   var possibleTypes: IndexedSeq[String]                  = ArraySeq.empty
   var typeFullName: String                               = "<empty>": String
@@ -1821,6 +1915,10 @@ class NewMethodParameterIn
   def lineNumber(value: Int): this.type                     = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type             = { this.lineNumber = value; this }
   def name(value: String): this.type                        = { this.name = value; this }
+  def offset(value: Int): this.type                         = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type                 = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type                      = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type              = { this.offsetEnd = value; this }
   def order(value: Int): this.type                          = { this.order = value; this }
   def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
   def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
@@ -1834,6 +1932,8 @@ class NewMethodParameterIn
     interface.countProperty(this, 31, 1)
     interface.countProperty(this, 35, lineNumber.size)
     interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
     interface.countProperty(this, 44, 1)
     interface.countProperty(this, 48, possibleTypes.size)
     interface.countProperty(this, 53, 1)
@@ -1850,6 +1950,8 @@ class NewMethodParameterIn
     newInstance.isVariadic = this.isVariadic
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.possibleTypes = this.possibleTypes
     newInstance.typeFullName = this.typeFullName
@@ -1867,9 +1969,11 @@ class NewMethodParameterIn
       case 6  => "isVariadic"
       case 7  => "lineNumber"
       case 8  => "name"
-      case 9  => "order"
-      case 10 => "possibleTypes"
-      case 11 => "typeFullName"
+      case 9  => "offset"
+      case 10 => "offsetEnd"
+      case 11 => "order"
+      case 12 => "possibleTypes"
+      case 13 => "typeFullName"
       case _  => ""
     }
 
@@ -1884,13 +1988,15 @@ class NewMethodParameterIn
       case 6  => this.isVariadic
       case 7  => this.lineNumber
       case 8  => this.name
-      case 9  => this.order
-      case 10 => this.possibleTypes
-      case 11 => this.typeFullName
+      case 9  => this.offset
+      case 10 => this.offsetEnd
+      case 11 => this.order
+      case 12 => this.possibleTypes
+      case 13 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix                = "NewMethodParameterIn"
-  override def productArity                 = 12
+  override def productArity                 = 14
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodParameterIn]
 }

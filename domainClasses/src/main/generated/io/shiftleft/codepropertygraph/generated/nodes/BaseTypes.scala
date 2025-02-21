@@ -1,9 +1,16 @@
 package io.shiftleft.codepropertygraph.generated.nodes
 
-trait AstNodeEMT extends AnyRef with HasCodeEMT with HasColumnNumberEMT with HasLineNumberEMT with HasOrderEMT
+trait AstNodeEMT
+    extends AnyRef
+    with HasCodeEMT
+    with HasColumnNumberEMT
+    with HasLineNumberEMT
+    with HasOffsetEMT
+    with HasOffsetEndEMT
+    with HasOrderEMT
 
 trait AstNodeBase extends AbstractNode with StaticType[AstNodeEMT]
-// new properties: CODE, COLUMN_NUMBER, LINE_NUMBER, ORDER
+// new properties: CODE, COLUMN_NUMBER, LINE_NUMBER, OFFSET, OFFSET_END, ORDER
 // inherited properties:
 // inherited interfaces:
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ANNOTATION_PARAMETER, ANNOTATION_PARAMETER_ASSIGN, ARRAY_INITIALIZER, BLOCK, CALL, COMMENT, CONTROL_STRUCTURE, FIELD_IDENTIFIER, FILE, IDENTIFIER, IMPORT, JUMP_LABEL, JUMP_TARGET, LITERAL, LOCAL, MEMBER, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, MODIFIER, NAMESPACE, NAMESPACE_BLOCK, RETURN, TEMPLATE_DOM, TYPE_ARGUMENT, TYPE_DECL, TYPE_PARAMETER, TYPE_REF, UNKNOWN
@@ -28,6 +35,14 @@ trait AstNodeNew extends NewNode with AstNodeBase with StaticType[AstNodeEMT] {
   def lineNumber_=(value: Option[Int]): Unit
   def lineNumber(value: Option[Int]): this.type
   def lineNumber(value: Int): this.type
+  def offset: Option[Int]
+  def offset_=(value: Option[Int]): Unit
+  def offset(value: Option[Int]): this.type
+  def offset(value: Int): this.type
+  def offsetEnd: Option[Int]
+  def offsetEnd_=(value: Option[Int]): Unit
+  def offsetEnd(value: Option[Int]): this.type
+  def offsetEnd(value: Int): this.type
   def order: Int
   def order_=(value: Int): Unit
   def order(value: Int): this.type
@@ -37,7 +52,7 @@ trait CallReprEMT extends AnyRef with CfgNodeEMT with HasNameEMT with HasSignatu
 
 trait CallReprBase extends AbstractNode with CfgNodeBase with StaticType[CallReprEMT]
 // new properties: NAME, SIGNATURE
-// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, ORDER
+// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, OFFSET, OFFSET_END, ORDER
 // inherited interfaces: AST_NODE
 // implementing nodes: CALL
 trait CallRepr extends StoredNode with CallReprBase with CfgNode with StaticType[CallReprEMT]
@@ -62,7 +77,7 @@ trait CfgNodeEMT extends AnyRef with AstNodeEMT
 
 trait CfgNodeBase extends AbstractNode with AstNodeBase with StaticType[CfgNodeEMT]
 // new properties:
-// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, ORDER
+// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, OFFSET, OFFSET_END, ORDER
 // inherited interfaces:
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ARRAY_INITIALIZER, BLOCK, CALL, CONTROL_STRUCTURE, FIELD_IDENTIFIER, IDENTIFIER, JUMP_TARGET, LITERAL, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, RETURN, TEMPLATE_DOM, TYPE_REF, UNKNOWN
 trait CfgNode extends StoredNode with CfgNodeBase with AstNode with StaticType[CfgNodeEMT]
@@ -98,7 +113,7 @@ trait ExpressionEMT extends AnyRef with CfgNodeEMT with HasArgumentIndexEMT with
 
 trait ExpressionBase extends AbstractNode with CfgNodeBase with StaticType[ExpressionEMT]
 // new properties: ARGUMENT_INDEX, ARGUMENT_NAME
-// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, ORDER
+// inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, OFFSET, OFFSET_END, ORDER
 // inherited interfaces: AST_NODE
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ARRAY_INITIALIZER, BLOCK, CALL, CONTROL_STRUCTURE, FIELD_IDENTIFIER, IDENTIFIER, LITERAL, METHOD_REF, RETURN, TEMPLATE_DOM, TYPE_REF, UNKNOWN
 trait Expression extends StoredNode with ExpressionBase with CfgNode with StaticType[ExpressionEMT]

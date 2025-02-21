@@ -32,6 +32,8 @@ trait MethodParameterOutBase
     if ((false: Boolean) != this.isVariadic) res.put("IS_VARIADIC", this.isVariadic)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
     if (("<empty>": String) != this.typeFullName) res.put("TYPE_FULL_NAME", this.typeFullName)
     res
@@ -73,6 +75,20 @@ object MethodParameterOut {
 
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = "NAME"
+
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = "OFFSET"
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = "OFFSET_END"
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
@@ -120,6 +136,20 @@ object MethodParameterOut {
     /** Name of represented object, e.g., method name (e.g. "run") */
     val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -151,34 +181,38 @@ class MethodParameterOut(graph_4762: flatgraph.Graph, seq_4762: Int)
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "code"
-      case 1 => "columnNumber"
-      case 2 => "evaluationStrategy"
-      case 3 => "index"
-      case 4 => "isVariadic"
-      case 5 => "lineNumber"
-      case 6 => "name"
-      case 7 => "order"
-      case 8 => "typeFullName"
-      case _ => ""
+      case 0  => "code"
+      case 1  => "columnNumber"
+      case 2  => "evaluationStrategy"
+      case 3  => "index"
+      case 4  => "isVariadic"
+      case 5  => "lineNumber"
+      case 6  => "name"
+      case 7  => "offset"
+      case 8  => "offsetEnd"
+      case 9  => "order"
+      case 10 => "typeFullName"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.code
-      case 1 => this.columnNumber
-      case 2 => this.evaluationStrategy
-      case 3 => this.index
-      case 4 => this.isVariadic
-      case 5 => this.lineNumber
-      case 6 => this.name
-      case 7 => this.order
-      case 8 => this.typeFullName
-      case _ => null
+      case 0  => this.code
+      case 1  => this.columnNumber
+      case 2  => this.evaluationStrategy
+      case 3  => this.index
+      case 4  => this.isVariadic
+      case 5  => this.lineNumber
+      case 6  => this.name
+      case 7  => this.offset
+      case 8  => this.offsetEnd
+      case 9  => this.order
+      case 10 => this.typeFullName
+      case _  => null
     }
 
   override def productPrefix = "MethodParameterOut"
-  override def productArity  = 9
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodParameterOut]
 }
@@ -1603,6 +1637,64 @@ object NewMethodParameterOut {
         }
       }
     }
+    object NewNodeInserter_MethodParameterOut_offset extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewMethodParameterOut =>
+              generated.offset match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_MethodParameterOut_offsetEnd extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewMethodParameterOut =>
+              generated.offsetEnd match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_MethodParameterOut_order extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1679,6 +1771,8 @@ class NewMethodParameterOut
   var isVariadic: Boolean                          = false: Boolean
   var lineNumber: Option[Int]                      = None
   var name: String                                 = "<empty>": String
+  var offset: Option[Int]                          = None
+  var offsetEnd: Option[Int]                       = None
   var order: Int                                   = -1: Int
   var typeFullName: String                         = "<empty>": String
   def code(value: String): this.type               = { this.code = value; this }
@@ -1690,6 +1784,10 @@ class NewMethodParameterOut
   def lineNumber(value: Int): this.type            = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type    = { this.lineNumber = value; this }
   def name(value: String): this.type               = { this.name = value; this }
+  def offset(value: Int): this.type                = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type        = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type             = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type     = { this.offsetEnd = value; this }
   def order(value: Int): this.type                 = { this.order = value; this }
   def typeFullName(value: String): this.type       = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
@@ -1700,6 +1798,8 @@ class NewMethodParameterOut
     interface.countProperty(this, 31, 1)
     interface.countProperty(this, 35, lineNumber.size)
     interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
     interface.countProperty(this, 44, 1)
     interface.countProperty(this, 53, 1)
   }
@@ -1713,6 +1813,8 @@ class NewMethodParameterOut
     newInstance.isVariadic = this.isVariadic
     newInstance.lineNumber = this.lineNumber
     newInstance.name = this.name
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
@@ -1720,33 +1822,37 @@ class NewMethodParameterOut
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "code"
-      case 1 => "columnNumber"
-      case 2 => "evaluationStrategy"
-      case 3 => "index"
-      case 4 => "isVariadic"
-      case 5 => "lineNumber"
-      case 6 => "name"
-      case 7 => "order"
-      case 8 => "typeFullName"
-      case _ => ""
+      case 0  => "code"
+      case 1  => "columnNumber"
+      case 2  => "evaluationStrategy"
+      case 3  => "index"
+      case 4  => "isVariadic"
+      case 5  => "lineNumber"
+      case 6  => "name"
+      case 7  => "offset"
+      case 8  => "offsetEnd"
+      case 9  => "order"
+      case 10 => "typeFullName"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.code
-      case 1 => this.columnNumber
-      case 2 => this.evaluationStrategy
-      case 3 => this.index
-      case 4 => this.isVariadic
-      case 5 => this.lineNumber
-      case 6 => this.name
-      case 7 => this.order
-      case 8 => this.typeFullName
-      case _ => null
+      case 0  => this.code
+      case 1  => this.columnNumber
+      case 2  => this.evaluationStrategy
+      case 3  => this.index
+      case 4  => this.isVariadic
+      case 5  => this.lineNumber
+      case 6  => this.name
+      case 7  => this.offset
+      case 8  => this.offsetEnd
+      case 9  => this.order
+      case 10 => this.typeFullName
+      case _  => null
     }
 
   override def productPrefix                = "NewMethodParameterOut"
-  override def productArity                 = 9
+  override def productArity                 = 11
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewMethodParameterOut]
 }

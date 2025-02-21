@@ -374,9 +374,6 @@ which language frontend was used to generate the CPG and the list property
     * `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and the name of the source file is specified in `FILENAME`. An optional
     * hash value MAY be calculated over the function contents and included in the `HASH` field.
     *
-    * The optional `OFFSET` and `OFFSET_END` specify the start and exclusive end position of the code belonging to a
-    * method within the corresponding `FILE` nodes `CONTENT` property.
-    *
     * Finally, the fully qualified name of the program constructs that the method is immediately contained in is stored
     * in the `AST_PARENT_FULL_NAME` field and its type is indicated in the `AST_PARENT_TYPE` field to be one of
     * `METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.
@@ -398,10 +395,6 @@ Line and column number information is specified in the optional fields
 `LINE_NUMBER`, `COLUMN_NUMBER`, `LINE_NUMBER_END`, and `COLUMN_NUMBER_END` and
 the name of the source file is specified in `FILENAME`. An optional hash value
 MAY be calculated over the function contents and included in the `HASH` field.
-
-The optional `OFFSET` and `OFFSET_END` specify the start
-and exclusive end position of the code belonging to a method within the corresponding
-`FILE` nodes `CONTENT` property.
 
 Finally, the fully qualified name of the program constructs that the method
 is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
@@ -576,9 +569,6 @@ to  interpret the type argument. It MUST however store its code in the
     * fully-qualified name of a base type. If the type is known to be an alias of another type (as for example
     * introduced via the C `typedef` statement), the name of the alias is stored in `ALIAS_TYPE_FULL_NAME`.
     *
-    * The optional `OFFSET` and `OFFSET_END` specify the start and exclusive end position of the code belonging to a
-    * `TYPE_DECL` within the corresponding `FILE` nodes `CONTENT` property.
-    *
     * Finally, the fully qualified name of the program constructs that the type declaration is immediately contained in
     * is stored in the `AST_PARENT_FULL_NAME` field and its type is indicated in the `AST_PARENT_TYPE` field to be one
     * of `METHOD`, `TYPE_DECL` or `NAMESPACE_BLOCK`.
@@ -603,10 +593,6 @@ Base types can be specified via the `INHERITS_FROM_TYPE_FULL_NAME` list, where
 each entry contains the fully-qualified name of a base type. If the type is
 known to be an alias of another type (as for example introduced via the C
 `typedef` statement), the name of the alias is stored in `ALIAS_TYPE_FULL_NAME`.
-
-The optional `OFFSET` and `OFFSET_END` specify the start
-and exclusive end position of the code belonging to a `TYPE_DECL` within the corresponding
-`FILE` nodes `CONTENT` property.
 
 Finally, the fully qualified name of the program constructs that the type declaration
 is immediately contained in is stored in the `AST_PARENT_FULL_NAME` field
@@ -649,11 +635,14 @@ included using a node of type `UNKNOWN`.""")
     * AST nodes contain optional `LINE_NUMBER` and `COLUMN_NUMBER` fields. For source-based frontends, these fields
     * contain the start line number and start column number of the code represented by the node. For machine-code-based
     * and bytecode-based frontends, `LINE_NUMBER` contains the address at which the code starts while `COLUMN_NUMBER` is
-    * undefined. subtypes: ANNOTATION, ANNOTATION_LITERAL, ANNOTATION_PARAMETER, ANNOTATION_PARAMETER_ASSIGN,
-    * ARRAY_INITIALIZER, BLOCK, CALL, COMMENT, CONTROL_STRUCTURE, FIELD_IDENTIFIER, FILE, IDENTIFIER, IMPORT,
-    * JUMP_LABEL, JUMP_TARGET, LITERAL, LOCAL, MEMBER, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF,
-    * METHOD_RETURN, MODIFIER, NAMESPACE, NAMESPACE_BLOCK, RETURN, TEMPLATE_DOM, TYPE_ARGUMENT, TYPE_DECL,
-    * TYPE_PARAMETER, TYPE_REF, UNKNOWN
+    * undefined.
+    *
+    * The optional `OFFSET` and `OFFSET_END` specify the start and exclusive end position of the code belonging to a
+    * node within the corresponding `FILE` nodes `CONTENT` property. subtypes: ANNOTATION, ANNOTATION_LITERAL,
+    * ANNOTATION_PARAMETER, ANNOTATION_PARAMETER_ASSIGN, ARRAY_INITIALIZER, BLOCK, CALL, COMMENT, CONTROL_STRUCTURE,
+    * FIELD_IDENTIFIER, FILE, IDENTIFIER, IMPORT, JUMP_LABEL, JUMP_TARGET, LITERAL, LOCAL, MEMBER, METHOD,
+    * METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, MODIFIER, NAMESPACE, NAMESPACE_BLOCK,
+    * RETURN, TEMPLATE_DOM, TYPE_ARGUMENT, TYPE_DECL, TYPE_PARAMETER, TYPE_REF, UNKNOWN
     */
   @flatgraph.help.Doc(
     info = """This is the base type for all nodes of the abstract syntax tree (AST). An AST
@@ -666,7 +655,11 @@ AST nodes contain optional `LINE_NUMBER` and `COLUMN_NUMBER` fields. For
 source-based frontends, these fields contain the start line number and
 start column number of the code represented by the node.
 For machine-code-based and bytecode-based frontends, `LINE_NUMBER` contains
-the address at which the code starts while `COLUMN_NUMBER` is undefined.""",
+the address at which the code starts while `COLUMN_NUMBER` is undefined.
+
+The optional `OFFSET` and `OFFSET_END` specify the start
+and exclusive end position of the code belonging to a node within the corresponding
+`FILE` nodes `CONTENT` property.""",
     longInfo =
       """subtypes: ANNOTATION, ANNOTATION_LITERAL, ANNOTATION_PARAMETER, ANNOTATION_PARAMETER_ASSIGN, ARRAY_INITIALIZER, BLOCK, CALL, COMMENT, CONTROL_STRUCTURE, FIELD_IDENTIFIER, FILE, IDENTIFIER, IMPORT, JUMP_LABEL, JUMP_TARGET, LITERAL, LOCAL, MEMBER, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, MODIFIER, NAMESPACE, NAMESPACE_BLOCK, RETURN, TEMPLATE_DOM, TYPE_ARGUMENT, TYPE_DECL, TYPE_PARAMETER, TYPE_REF, UNKNOWN"""
   )

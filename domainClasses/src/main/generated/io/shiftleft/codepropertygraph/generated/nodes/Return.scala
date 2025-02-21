@@ -19,6 +19,8 @@ trait ReturnBase extends AbstractNode with ExpressionBase with StaticType[Return
     if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
+    this.offset.foreach { p => res.put("OFFSET", p) }
+    this.offsetEnd.foreach { p => res.put("OFFSET_END", p) }
     if ((-1: Int) != this.order) res.put("ORDER", this.order)
     res
   }
@@ -53,6 +55,20 @@ object Return {
       */
     val LineNumber = "LINE_NUMBER"
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = "OFFSET"
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = "OFFSET_END"
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -85,6 +101,20 @@ object Return {
       */
     val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
 
+    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
+      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
+      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
+      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
+      * source code of the entire file.
+      */
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+
+    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
+      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
+      * method.
+      */
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
@@ -110,7 +140,9 @@ class Return(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 2 => "code"
       case 3 => "columnNumber"
       case 4 => "lineNumber"
-      case 5 => "order"
+      case 5 => "offset"
+      case 6 => "offsetEnd"
+      case 7 => "order"
       case _ => ""
     }
 
@@ -121,12 +153,14 @@ class Return(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 2 => this.code
       case 3 => this.columnNumber
       case 4 => this.lineNumber
-      case 5 => this.order
+      case 5 => this.offset
+      case 6 => this.offsetEnd
+      case 7 => this.order
       case _ => null
     }
 
   override def productPrefix = "Return"
-  override def productArity  = 6
+  override def productArity  = 8
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Return]
 }
@@ -1505,6 +1539,64 @@ object NewReturn {
         }
       }
     }
+    object NewNodeInserter_Return_offset extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewReturn =>
+              generated.offset match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Return_offsetEnd extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewReturn =>
+              generated.offsetEnd match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Return_order extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1549,6 +1641,8 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
   var code: String                                   = "<empty>": String
   var columnNumber: Option[Int]                      = None
   var lineNumber: Option[Int]                        = None
+  var offset: Option[Int]                            = None
+  var offsetEnd: Option[Int]                         = None
   var order: Int                                     = -1: Int
   def argumentIndex(value: Int): this.type           = { this.argumentIndex = value; this }
   def argumentName(value: Option[String]): this.type = { this.argumentName = value; this }
@@ -1558,6 +1652,10 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
   def columnNumber(value: Option[Int]): this.type    = { this.columnNumber = value; this }
   def lineNumber(value: Int): this.type              = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type      = { this.lineNumber = value; this }
+  def offset(value: Int): this.type                  = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type          = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type               = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type       = { this.offsetEnd = value; this }
   def order(value: Int): this.type                   = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
@@ -1565,6 +1663,8 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 42, offset.size)
+    interface.countProperty(this, 43, offsetEnd.size)
     interface.countProperty(this, 44, 1)
   }
 
@@ -1575,6 +1675,8 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
     newInstance.lineNumber = this.lineNumber
+    newInstance.offset = this.offset
+    newInstance.offsetEnd = this.offsetEnd
     newInstance.order = this.order
     newInstance.asInstanceOf[this.type]
   }
@@ -1586,7 +1688,9 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
       case 2 => "code"
       case 3 => "columnNumber"
       case 4 => "lineNumber"
-      case 5 => "order"
+      case 5 => "offset"
+      case 6 => "offsetEnd"
+      case 7 => "order"
       case _ => ""
     }
 
@@ -1597,11 +1701,13 @@ class NewReturn extends NewNode(34.toShort) with ReturnBase with ExpressionNew {
       case 2 => this.code
       case 3 => this.columnNumber
       case 4 => this.lineNumber
-      case 5 => this.order
+      case 5 => this.offset
+      case 6 => this.offsetEnd
+      case 7 => this.order
       case _ => null
     }
 
   override def productPrefix                = "NewReturn"
-  override def productArity                 = 6
+  override def productArity                 = 8
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewReturn]
 }
