@@ -668,6 +668,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(575) = FormalQtyType.QtyOne
     nodePropertyDescriptors(662) = FormalQtyType.StringType // LOCATION.CLASS_SHORT_NAME
     nodePropertyDescriptors(663) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(1014) = FormalQtyType.IntType // LOCATION.COLUMN_NUMBER
+    nodePropertyDescriptors(1015) = FormalQtyType.QtyOption
     nodePropertyDescriptors(1894) = FormalQtyType.StringType // LOCATION.FILENAME
     nodePropertyDescriptors(1895) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3126) = FormalQtyType.IntType // LOCATION.LINE_NUMBER
@@ -1240,6 +1242,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(4708) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_typeFullName
     _newNodeInserters(574) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_className
     _newNodeInserters(662) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_classShortName
+    _newNodeInserters(1014) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_columnNumber
     _newNodeInserters(1894) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_filename
     _newNodeInserters(3126) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_lineNumber
     _newNodeInserters(3302) = nodes.NewLocation.InsertionHelpers.NewNodeInserter_Location_methodFullName
@@ -1618,6 +1621,7 @@ object GraphSchema extends flatgraph.Schema {
         Set(
           "CLASS_NAME",
           "CLASS_SHORT_NAME",
+          "COLUMN_NUMBER",
           "FILENAME",
           "LINE_NUMBER",
           "METHOD_FULL_NAME",

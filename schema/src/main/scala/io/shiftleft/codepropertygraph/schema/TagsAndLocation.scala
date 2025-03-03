@@ -99,7 +99,8 @@ object TagsAndLocation extends SchemaBase {
         className,
         classShortName,
         nodeLabel,
-        filename
+        filename,
+        columnNumber
       )
 
     val tagNodePair: NodeType = builder
