@@ -492,6 +492,10 @@ object Accessors {
       case stored: nodes.StoredNode   => new AccessPropertyClassShortName(stored).classShortName
       case newNode: nodes.NewLocation => newNode.classShortName
     }
+    def columnNumber: Option[Int] = node match {
+      case stored: nodes.StoredNode   => new AccessPropertyColumnNumber(stored).columnNumber
+      case newNode: nodes.NewLocation => newNode.columnNumber
+    }
     def filename: String = node match {
       case stored: nodes.StoredNode   => new AccessPropertyFilename(stored).filename
       case newNode: nodes.NewLocation => newNode.filename

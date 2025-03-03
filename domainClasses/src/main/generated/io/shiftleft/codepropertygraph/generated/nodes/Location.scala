@@ -11,6 +11,7 @@ trait LocationEMT
     extends AnyRef
     with HasClassNameEMT
     with HasClassShortNameEMT
+    with HasColumnNumberEMT
     with HasFilenameEMT
     with HasLineNumberEMT
     with HasMethodFullNameEMT
@@ -26,6 +27,7 @@ trait LocationBase extends AbstractNode with StaticType[LocationEMT] {
     val res = new java.util.HashMap[String, Any]()
     if (("<empty>": String) != this.className) res.put("CLASS_NAME", this.className)
     if (("<empty>": String) != this.classShortName) res.put("CLASS_SHORT_NAME", this.classShortName)
+    this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     if (("<empty>": String) != this.filename) res.put("FILENAME", this.filename)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.methodFullName) res.put("METHOD_FULL_NAME", this.methodFullName)
@@ -45,6 +47,10 @@ object Location {
     val ClassName = "CLASS_NAME"
 
     val ClassShortName = "CLASS_SHORT_NAME"
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = "COLUMN_NUMBER"
 
     /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
       * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
@@ -74,6 +80,10 @@ object Location {
   object Properties {
     val ClassName      = flatgraph.SinglePropertyKey[String](kind = 6, name = "CLASS_NAME", default = "<empty>")
     val ClassShortName = flatgraph.SinglePropertyKey[String](kind = 7, name = "CLASS_SHORT_NAME", default = "<empty>")
+
+    /** This optional fields provides the column number of the program construct represented by the node.
+      */
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
 
     /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
       * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
@@ -116,36 +126,38 @@ class Location(graph_4762: flatgraph.Graph, seq_4762: Int)
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "className"
-      case 1 => "classShortName"
-      case 2 => "filename"
-      case 3 => "lineNumber"
-      case 4 => "methodFullName"
-      case 5 => "methodShortName"
-      case 6 => "nodeLabel"
-      case 7 => "packageName"
-      case 8 => "symbol"
-      case 9 => "node"
-      case _ => ""
+      case 0  => "className"
+      case 1  => "classShortName"
+      case 2  => "columnNumber"
+      case 3  => "filename"
+      case 4  => "lineNumber"
+      case 5  => "methodFullName"
+      case 6  => "methodShortName"
+      case 7  => "nodeLabel"
+      case 8  => "packageName"
+      case 9  => "symbol"
+      case 10 => "node"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.className
-      case 1 => this.classShortName
-      case 2 => this.filename
-      case 3 => this.lineNumber
-      case 4 => this.methodFullName
-      case 5 => this.methodShortName
-      case 6 => this.nodeLabel
-      case 7 => this.packageName
-      case 8 => this.symbol
-      case 9 => this.node
-      case _ => null
+      case 0  => this.className
+      case 1  => this.classShortName
+      case 2  => this.columnNumber
+      case 3  => this.filename
+      case 4  => this.lineNumber
+      case 5  => this.methodFullName
+      case 6  => this.methodShortName
+      case 7  => this.nodeLabel
+      case 8  => this.packageName
+      case 9  => this.symbol
+      case 10 => this.node
+      case _  => null
     }
 
   override def productPrefix = "Location"
-  override def productArity  = 10
+  override def productArity  = 11
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Location]
 }
@@ -198,6 +210,35 @@ object NewLocation {
             case generated: NewLocation =>
               dstCast(offset) = generated.classShortName
               offset += 1
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
+    object NewNodeInserter_Location_columnNumber extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Int]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewLocation =>
+              generated.columnNumber match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
             case _ =>
           }
           assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
@@ -433,6 +474,7 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
 
   var className: String                            = "<empty>": String
   var classShortName: String                       = "<empty>": String
+  var columnNumber: Option[Int]                    = None
   var filename: String                             = "<empty>": String
   var lineNumber: Option[Int]                      = None
   var methodFullName: String                       = "<empty>": String
@@ -443,6 +485,8 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
   var symbol: String                               = "<empty>": String
   def className(value: String): this.type          = { this.className = value; this }
   def classShortName(value: String): this.type     = { this.classShortName = value; this }
+  def columnNumber(value: Int): this.type          = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type  = { this.columnNumber = value; this }
   def filename(value: String): this.type           = { this.filename = value; this }
   def lineNumber(value: Int): this.type            = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type    = { this.lineNumber = value; this }
@@ -456,6 +500,7 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 6, 1)
     interface.countProperty(this, 7, 1)
+    interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 21, 1)
     interface.countProperty(this, 35, lineNumber.size)
     interface.countProperty(this, 37, 1)
@@ -471,6 +516,7 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
     val newInstance = new NewLocation
     newInstance.className = this.className
     newInstance.classShortName = this.classShortName
+    newInstance.columnNumber = this.columnNumber
     newInstance.filename = this.filename
     newInstance.lineNumber = this.lineNumber
     newInstance.methodFullName = this.methodFullName
@@ -484,35 +530,37 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
 
   override def productElementName(n: Int): String =
     n match {
-      case 0 => "className"
-      case 1 => "classShortName"
-      case 2 => "filename"
-      case 3 => "lineNumber"
-      case 4 => "methodFullName"
-      case 5 => "methodShortName"
-      case 6 => "nodeLabel"
-      case 7 => "packageName"
-      case 8 => "symbol"
-      case 9 => "node"
-      case _ => ""
+      case 0  => "className"
+      case 1  => "classShortName"
+      case 2  => "columnNumber"
+      case 3  => "filename"
+      case 4  => "lineNumber"
+      case 5  => "methodFullName"
+      case 6  => "methodShortName"
+      case 7  => "nodeLabel"
+      case 8  => "packageName"
+      case 9  => "symbol"
+      case 10 => "node"
+      case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
-      case 0 => this.className
-      case 1 => this.classShortName
-      case 2 => this.filename
-      case 3 => this.lineNumber
-      case 4 => this.methodFullName
-      case 5 => this.methodShortName
-      case 6 => this.nodeLabel
-      case 7 => this.packageName
-      case 8 => this.symbol
-      case 9 => this.node
-      case _ => null
+      case 0  => this.className
+      case 1  => this.classShortName
+      case 2  => this.columnNumber
+      case 3  => this.filename
+      case 4  => this.lineNumber
+      case 5  => this.methodFullName
+      case 6  => this.methodShortName
+      case 7  => this.nodeLabel
+      case 8  => this.packageName
+      case 9  => this.symbol
+      case 10 => this.node
+      case _  => null
     }
 
   override def productPrefix                = "NewLocation"
-  override def productArity                 = 10
+  override def productArity                 = 11
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewLocation]
 }
