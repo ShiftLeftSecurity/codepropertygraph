@@ -1,4 +1,4 @@
-addSbtPlugin("com.github.sbt"    % "sbt-protobuf"         % "0.7.1")
+addSbtPlugin("com.github.sbt"    % "sbt-protobuf"         % "0.8.2")
 addSbtPlugin("org.scalameta"     % "sbt-scalafmt"         % "2.4.6")
 addSbtPlugin("com.github.sbt"    % "sbt-findbugs"         % "2.0.0")
 addSbtPlugin("io.shiftleft"      % "sbt-ci-release-early" % "2.0.48")
