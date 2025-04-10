@@ -88,7 +88,11 @@ object TagsAndLocation extends SchemaBase {
       .primaryKey(name)
 
     val location: NodeType = builder
-      .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")
+      .addNodeType(
+        name = "LOCATION",
+        comment =
+          "Deprecated: Prefer the generated Loc node extension and .loc node step. A location node summarizes a source code location."
+      )
       .protoId(ProtoIds.Location)
       .addProperties(
         symbol,
