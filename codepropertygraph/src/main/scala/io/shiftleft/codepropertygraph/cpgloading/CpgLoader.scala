@@ -40,9 +40,7 @@ object CpgLoader {
       load(absolutePath, persistTo = path.resolveSibling(s"${path.getFileName}.fg"))
     } else {
       // assuming it's flatgraph format
-      val cpg = Cpg.withStorage(absolutePath)
-      logger.debug(s"Loaded Cpg with ${cpg.graph.nodeCount} nodes and ${cpg.graph.edgeCount} edges")
-      cpg
+      Cpg.withStorage(absolutePath)
     }
   }
 
@@ -60,7 +58,7 @@ object CpgLoader {
     if (persistTo != from)
       Files.deleteIfExists(persistTo)
 
-    val cpg = if (!Files.exists(absolutePath)) {
+    if (!Files.exists(absolutePath)) {
       throw new FileNotFoundException(s"given input file $absolutePath does not exist")
     } else if (isProtoFormat(absolutePath)) {
       logger.debug(s"Converting $from from proto cpg into new flatgraph storage: $persistTo")
@@ -75,9 +73,6 @@ object CpgLoader {
         s"unknown file format - we probed the first bytes but it didn't look like one of our known formats (proto.zip, flatgraph, overflowdb)"
       )
     }
-    logger.debug(s"Loaded Cpg with ${cpg.graph.nodeCount} nodes and ${cpg.graph.edgeCount} edges")
-
-    cpg
   }
 
   /** Determine whether the CPG is a legacy (proto) CPG */
