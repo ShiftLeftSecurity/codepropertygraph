@@ -335,8 +335,8 @@ contains the entire local variable declaration without initialization, e.g., for
   @flatgraph.help.Doc(info = """A location node summarizes a source code location.""")
   def location: Iterator[nodes.Location] = wrappedCpg.graph._nodes(23).asInstanceOf[Iterator[nodes.Location]]
 
-  /** This node represents a type member of a class, struct or union, e.g., for the type declaration `class Foo{ int i ;
-    * }`, it represents the declaration of the variable `i`.
+  /** This node represents a type member of a class, struct or union, e.g., for the type declaration
+    * `class Foo{ int i ; }`, it represents the declaration of the variable `i`.
     */
   @flatgraph.help.Doc(info = """This node represents a type member of a class, struct or union, e.g., for the
  type declaration `class Foo{ int i ; }`, it represents the declaration of the
