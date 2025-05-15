@@ -49,7 +49,7 @@ object Schema2Json extends App {
         val description = info.getDeclaringClass.getDeclaredMethod("description").invoke(null).asInstanceOf[String]
         val providedByFrontend =
           info.getDeclaringClass.getDeclaredMethod("providedByFrontend").invoke(null).asInstanceOf[Boolean]
-        ("name"                 -> name) ~
+        ("name"        -> name) ~
           ("description"        -> description) ~
           ("providedByFrontend" -> providedByFrontend)
       }
@@ -106,7 +106,7 @@ object Schema2Json extends App {
       .flatMap { edge =>
         val schName = schemaName(edge.schemaInfo)
         Some(
-          ("name"      -> edge.name) ~
+          ("name" -> edge.name) ~
             ("comment" -> edge.comment) ~
             ("schema"  -> schName)
         )
@@ -120,7 +120,7 @@ object Schema2Json extends App {
       .flatMap { prop =>
         val schName = schemaName(prop.schemaInfo)
         Some(
-          ("name"      -> prop.name) ~
+          ("name" -> prop.name) ~
             ("comment" -> prop.comment) ~
             ("schema"  -> schName)
         )
