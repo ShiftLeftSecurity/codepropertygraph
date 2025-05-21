@@ -24,7 +24,7 @@ object Hidden extends SchemaBase {
     fs: FileSystem.Schema,
     callGraph: CallGraph.Schema,
     pdg: Pdg.Schema,
-    tags: TagsAndLocation.Schema,
+    tags: Tags.Schema,
     shortcuts: Shortcuts.Schema
   ) = new Schema(builder, base, methodSchema, typeDecl, ast, cfg, fs, callGraph, pdg, tags, shortcuts)
 
@@ -38,7 +38,7 @@ object Hidden extends SchemaBase {
     fsSchema: FileSystem.Schema,
     callGraph: CallGraph.Schema,
     pdg: Pdg.Schema,
-    tags: TagsAndLocation.Schema,
+    tags: Tags.Schema,
     shortcuts: Shortcuts.Schema
   ) {
 
