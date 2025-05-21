@@ -4,7 +4,7 @@ import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
 import flatgraph.schema.Property.ValueType
 import flatgraph.schema._
 
-object TagsAndLocation extends SchemaBase {
+object Tags extends SchemaBase {
 
   override def docIndex: Int = 17
 
@@ -87,33 +87,10 @@ object TagsAndLocation extends SchemaBase {
       .addProperties(name, value)
       .primaryKey(name)
 
-    val location: NodeType = builder
-      .addNodeType(
-        name = "LOCATION",
-        comment =
-          "Deprecated: Prefer the generated Loc node extension and .loc node step. A location node summarizes a source code location."
-      )
-      .protoId(ProtoIds.Location)
-      .addProperties(
-        symbol,
-        methodFullName,
-        methodShortName,
-        packageName,
-        lineNumber,
-        className,
-        classShortName,
-        nodeLabel,
-        filename,
-        columnNumber
-      )
-
     val tagNodePair: NodeType = builder
       .addNodeType(name = "TAG_NODE_PAIR", comment = "This node contains an arbitrary node and an associated tag node.")
       .protoId(ProtoIds.TagNodePair)
       .addProperties()
-
-// node relations
-    location.addContainedNode(builder.anyNode, "node", Property.Cardinality.ZeroOrOne)
 
     // TODO MP: provide dummy/empty node as default, to avoid null?
     tagNodePair
