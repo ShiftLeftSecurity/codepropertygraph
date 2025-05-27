@@ -104,11 +104,11 @@ object MethodParameterOut {
   object Properties {
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
       * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
@@ -117,24 +117,24 @@ object MethodParameterOut {
       * object that it points to is not made.
       */
     val EvaluationStrategy =
-      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 17, name = "EVALUATION_STRATEGY", default = "<empty>")
 
     /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
       * 0 is reserved for implicit self / this parameter.
       */
-    val Index = flatgraph.SinglePropertyKey[Int](kind = 27, name = "INDEX", default = -1: Int)
+    val Index = flatgraph.SinglePropertyKey[Int](kind = 25, name = "INDEX", default = -1: Int)
 
     /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
       * parameter of a method is allowed to have this property set to true.
       */
-    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 31, name = "IS_VARIADIC", default = false)
+    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 29, name = "IS_VARIADIC", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 33, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 37, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -142,24 +142,24 @@ object MethodParameterOut {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 38, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 40, name = "ORDER", default = -1: Int)
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 47, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code               = "<empty>"
@@ -173,7 +173,7 @@ object MethodParameterOut {
 }
 
 class MethodParameterOut(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 28.toShort, seq_4762)
+    extends StoredNode(graph_4762, 27.toShort, seq_4762)
     with MethodParameterOutBase
     with CfgNode
     with Declaration
@@ -1749,7 +1749,7 @@ object NewMethodParameterOut {
 }
 
 class NewMethodParameterOut
-    extends NewNode(28.toShort)
+    extends NewNode(27.toShort)
     with MethodParameterOutBase
     with AstNodeNew
     with CfgNodeNew
@@ -1791,17 +1791,17 @@ class NewMethodParameterOut
   def order(value: Int): this.type                 = { this.order = value; this }
   def typeFullName(value: String): this.type       = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 19, 1)
-    interface.countProperty(this, 27, 1)
-    interface.countProperty(this, 31, 1)
-    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 17, 1)
+    interface.countProperty(this, 25, 1)
+    interface.countProperty(this, 29, 1)
+    interface.countProperty(this, 33, lineNumber.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 38, offset.size)
+    interface.countProperty(this, 39, offsetEnd.size)
     interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, offset.size)
-    interface.countProperty(this, 43, offsetEnd.size)
-    interface.countProperty(this, 44, 1)
-    interface.countProperty(this, 53, 1)
+    interface.countProperty(this, 47, 1)
   }
 
   override def copy: this.type = {

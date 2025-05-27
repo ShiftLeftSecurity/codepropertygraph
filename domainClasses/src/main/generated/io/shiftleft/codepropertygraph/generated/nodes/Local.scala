@@ -107,31 +107,31 @@ object Local {
     /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
       * the corresponding CLOSURE_BINDING nodes
       */
-    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 8, name = "CLOSURE_BINDING_ID")
+    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
 
     /** This field is experimental. It will likely be removed in the future without any notice. It stores type
       * information for generic types and methods as well as type information for members and locals where the type
       * either contains a type parameter reference or an instantiated type reference.
       */
     val GenericSignature =
-      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 21, name = "GENERIC_SIGNATURE", default = "<empty>")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 33, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 37, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -139,29 +139,29 @@ object Local {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 38, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 40, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 48, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 43, name = "POSSIBLE_TYPES")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 53, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 47, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code             = "<empty>"
@@ -1826,18 +1826,18 @@ class NewLocal extends NewNode(22.toShort) with LocalBase with AstNodeNew with D
   def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
   def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 8, closureBindingId.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 23, 1)
-    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 6, closureBindingId.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 16, dynamicTypeHintFullName.size)
+    interface.countProperty(this, 21, 1)
+    interface.countProperty(this, 33, lineNumber.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 38, offset.size)
+    interface.countProperty(this, 39, offsetEnd.size)
     interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, offset.size)
-    interface.countProperty(this, 43, offsetEnd.size)
-    interface.countProperty(this, 44, 1)
-    interface.countProperty(this, 48, possibleTypes.size)
-    interface.countProperty(this, 53, 1)
+    interface.countProperty(this, 43, possibleTypes.size)
+    interface.countProperty(this, 47, 1)
   }
 
   override def copy: this.type = {

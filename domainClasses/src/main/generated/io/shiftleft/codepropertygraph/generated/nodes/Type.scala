@@ -43,16 +43,16 @@ object Type {
     /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
+    val FullName = flatgraph.SinglePropertyKey[String](kind = 20, name = "FULL_NAME", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 37, name = "NAME", default = "<empty>")
 
     /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is
       * required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
       */
     val TypeDeclFullName =
-      flatgraph.SinglePropertyKey[String](kind = 52, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 46, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val FullName         = "<empty>"
@@ -62,7 +62,7 @@ object Type {
 }
 
 class Type(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 38.toShort, seq_4762)
+    extends StoredNode(graph_4762, 37.toShort, seq_4762)
     with TypeBase
     with StaticType[TypeEMT] {
 
@@ -192,7 +192,7 @@ object NewType {
   }
 }
 
-class NewType extends NewNode(38.toShort) with TypeBase {
+class NewType extends NewNode(37.toShort) with TypeBase {
   override type StoredNodeType = Type
   override def label: String = "TYPE"
 
@@ -210,9 +210,9 @@ class NewType extends NewNode(38.toShort) with TypeBase {
   def name(value: String): this.type             = { this.name = value; this }
   def typeDeclFullName(value: String): this.type = { this.typeDeclFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 22, 1)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 20, 1)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 46, 1)
   }
 
   override def copy: this.type = {
