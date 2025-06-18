@@ -18,9 +18,9 @@ object ProjectRoot {
   val FileNameToSearchForEnvVar = "FILE_IN_PROJECT_ROOT"
 
   object SearchDepthExceededError extends Error
-  
+
   private val SEARCH_DEPTH = 4
-  private lazy val filenameToSearchFor = 
+  private lazy val filenameToSearchFor =
     sys.env
       .get(FileNameToSearchForEnvVar)
       .getOrElse(".git")
