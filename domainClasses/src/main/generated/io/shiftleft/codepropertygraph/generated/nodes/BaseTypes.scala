@@ -234,6 +234,11 @@ trait HasDynamicTypeHintFullNameEMT
   */
 trait HasEvaluationStrategyEMT
 
+/** Node types with this marker trait are guaranteed to have the EVIDENCE_DESCRIPTION property. EMT stands for: "erased
+  * marker trait", it exists only at compile time in order to improve type safety.
+  */
+trait HasEvidenceDescriptionEMT
+
 /** Node types with this marker trait are guaranteed to have the EXPLICIT_AS property. EMT stands for: "erased marker
   * trait", it exists only at compile time in order to improve type safety.
   */
