@@ -1,6 +1,6 @@
 package io.shiftleft.utils
 
-import better.files.File
+import java.nio.file.{Files, Path, Paths}
 
 import scala.annotation.tailrec
 
@@ -15,19 +15,23 @@ import scala.annotation.tailrec
   * with this setting any more.
   */
 object ProjectRoot {
+  val FileNameToSearchForEnvVar = "FILE_IN_PROJECT_ROOT"
 
-  private val SEARCH_DEPTH = 4
   object SearchDepthExceededError extends Error
+  
+  private val SEARCH_DEPTH = 4
+  private lazy val filenameToSearchFor = 
+    sys.env
+      .get(FileNameToSearchForEnvVar)
+      .getOrElse(".git")
 
   def relativise(path: String): String =
     s"$findRelativePath$path"
 
   def findRelativePath: String = {
-    val fileThatOnlyExistsInRoot = ".git"
-
     @tailrec def loop(depth: Int): String = {
       val pathPrefix = "./" + "../" * depth
-      if (File(s"$pathPrefix$fileThatOnlyExistsInRoot").exists) pathPrefix
+      if (Files.exists(Paths.get(s"$pathPrefix$filenameToSearchFor"))) pathPrefix
       else if (depth < SEARCH_DEPTH) loop(depth + 1)
       else throw SearchDepthExceededError
     }
@@ -35,7 +39,7 @@ object ProjectRoot {
     loop(0)
   }
 
-  def find: File =
-    File(findRelativePath)
+  def find: Path =
+    Paths.get(findRelativePath)
 
 }
