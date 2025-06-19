@@ -41,12 +41,6 @@ unknown or there are partial overlaps, then one must make a reasonable guess,
 and trade off between false negatives and false positives). */
 public static final String CANONICAL_NAME = "CANONICAL_NAME";
 
-
-public static final String CLASS_NAME = "CLASS_NAME";
-
-
-public static final String CLASS_SHORT_NAME = "CLASS_SHORT_NAME";
-
 /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes */
 public static final String CLOSURE_BINDING_ID = "CLOSURE_BINDING_ID";
 
@@ -196,18 +190,12 @@ public static final String LINE_NUMBER_END = "LINE_NUMBER_END";
 to have exactly one METHOD node for each METHOD_FULL_NAME */
 public static final String METHOD_FULL_NAME = "METHOD_FULL_NAME";
 
-
-public static final String METHOD_SHORT_NAME = "METHOD_SHORT_NAME";
-
 /** The modifier type is a free-form string. The following are known modifier types:
 `STATIC`, `PUBLIC`, `PROTECTED`, `PRIVATE`, `ABSTRACT`, `NATIVE`, `CONSTRUCTOR`, `VIRTUAL`. */
 public static final String MODIFIER_TYPE = "MODIFIER_TYPE";
 
 /** Name of represented object, e.g., method name (e.g. "run") */
 public static final String NAME = "NAME";
-
-
-public static final String NODE_LABEL = "NODE_LABEL";
 
 /** Start offset into the CONTENT property of the corresponding FILE node.
 The offset is such that parts of the content can easily
@@ -235,9 +223,6 @@ dictate them but rather requires tool producers and consumers to communicate the
 between each other. */
 public static final String OVERLAYS = "OVERLAYS";
 
-
-public static final String PACKAGE_NAME = "PACKAGE_NAME";
-
 /** AST node type name emitted by parser. */
 public static final String PARSER_TYPE_NAME = "PARSER_TYPE_NAME";
 
@@ -258,9 +243,6 @@ function overloading. The present specification does not enforce a strict
 format for the signature, that is, it can be chosen by the frontend
 implementor to fit the source language. */
 public static final String SIGNATURE = "SIGNATURE";
-
-
-public static final String SYMBOL = "SYMBOL";
 
 /** The static type decl of a TYPE. This property is matched against the FULL_NAME
 of TYPE_DECL nodes. It is required to have exactly one TYPE_DECL for each
@@ -290,8 +272,6 @@ add(ARGUMENT_NAME);
 add(AST_PARENT_FULL_NAME);
 add(AST_PARENT_TYPE);
 add(CANONICAL_NAME);
-add(CLASS_NAME);
-add(CLASS_SHORT_NAME);
 add(CLOSURE_BINDING_ID);
 add(CLOSURE_ORIGINAL_NAME);
 add(CODE);
@@ -323,21 +303,17 @@ add(LANGUAGE);
 add(LINE_NUMBER);
 add(LINE_NUMBER_END);
 add(METHOD_FULL_NAME);
-add(METHOD_SHORT_NAME);
 add(MODIFIER_TYPE);
 add(NAME);
-add(NODE_LABEL);
 add(OFFSET);
 add(OFFSET_END);
 add(ORDER);
 add(OVERLAYS);
-add(PACKAGE_NAME);
 add(PARSER_TYPE_NAME);
 add(POSSIBLE_TYPES);
 add(ROOT);
 add(SECONDARY_ID);
 add(SIGNATURE);
-add(SYMBOL);
 add(TYPE_DECL_FULL_NAME);
 add(TYPE_FULL_NAME);
 add(VALUE);

@@ -1,7 +1,5 @@
 package io.shiftleft.codepropertygraph.schema
 
-import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import flatgraph.schema.Property.ValueType
 import flatgraph.schema._
 
 object Tags extends SchemaBase {
@@ -44,36 +42,7 @@ object Tags extends SchemaBase {
     import callGraph._
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
-// node properties
-    val symbol = builder
-      .addProperty(name = "SYMBOL", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.Symbol)
-
-    val methodShortName = builder
-      .addProperty(name = "METHOD_SHORT_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.MethodShortName)
-
-    val packageName = builder
-      .addProperty(name = "PACKAGE_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.PackageName)
-
-    val className = builder
-      .addProperty(name = "CLASS_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.ClassName)
-
-    val classShortName = builder
-      .addProperty(name = "CLASS_SHORT_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.ClassShortName)
-
-    val nodeLabel = builder
-      .addProperty(name = "NODE_LABEL", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.NodeLabel)
+    // node properties
 
     val taggedBy = builder
       .addEdgeType(name = "TAGGED_BY", comment = "Edges from nodes to the tags they are tagged by.")

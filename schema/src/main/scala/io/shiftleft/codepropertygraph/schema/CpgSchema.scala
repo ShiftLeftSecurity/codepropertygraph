@@ -23,12 +23,12 @@ class CpgSchema(builder: SchemaBuilder) {
 
   val shortcuts = Shortcuts(builder, base, method, ast, typeSchema, fs)
 
-  val sourceSpecific  = Comment(builder, base, ast, fs)
-  val tags = Tags(builder, base, typeSchema, method, ast, fs, callGraph)
-  val binding         = Binding(builder, base, typeSchema, method, callGraph)
-  val annotation      = Annotation(builder, base, method, typeSchema, ast, shortcuts)
-  val finding         = Finding(builder, base)
-  val hidden = Hidden(builder, base, method, typeSchema, ast, cfg, fs, callGraph, pdg, tags, shortcuts)
+  val sourceSpecific = Comment(builder, base, ast, fs)
+  val tags           = Tags(builder, base, typeSchema, method, ast, fs, callGraph)
+  val binding        = Binding(builder, base, typeSchema, method, callGraph)
+  val annotation     = Annotation(builder, base, method, typeSchema, ast, shortcuts)
+  val finding        = Finding(builder, base)
+  val hidden         = Hidden(builder, base, method, typeSchema, ast, cfg, fs, callGraph, pdg, tags, shortcuts)
   val protoSerialize = ProtoSerialize(builder, ast)
 }
 
