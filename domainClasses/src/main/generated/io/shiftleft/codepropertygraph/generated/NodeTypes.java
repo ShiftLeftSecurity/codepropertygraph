@@ -147,9 +147,6 @@ contains the entire local variable declaration without initialization, e.g., for
 `int x = 10;`, it contains `int x`. */
 public static final String LOCAL = "LOCAL";
 
-/** A location node summarizes a source code location. */
-public static final String LOCATION = "LOCATION";
-
 /** This node represents a type member of a class, struct or union, e.g., for the
  type declaration `class Foo{ int i ; }`, it represents the declaration of the
  variable `i`. */
@@ -329,7 +326,6 @@ add(JUMP_TARGET);
 add(KEY_VALUE_PAIR);
 add(LITERAL);
 add(LOCAL);
-add(LOCATION);
 add(MEMBER);
 add(META_DATA);
 add(METHOD);

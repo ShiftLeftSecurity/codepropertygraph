@@ -39,7 +39,7 @@ object Finding {
     /** Optional description for nodes in evidence. Used to give a hint about the kind of evidence provided by a node.
       * The evidence description and evidence nodes are associated by index.
       */
-    val EvidenceDescription = flatgraph.MultiPropertyKey[String](kind = 20, name = "EVIDENCE_DESCRIPTION")
+    val EvidenceDescription = flatgraph.MultiPropertyKey[String](kind = 18, name = "EVIDENCE_DESCRIPTION")
   }
   object PropertyDefaults {}
 }
@@ -48,9 +48,9 @@ class Finding(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 15.toShort, seq_4762)
     with FindingBase
     with StaticType[FindingEMT] {
-  def evidence: IndexedSeq[StoredNode] = flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind, 57, seq)
+  def evidence: IndexedSeq[StoredNode] = flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind, 51, seq)
   def keyValuePairs: IndexedSeq[KeyValuePair] =
-    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind, 58, seq)
+    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind, 52, seq)
 
   override def productElementName(n: Int): String =
     n match {
@@ -192,10 +192,10 @@ class NewFinding extends NewNode(15.toShort) with FindingBase {
     this.keyValuePairs = value.iterator.to(ArraySeq); this
   }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 20, evidenceDescription.size)
-    interface.countProperty(this, 57, evidence.size)
+    interface.countProperty(this, 18, evidenceDescription.size)
+    interface.countProperty(this, 51, evidence.size)
     evidence.foreach(interface.visitContainedNode)
-    interface.countProperty(this, 58, keyValuePairs.size)
+    interface.countProperty(this, 52, keyValuePairs.size)
     keyValuePairs.foreach(interface.visitContainedNode)
   }
 

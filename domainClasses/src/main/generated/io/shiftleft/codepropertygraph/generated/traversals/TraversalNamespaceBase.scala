@@ -32,7 +32,7 @@ final class TraversalNamespaceBase[NodeType <: nodes.NamespaceBase](val traversa
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 41, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 38, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.name == value }
   }
@@ -46,7 +46,7 @@ final class TraversalNamespaceBase[NodeType <: nodes.NamespaceBase](val traversa
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 41, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 38, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

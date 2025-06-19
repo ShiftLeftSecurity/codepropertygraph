@@ -100,42 +100,42 @@ object Import {
   object Properties {
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** Specifies whether the IMPORTED_AS property was explicitly present in the code. For languages like Java which do
       * not allow a renaming during import this is always false. For e.g. Kotlin it depends on the existence of the "as"
       * keyword.
       */
-    val ExplicitAs = flatgraph.OptionalPropertyKey[Boolean](kind = 21, name = "EXPLICIT_AS")
+    val ExplicitAs = flatgraph.OptionalPropertyKey[Boolean](kind = 19, name = "EXPLICIT_AS")
 
     /** The identifier under which the import can be accessed in the importing context. For a Java import this is always
       * identical to the class name. But e.g. for a Kotlin import like "import java.nio.ByteBuffer as BBuffer" this
       * would be "BBuffer". This property is ignored if IS_WILDCARD is true.
       */
-    val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 26, name = "IMPORTED_AS")
+    val ImportedAs = flatgraph.OptionalPropertyKey[String](kind = 24, name = "IMPORTED_AS")
 
     /** The identifying string of the imported entity. For a Java import like "import java.nio.ByteBuffer;" this would
       * be "java.nio.ByteBuffer".
       */
-    val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 27, name = "IMPORTED_ENTITY")
+    val ImportedEntity = flatgraph.OptionalPropertyKey[String](kind = 25, name = "IMPORTED_ENTITY")
 
     /** Specifies whether this is an explicit import. Most languages have implicit default imports of some standard
       * library elements and this flag is used to distinguish those from explicit imports found in the code base.
       */
-    val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 30, name = "IS_EXPLICIT")
+    val IsExplicit = flatgraph.OptionalPropertyKey[Boolean](kind = 28, name = "IS_EXPLICIT")
 
     /** Specifies whether this is a wildcard import. For a Java import like "import java.nio.*;" IS_WILDCARD would be
       * "true" and IMPORTED_ENTITY would be "java.nio". For wildcard imports the IMPORTED_AS property is ignored.
       */
-    val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 33, name = "IS_WILDCARD")
+    val IsWildcard = flatgraph.OptionalPropertyKey[Boolean](kind = 31, name = "IS_WILDCARD")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -143,18 +143,18 @@ object Import {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val Code  = "<empty>"
@@ -1800,17 +1800,17 @@ class NewImport extends NewNode(17.toShort) with ImportBase with AstNodeNew {
   def offsetEnd(value: Option[Int]): this.type         = { this.offsetEnd = value; this }
   def order(value: Int): this.type                     = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 21, explicitAs.size)
-    interface.countProperty(this, 26, importedAs.size)
-    interface.countProperty(this, 27, importedEntity.size)
-    interface.countProperty(this, 30, isExplicit.size)
-    interface.countProperty(this, 33, isWildcard.size)
-    interface.countProperty(this, 36, lineNumber.size)
-    interface.countProperty(this, 43, offset.size)
-    interface.countProperty(this, 44, offsetEnd.size)
-    interface.countProperty(this, 45, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 19, explicitAs.size)
+    interface.countProperty(this, 24, importedAs.size)
+    interface.countProperty(this, 25, importedEntity.size)
+    interface.countProperty(this, 28, isExplicit.size)
+    interface.countProperty(this, 31, isWildcard.size)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
   }
 
   override def copy: this.type = {

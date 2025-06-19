@@ -101,23 +101,23 @@ object Annotation {
     val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 23, name = "FULL_NAME", default = "<empty>")
+    val FullName = flatgraph.SinglePropertyKey[String](kind = 21, name = "FULL_NAME", default = "<empty>")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -125,18 +125,18 @@ object Annotation {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val ArgumentIndex = -1: Int
@@ -1738,14 +1738,14 @@ class NewAnnotation extends NewNode(0.toShort) with AnnotationBase with Expressi
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
     interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 23, 1)
-    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 21, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
     interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 43, offset.size)
-    interface.countProperty(this, 44, offsetEnd.size)
-    interface.countProperty(this, 45, 1)
   }
 
   override def copy: this.type = {
