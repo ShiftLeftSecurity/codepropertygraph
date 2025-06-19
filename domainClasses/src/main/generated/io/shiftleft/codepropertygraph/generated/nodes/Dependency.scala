@@ -39,15 +39,15 @@ object Dependency {
   object Properties {
 
     /** The group ID for a dependency */
-    val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 16, name = "DEPENDENCY_GROUP_ID")
+    val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 14, name = "DEPENDENCY_GROUP_ID")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
 
     /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
       * this CPG conforms to
       */
-    val Version = flatgraph.SinglePropertyKey[String](kind = 56, name = "VERSION", default = "<empty>")
+    val Version = flatgraph.SinglePropertyKey[String](kind = 50, name = "VERSION", default = "<empty>")
   }
   object PropertyDefaults {
     val Name    = "<empty>"
@@ -189,9 +189,9 @@ class NewDependency extends NewNode(12.toShort) with DependencyBase {
   def name(value: String): this.type                      = { this.name = value; this }
   def version(value: String): this.type                   = { this.version = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 16, dependencyGroupId.size)
-    interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 56, 1)
+    interface.countProperty(this, 14, dependencyGroupId.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {

@@ -127,17 +127,17 @@ object MethodParameterIn {
     /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
       * the corresponding CLOSURE_BINDING nodes
       */
-    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 8, name = "CLOSURE_BINDING_ID")
+    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
 
     /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
       * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
@@ -146,24 +146,24 @@ object MethodParameterIn {
       * object that it points to is not made.
       */
     val EvaluationStrategy =
-      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 17, name = "EVALUATION_STRATEGY", default = "<empty>")
 
     /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
       * 0 is reserved for implicit self / this parameter.
       */
-    val Index = flatgraph.SinglePropertyKey[Int](kind = 28, name = "INDEX", default = -1: Int)
+    val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
 
     /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
       * parameter of a method is allowed to have this property set to true.
       */
-    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 32, name = "IS_VARIADIC", default = false)
+    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_VARIADIC", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -171,29 +171,29 @@ object MethodParameterIn {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 49, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 54, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Code               = "<empty>"
@@ -207,7 +207,7 @@ object MethodParameterIn {
 }
 
 class MethodParameterIn(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 27.toShort, seq_4762)
+    extends StoredNode(graph_4762, 26.toShort, seq_4762)
     with MethodParameterInBase
     with CfgNode
     with Declaration
@@ -1872,7 +1872,7 @@ object NewMethodParameterIn {
 }
 
 class NewMethodParameterIn
-    extends NewNode(27.toShort)
+    extends NewNode(26.toShort)
     with MethodParameterInBase
     with AstNodeNew
     with CfgNodeNew
@@ -1923,20 +1923,20 @@ class NewMethodParameterIn
   def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
   def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 8, closureBindingId.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 19, 1)
-    interface.countProperty(this, 28, 1)
-    interface.countProperty(this, 32, 1)
-    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 6, closureBindingId.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 16, dynamicTypeHintFullName.size)
+    interface.countProperty(this, 17, 1)
+    interface.countProperty(this, 26, 1)
+    interface.countProperty(this, 30, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
     interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 43, offset.size)
-    interface.countProperty(this, 44, offsetEnd.size)
-    interface.countProperty(this, 45, 1)
-    interface.countProperty(this, 49, possibleTypes.size)
-    interface.countProperty(this, 54, 1)
+    interface.countProperty(this, 44, possibleTypes.size)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

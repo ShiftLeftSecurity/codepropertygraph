@@ -164,16 +164,6 @@ trait HasAstParentTypeEMT
   */
 trait HasCanonicalNameEMT
 
-/** Node types with this marker trait are guaranteed to have the CLASS_NAME property. EMT stands for: "erased marker
-  * trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasClassNameEMT
-
-/** Node types with this marker trait are guaranteed to have the CLASS_SHORT_NAME property. EMT stands for: "erased
-  * marker trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasClassShortNameEMT
-
 /** Node types with this marker trait are guaranteed to have the CLOSURE_BINDING_ID property. EMT stands for: "erased
   * marker trait", it exists only at compile time in order to improve type safety.
   */
@@ -329,11 +319,6 @@ trait HasLineNumberEndEMT
   */
 trait HasMethodFullNameEMT
 
-/** Node types with this marker trait are guaranteed to have the METHOD_SHORT_NAME property. EMT stands for: "erased
-  * marker trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasMethodShortNameEMT
-
 /** Node types with this marker trait are guaranteed to have the MODIFIER_TYPE property. EMT stands for: "erased marker
   * trait", it exists only at compile time in order to improve type safety.
   */
@@ -343,11 +328,6 @@ trait HasModifierTypeEMT
   * it exists only at compile time in order to improve type safety.
   */
 trait HasNameEMT
-
-/** Node types with this marker trait are guaranteed to have the NODE_LABEL property. EMT stands for: "erased marker
-  * trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasNodeLabelEMT
 
 /** Node types with this marker trait are guaranteed to have the OFFSET property. EMT stands for: "erased marker trait",
   * it exists only at compile time in order to improve type safety.
@@ -369,11 +349,6 @@ trait HasOrderEMT
   */
 trait HasOverlaysEMT
 
-/** Node types with this marker trait are guaranteed to have the PACKAGE_NAME property. EMT stands for: "erased marker
-  * trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasPackageNameEMT
-
 /** Node types with this marker trait are guaranteed to have the PARSER_TYPE_NAME property. EMT stands for: "erased
   * marker trait", it exists only at compile time in order to improve type safety.
   */
@@ -393,11 +368,6 @@ trait HasRootEMT
   * trait", it exists only at compile time in order to improve type safety.
   */
 trait HasSignatureEMT
-
-/** Node types with this marker trait are guaranteed to have the SYMBOL property. EMT stands for: "erased marker trait",
-  * it exists only at compile time in order to improve type safety.
-  */
-trait HasSymbolEMT
 
 /** Node types with this marker trait are guaranteed to have the TYPE_DECL_FULL_NAME property. EMT stands for: "erased
   * marker trait", it exists only at compile time in order to improve type safety.
