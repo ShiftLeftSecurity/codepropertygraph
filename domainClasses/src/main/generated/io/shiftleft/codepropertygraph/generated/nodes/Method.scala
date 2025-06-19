@@ -165,42 +165,42 @@ object Method {
       * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
       * file that is is declared in is unknown.
       */
-    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 22, name = "FILENAME", default = "<empty>")
 
     /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
+    val FullName = flatgraph.SinglePropertyKey[String](kind = 23, name = "FULL_NAME", default = "<empty>")
 
     /** This field is experimental. It will likely be removed in the future without any notice. It stores type
       * information for generic types and methods as well as type information for members and locals where the type
       * either contains a type parameter reference or an instantiated type reference.
       */
     val GenericSignature =
-      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 24, name = "GENERIC_SIGNATURE", default = "<empty>")
 
     /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
       * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
       * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
       * be deferred or skipped if the hash is not needed.
       */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 24, name = "HASH")
+    val Hash = flatgraph.OptionalPropertyKey[String](kind = 25, name = "HASH")
 
     /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
       * code (applies both to insular parsing and to library functions where we have header files only)
       */
-    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_EXTERNAL", default = false)
+    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 31, name = "IS_EXTERNAL", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
 
     /** This optional fields provides the line number at which the program construct represented by the node ends.
       */
-    val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER_END")
+    val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 37, name = "LINE_NUMBER_END")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -208,25 +208,25 @@ object Method {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
 
     /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
       * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
       * function overloading. The present specification does not enforce a strict format for the signature, that is, it
       * can be chosen by the frontend implementor to fit the source language.
       */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 50, name = "SIGNATURE", default = "")
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 51, name = "SIGNATURE", default = "")
   }
   object PropertyDefaults {
     val AstParentFullName = "<empty>"
@@ -2050,18 +2050,18 @@ class NewMethod extends NewNode(26.toShort) with MethodBase with AstNodeNew with
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
     interface.countProperty(this, 12, columnNumberEnd.size)
-    interface.countProperty(this, 21, 1)
     interface.countProperty(this, 22, 1)
     interface.countProperty(this, 23, 1)
-    interface.countProperty(this, 24, hash.size)
-    interface.countProperty(this, 30, 1)
-    interface.countProperty(this, 35, lineNumber.size)
-    interface.countProperty(this, 36, lineNumberEnd.size)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, offset.size)
-    interface.countProperty(this, 43, offsetEnd.size)
-    interface.countProperty(this, 44, 1)
-    interface.countProperty(this, 50, 1)
+    interface.countProperty(this, 24, 1)
+    interface.countProperty(this, 25, hash.size)
+    interface.countProperty(this, 31, 1)
+    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 37, lineNumberEnd.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 43, offset.size)
+    interface.countProperty(this, 44, offsetEnd.size)
+    interface.countProperty(this, 45, 1)
+    interface.countProperty(this, 51, 1)
   }
 
   override def copy: this.type = {

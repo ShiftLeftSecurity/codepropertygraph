@@ -94,6 +94,10 @@ package object traversals {
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasEvaluationStrategyEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyEvaluationStrategy[NodeType] =
       new TraversalPropertyEvaluationStrategy(traversal.iterator)
+    implicit def accessPropertyEvidenceDescriptionTraversal[
+      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasEvidenceDescriptionEMT]
+    ](traversal: IterableOnce[NodeType]): TraversalPropertyEvidenceDescription[NodeType] =
+      new TraversalPropertyEvidenceDescription(traversal.iterator)
     implicit def accessPropertyExplicitAsTraversal[
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasExplicitAsEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyExplicitAs[NodeType] = new TraversalPropertyExplicitAs(

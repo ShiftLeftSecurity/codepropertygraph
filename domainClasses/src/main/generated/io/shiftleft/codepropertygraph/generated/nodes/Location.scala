@@ -90,21 +90,21 @@ object Location {
       * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
       * file that is is declared in is unknown.
       */
-    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 22, name = "FILENAME", default = "<empty>")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
 
     /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
       * for each METHOD_FULL_NAME
       */
-    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 37, name = "METHOD_FULL_NAME", default = "<empty>")
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 38, name = "METHOD_FULL_NAME", default = "<empty>")
     val MethodShortName =
-      flatgraph.SinglePropertyKey[String](kind = 38, name = "METHOD_SHORT_NAME", default = "<empty>")
-    val NodeLabel   = flatgraph.SinglePropertyKey[String](kind = 41, name = "NODE_LABEL", default = "<empty>")
-    val PackageName = flatgraph.SinglePropertyKey[String](kind = 46, name = "PACKAGE_NAME", default = "<empty>")
-    val Symbol      = flatgraph.SinglePropertyKey[String](kind = 51, name = "SYMBOL", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 39, name = "METHOD_SHORT_NAME", default = "<empty>")
+    val NodeLabel   = flatgraph.SinglePropertyKey[String](kind = 42, name = "NODE_LABEL", default = "<empty>")
+    val PackageName = flatgraph.SinglePropertyKey[String](kind = 47, name = "PACKAGE_NAME", default = "<empty>")
+    val Symbol      = flatgraph.SinglePropertyKey[String](kind = 52, name = "SYMBOL", default = "<empty>")
   }
   object PropertyDefaults {
     val ClassName       = "<empty>"
@@ -122,7 +122,7 @@ class Location(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 23.toShort, seq_4762)
     with LocationBase
     with StaticType[LocationEMT] {
-  def node: Option[StoredNode] = flatgraph.Accessors.getNodePropertyOption[StoredNode](graph, nodeKind, 58, seq)
+  def node: Option[StoredNode] = flatgraph.Accessors.getNodePropertyOption[StoredNode](graph, nodeKind, 59, seq)
 
   override def productElementName(n: Int): String =
     n match {
@@ -501,14 +501,14 @@ class NewLocation extends NewNode(23.toShort) with LocationBase {
     interface.countProperty(this, 6, 1)
     interface.countProperty(this, 7, 1)
     interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 21, 1)
-    interface.countProperty(this, 35, lineNumber.size)
-    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 22, 1)
+    interface.countProperty(this, 36, lineNumber.size)
     interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 46, 1)
-    interface.countProperty(this, 51, 1)
-    interface.countProperty(this, 58, node.size)
+    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 42, 1)
+    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 52, 1)
+    interface.countProperty(this, 59, node.size)
     node.foreach(interface.visitContainedNode)
   }
 

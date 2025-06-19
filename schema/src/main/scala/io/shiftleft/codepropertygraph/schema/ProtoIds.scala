@@ -171,4 +171,5 @@ object ProtoIds {
   val FieldIdentifier           = 2001081
   val CanonicalName             = 2001092
   val ContainedRef              = 2007161
+  val EvidenceDescription       = 2007162
 }

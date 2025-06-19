@@ -96,10 +96,10 @@ object JumpTarget {
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -107,21 +107,21 @@ object JumpTarget {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
 
     /** AST node type name emitted by parser. */
-    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 47, name = "PARSER_TYPE_NAME", default = "<empty>")
+    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 48, name = "PARSER_TYPE_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex  = -1: Int
@@ -1690,12 +1690,12 @@ class NewJumpTarget extends NewNode(19.toShort) with JumpTargetBase with AstNode
     interface.countProperty(this, 1, 1)
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 35, lineNumber.size)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, offset.size)
-    interface.countProperty(this, 43, offsetEnd.size)
-    interface.countProperty(this, 44, 1)
-    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 43, offset.size)
+    interface.countProperty(this, 44, offsetEnd.size)
+    interface.countProperty(this, 45, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

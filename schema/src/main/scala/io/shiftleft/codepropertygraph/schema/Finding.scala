@@ -54,11 +54,22 @@ object Finding extends SchemaBase {
       .protoId(ProtoIds.KeyValuePair)
       .addProperties(key, value)
 
-// node relations
+    val evidenceDescription = builder
+      .addProperty(
+        name = "EVIDENCE_DESCRIPTION",
+        valueType = ValueType.String,
+        comment = """Optional description for nodes in evidence. Used to give a hint about the kind of evidence
+            |provided by a node. The evidence description and evidence nodes are associated by index.
+            |""".stripMargin
+      )
+      .asList()
+      .protoId(ProtoIds.EvidenceDescription)
+
+    // node relations
     finding
       .addContainedNode(builder.anyNode, "evidence", Cardinality.List)
       .addContainedNode(keyValuePair, "keyValuePairs", Cardinality.List)
-
+      .addProperty(evidenceDescription)
 // constants
 
   }

@@ -98,6 +98,10 @@ the caller/callee. While a copy of the pointer is made, a copy of the object
 that it points to is not made. */
 public static final String EVALUATION_STRATEGY = "EVALUATION_STRATEGY";
 
+/** Optional description for nodes in evidence. Used to give a hint about the kind of evidence
+provided by a node. The evidence description and evidence nodes are associated by index. */
+public static final String EVIDENCE_DESCRIPTION = "EVIDENCE_DESCRIPTION";
+
 /** Specifies whether the IMPORTED_AS property was explicitly present in the code.
 For languages like Java which do not allow a renaming during import this is
 always false. For e.g. Kotlin it depends on the existence of the "as" keyword. */
@@ -300,6 +304,7 @@ add(DEPENDENCY_GROUP_ID);
 add(DISPATCH_TYPE);
 add(DYNAMIC_TYPE_HINT_FULL_NAME);
 add(EVALUATION_STRATEGY);
+add(EVIDENCE_DESCRIPTION);
 add(EXPLICIT_AS);
 add(FILENAME);
 add(FULL_NAME);

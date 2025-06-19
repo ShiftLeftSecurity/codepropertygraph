@@ -149,36 +149,36 @@ object TypeDecl {
       * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
       * file that is is declared in is unknown.
       */
-    val Filename = flatgraph.SinglePropertyKey[String](kind = 21, name = "FILENAME", default = "<empty>")
+    val Filename = flatgraph.SinglePropertyKey[String](kind = 22, name = "FILENAME", default = "<empty>")
 
     /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
       * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
       */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 22, name = "FULL_NAME", default = "<empty>")
+    val FullName = flatgraph.SinglePropertyKey[String](kind = 23, name = "FULL_NAME", default = "<empty>")
 
     /** This field is experimental. It will likely be removed in the future without any notice. It stores type
       * information for generic types and methods as well as type information for members and locals where the type
       * either contains a type parameter reference or an instantiated type reference.
       */
     val GenericSignature =
-      flatgraph.SinglePropertyKey[String](kind = 23, name = "GENERIC_SIGNATURE", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 24, name = "GENERIC_SIGNATURE", default = "<empty>")
 
     /** The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and
       * thus it is required to have at least one TYPE node for each TYPE_FULL_NAME
       */
-    val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 28, name = "INHERITS_FROM_TYPE_FULL_NAME")
+    val InheritsFromTypeFullName = flatgraph.MultiPropertyKey[String](kind = 29, name = "INHERITS_FROM_TYPE_FULL_NAME")
 
     /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
       * code (applies both to insular parsing and to library functions where we have header files only)
       */
-    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_EXTERNAL", default = false)
+    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 31, name = "IS_EXTERNAL", default = false)
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 40, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -186,18 +186,18 @@ object TypeDecl {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 42, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 44, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
   }
   object PropertyDefaults {
     val AstParentFullName = "<empty>"
@@ -1955,16 +1955,16 @@ class NewTypeDecl extends NewNode(40.toShort) with TypeDeclBase with AstNodeNew 
     interface.countProperty(this, 4, 1)
     interface.countProperty(this, 10, 1)
     interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 21, 1)
     interface.countProperty(this, 22, 1)
     interface.countProperty(this, 23, 1)
-    interface.countProperty(this, 28, inheritsFromTypeFullName.size)
-    interface.countProperty(this, 30, 1)
-    interface.countProperty(this, 35, lineNumber.size)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, offset.size)
-    interface.countProperty(this, 43, offsetEnd.size)
-    interface.countProperty(this, 44, 1)
+    interface.countProperty(this, 24, 1)
+    interface.countProperty(this, 29, inheritsFromTypeFullName.size)
+    interface.countProperty(this, 31, 1)
+    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 43, offset.size)
+    interface.countProperty(this, 44, offsetEnd.size)
+    interface.countProperty(this, 45, 1)
   }
 
   override def copy: this.type = {
