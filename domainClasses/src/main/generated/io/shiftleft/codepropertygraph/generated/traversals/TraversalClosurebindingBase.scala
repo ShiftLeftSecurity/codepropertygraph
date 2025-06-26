@@ -38,7 +38,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 8, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 6, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ =>
       traversal.filter { node =>
@@ -111,7 +111,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 9, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 7, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ =>
       traversal.filter { node =>
@@ -179,7 +179,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 19, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 17, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.evaluationStrategy == value }
   }
@@ -193,7 +193,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 19, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 17, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

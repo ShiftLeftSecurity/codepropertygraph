@@ -33,10 +33,10 @@ object Tag {
   object Properties {
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
 
     /** This property denotes a string value as used in a key-value pair. */
-    val Value = flatgraph.SinglePropertyKey[String](kind = 55, name = "VALUE", default = "")
+    val Value = flatgraph.SinglePropertyKey[String](kind = 49, name = "VALUE", default = "")
   }
   object PropertyDefaults {
     val Name  = "<empty>"
@@ -45,7 +45,7 @@ object Tag {
 }
 
 class Tag(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 35.toShort, seq_4762)
+    extends StoredNode(graph_4762, 34.toShort, seq_4762)
     with TagBase
     with StaticType[TagEMT] {
 
@@ -153,7 +153,7 @@ object NewTag {
   }
 }
 
-class NewTag extends NewNode(35.toShort) with TagBase {
+class NewTag extends NewNode(34.toShort) with TagBase {
   override type StoredNodeType = Tag
   override def label: String = "TAG"
 
@@ -169,8 +169,8 @@ class NewTag extends NewNode(35.toShort) with TagBase {
   def name(value: String): this.type  = { this.name = value; this }
   def value(value: String): this.type = { this.value = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 55, 1)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 49, 1)
   }
 
   override def copy: this.type = {

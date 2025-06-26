@@ -1,10 +1,8 @@
 package io.shiftleft.codepropertygraph.schema
 
-import io.shiftleft.codepropertygraph.schema.CpgSchema.PropertyDefaults
-import flatgraph.schema.Property.ValueType
 import flatgraph.schema._
 
-object TagsAndLocation extends SchemaBase {
+object Tags extends SchemaBase {
 
   override def docIndex: Int = 17
 
@@ -44,36 +42,7 @@ object TagsAndLocation extends SchemaBase {
     import callGraph._
     implicit private val schemaInfo: SchemaInfo = SchemaInfo.forClass(getClass)
 
-// node properties
-    val symbol = builder
-      .addProperty(name = "SYMBOL", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.Symbol)
-
-    val methodShortName = builder
-      .addProperty(name = "METHOD_SHORT_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.MethodShortName)
-
-    val packageName = builder
-      .addProperty(name = "PACKAGE_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.PackageName)
-
-    val className = builder
-      .addProperty(name = "CLASS_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.ClassName)
-
-    val classShortName = builder
-      .addProperty(name = "CLASS_SHORT_NAME", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.ClassShortName)
-
-    val nodeLabel = builder
-      .addProperty(name = "NODE_LABEL", valueType = ValueType.String, comment = "")
-      .mandatory(PropertyDefaults.String)
-      .protoId(ProtoIds.NodeLabel)
+    // node properties
 
     val taggedBy = builder
       .addEdgeType(name = "TAGGED_BY", comment = "Edges from nodes to the tags they are tagged by.")
@@ -87,29 +56,10 @@ object TagsAndLocation extends SchemaBase {
       .addProperties(name, value)
       .primaryKey(name)
 
-    val location: NodeType = builder
-      .addNodeType(name = "LOCATION", comment = "A location node summarizes a source code location.")
-      .protoId(ProtoIds.Location)
-      .addProperties(
-        symbol,
-        methodFullName,
-        methodShortName,
-        packageName,
-        lineNumber,
-        className,
-        classShortName,
-        nodeLabel,
-        filename,
-        columnNumber
-      )
-
     val tagNodePair: NodeType = builder
       .addNodeType(name = "TAG_NODE_PAIR", comment = "This node contains an arbitrary node and an associated tag node.")
       .protoId(ProtoIds.TagNodePair)
       .addProperties()
-
-// node relations
-    location.addContainedNode(builder.anyNode, "node", Property.Cardinality.ZeroOrOne)
 
     // TODO MP: provide dummy/empty node as default, to avoid null?
     tagNodePair

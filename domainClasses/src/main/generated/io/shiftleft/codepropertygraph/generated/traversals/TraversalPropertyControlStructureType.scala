@@ -35,7 +35,7 @@ final class TraversalPropertyControlStructureType[
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 15, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 13, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.controlStructureType == value }
   }
@@ -49,7 +49,7 @@ final class TraversalPropertyControlStructureType[
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 15, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 13, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

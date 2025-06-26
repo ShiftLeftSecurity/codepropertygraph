@@ -37,10 +37,10 @@ object ConfigFile {
     /** Certain files, e.g., configuration files, may be included in the CPG as-is. For such files, the `CONTENT` field
       * contains the files content.
       */
-    val Content = flatgraph.SinglePropertyKey[String](kind = 14, name = "CONTENT", default = "<empty>")
+    val Content = flatgraph.SinglePropertyKey[String](kind = 12, name = "CONTENT", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val Content = "<empty>"
@@ -148,8 +148,8 @@ class NewConfigFile extends NewNode(10.toShort) with ConfigFileBase {
   def content(value: String): this.type = { this.content = value; this }
   def name(value: String): this.type    = { this.name = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 14, 1)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 12, 1)
+    interface.countProperty(this, 38, 1)
   }
 
   override def copy: this.type = {

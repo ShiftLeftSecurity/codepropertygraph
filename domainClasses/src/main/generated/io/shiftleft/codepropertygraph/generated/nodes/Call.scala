@@ -144,33 +144,33 @@ object Call {
     val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or `DYNAMIC_DISPATCH`. For
       * statically dispatched method calls, the call target is known at compile time while for dynamically dispatched
       * calls, it can only be determined at runtime as it may depend on the type of an object (as is the case for
       * virtual method calls) or calculation of an offset.
       */
-    val DispatchType = flatgraph.SinglePropertyKey[String](kind = 17, name = "DISPATCH_TYPE", default = "<empty>")
+    val DispatchType = flatgraph.SinglePropertyKey[String](kind = 15, name = "DISPATCH_TYPE", default = "<empty>")
 
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
 
     /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
       * for each METHOD_FULL_NAME
       */
-    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 38, name = "METHOD_FULL_NAME", default = "<empty>")
+    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
 
     /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 41, name = "NAME", default = "<empty>")
+    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -178,36 +178,36 @@ object Call {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 49, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
 
     /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
       * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
       * function overloading. The present specification does not enforce a strict format for the signature, that is, it
       * can be chosen by the frontend implementor to fit the source language.
       */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 51, name = "SIGNATURE", default = "")
+    val Signature = flatgraph.SinglePropertyKey[String](kind = 46, name = "SIGNATURE", default = "")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 54, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex  = -1: Int
@@ -1964,19 +1964,19 @@ class NewCall extends NewNode(7.toShort) with CallBase with CallReprNew with Exp
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
     interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 17, 1)
-    interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 36, lineNumber.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 15, 1)
+    interface.countProperty(this, 16, dynamicTypeHintFullName.size)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 36, 1)
     interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
     interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 43, offset.size)
-    interface.countProperty(this, 44, offsetEnd.size)
-    interface.countProperty(this, 45, 1)
-    interface.countProperty(this, 49, possibleTypes.size)
-    interface.countProperty(this, 51, 1)
-    interface.countProperty(this, 54, 1)
+    interface.countProperty(this, 44, possibleTypes.size)
+    interface.countProperty(this, 46, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

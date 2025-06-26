@@ -50,10 +50,10 @@ object ClosureBinding {
     /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
       * the corresponding CLOSURE_BINDING nodes
       */
-    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 8, name = "CLOSURE_BINDING_ID")
+    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
 
     /** The original name of the (potentially mangled) captured variable */
-    val ClosureOriginalName = flatgraph.OptionalPropertyKey[String](kind = 9, name = "CLOSURE_ORIGINAL_NAME")
+    val ClosureOriginalName = flatgraph.OptionalPropertyKey[String](kind = 7, name = "CLOSURE_ORIGINAL_NAME")
 
     /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
       * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
@@ -62,7 +62,7 @@ object ClosureBinding {
       * object that it points to is not made.
       */
     val EvaluationStrategy =
-      flatgraph.SinglePropertyKey[String](kind = 19, name = "EVALUATION_STRATEGY", default = "<empty>")
+      flatgraph.SinglePropertyKey[String](kind = 17, name = "EVALUATION_STRATEGY", default = "<empty>")
   }
   object PropertyDefaults {
     val EvaluationStrategy = "<empty>"
@@ -209,9 +209,9 @@ class NewClosureBinding extends NewNode(8.toShort) with ClosureBindingBase {
   def closureOriginalName(value: String): this.type         = { this.closureOriginalName = Option(value); this }
   def evaluationStrategy(value: String): this.type          = { this.evaluationStrategy = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 8, closureBindingId.size)
-    interface.countProperty(this, 9, closureOriginalName.size)
-    interface.countProperty(this, 19, 1)
+    interface.countProperty(this, 6, closureBindingId.size)
+    interface.countProperty(this, 7, closureOriginalName.size)
+    interface.countProperty(this, 17, 1)
   }
 
   override def copy: this.type = {

@@ -127,23 +127,23 @@ object Unknown {
     val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
 
     /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 10, name = "CODE", default = "<empty>")
+    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
 
     /** This optional fields provides the column number of the program construct represented by the node.
       */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 11, name = "COLUMN_NUMBER")
+    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
 
     /** References to other nodes. This is not a real property; it exists here for the sake of proto serialization only.
       * valueType and cardinality are meaningless.
       */
-    val ContainedRef = flatgraph.SinglePropertyKey[String](kind = 13, name = "CONTAINED_REF", default = "<empty>")
+    val ContainedRef = flatgraph.SinglePropertyKey[String](kind = 11, name = "CONTAINED_REF", default = "<empty>")
 
     /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 18, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
+    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
 
     /** This optional field provides the line number of the program construct represented by the node.
       */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 36, name = "LINE_NUMBER")
+    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
 
     /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
       * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
@@ -151,32 +151,32 @@ object Unknown {
       * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
       * source code of the entire file.
       */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 43, name = "OFFSET")
+    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
 
     /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
       * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
       * method.
       */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 44, name = "OFFSET_END")
+    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
 
     /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
       * of 0.
       */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 45, name = "ORDER", default = -1: Int)
+    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
 
     /** AST node type name emitted by parser. */
-    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 48, name = "PARSER_TYPE_NAME", default = "<empty>")
+    val ParserTypeName = flatgraph.SinglePropertyKey[String](kind = 43, name = "PARSER_TYPE_NAME", default = "<empty>")
 
     /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
       * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
       */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 49, name = "POSSIBLE_TYPES")
+    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
 
     /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
       * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
       * cannot be determined, this field should be set to the empty string.
       */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 54, name = "TYPE_FULL_NAME", default = "<empty>")
+    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
   }
   object PropertyDefaults {
     val ArgumentIndex  = -1: Int
@@ -189,7 +189,7 @@ object Unknown {
 }
 
 class Unknown(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 43.toShort, seq_4762)
+    extends StoredNode(graph_4762, 42.toShort, seq_4762)
     with UnknownBase
     with Expression
     with StaticType[UnknownEMT] {
@@ -1825,7 +1825,7 @@ object NewUnknown {
   }
 }
 
-class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew {
+class NewUnknown extends NewNode(42.toShort) with UnknownBase with ExpressionNew {
   override type StoredNodeType = Unknown
   override def label: String = "UNKNOWN"
 
@@ -1872,17 +1872,17 @@ class NewUnknown extends NewNode(43.toShort) with UnknownBase with ExpressionNew
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
     interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 11, columnNumber.size)
-    interface.countProperty(this, 13, 1)
-    interface.countProperty(this, 18, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 36, lineNumber.size)
-    interface.countProperty(this, 43, offset.size)
-    interface.countProperty(this, 44, offsetEnd.size)
-    interface.countProperty(this, 45, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 11, 1)
+    interface.countProperty(this, 16, dynamicTypeHintFullName.size)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 44, possibleTypes.size)
     interface.countProperty(this, 48, 1)
-    interface.countProperty(this, 49, possibleTypes.size)
-    interface.countProperty(this, 54, 1)
   }
 
   override def copy: this.type = {
