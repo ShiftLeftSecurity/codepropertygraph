@@ -33,6 +33,7 @@ inThisBuild(
 )
 
 ThisBuild / publishTo             := sonatypePublishToBundle.value
+ThisBuild/sonatypeCredentialHost := "central.sonatype.com"
 ThisBuild / sonatypeTimeoutMillis := 7200000 // double the default close timeout
 ThisBuild / Test / fork           := true
 ThisBuild / Test / javaOptions += s"-Dlog4j2.configurationFile=file:${(ThisBuild / baseDirectory).value}/resources/log4j2-test.xml"
