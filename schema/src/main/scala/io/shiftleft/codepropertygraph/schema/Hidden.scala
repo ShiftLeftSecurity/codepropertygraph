@@ -71,7 +71,8 @@ object Hidden extends SchemaBase {
       .addProperty(
         name = "CLOSURE_ORIGINAL_NAME",
         valueType = ValueType.String,
-        comment = "The original name of the (potentially mangled) captured variable"
+        comment =
+          "Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured variable"
       )
       .protoId(ProtoIds.ClosureOriginalName)
 

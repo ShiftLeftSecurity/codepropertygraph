@@ -34,7 +34,9 @@ object ClosureBinding {
       */
     val ClosureBindingId = "CLOSURE_BINDING_ID"
 
-    /** The original name of the (potentially mangled) captured variable */
+    /** Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured
+      * variable
+      */
     val ClosureOriginalName = "CLOSURE_ORIGINAL_NAME"
 
     /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
@@ -52,7 +54,9 @@ object ClosureBinding {
       */
     val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
 
-    /** The original name of the (potentially mangled) captured variable */
+    /** Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured
+      * variable
+      */
     val ClosureOriginalName = flatgraph.OptionalPropertyKey[String](kind = 7, name = "CLOSURE_ORIGINAL_NAME")
 
     /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
