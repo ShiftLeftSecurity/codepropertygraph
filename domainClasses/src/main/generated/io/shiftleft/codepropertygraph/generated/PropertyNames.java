@@ -44,7 +44,7 @@ public static final String CANONICAL_NAME = "CANONICAL_NAME";
 /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes */
 public static final String CLOSURE_BINDING_ID = "CLOSURE_BINDING_ID";
 
-/** The original name of the (potentially mangled) captured variable */
+/** Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured variable */
 public static final String CLOSURE_ORIGINAL_NAME = "CLOSURE_ORIGINAL_NAME";
 
 /** This field holds the code snippet that the node represents. */

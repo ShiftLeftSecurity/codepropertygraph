@@ -42,7 +42,9 @@ object Properties {
     */
   val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
 
-  /** The original name of the (potentially mangled) captured variable */
+  /** Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured
+    * variable
+    */
   val ClosureOriginalName = flatgraph.OptionalPropertyKey[String](kind = 7, name = "CLOSURE_ORIGINAL_NAME")
 
   /** This field holds the code snippet that the node represents. */
