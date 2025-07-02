@@ -27,83 +27,17 @@ trait NamespaceBase extends AbstractNode with AstNodeBase with StaticType[Namesp
 
 object Namespace {
   val Label = "NAMESPACE"
-  object PropertyNames {
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-  }
-  object Properties {
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-  }
-  object PropertyDefaults {
-    val Code  = "<empty>"
-    val Name  = "<empty>"
-    val Order = -1: Int
-  }
 }
 
+/** Node properties:
+  *   - Code
+  *   - ColumnNumber
+  *   - LineNumber
+  *   - Name
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  */
 class Namespace(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 31.toShort, seq_4762)
     with NamespaceBase

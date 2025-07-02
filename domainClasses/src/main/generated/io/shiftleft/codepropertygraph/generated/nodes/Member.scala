@@ -44,145 +44,23 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase with
 
 object Member {
   val Label = "MEMBER"
-  object PropertyNames {
-
-    /** This field holds the FULL_NAME of the AST parent of an entity. */
-    val AstParentFullName = "AST_PARENT_FULL_NAME"
-
-    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
-      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
-      */
-    val AstParentType = "AST_PARENT_TYPE"
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
-
-    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
-      * information for generic types and methods as well as type information for members and locals where the type
-      * either contains a type parameter reference or an instantiated type reference.
-      */
-    val GenericSignature = "GENERIC_SIGNATURE"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = "POSSIBLE_TYPES"
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = "TYPE_FULL_NAME"
-  }
-  object Properties {
-
-    /** This field holds the FULL_NAME of the AST parent of an entity. */
-    val AstParentFullName =
-      flatgraph.SinglePropertyKey[String](kind = 3, name = "AST_PARENT_FULL_NAME", default = "<empty>")
-
-    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
-      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
-      */
-    val AstParentType = flatgraph.SinglePropertyKey[String](kind = 4, name = "AST_PARENT_TYPE", default = "<empty>")
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
-
-    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
-      * information for generic types and methods as well as type information for members and locals where the type
-      * either contains a type parameter reference or an instantiated type reference.
-      */
-    val GenericSignature =
-      flatgraph.SinglePropertyKey[String](kind = 22, name = "GENERIC_SIGNATURE", default = "<empty>")
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val AstParentFullName = "<empty>"
-    val AstParentType     = "<empty>"
-    val Code              = "<empty>"
-    val GenericSignature  = "<empty>"
-    val Name              = "<empty>"
-    val Order             = -1: Int
-    val TypeFullName      = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - AstParentFullName
+  *   - AstParentType
+  *   - Code
+  *   - ColumnNumber
+  *   - DynamicTypeHintFullName
+  *   - GenericSignature
+  *   - LineNumber
+  *   - Name
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  *   - PossibleTypes
+  *   - TypeFullName
+  */
 class Member(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 23.toShort, seq_4762)
     with MemberBase

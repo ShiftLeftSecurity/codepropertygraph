@@ -28,105 +28,18 @@ trait ReturnBase extends AbstractNode with ExpressionBase with StaticType[Return
 
 object Return {
   val Label = "RETURN"
-  object PropertyNames {
-
-    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
-      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
-      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
-      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
-      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
-      * ignored. It is suggested to set it to -1.
-      */
-    val ArgumentIndex = "ARGUMENT_INDEX"
-
-    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
-      * the expression. For all other calls, this field is unset.
-      */
-    val ArgumentName = "ARGUMENT_NAME"
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-  }
-  object Properties {
-
-    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
-      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
-      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
-      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
-      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
-      * ignored. It is suggested to set it to -1.
-      */
-    val ArgumentIndex = flatgraph.SinglePropertyKey[Int](kind = 1, name = "ARGUMENT_INDEX", default = -1: Int)
-
-    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
-      * the expression. For all other calls, this field is unset.
-      */
-    val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-  }
-  object PropertyDefaults {
-    val ArgumentIndex = -1: Int
-    val Code          = "<empty>"
-    val Order         = -1: Int
-  }
 }
 
+/** Node properties:
+  *   - ArgumentIndex
+  *   - ArgumentName
+  *   - Code
+  *   - ColumnNumber
+  *   - LineNumber
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  */
 class Return(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 33.toShort, seq_4762)
     with ReturnBase

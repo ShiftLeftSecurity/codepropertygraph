@@ -23,44 +23,13 @@ trait TypeBase extends AbstractNode with StaticType[TypeEMT] {
 
 object Type {
   val Label = "TYPE"
-  object PropertyNames {
-
-    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
-      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
-      */
-    val FullName = "FULL_NAME"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is
-      * required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
-      */
-    val TypeDeclFullName = "TYPE_DECL_FULL_NAME"
-  }
-  object Properties {
-
-    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
-      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
-      */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 21, name = "FULL_NAME", default = "<empty>")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is
-      * required to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
-      */
-    val TypeDeclFullName =
-      flatgraph.SinglePropertyKey[String](kind = 47, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val FullName         = "<empty>"
-    val Name             = "<empty>"
-    val TypeDeclFullName = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - FullName
+  *   - Name
+  *   - TypeDeclFullName
+  */
 class Type(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 37.toShort, seq_4762)
     with TypeBase

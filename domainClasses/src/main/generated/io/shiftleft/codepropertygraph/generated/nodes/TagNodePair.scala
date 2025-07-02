@@ -23,14 +23,11 @@ trait TagNodePairBase extends AbstractNode with StaticType[TagNodePairEMT] {
 
 object TagNodePair {
   val Label = "TAG_NODE_PAIR"
-  object PropertyNames {
-    val Node = "node"
-    val Tag  = "tag"
-  }
-  object Properties       {}
-  object PropertyDefaults {}
 }
 
+/** Anynode
+  *   - Tag
+  */
 class TagNodePair(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 35.toShort, seq_4762)
     with TagNodePairBase

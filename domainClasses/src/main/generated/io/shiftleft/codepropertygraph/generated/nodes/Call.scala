@@ -45,182 +45,25 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase with S
 
 object Call {
   val Label = "CALL"
-  object PropertyNames {
-
-    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
-      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
-      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
-      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
-      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
-      * ignored. It is suggested to set it to -1.
-      */
-    val ArgumentIndex = "ARGUMENT_INDEX"
-
-    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
-      * the expression. For all other calls, this field is unset.
-      */
-    val ArgumentName = "ARGUMENT_NAME"
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or `DYNAMIC_DISPATCH`. For
-      * statically dispatched method calls, the call target is known at compile time while for dynamically dispatched
-      * calls, it can only be determined at runtime as it may depend on the type of an object (as is the case for
-      * virtual method calls) or calculation of an offset.
-      */
-    val DispatchType = "DISPATCH_TYPE"
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
-      * for each METHOD_FULL_NAME
-      */
-    val MethodFullName = "METHOD_FULL_NAME"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = "POSSIBLE_TYPES"
-
-    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
-      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
-      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
-      * can be chosen by the frontend implementor to fit the source language.
-      */
-    val Signature = "SIGNATURE"
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = "TYPE_FULL_NAME"
-  }
-  object Properties {
-
-    /** AST-children of CALL nodes have an argument index, that is used to match call-site arguments with callee
-      * parameters. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
-      * parameter. CALLs without implicit parameter therefore have arguments starting with index 1. AST-children of
-      * BLOCK nodes may have an argument index as well; in this case, the last argument index determines the return
-      * expression of a BLOCK expression. If the `PARAMETER_NAME` field is set, then the `ARGUMENT_INDEX` field is
-      * ignored. It is suggested to set it to -1.
-      */
-    val ArgumentIndex = flatgraph.SinglePropertyKey[Int](kind = 1, name = "ARGUMENT_INDEX", default = -1: Int)
-
-    /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by
-      * the expression. For all other calls, this field is unset.
-      */
-    val ArgumentName = flatgraph.OptionalPropertyKey[String](kind = 2, name = "ARGUMENT_NAME")
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** This field holds the dispatch type of a call, which is either `STATIC_DISPATCH` or `DYNAMIC_DISPATCH`. For
-      * statically dispatched method calls, the call target is known at compile time while for dynamically dispatched
-      * calls, it can only be determined at runtime as it may depend on the type of an object (as is the case for
-      * virtual method calls) or calculation of an offset.
-      */
-    val DispatchType = flatgraph.SinglePropertyKey[String](kind = 15, name = "DISPATCH_TYPE", default = "<empty>")
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** The FULL_NAME of a method. Used to link CALL and METHOD nodes. It is required to have exactly one METHOD node
-      * for each METHOD_FULL_NAME
-      */
-    val MethodFullName = flatgraph.SinglePropertyKey[String](kind = 36, name = "METHOD_FULL_NAME", default = "<empty>")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
-
-    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
-      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
-      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
-      * can be chosen by the frontend implementor to fit the source language.
-      */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 46, name = "SIGNATURE", default = "")
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val ArgumentIndex  = -1: Int
-    val Code           = "<empty>"
-    val DispatchType   = "<empty>"
-    val MethodFullName = "<empty>"
-    val Name           = "<empty>"
-    val Order          = -1: Int
-    val Signature      = ""
-    val TypeFullName   = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - ArgumentIndex
+  *   - ArgumentName
+  *   - Code
+  *   - ColumnNumber
+  *   - DispatchType
+  *   - DynamicTypeHintFullName
+  *   - LineNumber
+  *   - MethodFullName
+  *   - Name
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  *   - PossibleTypes
+  *   - Signature
+  *   - TypeFullName
+  */
 class Call(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 7.toShort, seq_4762)
     with CallBase
