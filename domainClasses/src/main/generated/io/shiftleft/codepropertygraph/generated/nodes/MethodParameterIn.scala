@@ -50,162 +50,24 @@ trait MethodParameterInBase
 
 object MethodParameterIn {
   val Label = "METHOD_PARAMETER_IN"
-  object PropertyNames {
-
-    /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
-      * the corresponding CLOSURE_BINDING nodes
-      */
-    val ClosureBindingId = "CLOSURE_BINDING_ID"
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = "DYNAMIC_TYPE_HINT_FULL_NAME"
-
-    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
-      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
-      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
-      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
-      * object that it points to is not made.
-      */
-    val EvaluationStrategy = "EVALUATION_STRATEGY"
-
-    /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
-      * 0 is reserved for implicit self / this parameter.
-      */
-    val Index = "INDEX"
-
-    /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
-      * parameter of a method is allowed to have this property set to true.
-      */
-    val IsVariadic = "IS_VARIADIC"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = "POSSIBLE_TYPES"
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = "TYPE_FULL_NAME"
-  }
-  object Properties {
-
-    /** Identifier which uniquely describes a CLOSURE_BINDING. This property is used to match captured LOCAL nodes with
-      * the corresponding CLOSURE_BINDING nodes
-      */
-    val ClosureBindingId = flatgraph.OptionalPropertyKey[String](kind = 6, name = "CLOSURE_BINDING_ID")
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** Type hint for the dynamic type. These are observed to be verifiable at runtime. */
-    val DynamicTypeHintFullName = flatgraph.MultiPropertyKey[String](kind = 16, name = "DYNAMIC_TYPE_HINT_FULL_NAME")
-
-    /** For formal method input parameters, output parameters, and return parameters, this field holds the evaluation
-      * strategy, which is one of the following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference,
-      * 2) `BY_VALUE` indicates that it is passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a
-      * pointer/reference and it is shared with the caller/callee. While a copy of the pointer is made, a copy of the
-      * object that it points to is not made.
-      */
-    val EvaluationStrategy =
-      flatgraph.SinglePropertyKey[String](kind = 17, name = "EVALUATION_STRATEGY", default = "<empty>")
-
-    /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index
-      * 0 is reserved for implicit self / this parameter.
-      */
-    val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
-
-    /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one
-      * parameter of a method is allowed to have this property set to true.
-      */
-    val IsVariadic = flatgraph.SinglePropertyKey[Boolean](kind = 30, name = "IS_VARIADIC", default = false)
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-
-    /** Similar to `DYNAMIC_TYPE_HINT_FULL_NAME`, but that this makes no guarantee that types within this property are
-      * correct. This property is used to capture observations between node interactions during a 'may-analysis'.
-      */
-    val PossibleTypes = flatgraph.MultiPropertyKey[String](kind = 44, name = "POSSIBLE_TYPES")
-
-    /** This field contains the fully-qualified static type name of the program construct represented by a node. It is
-      * the name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type
-      * cannot be determined, this field should be set to the empty string.
-      */
-    val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val Code               = "<empty>"
-    val EvaluationStrategy = "<empty>"
-    val Index              = -1: Int
-    val IsVariadic         = false
-    val Name               = "<empty>"
-    val Order              = -1: Int
-    val TypeFullName       = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - ClosureBindingId
+  *   - Code
+  *   - ColumnNumber
+  *   - DynamicTypeHintFullName
+  *   - EvaluationStrategy
+  *   - Index
+  *   - IsVariadic
+  *   - LineNumber
+  *   - Name
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  *   - PossibleTypes
+  *   - TypeFullName
+  */
 class MethodParameterIn(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 26.toShort, seq_4762)
     with MethodParameterInBase

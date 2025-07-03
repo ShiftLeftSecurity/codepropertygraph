@@ -25,25 +25,13 @@ trait FindingBase extends AbstractNode with StaticType[FindingEMT] {
 
 object Finding {
   val Label = "FINDING"
-  object PropertyNames {
-
-    /** Optional description for nodes in evidence. Used to give a hint about the kind of evidence provided by a node.
-      * The evidence description and evidence nodes are associated by index.
-      */
-    val EvidenceDescription = "EVIDENCE_DESCRIPTION"
-    val Evidence            = "evidence"
-    val Keyvaluepairs       = "keyValuePairs"
-  }
-  object Properties {
-
-    /** Optional description for nodes in evidence. Used to give a hint about the kind of evidence provided by a node.
-      * The evidence description and evidence nodes are associated by index.
-      */
-    val EvidenceDescription = flatgraph.MultiPropertyKey[String](kind = 18, name = "EVIDENCE_DESCRIPTION")
-  }
-  object PropertyDefaults {}
 }
 
+/** Node properties:
+  *   - EvidenceDescription
+  *   - Anynode
+  *   - KeyValuePair
+  */
 class Finding(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 15.toShort, seq_4762)
     with FindingBase

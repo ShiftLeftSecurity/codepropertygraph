@@ -50,198 +50,27 @@ trait MethodBase extends AbstractNode with CfgNodeBase with DeclarationBase with
 
 object Method {
   val Label = "METHOD"
-  object PropertyNames {
-
-    /** This field holds the FULL_NAME of the AST parent of an entity. */
-    val AstParentFullName = "AST_PARENT_FULL_NAME"
-
-    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
-      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
-      */
-    val AstParentType = "AST_PARENT_TYPE"
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = "CODE"
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = "COLUMN_NUMBER"
-
-    /** This optional fields provides the column number at which the program construct represented by the node ends.
-      */
-    val ColumnNumberEnd = "COLUMN_NUMBER_END"
-
-    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
-      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
-      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
-      * file that is is declared in is unknown.
-      */
-    val Filename = "FILENAME"
-
-    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
-      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
-      */
-    val FullName = "FULL_NAME"
-
-    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
-      * information for generic types and methods as well as type information for members and locals where the type
-      * either contains a type parameter reference or an instantiated type reference.
-      */
-    val GenericSignature = "GENERIC_SIGNATURE"
-
-    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
-      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
-      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
-      * be deferred or skipped if the hash is not needed.
-      */
-    val Hash = "HASH"
-
-    /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
-      * code (applies both to insular parsing and to library functions where we have header files only)
-      */
-    val IsExternal = "IS_EXTERNAL"
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = "LINE_NUMBER"
-
-    /** This optional fields provides the line number at which the program construct represented by the node ends.
-      */
-    val LineNumberEnd = "LINE_NUMBER_END"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = "OFFSET"
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = "OFFSET_END"
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = "ORDER"
-
-    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
-      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
-      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
-      * can be chosen by the frontend implementor to fit the source language.
-      */
-    val Signature = "SIGNATURE"
-  }
-  object Properties {
-
-    /** This field holds the FULL_NAME of the AST parent of an entity. */
-    val AstParentFullName =
-      flatgraph.SinglePropertyKey[String](kind = 3, name = "AST_PARENT_FULL_NAME", default = "<empty>")
-
-    /** The type of the AST parent. Since this is only used in some parts of the graph, the list does not include all
-      * possible parents by intention. Possible parents: METHOD, TYPE_DECL, NAMESPACE_BLOCK.
-      */
-    val AstParentType = flatgraph.SinglePropertyKey[String](kind = 4, name = "AST_PARENT_TYPE", default = "<empty>")
-
-    /** This field holds the code snippet that the node represents. */
-    val Code = flatgraph.SinglePropertyKey[String](kind = 8, name = "CODE", default = "<empty>")
-
-    /** This optional fields provides the column number of the program construct represented by the node.
-      */
-    val ColumnNumber = flatgraph.OptionalPropertyKey[Int](kind = 9, name = "COLUMN_NUMBER")
-
-    /** This optional fields provides the column number at which the program construct represented by the node ends.
-      */
-    val ColumnNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 10, name = "COLUMN_NUMBER_END")
-
-    /** The path of the source file this node was generated from, relative to the root path in the meta data node. This
-      * field must be set but may be set to the value `<unknown>` to indicate that no source file can be associated with
-      * the node, e.g., because the node represents an entity known to exist because it is referenced, but for which the
-      * file that is is declared in is unknown.
-      */
-    val Filename = flatgraph.SinglePropertyKey[String](kind = 20, name = "FILENAME", default = "<empty>")
-
-    /** This is the fully-qualified name of an entity, e.g., the fully-qualified name of a method or type. The details
-      * of what constitutes a fully-qualified name are language specific. This field SHOULD be human readable.
-      */
-    val FullName = flatgraph.SinglePropertyKey[String](kind = 21, name = "FULL_NAME", default = "<empty>")
-
-    /** This field is experimental. It will likely be removed in the future without any notice. It stores type
-      * information for generic types and methods as well as type information for members and locals where the type
-      * either contains a type parameter reference or an instantiated type reference.
-      */
-    val GenericSignature =
-      flatgraph.SinglePropertyKey[String](kind = 22, name = "GENERIC_SIGNATURE", default = "<empty>")
-
-    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
-      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
-      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
-      * be deferred or skipped if the hash is not needed.
-      */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
-
-    /** Indicates that the construct (METHOD or TYPE_DECL) is external, that is, it is referenced but not defined in the
-      * code (applies both to insular parsing and to library functions where we have header files only)
-      */
-    val IsExternal = flatgraph.SinglePropertyKey[Boolean](kind = 29, name = "IS_EXTERNAL", default = false)
-
-    /** This optional field provides the line number of the program construct represented by the node.
-      */
-    val LineNumber = flatgraph.OptionalPropertyKey[Int](kind = 34, name = "LINE_NUMBER")
-
-    /** This optional fields provides the line number at which the program construct represented by the node ends.
-      */
-    val LineNumberEnd = flatgraph.OptionalPropertyKey[Int](kind = 35, name = "LINE_NUMBER_END")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** Start offset into the CONTENT property of the corresponding FILE node. The offset is such that parts of the
-      * content can easily be accessed via `content.substring(offset, offsetEnd)`. This means that the offset must be
-      * measured in utf16 encoding (i.e. neither in characters/codeunits nor in byte-offsets into a utf8 encoding). E.g.
-      * for METHOD nodes this start offset points to the start of the methods source code in the string holding the
-      * source code of the entire file.
-      */
-    val Offset = flatgraph.OptionalPropertyKey[Int](kind = 39, name = "OFFSET")
-
-    /** End offset (exclusive) into the CONTENT property of the corresponding FILE node. See OFFSET documentation for
-      * finer details. E.g. for METHOD nodes this end offset points to the first code position which is not part of the
-      * method.
-      */
-    val OffsetEnd = flatgraph.OptionalPropertyKey[Int](kind = 40, name = "OFFSET_END")
-
-    /** This integer indicates the position of the node among its siblings in the AST. The left-most child has an order
-      * of 0.
-      */
-    val Order = flatgraph.SinglePropertyKey[Int](kind = 41, name = "ORDER", default = -1: Int)
-
-    /** The method signature encodes the types of parameters in a string. The string SHOULD be human readable and
-      * suitable for differentiating methods with different parameter types sufficiently to allow for resolving of
-      * function overloading. The present specification does not enforce a strict format for the signature, that is, it
-      * can be chosen by the frontend implementor to fit the source language.
-      */
-    val Signature = flatgraph.SinglePropertyKey[String](kind = 46, name = "SIGNATURE", default = "")
-  }
-  object PropertyDefaults {
-    val AstParentFullName = "<empty>"
-    val AstParentType     = "<empty>"
-    val Code              = "<empty>"
-    val Filename          = "<empty>"
-    val FullName          = "<empty>"
-    val GenericSignature  = "<empty>"
-    val IsExternal        = false
-    val Name              = "<empty>"
-    val Order             = -1: Int
-    val Signature         = ""
-  }
 }
 
+/** Node properties:
+  *   - AstParentFullName
+  *   - AstParentType
+  *   - Code
+  *   - ColumnNumber
+  *   - ColumnNumberEnd
+  *   - Filename
+  *   - FullName
+  *   - GenericSignature
+  *   - Hash
+  *   - IsExternal
+  *   - LineNumber
+  *   - LineNumberEnd
+  *   - Name
+  *   - Offset
+  *   - OffsetEnd
+  *   - Order
+  *   - Signature
+  */
 class Method(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 25.toShort, seq_4762)
     with MethodBase

@@ -16,13 +16,6 @@ trait AstNodeBase extends AbstractNode with StaticType[AstNodeEMT]
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ANNOTATION_PARAMETER, ANNOTATION_PARAMETER_ASSIGN, ARRAY_INITIALIZER, BLOCK, CALL, COMMENT, CONTROL_STRUCTURE, FIELD_IDENTIFIER, FILE, IDENTIFIER, IMPORT, JUMP_LABEL, JUMP_TARGET, LITERAL, LOCAL, MEMBER, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, MODIFIER, NAMESPACE, NAMESPACE_BLOCK, RETURN, TEMPLATE_DOM, TYPE_ARGUMENT, TYPE_DECL, TYPE_PARAMETER, TYPE_REF, UNKNOWN
 trait AstNode extends StoredNode with AstNodeBase with StaticType[AstNodeEMT]
 
-object AstNode {
-  object PropertyDefaults {
-    val Code  = "<empty>"
-    val Order = -1: Int
-  }
-}
-
 trait AstNodeNew extends NewNode with AstNodeBase with StaticType[AstNodeEMT] {
   def code: String
   def code_=(value: String): Unit
@@ -57,13 +50,6 @@ trait CallReprBase extends AbstractNode with CfgNodeBase with StaticType[CallRep
 // implementing nodes: CALL
 trait CallRepr extends StoredNode with CallReprBase with CfgNode with StaticType[CallReprEMT]
 
-object CallRepr {
-  object PropertyDefaults {
-    val Name      = "<empty>"
-    val Signature = ""
-  }
-}
-
 trait CallReprNew extends NewNode with CallReprBase with CfgNodeNew with StaticType[CallReprEMT] {
   def name: String
   def name_=(value: String): Unit
@@ -82,10 +68,6 @@ trait CfgNodeBase extends AbstractNode with AstNodeBase with StaticType[CfgNodeE
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ARRAY_INITIALIZER, BLOCK, CALL, CONTROL_STRUCTURE, FIELD_IDENTIFIER, IDENTIFIER, JUMP_TARGET, LITERAL, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT, METHOD_REF, METHOD_RETURN, RETURN, TEMPLATE_DOM, TYPE_REF, UNKNOWN
 trait CfgNode extends StoredNode with CfgNodeBase with AstNode with StaticType[CfgNodeEMT]
 
-object CfgNode {
-  object PropertyDefaults {}
-}
-
 trait CfgNodeNew extends NewNode with CfgNodeBase with AstNodeNew with StaticType[CfgNodeEMT] {}
 
 trait DeclarationEMT extends AnyRef with HasNameEMT
@@ -96,12 +78,6 @@ trait DeclarationBase extends AbstractNode with StaticType[DeclarationEMT]
 // inherited interfaces:
 // implementing nodes: LOCAL, MEMBER, METHOD, METHOD_PARAMETER_IN, METHOD_PARAMETER_OUT
 trait Declaration extends StoredNode with DeclarationBase with StaticType[DeclarationEMT]
-
-object Declaration {
-  object PropertyDefaults {
-    val Name = "<empty>"
-  }
-}
 
 trait DeclarationNew extends NewNode with DeclarationBase with StaticType[DeclarationEMT] {
   def name: String
@@ -117,12 +93,6 @@ trait ExpressionBase extends AbstractNode with CfgNodeBase with StaticType[Expre
 // inherited interfaces: AST_NODE
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ARRAY_INITIALIZER, BLOCK, CALL, CONTROL_STRUCTURE, FIELD_IDENTIFIER, IDENTIFIER, LITERAL, METHOD_REF, RETURN, TEMPLATE_DOM, TYPE_REF, UNKNOWN
 trait Expression extends StoredNode with ExpressionBase with CfgNode with StaticType[ExpressionEMT]
-
-object Expression {
-  object PropertyDefaults {
-    val ArgumentIndex = -1: Int
-  }
-}
 
 trait ExpressionNew extends NewNode with ExpressionBase with AstNodeNew with CfgNodeNew with StaticType[ExpressionEMT] {
   def argumentIndex: Int

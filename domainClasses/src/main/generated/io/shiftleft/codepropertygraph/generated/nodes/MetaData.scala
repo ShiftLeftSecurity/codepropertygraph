@@ -31,71 +31,15 @@ trait MetaDataBase extends AbstractNode with StaticType[MetaDataEMT] {
 
 object MetaData {
   val Label = "META_DATA"
-  object PropertyNames {
-
-    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
-      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
-      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
-      * be deferred or skipped if the hash is not needed.
-      */
-    val Hash = "HASH"
-
-    /** This field indicates which CPG language frontend generated the CPG. Frontend developers may freely choose a
-      * value that describes their frontend so long as it is not used by an existing frontend. Reserved values are to
-      * date: C, LLVM, GHIDRA, PHP.
-      */
-    val Language = "LANGUAGE"
-
-    /** The field contains the names of the overlays applied to this CPG, in order of their application. Names are
-      * free-form strings, that is, this specification does not dictate them but rather requires tool producers and
-      * consumers to communicate them between each other.
-      */
-    val Overlays = "OVERLAYS"
-
-    /** The path to the root directory of the source/binary this CPG is generated from. */
-    val Root = "ROOT"
-
-    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
-      * this CPG conforms to
-      */
-    val Version = "VERSION"
-  }
-  object Properties {
-
-    /** This property contains a hash value in the form of a string. Hashes can be used to summarize data, e.g., to
-      * summarize the contents of source files or sub graphs. Such summaries are useful to determine whether code has
-      * already been analyzed in incremental analysis pipelines. This property is optional to allow its calculation to
-      * be deferred or skipped if the hash is not needed.
-      */
-    val Hash = flatgraph.OptionalPropertyKey[String](kind = 23, name = "HASH")
-
-    /** This field indicates which CPG language frontend generated the CPG. Frontend developers may freely choose a
-      * value that describes their frontend so long as it is not used by an existing frontend. Reserved values are to
-      * date: C, LLVM, GHIDRA, PHP.
-      */
-    val Language = flatgraph.SinglePropertyKey[String](kind = 33, name = "LANGUAGE", default = "<empty>")
-
-    /** The field contains the names of the overlays applied to this CPG, in order of their application. Names are
-      * free-form strings, that is, this specification does not dictate them but rather requires tool producers and
-      * consumers to communicate them between each other.
-      */
-    val Overlays = flatgraph.MultiPropertyKey[String](kind = 42, name = "OVERLAYS")
-
-    /** The path to the root directory of the source/binary this CPG is generated from. */
-    val Root = flatgraph.SinglePropertyKey[String](kind = 45, name = "ROOT", default = "<empty>")
-
-    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
-      * this CPG conforms to
-      */
-    val Version = flatgraph.SinglePropertyKey[String](kind = 50, name = "VERSION", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val Language = "<empty>"
-    val Root     = "<empty>"
-    val Version  = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - Hash
+  *   - Language
+  *   - Overlays
+  *   - Root
+  *   - Version
+  */
 class MetaData(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 24.toShort, seq_4762)
     with MetaDataBase

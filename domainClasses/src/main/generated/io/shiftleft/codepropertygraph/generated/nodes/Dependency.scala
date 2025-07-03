@@ -23,38 +23,13 @@ trait DependencyBase extends AbstractNode with StaticType[DependencyEMT] {
 
 object Dependency {
   val Label = "DEPENDENCY"
-  object PropertyNames {
-
-    /** The group ID for a dependency */
-    val DependencyGroupId = "DEPENDENCY_GROUP_ID"
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
-      * this CPG conforms to
-      */
-    val Version = "VERSION"
-  }
-  object Properties {
-
-    /** The group ID for a dependency */
-    val DependencyGroupId = flatgraph.OptionalPropertyKey[String](kind = 14, name = "DEPENDENCY_GROUP_ID")
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
-      * this CPG conforms to
-      */
-    val Version = flatgraph.SinglePropertyKey[String](kind = 50, name = "VERSION", default = "<empty>")
-  }
-  object PropertyDefaults {
-    val Name    = "<empty>"
-    val Version = "<empty>"
-  }
 }
 
+/** Node properties:
+  *   - DependencyGroupId
+  *   - Name
+  *   - Version
+  */
 class Dependency(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 12.toShort, seq_4762)
     with DependencyBase

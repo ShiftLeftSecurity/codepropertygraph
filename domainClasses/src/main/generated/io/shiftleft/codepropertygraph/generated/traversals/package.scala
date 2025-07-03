@@ -1,5 +1,6 @@
 package io.shiftleft.codepropertygraph.generated
 
+import scala.language.implicitConversions
 import io.shiftleft.codepropertygraph.generated.nodes
 
 package object traversals {

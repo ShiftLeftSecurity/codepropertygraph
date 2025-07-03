@@ -22,28 +22,12 @@ trait TagBase extends AbstractNode with StaticType[TagEMT] {
 
 object Tag {
   val Label = "TAG"
-  object PropertyNames {
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = "NAME"
-
-    /** This property denotes a string value as used in a key-value pair. */
-    val Value = "VALUE"
-  }
-  object Properties {
-
-    /** Name of represented object, e.g., method name (e.g. "run") */
-    val Name = flatgraph.SinglePropertyKey[String](kind = 38, name = "NAME", default = "<empty>")
-
-    /** This property denotes a string value as used in a key-value pair. */
-    val Value = flatgraph.SinglePropertyKey[String](kind = 49, name = "VALUE", default = "")
-  }
-  object PropertyDefaults {
-    val Name  = "<empty>"
-    val Value = ""
-  }
 }
 
+/** Node properties:
+  *   - Name
+  *   - Value
+  */
 class Tag(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 34.toShort, seq_4762)
     with TagBase
