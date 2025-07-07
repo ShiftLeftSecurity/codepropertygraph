@@ -8,203 +8,353 @@ object languagebootstrap extends ConcreteStoredConversions
 object Accessors {
   /* accessors for concrete stored nodes start */
   final class AccessPropertyAliasTypeFullName(val node: nodes.StoredNode) extends AnyVal {
-    def aliasTypeFullName: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 0, node.seq)
+    def aliasTypeFullName: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 0, seq = node.seq)
   }
   final class AccessPropertyArgumentIndex(val node: nodes.StoredNode) extends AnyVal {
-    def argumentIndex: Int =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 1, node.seq(), -1: Int)
+    def argumentIndex: Int = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 1,
+      seq = node.seq(),
+      default = -1: Int
+    )
   }
   final class AccessPropertyArgumentName(val node: nodes.StoredNode) extends AnyVal {
-    def argumentName: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 2, node.seq)
+    def argumentName: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 2, seq = node.seq)
   }
   final class AccessPropertyAstParentFullName(val node: nodes.StoredNode) extends AnyVal {
-    def astParentFullName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 3, node.seq(), "<empty>": String)
+    def astParentFullName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 3,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyAstParentType(val node: nodes.StoredNode) extends AnyVal {
-    def astParentType: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 4, node.seq(), "<empty>": String)
+    def astParentType: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 4,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyCanonicalName(val node: nodes.StoredNode) extends AnyVal {
-    def canonicalName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 5, node.seq(), "<empty>": String)
+    def canonicalName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 5,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyClosureBindingId(val node: nodes.StoredNode) extends AnyVal {
-    def closureBindingId: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 6, node.seq)
+    def closureBindingId: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 6, seq = node.seq)
   }
   final class AccessPropertyClosureOriginalName(val node: nodes.StoredNode) extends AnyVal {
-    def closureOriginalName: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 7, node.seq)
+    def closureOriginalName: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 7, seq = node.seq)
   }
   final class AccessPropertyCode(val node: nodes.StoredNode) extends AnyVal {
-    def code: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 8, node.seq(), "<empty>": String)
+    def code: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 8,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyColumnNumber(val node: nodes.StoredNode) extends AnyVal {
-    def columnNumber: Option[Int] =
-      flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 9, node.seq)
+    def columnNumber: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 9, seq = node.seq)
   }
   final class AccessPropertyColumnNumberEnd(val node: nodes.StoredNode) extends AnyVal {
-    def columnNumberEnd: Option[Int] =
-      flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 10, node.seq)
+    def columnNumberEnd: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 10, seq = node.seq)
   }
   final class AccessPropertyContainedRef(val node: nodes.StoredNode) extends AnyVal {
-    def containedRef: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 11, node.seq(), "<empty>": String)
+    def containedRef: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 11,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyContent(val node: nodes.StoredNode) extends AnyVal {
-    def content: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 12, node.seq(), "<empty>": String)
+    def content: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 12,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyControlStructureType(val node: nodes.StoredNode) extends AnyVal {
-    def controlStructureType: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 13, node.seq(), "<empty>": String)
+    def controlStructureType: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 13,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyDependencyGroupId(val node: nodes.StoredNode) extends AnyVal {
-    def dependencyGroupId: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 14, node.seq)
+    def dependencyGroupId: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 14, seq = node.seq)
   }
   final class AccessPropertyDispatchType(val node: nodes.StoredNode) extends AnyVal {
-    def dispatchType: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 15, node.seq(), "<empty>": String)
+    def dispatchType: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 15,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyDynamicTypeHintFullName(val node: nodes.StoredNode) extends AnyVal {
-    def dynamicTypeHintFullName: IndexedSeq[String] =
-      flatgraph.Accessors.getNodePropertyMulti[String](node.graph, node.nodeKind, 16, node.seq)
+    def dynamicTypeHintFullName: IndexedSeq[String] = flatgraph.Accessors
+      .getNodePropertyMulti[String](node.graph, nodeKind = node.nodeKind, propertyKind = 16, seq = node.seq)
   }
   final class AccessPropertyEvaluationStrategy(val node: nodes.StoredNode) extends AnyVal {
-    def evaluationStrategy: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 17, node.seq(), "<empty>": String)
+    def evaluationStrategy: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 17,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyEvidenceDescription(val node: nodes.StoredNode) extends AnyVal {
-    def evidenceDescription: IndexedSeq[String] =
-      flatgraph.Accessors.getNodePropertyMulti[String](node.graph, node.nodeKind, 18, node.seq)
+    def evidenceDescription: IndexedSeq[String] = flatgraph.Accessors
+      .getNodePropertyMulti[String](node.graph, nodeKind = node.nodeKind, propertyKind = 18, seq = node.seq)
   }
   final class AccessPropertyExplicitAs(val node: nodes.StoredNode) extends AnyVal {
-    def explicitAs: Option[Boolean] =
-      flatgraph.Accessors.getNodePropertyOption[Boolean](node.graph, node.nodeKind, 19, node.seq)
+    def explicitAs: Option[Boolean] = flatgraph.Accessors
+      .getNodePropertyOption[Boolean](node.graph, nodeKind = node.nodeKind, propertyKind = 19, seq = node.seq)
   }
   final class AccessPropertyFilename(val node: nodes.StoredNode) extends AnyVal {
-    def filename: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 20, node.seq(), "<empty>": String)
+    def filename: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 20,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyFullName(val node: nodes.StoredNode) extends AnyVal {
-    def fullName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 21, node.seq(), "<empty>": String)
+    def fullName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 21,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyGenericSignature(val node: nodes.StoredNode) extends AnyVal {
-    def genericSignature: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 22, node.seq(), "<empty>": String)
+    def genericSignature: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 22,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyHash(val node: nodes.StoredNode) extends AnyVal {
-    def hash: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 23, node.seq)
+    def hash: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 23, seq = node.seq)
   }
   final class AccessPropertyImportedAs(val node: nodes.StoredNode) extends AnyVal {
-    def importedAs: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 24, node.seq)
+    def importedAs: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 24, seq = node.seq)
   }
   final class AccessPropertyImportedEntity(val node: nodes.StoredNode) extends AnyVal {
-    def importedEntity: Option[String] =
-      flatgraph.Accessors.getNodePropertyOption[String](node.graph, node.nodeKind, 25, node.seq)
+    def importedEntity: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 25, seq = node.seq)
   }
   final class AccessPropertyIndex(val node: nodes.StoredNode) extends AnyVal {
-    def index: Int = flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 26, node.seq(), -1: Int)
+    def index: Int = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 26,
+      seq = node.seq(),
+      default = -1: Int
+    )
   }
   final class AccessPropertyInheritsFromTypeFullName(val node: nodes.StoredNode) extends AnyVal {
-    def inheritsFromTypeFullName: IndexedSeq[String] =
-      flatgraph.Accessors.getNodePropertyMulti[String](node.graph, node.nodeKind, 27, node.seq)
+    def inheritsFromTypeFullName: IndexedSeq[String] = flatgraph.Accessors
+      .getNodePropertyMulti[String](node.graph, nodeKind = node.nodeKind, propertyKind = 27, seq = node.seq)
   }
   final class AccessPropertyIsExplicit(val node: nodes.StoredNode) extends AnyVal {
-    def isExplicit: Option[Boolean] =
-      flatgraph.Accessors.getNodePropertyOption[Boolean](node.graph, node.nodeKind, 28, node.seq)
+    def isExplicit: Option[Boolean] = flatgraph.Accessors
+      .getNodePropertyOption[Boolean](node.graph, nodeKind = node.nodeKind, propertyKind = 28, seq = node.seq)
   }
   final class AccessPropertyIsExternal(val node: nodes.StoredNode) extends AnyVal {
-    def isExternal: Boolean =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 29, node.seq(), false: Boolean)
+    def isExternal: Boolean = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 29,
+      seq = node.seq(),
+      default = false: Boolean
+    )
   }
   final class AccessPropertyIsVariadic(val node: nodes.StoredNode) extends AnyVal {
-    def isVariadic: Boolean =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 30, node.seq(), false: Boolean)
+    def isVariadic: Boolean = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 30,
+      seq = node.seq(),
+      default = false: Boolean
+    )
   }
   final class AccessPropertyIsWildcard(val node: nodes.StoredNode) extends AnyVal {
-    def isWildcard: Option[Boolean] =
-      flatgraph.Accessors.getNodePropertyOption[Boolean](node.graph, node.nodeKind, 31, node.seq)
+    def isWildcard: Option[Boolean] = flatgraph.Accessors
+      .getNodePropertyOption[Boolean](node.graph, nodeKind = node.nodeKind, propertyKind = 31, seq = node.seq)
   }
   final class AccessPropertyKey(val node: nodes.StoredNode) extends AnyVal {
-    def key: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 32, node.seq(), "<empty>": String)
+    def key: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 32,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyLanguage(val node: nodes.StoredNode) extends AnyVal {
-    def language: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 33, node.seq(), "<empty>": String)
+    def language: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 33,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyLineNumber(val node: nodes.StoredNode) extends AnyVal {
-    def lineNumber: Option[Int] =
-      flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 34, node.seq)
+    def lineNumber: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 34, seq = node.seq)
   }
   final class AccessPropertyLineNumberEnd(val node: nodes.StoredNode) extends AnyVal {
-    def lineNumberEnd: Option[Int] =
-      flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 35, node.seq)
+    def lineNumberEnd: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 35, seq = node.seq)
   }
   final class AccessPropertyMethodFullName(val node: nodes.StoredNode) extends AnyVal {
-    def methodFullName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 36, node.seq(), "<empty>": String)
+    def methodFullName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 36,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyModifierType(val node: nodes.StoredNode) extends AnyVal {
-    def modifierType: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 37, node.seq(), "<empty>": String)
+    def modifierType: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 37,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyName(val node: nodes.StoredNode) extends AnyVal {
-    def name: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 38, node.seq(), "<empty>": String)
+    def name: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 38,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyOffset(val node: nodes.StoredNode) extends AnyVal {
-    def offset: Option[Int] = flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 39, node.seq)
+    def offset: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 39, seq = node.seq)
   }
   final class AccessPropertyOffsetEnd(val node: nodes.StoredNode) extends AnyVal {
-    def offsetEnd: Option[Int] = flatgraph.Accessors.getNodePropertyOption[Int](node.graph, node.nodeKind, 40, node.seq)
+    def offsetEnd: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 40, seq = node.seq)
   }
   final class AccessPropertyOrder(val node: nodes.StoredNode) extends AnyVal {
-    def order: Int = flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 41, node.seq(), -1: Int)
+    def order: Int = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 41,
+      seq = node.seq(),
+      default = -1: Int
+    )
   }
   final class AccessPropertyOverlays(val node: nodes.StoredNode) extends AnyVal {
-    def overlays: IndexedSeq[String] =
-      flatgraph.Accessors.getNodePropertyMulti[String](node.graph, node.nodeKind, 42, node.seq)
+    def overlays: IndexedSeq[String] = flatgraph.Accessors
+      .getNodePropertyMulti[String](node.graph, nodeKind = node.nodeKind, propertyKind = 42, seq = node.seq)
   }
   final class AccessPropertyParserTypeName(val node: nodes.StoredNode) extends AnyVal {
-    def parserTypeName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 43, node.seq(), "<empty>": String)
+    def parserTypeName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 43,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyPossibleTypes(val node: nodes.StoredNode) extends AnyVal {
-    def possibleTypes: IndexedSeq[String] =
-      flatgraph.Accessors.getNodePropertyMulti[String](node.graph, node.nodeKind, 44, node.seq)
+    def possibleTypes: IndexedSeq[String] = flatgraph.Accessors
+      .getNodePropertyMulti[String](node.graph, nodeKind = node.nodeKind, propertyKind = 44, seq = node.seq)
   }
   final class AccessPropertyRoot(val node: nodes.StoredNode) extends AnyVal {
-    def root: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 45, node.seq(), "<empty>": String)
+    def root: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 45,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertySignature(val node: nodes.StoredNode) extends AnyVal {
-    def signature: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 46, node.seq(), "": String)
+    def signature: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 46,
+      seq = node.seq(),
+      default = "": String
+    )
   }
   final class AccessPropertyTypeDeclFullName(val node: nodes.StoredNode) extends AnyVal {
-    def typeDeclFullName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 47, node.seq(), "<empty>": String)
+    def typeDeclFullName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 47,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyTypeFullName(val node: nodes.StoredNode) extends AnyVal {
-    def typeFullName: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 48, node.seq(), "<empty>": String)
+    def typeFullName: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 48,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   final class AccessPropertyValue(val node: nodes.StoredNode) extends AnyVal {
-    def value: String = flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 49, node.seq(), "": String)
+    def value: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 49,
+      seq = node.seq(),
+      default = "": String
+    )
   }
   final class AccessPropertyVersion(val node: nodes.StoredNode) extends AnyVal {
-    def version: String =
-      flatgraph.Accessors.getNodePropertySingle(node.graph, node.nodeKind, 50, node.seq(), "<empty>": String)
+    def version: String = flatgraph.Accessors.getNodePropertySingle(
+      node.graph,
+      nodeKind = node.nodeKind,
+      propertyKind = 50,
+      seq = node.seq(),
+      default = "<empty>": String
+    )
   }
   /* accessors for concrete stored nodes end */
 
