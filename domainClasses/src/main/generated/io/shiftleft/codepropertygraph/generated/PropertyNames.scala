@@ -274,13 +274,13 @@ object PropertyNames {
     */
   val Version: String = "VERSION"
 
-  /** Contained node */
+  /** generic node base trait - use if you want to be explicitly unspecific */
   val Anynode: String = "AnyNode"
 
-  /** Contained node */
+  /** This node represents a key value pair, where both the key and the value are strings. */
   val KeyValuePair: String = "KEY_VALUE_PAIR"
 
-  /** Contained node */
+  /** This node represents a tag. */
   val Tag: String = "TAG"
 
   val All: Set[String] = new HashSet[String](

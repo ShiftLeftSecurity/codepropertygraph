@@ -25,13 +25,18 @@ object Dependency {
   val Label = "DEPENDENCY"
 }
 
-/** Node properties:
-  *   - DependencyGroupId
-  *   - Name
-  *   - Version
+/** * NODE PROPERTIES:
+  *
+  * ▸ DependencyGroupId (String); Cardinality `ZeroOrOne` (optional); The group ID for a dependency
+  *
+  * ▸ Name (String); Cardinality `one` (mandatory with default value `<empty>`); Name of represented object, e.g.,
+  * method name (e.g. "run")
+  *
+  * ▸ Version (String); Cardinality `one` (mandatory with default value `<empty>`); A version, given as a string. Used,
+  * for example, in the META_DATA node to indicate which version of the CPG spec this CPG conforms to
   */
 class Dependency(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 12.toShort, seq_4762)
+    extends StoredNode(graph_4762, 12, seq_4762)
     with DependencyBase
     with StaticType[DependencyEMT] {
 
@@ -55,145 +60,4 @@ class Dependency(graph_4762: flatgraph.Graph, seq_4762: Int)
   override def productArity  = 3
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Dependency]
-}
-
-object NewDependency {
-  def apply(): NewDependency                         = new NewDependency
-  private val outNeighbors: Map[String, Set[String]] = Map()
-  private val inNeighbors: Map[String, Set[String]]  = Map("IMPORTS" -> Set("IMPORT"))
-
-  object InsertionHelpers {
-    object NewNodeInserter_Dependency_dependencyGroupId extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewDependency =>
-              generated.dependencyGroupId match {
-                case Some(item) =>
-                  dstCast(offset) = item
-                  offset += 1
-                case _ =>
-              }
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-    object NewNodeInserter_Dependency_name extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewDependency =>
-              dstCast(offset) = generated.name
-              offset += 1
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-    object NewNodeInserter_Dependency_version extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewDependency =>
-              dstCast(offset) = generated.version
-              offset += 1
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-  }
-}
-
-class NewDependency extends NewNode(12.toShort) with DependencyBase {
-  override type StoredNodeType = Dependency
-  override def label: String = "DEPENDENCY"
-
-  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
-    NewDependency.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
-  }
-  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
-    NewDependency.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
-  }
-
-  var dependencyGroupId: Option[String]                   = None
-  var name: String                                        = "<empty>": String
-  var version: String                                     = "<empty>": String
-  def dependencyGroupId(value: Option[String]): this.type = { this.dependencyGroupId = value; this }
-  def dependencyGroupId(value: String): this.type         = { this.dependencyGroupId = Option(value); this }
-  def name(value: String): this.type                      = { this.name = value; this }
-  def version(value: String): this.type                   = { this.version = value; this }
-  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 14, dependencyGroupId.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 50, 1)
-  }
-
-  override def copy: this.type = {
-    val newInstance = new NewDependency
-    newInstance.dependencyGroupId = this.dependencyGroupId
-    newInstance.name = this.name
-    newInstance.version = this.version
-    newInstance.asInstanceOf[this.type]
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "dependencyGroupId"
-      case 1 => "name"
-      case 2 => "version"
-      case _ => ""
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => this.dependencyGroupId
-      case 1 => this.name
-      case 2 => this.version
-      case _ => null
-    }
-
-  override def productPrefix                = "NewDependency"
-  override def productArity                 = 3
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewDependency]
 }

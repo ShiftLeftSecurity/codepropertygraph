@@ -29,13 +29,22 @@ object ClosureBinding {
   val Label = "CLOSURE_BINDING"
 }
 
-/** Node properties:
-  *   - ClosureBindingId
-  *   - ClosureOriginalName
-  *   - EvaluationStrategy
+/** * NODE PROPERTIES:
+  *
+  * ▸ ClosureBindingId (String); Cardinality `ZeroOrOne` (optional); Identifier which uniquely describes a
+  * CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes
+  *
+  * ▸ ClosureOriginalName (String); Cardinality `ZeroOrOne` (optional); Deprecated. Create an explict REF edge instead.
+  * Formerly the original name of the (potentially mangled) captured variable
+  *
+  * ▸ EvaluationStrategy (String); Cardinality `one` (mandatory with default value `<empty>`); For formal method input
+  * parameters, output parameters, and return parameters, this field holds the evaluation strategy, which is one of the
+  * following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference, 2) `BY_VALUE` indicates that it is
+  * passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a pointer/reference and it is shared with
+  * the caller/callee. While a copy of the pointer is made, a copy of the object that it points to is not made.
   */
 class ClosureBinding(graph_4762: flatgraph.Graph, seq_4762: Int)
-    extends StoredNode(graph_4762, 8.toShort, seq_4762)
+    extends StoredNode(graph_4762, 8, seq_4762)
     with ClosureBindingBase
     with StaticType[ClosureBindingEMT] {
 
@@ -59,151 +68,4 @@ class ClosureBinding(graph_4762: flatgraph.Graph, seq_4762: Int)
   override def productArity  = 3
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[ClosureBinding]
-}
-
-object NewClosureBinding {
-  def apply(): NewClosureBinding                     = new NewClosureBinding
-  private val outNeighbors: Map[String, Set[String]] = Map("REF" -> Set("LOCAL", "METHOD_PARAMETER_IN"))
-  private val inNeighbors: Map[String, Set[String]] =
-    Map("CAPTURE" -> Set("METHOD_REF", "TYPE_REF"), "CAPTURED_BY" -> Set("LOCAL", "METHOD_PARAMETER_IN"))
-
-  object InsertionHelpers {
-    object NewNodeInserter_ClosureBinding_closureBindingId extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewClosureBinding =>
-              generated.closureBindingId match {
-                case Some(item) =>
-                  dstCast(offset) = item
-                  offset += 1
-                case _ =>
-              }
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-    object NewNodeInserter_ClosureBinding_closureOriginalName extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewClosureBinding =>
-              generated.closureOriginalName match {
-                case Some(item) =>
-                  dstCast(offset) = item
-                  offset += 1
-                case _ =>
-              }
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-    object NewNodeInserter_ClosureBinding_evaluationStrategy extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewClosureBinding =>
-              dstCast(offset) = generated.evaluationStrategy
-              offset += 1
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
-  }
-}
-
-class NewClosureBinding extends NewNode(8.toShort) with ClosureBindingBase {
-  override type StoredNodeType = ClosureBinding
-  override def label: String = "CLOSURE_BINDING"
-
-  override def isValidOutNeighbor(edgeLabel: String, n: NewNode): Boolean = {
-    NewClosureBinding.outNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
-  }
-  override def isValidInNeighbor(edgeLabel: String, n: NewNode): Boolean = {
-    NewClosureBinding.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
-  }
-
-  var closureBindingId: Option[String]                      = None
-  var closureOriginalName: Option[String]                   = None
-  var evaluationStrategy: String                            = "<empty>": String
-  def closureBindingId(value: Option[String]): this.type    = { this.closureBindingId = value; this }
-  def closureBindingId(value: String): this.type            = { this.closureBindingId = Option(value); this }
-  def closureOriginalName(value: Option[String]): this.type = { this.closureOriginalName = value; this }
-  def closureOriginalName(value: String): this.type         = { this.closureOriginalName = Option(value); this }
-  def evaluationStrategy(value: String): this.type          = { this.evaluationStrategy = value; this }
-  override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 6, closureBindingId.size)
-    interface.countProperty(this, 7, closureOriginalName.size)
-    interface.countProperty(this, 17, 1)
-  }
-
-  override def copy: this.type = {
-    val newInstance = new NewClosureBinding
-    newInstance.closureBindingId = this.closureBindingId
-    newInstance.closureOriginalName = this.closureOriginalName
-    newInstance.evaluationStrategy = this.evaluationStrategy
-    newInstance.asInstanceOf[this.type]
-  }
-
-  override def productElementName(n: Int): String =
-    n match {
-      case 0 => "closureBindingId"
-      case 1 => "closureOriginalName"
-      case 2 => "evaluationStrategy"
-      case _ => ""
-    }
-
-  override def productElement(n: Int): Any =
-    n match {
-      case 0 => this.closureBindingId
-      case 1 => this.closureOriginalName
-      case 2 => this.evaluationStrategy
-      case _ => null
-    }
-
-  override def productPrefix                = "NewClosureBinding"
-  override def productArity                 = 3
-  override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewClosureBinding]
 }
