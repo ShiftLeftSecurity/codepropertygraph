@@ -274,16 +274,16 @@ object PropertyNames {
     */
   val Version: String = "VERSION"
 
-  /** /** This is a contained node */ */
+  /** This is a contained node */
   val Evidence: String = "evidence"
 
-  /** /** This is a contained node */ */
+  /** This is a contained node */
   val Keyvaluepairs: String = "keyValuePairs"
 
-  /** /** This is a contained node */ */
+  /** This is a contained node */
   val Node: String = "node"
 
-  /** /** This is a contained node */ */
+  /** This is a contained node */
   val Tag: String = "tag"
 
   val All: Set[String] = new HashSet[String](
