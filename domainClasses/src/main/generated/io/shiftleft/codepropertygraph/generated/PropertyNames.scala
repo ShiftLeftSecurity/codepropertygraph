@@ -274,14 +274,17 @@ object PropertyNames {
     */
   val Version: String = "VERSION"
 
-  /** generic node base trait - use if you want to be explicitly unspecific */
-  val Anynode: String = "AnyNode"
+  /** /** This is a contained node */ */
+  val Evidence: String = "evidence"
 
-  /** This node represents a key value pair, where both the key and the value are strings. */
-  val KeyValuePair: String = "KEY_VALUE_PAIR"
+  /** /** This is a contained node */ */
+  val Keyvaluepairs: String = "keyValuePairs"
 
-  /** This node represents a tag. */
-  val Tag: String = "TAG"
+  /** /** This is a contained node */ */
+  val Node: String = "node"
+
+  /** /** This is a contained node */ */
+  val Tag: String = "tag"
 
   val All: Set[String] = new HashSet[String](
     Seq(
@@ -338,9 +341,9 @@ object PropertyNames {
       Value,
       Variable,
       Version,
-      Anynode,
-      KeyValuePair,
-      Anynode,
+      Evidence,
+      Keyvaluepairs,
+      Node,
       Tag
     ).asJava
   )
