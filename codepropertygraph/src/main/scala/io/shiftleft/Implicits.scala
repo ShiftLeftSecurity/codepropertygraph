@@ -43,16 +43,12 @@ object Implicits {
       }
     }
 
-    /** @see {{{loneElementOption(hint)}}} */
-    def loneElementOption: Option[A] =
-      loneElementOption(hint = None)
-
     /** @return
       *   {{{Some(element)}}} if the Iterable has exactly one element, or {{{None}}} if the Iterable has zero or more
       *   than 1 element. Note: if the lone element is {{{null}}}, this will return {{{Some(null)}}}, which is in
       *   accordance with how {{{headOption}}} works.
       */
-    def loneElementOption(hint: String | None.type = None): Option[A] = {
+    def loneElementOption: Option[A] = {
       val iter = iterable.iterator
       if (iter.isEmpty) {
         None
