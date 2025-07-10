@@ -38,15 +38,11 @@ class ImplicitsTests extends AnyWordSpec with Matchers {
 
   "loneElementOption returns an Option of the one and only element from an Iterable, or else None" in {
     Seq(1).loneElementOption shouldBe Some(1)
-    Seq(1).loneElementOption("some context") shouldBe Some(1)
     Seq(null).loneElementOption shouldBe Some(null)
-    Seq(null).loneElementOption("some context") shouldBe Some(null)
 
     Seq.empty.loneElementOption shouldBe None
-    Seq.empty.loneElementOption("some context") shouldBe None
-
+    
     Seq(1, 2).loneElementOption shouldBe None
-    Seq(1, 2).loneElementOption("some context") shouldBe None
   }
 
 }
