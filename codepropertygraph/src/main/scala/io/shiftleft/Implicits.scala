@@ -3,10 +3,13 @@ package io.shiftleft
 import org.slf4j.{Logger, LoggerFactory}
 
 object Implicits {
-
   private val logger: Logger = LoggerFactory.getLogger(Implicits.getClass)
 
   implicit class IterableOnceDeco[T](val iterable: IterableOnce[T]) extends AnyVal {
+    @deprecated(
+      "please use `.loneElement` from flatgraph (mixed into the generated `language` packages) instead, which has a better name and will throw if the iterable has more than one element (rather than just log.warn)",
+      since = "1.7.42 (July 2025)"
+    )
     def onlyChecked: T = {
       if (iterable.iterator.hasNext) {
         val res = iterable.iterator.next()
@@ -14,34 +17,9 @@ object Implicits {
           logger.warn("iterator was expected to have exactly one element, but it actually has more")
         }
         res
-      } else { throw new NoSuchElementException() }
-    }
-  }
-
-  /** A wrapper around a Java iterator that throws a proper NoSuchElementException.
-    *
-    * Proper in this case means an exception with a stack trace. This is intended to be used as a replacement for next()
-    * on the iterators returned from TinkerPop since those are missing stack traces.
-    */
-  implicit class JavaIteratorDeco[T](val iterator: java.util.Iterator[T]) extends AnyVal {
-    def nextChecked: T = {
-      try {
-        iterator.next
-      } catch {
-        case _: NoSuchElementException =>
-          throw new NoSuchElementException()
+      } else {
+        throw new NoSuchElementException()
       }
     }
-
-    def onlyChecked: T = {
-      if (iterator.hasNext) {
-        val res = iterator.next
-        if (iterator.hasNext) {
-          logger.warn("iterator was expected to have exactly one element, but it actually has more")
-        }
-        res
-      } else { throw new NoSuchElementException() }
-    }
   }
-
 }
