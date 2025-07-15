@@ -1526,13 +1526,13 @@ class NewTemplateDom extends NewNode(nodeKind = 36) with TemplateDomBase with Ex
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
     interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 8, 1)
-    interface.countProperty(this, 9, columnNumber.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 7, 1)
+    interface.countProperty(this, 8, columnNumber.size)
+    interface.countProperty(this, 33, lineNumber.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 38, offset.size)
+    interface.countProperty(this, 39, offsetEnd.size)
+    interface.countProperty(this, 40, 1)
   }
 
   override def copy: this.type = {

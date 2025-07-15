@@ -44,11 +44,6 @@ object PropertyNames {
     */
   val ClosureBindingId: String = "CLOSURE_BINDING_ID"
 
-  /** Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured
-    * variable
-    */
-  val ClosureOriginalName: String = "CLOSURE_ORIGINAL_NAME"
-
   /** This field holds the code snippet that the node represents. */
   val Code: String = "CODE"
 
@@ -295,7 +290,6 @@ object PropertyNames {
       AstParentType,
       CanonicalName,
       ClosureBindingId,
-      ClosureOriginalName,
       Code,
       ColumnNumber,
       ColumnNumberEnd,

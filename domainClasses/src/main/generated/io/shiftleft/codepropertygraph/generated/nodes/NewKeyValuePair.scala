@@ -79,8 +79,8 @@ class NewKeyValuePair extends NewNode(nodeKind = 20) with KeyValuePairBase {
   def key(value: String): this.type   = { this.key = value; this }
   def value(value: String): this.type = { this.value = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 32, 1)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 31, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

@@ -1578,17 +1578,17 @@ class NewMethodParameterOut
   def order(value: Int): this.type                 = { this.order = value; this }
   def typeFullName(value: String): this.type       = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 8, 1)
-    interface.countProperty(this, 9, columnNumber.size)
-    interface.countProperty(this, 17, 1)
-    interface.countProperty(this, 26, 1)
-    interface.countProperty(this, 30, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 48, 1)
+    interface.countProperty(this, 7, 1)
+    interface.countProperty(this, 8, columnNumber.size)
+    interface.countProperty(this, 16, 1)
+    interface.countProperty(this, 25, 1)
+    interface.countProperty(this, 29, 1)
+    interface.countProperty(this, 33, lineNumber.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 38, offset.size)
+    interface.countProperty(this, 39, offsetEnd.size)
+    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 47, 1)
   }
 
   override def copy: this.type = {

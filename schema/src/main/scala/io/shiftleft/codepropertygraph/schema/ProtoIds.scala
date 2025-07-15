@@ -142,7 +142,6 @@ object ProtoIds {
   val Argument                  = 156
   val SourceFile                = 157
   val AliasTypeFullName         = 158
-  val ClosureOriginalName       = 159
   val Dominate                  = 181
   val PostDominate              = 182
   val Cdg                       = 183
