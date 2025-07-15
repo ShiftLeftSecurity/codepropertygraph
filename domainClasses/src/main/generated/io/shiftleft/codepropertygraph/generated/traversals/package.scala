@@ -41,10 +41,6 @@ package object traversals {
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasClosureBindingIdEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyClosureBindingId[NodeType] =
       new TraversalPropertyClosureBindingId(traversal.iterator)
-    implicit def accessPropertyClosureOriginalNameTraversal[
-      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasClosureOriginalNameEMT]
-    ](traversal: IterableOnce[NodeType]): TraversalPropertyClosureOriginalName[NodeType] =
-      new TraversalPropertyClosureOriginalName(traversal.iterator)
     implicit def accessPropertyCodeTraversal[NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasCodeEMT]](
       traversal: IterableOnce[NodeType]
     ): TraversalPropertyCode[NodeType] = new TraversalPropertyCode(traversal.iterator)

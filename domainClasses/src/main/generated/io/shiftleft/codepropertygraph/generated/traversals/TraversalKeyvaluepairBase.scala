@@ -33,7 +33,7 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 32, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 31, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.key == value }
   }
@@ -47,7 +47,7 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 32, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 31, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>
@@ -101,7 +101,7 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 49, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 48, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.value == value }
   }
@@ -115,7 +115,7 @@ final class TraversalKeyvaluepairBase[NodeType <: nodes.KeyValuePairBase](val tr
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 49, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 48, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

@@ -67,15 +67,6 @@ object Hidden extends SchemaBase {
       )
       .protoId(ProtoIds.ClosureBindingId)
 
-    val closureOriginalName = builder
-      .addProperty(
-        name = "CLOSURE_ORIGINAL_NAME",
-        valueType = ValueType.String,
-        comment =
-          "Deprecated. Create an explict REF edge instead. Formerly the original name of the (potentially mangled) captured variable"
-      )
-      .protoId(ProtoIds.ClosureOriginalName)
-
     // edge types
     val capture = builder
       .addEdgeType(name = "CAPTURE", comment = "Represents the capturing of a variable into a closure")
@@ -91,7 +82,7 @@ object Hidden extends SchemaBase {
         comment = "Represents the binding of a LOCAL or METHOD_PARAMETER_IN into the closure of a method"
       )
       .protoId(ProtoIds.ClosureBinding)
-      .addProperties(closureBindingId, evaluationStrategy, closureOriginalName)
+      .addProperties(closureBindingId, evaluationStrategy)
 
     val capturedBy = builder
       .addEdgeType(

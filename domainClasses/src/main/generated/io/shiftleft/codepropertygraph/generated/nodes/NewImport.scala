@@ -1598,17 +1598,17 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
   def offsetEnd(value: Option[Int]): this.type         = { this.offsetEnd = value; this }
   def order(value: Int): this.type                     = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 8, 1)
-    interface.countProperty(this, 9, columnNumber.size)
-    interface.countProperty(this, 19, explicitAs.size)
-    interface.countProperty(this, 24, importedAs.size)
-    interface.countProperty(this, 25, importedEntity.size)
-    interface.countProperty(this, 28, isExplicit.size)
-    interface.countProperty(this, 31, isWildcard.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 7, 1)
+    interface.countProperty(this, 8, columnNumber.size)
+    interface.countProperty(this, 18, explicitAs.size)
+    interface.countProperty(this, 23, importedAs.size)
+    interface.countProperty(this, 24, importedEntity.size)
+    interface.countProperty(this, 27, isExplicit.size)
+    interface.countProperty(this, 30, isWildcard.size)
+    interface.countProperty(this, 33, lineNumber.size)
+    interface.countProperty(this, 38, offset.size)
+    interface.countProperty(this, 39, offsetEnd.size)
+    interface.countProperty(this, 40, 1)
   }
 
   override def copy: this.type = {

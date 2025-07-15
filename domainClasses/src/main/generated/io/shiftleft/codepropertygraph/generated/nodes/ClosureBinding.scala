@@ -7,11 +7,7 @@ import scala.collection.mutable
 /** Node base type for compiletime-only checks to improve type safety. EMT stands for: "erased marker trait", i.e. it is
   * erased at runtime
   */
-trait ClosureBindingEMT
-    extends AnyRef
-    with HasClosureBindingIdEMT
-    with HasClosureOriginalNameEMT
-    with HasEvaluationStrategyEMT
+trait ClosureBindingEMT extends AnyRef with HasClosureBindingIdEMT with HasEvaluationStrategyEMT
 
 trait ClosureBindingBase extends AbstractNode with StaticType[ClosureBindingEMT] {
 
@@ -19,7 +15,6 @@ trait ClosureBindingBase extends AbstractNode with StaticType[ClosureBindingEMT]
     import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     this.closureBindingId.foreach { p => res.put("CLOSURE_BINDING_ID", p) }
-    this.closureOriginalName.foreach { p => res.put("CLOSURE_ORIGINAL_NAME", p) }
     if (("<empty>": String) != this.evaluationStrategy) res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
     res
   }
@@ -33,9 +28,6 @@ object ClosureBinding {
   *
   * ▸ ClosureBindingId (String); Cardinality `ZeroOrOne` (optional); Identifier which uniquely describes a
   * CLOSURE_BINDING. This property is used to match captured LOCAL nodes with the corresponding CLOSURE_BINDING nodes
-  *
-  * ▸ ClosureOriginalName (String); Cardinality `ZeroOrOne` (optional); Deprecated. Create an explict REF edge instead.
-  * Formerly the original name of the (potentially mangled) captured variable
   *
   * ▸ EvaluationStrategy (String); Cardinality `one` (mandatory with default value `<empty>`); For formal method input
   * parameters, output parameters, and return parameters, this field holds the evaluation strategy, which is one of the
@@ -51,21 +43,19 @@ class ClosureBinding(graph_4762: flatgraph.Graph, seq_4762: Int)
   override def productElementName(n: Int): String =
     n match {
       case 0 => "closureBindingId"
-      case 1 => "closureOriginalName"
-      case 2 => "evaluationStrategy"
+      case 1 => "evaluationStrategy"
       case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.closureBindingId
-      case 1 => this.closureOriginalName
-      case 2 => this.evaluationStrategy
+      case 1 => this.evaluationStrategy
       case _ => null
     }
 
   override def productPrefix = "ClosureBinding"
-  override def productArity  = 3
+  override def productArity  = 2
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[ClosureBinding]
 }

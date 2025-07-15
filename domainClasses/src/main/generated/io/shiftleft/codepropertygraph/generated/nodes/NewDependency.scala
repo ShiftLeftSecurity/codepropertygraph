@@ -111,9 +111,9 @@ class NewDependency extends NewNode(nodeKind = 12) with DependencyBase {
   def name(value: String): this.type                      = { this.name = value; this }
   def version(value: String): this.type                   = { this.version = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 14, dependencyGroupId.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 50, 1)
+    interface.countProperty(this, 13, dependencyGroupId.size)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 49, 1)
   }
 
   override def copy: this.type = {

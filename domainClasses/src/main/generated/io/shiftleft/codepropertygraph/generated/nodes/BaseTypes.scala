@@ -139,11 +139,6 @@ trait HasCanonicalNameEMT
   */
 trait HasClosureBindingIdEMT
 
-/** Node types with this marker trait are guaranteed to have the CLOSURE_ORIGINAL_NAME property. EMT stands for: "erased
-  * marker trait", it exists only at compile time in order to improve type safety.
-  */
-trait HasClosureOriginalNameEMT
-
 /** Node types with this marker trait are guaranteed to have the CODE property. EMT stands for: "erased marker trait",
   * it exists only at compile time in order to improve type safety.
   */

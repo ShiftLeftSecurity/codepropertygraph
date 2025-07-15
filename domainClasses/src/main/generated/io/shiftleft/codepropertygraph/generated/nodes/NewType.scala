@@ -126,9 +126,9 @@ class NewType extends NewNode(nodeKind = 37) with TypeBase {
   def name(value: String): this.type             = { this.name = value; this }
   def typeDeclFullName(value: String): this.type = { this.typeDeclFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 21, 1)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 20, 1)
+    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 46, 1)
   }
 
   override def copy: this.type = {

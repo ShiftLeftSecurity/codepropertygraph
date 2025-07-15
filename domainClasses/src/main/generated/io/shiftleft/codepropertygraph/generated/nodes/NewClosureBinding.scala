@@ -40,35 +40,6 @@ object NewClosureBinding {
         }
       }
     }
-    object NewNodeInserter_ClosureBinding_closureOriginalName extends flatgraph.NewNodePropertyInsertionHelper {
-      override def insertNewNodeProperties(
-        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
-        dst: AnyRef,
-        offsets: Array[Int]
-      ): Unit = {
-        if (newNodes.isEmpty) return
-        val dstCast = dst.asInstanceOf[Array[String]]
-        val seq     = newNodes.head.storedRef.get.seq()
-        var offset  = offsets(seq)
-        var idx     = 0
-        while (idx < newNodes.length) {
-          val nn = newNodes(idx)
-          nn match {
-            case generated: NewClosureBinding =>
-              generated.closureOriginalName match {
-                case Some(item) =>
-                  dstCast(offset) = item
-                  offset += 1
-                case _ =>
-              }
-            case _ =>
-          }
-          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
-          idx += 1
-          offsets(idx + seq) = offset
-        }
-      }
-    }
     object NewNodeInserter_ClosureBinding_evaluationStrategy extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -108,24 +79,19 @@ class NewClosureBinding extends NewNode(nodeKind = 8) with ClosureBindingBase {
     NewClosureBinding.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  var closureBindingId: Option[String]                      = None
-  var closureOriginalName: Option[String]                   = None
-  var evaluationStrategy: String                            = "<empty>": String
-  def closureBindingId(value: Option[String]): this.type    = { this.closureBindingId = value; this }
-  def closureBindingId(value: String): this.type            = { this.closureBindingId = Option(value); this }
-  def closureOriginalName(value: Option[String]): this.type = { this.closureOriginalName = value; this }
-  def closureOriginalName(value: String): this.type         = { this.closureOriginalName = Option(value); this }
-  def evaluationStrategy(value: String): this.type          = { this.evaluationStrategy = value; this }
+  var closureBindingId: Option[String]                   = None
+  var evaluationStrategy: String                         = "<empty>": String
+  def closureBindingId(value: Option[String]): this.type = { this.closureBindingId = value; this }
+  def closureBindingId(value: String): this.type         = { this.closureBindingId = Option(value); this }
+  def evaluationStrategy(value: String): this.type       = { this.evaluationStrategy = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 6, closureBindingId.size)
-    interface.countProperty(this, 7, closureOriginalName.size)
-    interface.countProperty(this, 17, 1)
+    interface.countProperty(this, 16, 1)
   }
 
   override def copy: this.type = {
     val newInstance = new NewClosureBinding
     newInstance.closureBindingId = this.closureBindingId
-    newInstance.closureOriginalName = this.closureOriginalName
     newInstance.evaluationStrategy = this.evaluationStrategy
     newInstance.asInstanceOf[this.type]
   }
@@ -133,20 +99,18 @@ class NewClosureBinding extends NewNode(nodeKind = 8) with ClosureBindingBase {
   override def productElementName(n: Int): String =
     n match {
       case 0 => "closureBindingId"
-      case 1 => "closureOriginalName"
-      case 2 => "evaluationStrategy"
+      case 1 => "evaluationStrategy"
       case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.closureBindingId
-      case 1 => this.closureOriginalName
-      case 2 => this.evaluationStrategy
+      case 1 => this.evaluationStrategy
       case _ => null
     }
 
   override def productPrefix                = "NewClosureBinding"
-  override def productArity                 = 3
+  override def productArity                 = 2
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewClosureBinding]
 }
