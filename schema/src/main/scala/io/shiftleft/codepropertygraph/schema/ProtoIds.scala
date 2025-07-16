@@ -124,6 +124,7 @@ object ProtoIds {
   val AstParentType             = 56
   val AstParentFullName         = 57
   val DependencyGroupId         = 58
+  val StaticBaseType            = 59
   val Symbol                    = 100
   val MethodShortName           = 102
   val PackageName               = 103
