@@ -334,6 +334,11 @@ trait HasRootEMT
   */
 trait HasSignatureEMT
 
+/** Node types with this marker trait are guaranteed to have the STATIC_BASE_TYPE property. EMT stands for: "erased
+  * marker trait", it exists only at compile time in order to improve type safety.
+  */
+trait HasStaticBaseTypeEMT
+
 /** Node types with this marker trait are guaranteed to have the TYPE_DECL_FULL_NAME property. EMT stands for: "erased
   * marker trait", it exists only at compile time in order to improve type safety.
   */

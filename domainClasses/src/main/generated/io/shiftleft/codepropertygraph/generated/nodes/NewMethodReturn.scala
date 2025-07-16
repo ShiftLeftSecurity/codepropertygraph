@@ -1561,7 +1561,7 @@ class NewMethodReturn extends NewNode(nodeKind = 29) with MethodReturnBase with 
     interface.countProperty(this, 39, offsetEnd.size)
     interface.countProperty(this, 40, 1)
     interface.countProperty(this, 43, possibleTypes.size)
-    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

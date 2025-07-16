@@ -1622,7 +1622,7 @@ class NewMethodRef extends NewNode(nodeKind = 28) with MethodRefBase with Expres
     interface.countProperty(this, 39, offsetEnd.size)
     interface.countProperty(this, 40, 1)
     interface.countProperty(this, 43, possibleTypes.size)
-    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

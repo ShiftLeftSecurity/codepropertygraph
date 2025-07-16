@@ -1594,7 +1594,7 @@ class NewBlock extends NewNode(nodeKind = 6) with BlockBase with ExpressionNew {
     interface.countProperty(this, 39, offsetEnd.size)
     interface.countProperty(this, 40, 1)
     interface.countProperty(this, 43, possibleTypes.size)
-    interface.countProperty(this, 47, 1)
+    interface.countProperty(this, 48, 1)
   }
 
   override def copy: this.type = {

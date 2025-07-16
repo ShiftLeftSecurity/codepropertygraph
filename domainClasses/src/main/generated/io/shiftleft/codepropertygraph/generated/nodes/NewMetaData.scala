@@ -171,7 +171,7 @@ class NewMetaData extends NewNode(nodeKind = 24) with MetaDataBase {
     interface.countProperty(this, 32, 1)
     interface.countProperty(this, 41, overlays.size)
     interface.countProperty(this, 44, 1)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {
