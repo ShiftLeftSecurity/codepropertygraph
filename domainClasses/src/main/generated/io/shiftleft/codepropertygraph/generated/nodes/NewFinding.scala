@@ -123,9 +123,9 @@ class NewFinding extends NewNode(nodeKind = 15) with FindingBase {
   }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 17, evidenceDescription.size)
-    interface.countProperty(this, 50, evidence.size)
+    interface.countProperty(this, 51, evidence.size)
     evidence.foreach(interface.visitContainedNode)
-    interface.countProperty(this, 51, keyValuePairs.size)
+    interface.countProperty(this, 52, keyValuePairs.size)
     keyValuePairs.foreach(interface.visitContainedNode)
   }
 

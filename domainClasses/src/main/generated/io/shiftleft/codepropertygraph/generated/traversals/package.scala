@@ -199,6 +199,10 @@ package object traversals {
     ](traversal: IterableOnce[NodeType]): TraversalPropertySignature[NodeType] = new TraversalPropertySignature(
       traversal.iterator
     )
+    implicit def accessPropertyStaticBaseTypeTraversal[
+      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasStaticBaseTypeEMT]
+    ](traversal: IterableOnce[NodeType]): TraversalPropertyStaticBaseType[NodeType] =
+      new TraversalPropertyStaticBaseType(traversal.iterator)
     implicit def accessPropertyTypeDeclFullNameTraversal[
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasTypeDeclFullNameEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyTypeDeclFullName[NodeType] =

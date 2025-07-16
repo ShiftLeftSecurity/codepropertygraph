@@ -316,11 +316,15 @@ object Accessors {
       default = "": String
     )
   }
+  final class AccessPropertyStaticBaseType(val node: nodes.StoredNode) extends AnyVal {
+    def staticBaseType: Option[String] = flatgraph.Accessors
+      .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 46, seq = node.seq)
+  }
   final class AccessPropertyTypeDeclFullName(val node: nodes.StoredNode) extends AnyVal {
     def typeDeclFullName: String = flatgraph.Accessors.getNodePropertySingle(
       node.graph,
       nodeKind = node.nodeKind,
-      propertyKind = 46,
+      propertyKind = 47,
       seq = node.seq(),
       default = "<empty>": String
     )
@@ -329,7 +333,7 @@ object Accessors {
     def typeFullName: String = flatgraph.Accessors.getNodePropertySingle(
       node.graph,
       nodeKind = node.nodeKind,
-      propertyKind = 47,
+      propertyKind = 48,
       seq = node.seq(),
       default = "<empty>": String
     )
@@ -338,7 +342,7 @@ object Accessors {
     def value: String = flatgraph.Accessors.getNodePropertySingle(
       node.graph,
       nodeKind = node.nodeKind,
-      propertyKind = 48,
+      propertyKind = 49,
       seq = node.seq(),
       default = "": String
     )
@@ -347,7 +351,7 @@ object Accessors {
     def version: String = flatgraph.Accessors.getNodePropertySingle(
       node.graph,
       nodeKind = node.nodeKind,
-      propertyKind = 49,
+      propertyKind = 50,
       seq = node.seq(),
       default = "<empty>": String
     )
@@ -418,6 +422,10 @@ object Accessors {
     def possibleTypes: IndexedSeq[String] = node match {
       case stored: nodes.StoredNode => new AccessPropertyPossibleTypes(stored).possibleTypes
       case newNode: nodes.NewCall   => newNode.possibleTypes
+    }
+    def staticBaseType: Option[String] = node match {
+      case stored: nodes.StoredNode => new AccessPropertyStaticBaseType(stored).staticBaseType
+      case newNode: nodes.NewCall   => newNode.staticBaseType
     }
     def typeFullName: String = node match {
       case stored: nodes.StoredNode => new AccessPropertyTypeFullName(stored).typeFullName
@@ -1112,6 +1120,9 @@ trait ConcreteStoredConversions extends ConcreteBaseConversions {
   implicit def accessPropertySignature(
     node: nodes.StoredNode & nodes.StaticType[nodes.HasSignatureEMT]
   ): AccessPropertySignature = new AccessPropertySignature(node)
+  implicit def accessPropertyStaticBaseType(
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasStaticBaseTypeEMT]
+  ): AccessPropertyStaticBaseType = new AccessPropertyStaticBaseType(node)
   implicit def accessPropertyTypeDeclFullName(
     node: nodes.StoredNode & nodes.StaticType[nodes.HasTypeDeclFullNameEMT]
   ): AccessPropertyTypeDeclFullName = new AccessPropertyTypeDeclFullName(node)

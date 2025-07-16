@@ -128,7 +128,7 @@ class NewType extends NewNode(nodeKind = 37) with TypeBase {
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 20, 1)
     interface.countProperty(this, 37, 1)
-    interface.countProperty(this, 46, 1)
+    interface.countProperty(this, 47, 1)
   }
 
   override def copy: this.type = {
