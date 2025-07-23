@@ -176,22 +176,22 @@ object CallGraph extends SchemaBase {
       ).protoId(ProtoIds.Inlined)
     )
 
-    val staticBaseType = builder
+    val staticReceiver = builder
       .addProperty(
-        name = "STATIC_BASE_TYPE",
+        name = "STATIC_RECEIVER",
         valueType = ValueType.String,
-        comment = """The `STATIC_BASE_TYPE` field is used to keep track of the type on which a static method
+        comment = """The `STATIC_RECEIVER` field is used to keep track of the type on which a static method
             |is called for static methods which may be inherited. This information can then be used to find
             |the true `METHOD_FULL_NAME` of the method being called during call linking. For example, if a
-            |class `Foo` defines a static method `foo` and a class `Bar extends Foo`, then the `STATIC_BASE_TYPE`
+            |class `Foo` defines a static method `foo` and a class `Bar extends Foo`, then the `STATIC_RECEIVER`
             |of a`Bar.foo()` call is `Bar` and the `METHOD_FULL_NAME` of the `foo` call is rewritten to
             |`Foo.foo:<signature>`.
             |""".stripMargin
       )
-      .protoId(ProtoIds.StaticBaseType)
+      .protoId(ProtoIds.StaticReceiver)
 
     callNode
-      .addProperties(dispatchType, staticBaseType)
+      .addProperties(dispatchType, staticReceiver)
 
     callNode
       .addOutEdge(edge = call, inNode = method)
