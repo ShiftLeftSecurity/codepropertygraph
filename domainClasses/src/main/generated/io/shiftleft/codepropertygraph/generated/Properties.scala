@@ -242,23 +242,31 @@ object Properties {
     */
   val Signature = flatgraph.SinglePropertyKey[String](kind = 45, name = "SIGNATURE", default = "")
 
+  /** The `STATIC_RECEIVER` field is used to keep track of the type on which a static method is called for static
+    * methods which may be inherited. This information can then be used to find the true `METHOD_FULL_NAME` of the
+    * method being called during call linking. For example, if a class `Foo` defines a static method `foo` and a class
+    * `Bar extends Foo`, then the `STATIC_RECEIVER` of a`Bar.foo()` call is `Bar` and the `METHOD_FULL_NAME` of the
+    * `foo` call is rewritten to `Foo.foo:<signature>`.
+    */
+  val StaticReceiver = flatgraph.OptionalPropertyKey[String](kind = 46, name = "STATIC_RECEIVER")
+
   /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required
     * to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
     */
   val TypeDeclFullName =
-    flatgraph.SinglePropertyKey[String](kind = 46, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
+    flatgraph.SinglePropertyKey[String](kind = 47, name = "TYPE_DECL_FULL_NAME", default = "<empty>")
 
   /** This field contains the fully-qualified static type name of the program construct represented by a node. It is the
     * name of an instantiated type, e.g., `java.util.List<Integer>`, rather than `java.util.List[T]`. If the type cannot
     * be determined, this field should be set to the empty string.
     */
-  val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 47, name = "TYPE_FULL_NAME", default = "<empty>")
+  val TypeFullName = flatgraph.SinglePropertyKey[String](kind = 48, name = "TYPE_FULL_NAME", default = "<empty>")
 
   /** This property denotes a string value as used in a key-value pair. */
-  val Value = flatgraph.SinglePropertyKey[String](kind = 48, name = "VALUE", default = "")
+  val Value = flatgraph.SinglePropertyKey[String](kind = 49, name = "VALUE", default = "")
 
   /** A version, given as a string. Used, for example, in the META_DATA node to indicate which version of the CPG spec
     * this CPG conforms to
     */
-  val Version = flatgraph.SinglePropertyKey[String](kind = 49, name = "VERSION", default = "<empty>")
+  val Version = flatgraph.SinglePropertyKey[String](kind = 50, name = "VERSION", default = "<empty>")
 }

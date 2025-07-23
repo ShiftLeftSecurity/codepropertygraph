@@ -224,6 +224,7 @@ object GraphSchema extends flatgraph.Schema {
     size => new Array[String](size),
     size => new Array[String](size),
     size => new Array[String](size),
+    size => new Array[String](size),
     size => new Array[flatgraph.GNode](size),
     size => new Array[flatgraph.GNode](size),
     size => new Array[flatgraph.GNode](size),
@@ -276,19 +277,20 @@ object GraphSchema extends flatgraph.Schema {
     "POSSIBLE_TYPES",
     "ROOT",
     "SIGNATURE",
+    "STATIC_RECEIVER",
     "TYPE_DECL_FULL_NAME",
     "TYPE_FULL_NAME",
     "VALUE",
     "VERSION"
   )
   val nodePropertyByLabel = normalNodePropertyNames.zipWithIndex.toMap
-    .updated("evidence", 50)
-    .updated("keyValuePairs", 51)
-    .updated("node", 52)
-    .updated("tag", 53)
+    .updated("evidence", 51)
+    .updated("keyValuePairs", 52)
+    .updated("node", 53)
+    .updated("tag", 54)
   val nodePropertyDescriptors: Array[FormalQtyType.FormalQuantity | FormalQtyType.FormalType] = {
-    val nodePropertyDescriptors = new Array[FormalQtyType.FormalQuantity | FormalQtyType.FormalType](4644)
-    for (idx <- Range(0, 4644)) {
+    val nodePropertyDescriptors = new Array[FormalQtyType.FormalQuantity | FormalQtyType.FormalType](4730)
+    for (idx <- Range(0, 4730)) {
       nodePropertyDescriptors(idx) =
         if ((idx & 1) == 0) FormalQtyType.NothingType
         else FormalQtyType.QtyNone
@@ -398,8 +400,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3453) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3710) = FormalQtyType.StringType // BLOCK.POSSIBLE_TYPES
     nodePropertyDescriptors(3711) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4054) = FormalQtyType.StringType // BLOCK.TYPE_FULL_NAME
-    nodePropertyDescriptors(4055) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4140) = FormalQtyType.StringType // BLOCK.TYPE_FULL_NAME
+    nodePropertyDescriptors(4141) = FormalQtyType.QtyOne
     nodePropertyDescriptors(100) = FormalQtyType.IntType // CALL.ARGUMENT_INDEX
     nodePropertyDescriptors(101) = FormalQtyType.QtyOne
     nodePropertyDescriptors(186) = FormalQtyType.StringType // CALL.ARGUMENT_NAME
@@ -428,8 +430,10 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3713) = FormalQtyType.QtyMulti
     nodePropertyDescriptors(3884) = FormalQtyType.StringType // CALL.SIGNATURE
     nodePropertyDescriptors(3885) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4056) = FormalQtyType.StringType // CALL.TYPE_FULL_NAME
-    nodePropertyDescriptors(4057) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(3970) = FormalQtyType.StringType // CALL.STATIC_RECEIVER
+    nodePropertyDescriptors(3971) = FormalQtyType.QtyOption
+    nodePropertyDescriptors(4142) = FormalQtyType.StringType // CALL.TYPE_FULL_NAME
+    nodePropertyDescriptors(4143) = FormalQtyType.QtyOne
     nodePropertyDescriptors(532) = FormalQtyType.StringType // CLOSURE_BINDING.CLOSURE_BINDING_ID
     nodePropertyDescriptors(533) = FormalQtyType.QtyOption
     nodePropertyDescriptors(1392) = FormalQtyType.StringType // CLOSURE_BINDING.EVALUATION_STRATEGY
@@ -476,8 +480,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(1143) = FormalQtyType.QtyOption
     nodePropertyDescriptors(3206) = FormalQtyType.StringType // DEPENDENCY.NAME
     nodePropertyDescriptors(3207) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4238) = FormalQtyType.StringType // DEPENDENCY.VERSION
-    nodePropertyDescriptors(4239) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4324) = FormalQtyType.StringType // DEPENDENCY.VERSION
+    nodePropertyDescriptors(4325) = FormalQtyType.QtyOne
     nodePropertyDescriptors(112) = FormalQtyType.IntType // FIELD_IDENTIFIER.ARGUMENT_INDEX
     nodePropertyDescriptors(113) = FormalQtyType.QtyOne
     nodePropertyDescriptors(198) = FormalQtyType.StringType // FIELD_IDENTIFIER.ARGUMENT_NAME
@@ -516,10 +520,10 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3469) = FormalQtyType.QtyOne
     nodePropertyDescriptors(1492) = FormalQtyType.StringType // FINDING.EVIDENCE_DESCRIPTION
     nodePropertyDescriptors(1493) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4330) = FormalQtyType.RefType // FINDING.evidence
-    nodePropertyDescriptors(4331) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4416) = FormalQtyType.RefType // FINDING.keyValuePairs
+    nodePropertyDescriptors(4416) = FormalQtyType.RefType // FINDING.evidence
     nodePropertyDescriptors(4417) = FormalQtyType.QtyMulti
+    nodePropertyDescriptors(4502) = FormalQtyType.RefType // FINDING.keyValuePairs
+    nodePropertyDescriptors(4503) = FormalQtyType.QtyMulti
     nodePropertyDescriptors(118) = FormalQtyType.IntType // IDENTIFIER.ARGUMENT_INDEX
     nodePropertyDescriptors(119) = FormalQtyType.QtyOne
     nodePropertyDescriptors(204) = FormalQtyType.StringType // IDENTIFIER.ARGUMENT_NAME
@@ -542,8 +546,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3473) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3730) = FormalQtyType.StringType // IDENTIFIER.POSSIBLE_TYPES
     nodePropertyDescriptors(3731) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4074) = FormalQtyType.StringType // IDENTIFIER.TYPE_FULL_NAME
-    nodePropertyDescriptors(4075) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4160) = FormalQtyType.StringType // IDENTIFIER.TYPE_FULL_NAME
+    nodePropertyDescriptors(4161) = FormalQtyType.QtyOne
     nodePropertyDescriptors(636) = FormalQtyType.StringType // IMPORT.CODE
     nodePropertyDescriptors(637) = FormalQtyType.QtyOne
     nodePropertyDescriptors(722) = FormalQtyType.IntType // IMPORT.COLUMN_NUMBER
@@ -602,8 +606,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3651) = FormalQtyType.QtyOne
     nodePropertyDescriptors(2706) = FormalQtyType.StringType // KEY_VALUE_PAIR.KEY
     nodePropertyDescriptors(2707) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4168) = FormalQtyType.StringType // KEY_VALUE_PAIR.VALUE
-    nodePropertyDescriptors(4169) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4254) = FormalQtyType.StringType // KEY_VALUE_PAIR.VALUE
+    nodePropertyDescriptors(4255) = FormalQtyType.QtyOne
     nodePropertyDescriptors(128) = FormalQtyType.IntType // LITERAL.ARGUMENT_INDEX
     nodePropertyDescriptors(129) = FormalQtyType.QtyOne
     nodePropertyDescriptors(214) = FormalQtyType.StringType // LITERAL.ARGUMENT_NAME
@@ -624,8 +628,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3483) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3740) = FormalQtyType.StringType // LITERAL.POSSIBLE_TYPES
     nodePropertyDescriptors(3741) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4084) = FormalQtyType.StringType // LITERAL.TYPE_FULL_NAME
-    nodePropertyDescriptors(4085) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4170) = FormalQtyType.StringType // LITERAL.TYPE_FULL_NAME
+    nodePropertyDescriptors(4171) = FormalQtyType.QtyOne
     nodePropertyDescriptors(560) = FormalQtyType.StringType // LOCAL.CLOSURE_BINDING_ID
     nodePropertyDescriptors(561) = FormalQtyType.QtyOption
     nodePropertyDescriptors(646) = FormalQtyType.StringType // LOCAL.CODE
@@ -648,8 +652,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3485) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3742) = FormalQtyType.StringType // LOCAL.POSSIBLE_TYPES
     nodePropertyDescriptors(3743) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4086) = FormalQtyType.StringType // LOCAL.TYPE_FULL_NAME
-    nodePropertyDescriptors(4087) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4172) = FormalQtyType.StringType // LOCAL.TYPE_FULL_NAME
+    nodePropertyDescriptors(4173) = FormalQtyType.QtyOne
     nodePropertyDescriptors(304) = FormalQtyType.StringType // MEMBER.AST_PARENT_FULL_NAME
     nodePropertyDescriptors(305) = FormalQtyType.QtyOne
     nodePropertyDescriptors(390) = FormalQtyType.StringType // MEMBER.AST_PARENT_TYPE
@@ -674,8 +678,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3487) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3744) = FormalQtyType.StringType // MEMBER.POSSIBLE_TYPES
     nodePropertyDescriptors(3745) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4088) = FormalQtyType.StringType // MEMBER.TYPE_FULL_NAME
-    nodePropertyDescriptors(4089) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4174) = FormalQtyType.StringType // MEMBER.TYPE_FULL_NAME
+    nodePropertyDescriptors(4175) = FormalQtyType.QtyOne
     nodePropertyDescriptors(1940) = FormalQtyType.StringType // META_DATA.HASH
     nodePropertyDescriptors(1941) = FormalQtyType.QtyOption
     nodePropertyDescriptors(2800) = FormalQtyType.StringType // META_DATA.LANGUAGE
@@ -684,8 +688,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3575) = FormalQtyType.QtyMulti
     nodePropertyDescriptors(3832) = FormalQtyType.StringType // META_DATA.ROOT
     nodePropertyDescriptors(3833) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4262) = FormalQtyType.StringType // META_DATA.VERSION
-    nodePropertyDescriptors(4263) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4348) = FormalQtyType.StringType // META_DATA.VERSION
+    nodePropertyDescriptors(4349) = FormalQtyType.QtyOne
     nodePropertyDescriptors(308) = FormalQtyType.StringType // METHOD.AST_PARENT_FULL_NAME
     nodePropertyDescriptors(309) = FormalQtyType.QtyOne
     nodePropertyDescriptors(394) = FormalQtyType.StringType // METHOD.AST_PARENT_TYPE
@@ -746,8 +750,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3493) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3750) = FormalQtyType.StringType // METHOD_PARAMETER_IN.POSSIBLE_TYPES
     nodePropertyDescriptors(3751) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4094) = FormalQtyType.StringType // METHOD_PARAMETER_IN.TYPE_FULL_NAME
-    nodePropertyDescriptors(4095) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4180) = FormalQtyType.StringType // METHOD_PARAMETER_IN.TYPE_FULL_NAME
+    nodePropertyDescriptors(4181) = FormalQtyType.QtyOne
     nodePropertyDescriptors(656) = FormalQtyType.StringType // METHOD_PARAMETER_OUT.CODE
     nodePropertyDescriptors(657) = FormalQtyType.QtyOne
     nodePropertyDescriptors(742) = FormalQtyType.IntType // METHOD_PARAMETER_OUT.COLUMN_NUMBER
@@ -768,8 +772,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3409) = FormalQtyType.QtyOption
     nodePropertyDescriptors(3494) = FormalQtyType.IntType // METHOD_PARAMETER_OUT.ORDER
     nodePropertyDescriptors(3495) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4096) = FormalQtyType.StringType // METHOD_PARAMETER_OUT.TYPE_FULL_NAME
-    nodePropertyDescriptors(4097) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4182) = FormalQtyType.StringType // METHOD_PARAMETER_OUT.TYPE_FULL_NAME
+    nodePropertyDescriptors(4183) = FormalQtyType.QtyOne
     nodePropertyDescriptors(142) = FormalQtyType.IntType // METHOD_REF.ARGUMENT_INDEX
     nodePropertyDescriptors(143) = FormalQtyType.QtyOne
     nodePropertyDescriptors(228) = FormalQtyType.StringType // METHOD_REF.ARGUMENT_NAME
@@ -792,8 +796,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3497) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3754) = FormalQtyType.StringType // METHOD_REF.POSSIBLE_TYPES
     nodePropertyDescriptors(3755) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4098) = FormalQtyType.StringType // METHOD_REF.TYPE_FULL_NAME
-    nodePropertyDescriptors(4099) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4184) = FormalQtyType.StringType // METHOD_REF.TYPE_FULL_NAME
+    nodePropertyDescriptors(4185) = FormalQtyType.QtyOne
     nodePropertyDescriptors(660) = FormalQtyType.StringType // METHOD_RETURN.CODE
     nodePropertyDescriptors(661) = FormalQtyType.QtyOne
     nodePropertyDescriptors(746) = FormalQtyType.IntType // METHOD_RETURN.COLUMN_NUMBER
@@ -812,8 +816,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3499) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3756) = FormalQtyType.StringType // METHOD_RETURN.POSSIBLE_TYPES
     nodePropertyDescriptors(3757) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4100) = FormalQtyType.StringType // METHOD_RETURN.TYPE_FULL_NAME
-    nodePropertyDescriptors(4101) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4186) = FormalQtyType.StringType // METHOD_RETURN.TYPE_FULL_NAME
+    nodePropertyDescriptors(4187) = FormalQtyType.QtyOne
     nodePropertyDescriptors(662) = FormalQtyType.StringType // MODIFIER.CODE
     nodePropertyDescriptors(663) = FormalQtyType.QtyOne
     nodePropertyDescriptors(748) = FormalQtyType.IntType // MODIFIER.COLUMN_NUMBER
@@ -878,12 +882,12 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3507) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3250) = FormalQtyType.StringType // TAG.NAME
     nodePropertyDescriptors(3251) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4196) = FormalQtyType.StringType // TAG.VALUE
-    nodePropertyDescriptors(4197) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4542) = FormalQtyType.RefType // TAG_NODE_PAIR.node
-    nodePropertyDescriptors(4543) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4628) = FormalQtyType.RefType // TAG_NODE_PAIR.tag
+    nodePropertyDescriptors(4282) = FormalQtyType.StringType // TAG.VALUE
+    nodePropertyDescriptors(4283) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4628) = FormalQtyType.RefType // TAG_NODE_PAIR.node
     nodePropertyDescriptors(4629) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4714) = FormalQtyType.RefType // TAG_NODE_PAIR.tag
+    nodePropertyDescriptors(4715) = FormalQtyType.QtyOne
     nodePropertyDescriptors(158) = FormalQtyType.IntType // TEMPLATE_DOM.ARGUMENT_INDEX
     nodePropertyDescriptors(159) = FormalQtyType.QtyOne
     nodePropertyDescriptors(244) = FormalQtyType.StringType // TEMPLATE_DOM.ARGUMENT_NAME
@@ -906,8 +910,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(1795) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3256) = FormalQtyType.StringType // TYPE.NAME
     nodePropertyDescriptors(3257) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(4030) = FormalQtyType.StringType // TYPE.TYPE_DECL_FULL_NAME
-    nodePropertyDescriptors(4031) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4116) = FormalQtyType.StringType // TYPE.TYPE_DECL_FULL_NAME
+    nodePropertyDescriptors(4117) = FormalQtyType.QtyOne
     nodePropertyDescriptors(678) = FormalQtyType.StringType // TYPE_ARGUMENT.CODE
     nodePropertyDescriptors(679) = FormalQtyType.QtyOne
     nodePropertyDescriptors(764) = FormalQtyType.IntType // TYPE_ARGUMENT.COLUMN_NUMBER
@@ -984,8 +988,8 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3523) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3780) = FormalQtyType.StringType // TYPE_REF.POSSIBLE_TYPES
     nodePropertyDescriptors(3781) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4124) = FormalQtyType.StringType // TYPE_REF.TYPE_FULL_NAME
-    nodePropertyDescriptors(4125) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4210) = FormalQtyType.StringType // TYPE_REF.TYPE_FULL_NAME
+    nodePropertyDescriptors(4211) = FormalQtyType.QtyOne
     nodePropertyDescriptors(170) = FormalQtyType.IntType // UNKNOWN.ARGUMENT_INDEX
     nodePropertyDescriptors(171) = FormalQtyType.QtyOne
     nodePropertyDescriptors(256) = FormalQtyType.StringType // UNKNOWN.ARGUMENT_NAME
@@ -1010,12 +1014,12 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3697) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3782) = FormalQtyType.StringType // UNKNOWN.POSSIBLE_TYPES
     nodePropertyDescriptors(3783) = FormalQtyType.QtyMulti
-    nodePropertyDescriptors(4126) = FormalQtyType.StringType // UNKNOWN.TYPE_FULL_NAME
-    nodePropertyDescriptors(4127) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(4212) = FormalQtyType.StringType // UNKNOWN.TYPE_FULL_NAME
+    nodePropertyDescriptors(4213) = FormalQtyType.QtyOne
     nodePropertyDescriptors
   }
   private val newNodeInsertionHelpers: Array[flatgraph.NewNodePropertyInsertionHelper] = {
-    val _newNodeInserters = new Array[flatgraph.NewNodePropertyInsertionHelper](4644)
+    val _newNodeInserters = new Array[flatgraph.NewNodePropertyInsertionHelper](4730)
     _newNodeInserters(86) = nodes.NewAnnotation.InsertionHelpers.NewNodeInserter_Annotation_argumentIndex
     _newNodeInserters(172) = nodes.NewAnnotation.InsertionHelpers.NewNodeInserter_Annotation_argumentName
     _newNodeInserters(602) = nodes.NewAnnotation.InsertionHelpers.NewNodeInserter_Annotation_code
@@ -1077,7 +1081,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3366) = nodes.NewBlock.InsertionHelpers.NewNodeInserter_Block_offsetEnd
     _newNodeInserters(3452) = nodes.NewBlock.InsertionHelpers.NewNodeInserter_Block_order
     _newNodeInserters(3710) = nodes.NewBlock.InsertionHelpers.NewNodeInserter_Block_possibleTypes
-    _newNodeInserters(4054) = nodes.NewBlock.InsertionHelpers.NewNodeInserter_Block_typeFullName
+    _newNodeInserters(4140) = nodes.NewBlock.InsertionHelpers.NewNodeInserter_Block_typeFullName
     _newNodeInserters(100) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_argumentIndex
     _newNodeInserters(186) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_argumentName
     _newNodeInserters(616) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_code
@@ -1092,7 +1096,8 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3454) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_order
     _newNodeInserters(3712) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_possibleTypes
     _newNodeInserters(3884) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_signature
-    _newNodeInserters(4056) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_typeFullName
+    _newNodeInserters(3970) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_staticReceiver
+    _newNodeInserters(4142) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_typeFullName
     _newNodeInserters(532) = nodes.NewClosureBinding.InsertionHelpers.NewNodeInserter_ClosureBinding_closureBindingId
     _newNodeInserters(1392) = nodes.NewClosureBinding.InsertionHelpers.NewNodeInserter_ClosureBinding_evaluationStrategy
     _newNodeInserters(620) = nodes.NewComment.InsertionHelpers.NewNodeInserter_Comment_code
@@ -1117,7 +1122,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3634) = nodes.NewControlStructure.InsertionHelpers.NewNodeInserter_ControlStructure_parserTypeName
     _newNodeInserters(1142) = nodes.NewDependency.InsertionHelpers.NewNodeInserter_Dependency_dependencyGroupId
     _newNodeInserters(3206) = nodes.NewDependency.InsertionHelpers.NewNodeInserter_Dependency_name
-    _newNodeInserters(4238) = nodes.NewDependency.InsertionHelpers.NewNodeInserter_Dependency_version
+    _newNodeInserters(4324) = nodes.NewDependency.InsertionHelpers.NewNodeInserter_Dependency_version
     _newNodeInserters(112) = nodes.NewFieldIdentifier.InsertionHelpers.NewNodeInserter_FieldIdentifier_argumentIndex
     _newNodeInserters(198) = nodes.NewFieldIdentifier.InsertionHelpers.NewNodeInserter_FieldIdentifier_argumentName
     _newNodeInserters(456) = nodes.NewFieldIdentifier.InsertionHelpers.NewNodeInserter_FieldIdentifier_canonicalName
@@ -1137,8 +1142,8 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3382) = nodes.NewFile.InsertionHelpers.NewNodeInserter_File_offsetEnd
     _newNodeInserters(3468) = nodes.NewFile.InsertionHelpers.NewNodeInserter_File_order
     _newNodeInserters(1492) = nodes.NewFinding.InsertionHelpers.NewNodeInserter_Finding_evidenceDescription
-    _newNodeInserters(4330) = nodes.NewFinding.InsertionHelpers.NewNodeInserter_Finding_evidence
-    _newNodeInserters(4416) = nodes.NewFinding.InsertionHelpers.NewNodeInserter_Finding_keyValuePairs
+    _newNodeInserters(4416) = nodes.NewFinding.InsertionHelpers.NewNodeInserter_Finding_evidence
+    _newNodeInserters(4502) = nodes.NewFinding.InsertionHelpers.NewNodeInserter_Finding_keyValuePairs
     _newNodeInserters(118) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_argumentIndex
     _newNodeInserters(204) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_argumentName
     _newNodeInserters(634) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_code
@@ -1150,7 +1155,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3386) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_offsetEnd
     _newNodeInserters(3472) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_order
     _newNodeInserters(3730) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_possibleTypes
-    _newNodeInserters(4074) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_typeFullName
+    _newNodeInserters(4160) = nodes.NewIdentifier.InsertionHelpers.NewNodeInserter_Identifier_typeFullName
     _newNodeInserters(636) = nodes.NewImport.InsertionHelpers.NewNodeInserter_Import_code
     _newNodeInserters(722) = nodes.NewImport.InsertionHelpers.NewNodeInserter_Import_columnNumber
     _newNodeInserters(1582) = nodes.NewImport.InsertionHelpers.NewNodeInserter_Import_explicitAs
@@ -1180,7 +1185,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3478) = nodes.NewJumpTarget.InsertionHelpers.NewNodeInserter_JumpTarget_order
     _newNodeInserters(3650) = nodes.NewJumpTarget.InsertionHelpers.NewNodeInserter_JumpTarget_parserTypeName
     _newNodeInserters(2706) = nodes.NewKeyValuePair.InsertionHelpers.NewNodeInserter_KeyValuePair_key
-    _newNodeInserters(4168) = nodes.NewKeyValuePair.InsertionHelpers.NewNodeInserter_KeyValuePair_value
+    _newNodeInserters(4254) = nodes.NewKeyValuePair.InsertionHelpers.NewNodeInserter_KeyValuePair_value
     _newNodeInserters(128) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_argumentIndex
     _newNodeInserters(214) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_argumentName
     _newNodeInserters(644) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_code
@@ -1191,7 +1196,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3396) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_offsetEnd
     _newNodeInserters(3482) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_order
     _newNodeInserters(3740) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_possibleTypes
-    _newNodeInserters(4084) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_typeFullName
+    _newNodeInserters(4170) = nodes.NewLiteral.InsertionHelpers.NewNodeInserter_Literal_typeFullName
     _newNodeInserters(560) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_closureBindingId
     _newNodeInserters(646) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_code
     _newNodeInserters(732) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_columnNumber
@@ -1203,7 +1208,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3398) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_offsetEnd
     _newNodeInserters(3484) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_order
     _newNodeInserters(3742) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_possibleTypes
-    _newNodeInserters(4086) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_typeFullName
+    _newNodeInserters(4172) = nodes.NewLocal.InsertionHelpers.NewNodeInserter_Local_typeFullName
     _newNodeInserters(304) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_astParentFullName
     _newNodeInserters(390) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_astParentType
     _newNodeInserters(648) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_code
@@ -1216,12 +1221,12 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3400) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_offsetEnd
     _newNodeInserters(3486) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_order
     _newNodeInserters(3744) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_possibleTypes
-    _newNodeInserters(4088) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_typeFullName
+    _newNodeInserters(4174) = nodes.NewMember.InsertionHelpers.NewNodeInserter_Member_typeFullName
     _newNodeInserters(1940) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_hash
     _newNodeInserters(2800) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_language
     _newNodeInserters(3574) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_overlays
     _newNodeInserters(3832) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_root
-    _newNodeInserters(4262) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_version
+    _newNodeInserters(4348) = nodes.NewMetaData.InsertionHelpers.NewNodeInserter_MetaData_version
     _newNodeInserters(308) = nodes.NewMethod.InsertionHelpers.NewNodeInserter_Method_astParentFullName
     _newNodeInserters(394) = nodes.NewMethod.InsertionHelpers.NewNodeInserter_Method_astParentType
     _newNodeInserters(652) = nodes.NewMethod.InsertionHelpers.NewNodeInserter_Method_code
@@ -1256,7 +1261,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3492) = nodes.NewMethodParameterIn.InsertionHelpers.NewNodeInserter_MethodParameterIn_order
     _newNodeInserters(3750) =
       nodes.NewMethodParameterIn.InsertionHelpers.NewNodeInserter_MethodParameterIn_possibleTypes
-    _newNodeInserters(4094) = nodes.NewMethodParameterIn.InsertionHelpers.NewNodeInserter_MethodParameterIn_typeFullName
+    _newNodeInserters(4180) = nodes.NewMethodParameterIn.InsertionHelpers.NewNodeInserter_MethodParameterIn_typeFullName
     _newNodeInserters(656) = nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_code
     _newNodeInserters(742) =
       nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_columnNumber
@@ -1269,7 +1274,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3322) = nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_offset
     _newNodeInserters(3408) = nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_offsetEnd
     _newNodeInserters(3494) = nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_order
-    _newNodeInserters(4096) =
+    _newNodeInserters(4182) =
       nodes.NewMethodParameterOut.InsertionHelpers.NewNodeInserter_MethodParameterOut_typeFullName
     _newNodeInserters(142) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_argumentIndex
     _newNodeInserters(228) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_argumentName
@@ -1282,7 +1287,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3410) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_offsetEnd
     _newNodeInserters(3496) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_order
     _newNodeInserters(3754) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_possibleTypes
-    _newNodeInserters(4098) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_typeFullName
+    _newNodeInserters(4184) = nodes.NewMethodRef.InsertionHelpers.NewNodeInserter_MethodRef_typeFullName
     _newNodeInserters(660) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_code
     _newNodeInserters(746) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_columnNumber
     _newNodeInserters(1348) =
@@ -1293,7 +1298,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3412) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_offsetEnd
     _newNodeInserters(3498) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_order
     _newNodeInserters(3756) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_possibleTypes
-    _newNodeInserters(4100) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_typeFullName
+    _newNodeInserters(4186) = nodes.NewMethodReturn.InsertionHelpers.NewNodeInserter_MethodReturn_typeFullName
     _newNodeInserters(662) = nodes.NewModifier.InsertionHelpers.NewNodeInserter_Modifier_code
     _newNodeInserters(748) = nodes.NewModifier.InsertionHelpers.NewNodeInserter_Modifier_columnNumber
     _newNodeInserters(2898) = nodes.NewModifier.InsertionHelpers.NewNodeInserter_Modifier_lineNumber
@@ -1326,9 +1331,9 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3420) = nodes.NewReturn.InsertionHelpers.NewNodeInserter_Return_offsetEnd
     _newNodeInserters(3506) = nodes.NewReturn.InsertionHelpers.NewNodeInserter_Return_order
     _newNodeInserters(3250) = nodes.NewTag.InsertionHelpers.NewNodeInserter_Tag_name
-    _newNodeInserters(4196) = nodes.NewTag.InsertionHelpers.NewNodeInserter_Tag_value
-    _newNodeInserters(4542) = nodes.NewTagNodePair.InsertionHelpers.NewNodeInserter_TagNodePair_node
-    _newNodeInserters(4628) = nodes.NewTagNodePair.InsertionHelpers.NewNodeInserter_TagNodePair_tag
+    _newNodeInserters(4282) = nodes.NewTag.InsertionHelpers.NewNodeInserter_Tag_value
+    _newNodeInserters(4628) = nodes.NewTagNodePair.InsertionHelpers.NewNodeInserter_TagNodePair_node
+    _newNodeInserters(4714) = nodes.NewTagNodePair.InsertionHelpers.NewNodeInserter_TagNodePair_tag
     _newNodeInserters(158) = nodes.NewTemplateDom.InsertionHelpers.NewNodeInserter_TemplateDom_argumentIndex
     _newNodeInserters(244) = nodes.NewTemplateDom.InsertionHelpers.NewNodeInserter_TemplateDom_argumentName
     _newNodeInserters(674) = nodes.NewTemplateDom.InsertionHelpers.NewNodeInserter_TemplateDom_code
@@ -1340,7 +1345,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3512) = nodes.NewTemplateDom.InsertionHelpers.NewNodeInserter_TemplateDom_order
     _newNodeInserters(1794) = nodes.NewType.InsertionHelpers.NewNodeInserter_Type_fullName
     _newNodeInserters(3256) = nodes.NewType.InsertionHelpers.NewNodeInserter_Type_name
-    _newNodeInserters(4030) = nodes.NewType.InsertionHelpers.NewNodeInserter_Type_typeDeclFullName
+    _newNodeInserters(4116) = nodes.NewType.InsertionHelpers.NewNodeInserter_Type_typeDeclFullName
     _newNodeInserters(678) = nodes.NewTypeArgument.InsertionHelpers.NewNodeInserter_TypeArgument_code
     _newNodeInserters(764) = nodes.NewTypeArgument.InsertionHelpers.NewNodeInserter_TypeArgument_columnNumber
     _newNodeInserters(2914) = nodes.NewTypeArgument.InsertionHelpers.NewNodeInserter_TypeArgument_lineNumber
@@ -1379,7 +1384,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3436) = nodes.NewTypeRef.InsertionHelpers.NewNodeInserter_TypeRef_offsetEnd
     _newNodeInserters(3522) = nodes.NewTypeRef.InsertionHelpers.NewNodeInserter_TypeRef_order
     _newNodeInserters(3780) = nodes.NewTypeRef.InsertionHelpers.NewNodeInserter_TypeRef_possibleTypes
-    _newNodeInserters(4124) = nodes.NewTypeRef.InsertionHelpers.NewNodeInserter_TypeRef_typeFullName
+    _newNodeInserters(4210) = nodes.NewTypeRef.InsertionHelpers.NewNodeInserter_TypeRef_typeFullName
     _newNodeInserters(170) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_argumentIndex
     _newNodeInserters(256) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_argumentName
     _newNodeInserters(686) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_code
@@ -1392,7 +1397,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3524) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_order
     _newNodeInserters(3696) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_parserTypeName
     _newNodeInserters(3782) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_possibleTypes
-    _newNodeInserters(4126) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_typeFullName
+    _newNodeInserters(4212) = nodes.NewUnknown.InsertionHelpers.NewNodeInserter_Unknown_typeFullName
     _newNodeInserters
   }
   override def getNumberOfNodeKinds: Int              = 43
@@ -1463,6 +1468,7 @@ object GraphSchema extends flatgraph.Schema {
           "ORDER",
           "POSSIBLE_TYPES",
           "SIGNATURE",
+          "STATIC_RECEIVER",
           "TYPE_FULL_NAME"
         )
       case "CLOSURE_BINDING" => Set("CLOSURE_BINDING_ID", "EVALUATION_STRATEGY")
@@ -1748,17 +1754,17 @@ object GraphSchema extends flatgraph.Schema {
   }
 
   override def getPropertyLabel(nodeKind: Int, propertyKind: Int): String = {
-    if (propertyKind < 50) normalNodePropertyNames(propertyKind)
-    else if (propertyKind == 50 && nodeKind == 15) "evidence"      /*on node FINDING*/
-    else if (propertyKind == 51 && nodeKind == 15) "keyValuePairs" /*on node FINDING*/
-    else if (propertyKind == 52 && nodeKind == 35) "node"          /*on node TAG_NODE_PAIR*/
-    else if (propertyKind == 53 && nodeKind == 35) "tag"           /*on node TAG_NODE_PAIR*/
+    if (propertyKind < 51) normalNodePropertyNames(propertyKind)
+    else if (propertyKind == 51 && nodeKind == 15) "evidence"      /*on node FINDING*/
+    else if (propertyKind == 52 && nodeKind == 15) "keyValuePairs" /*on node FINDING*/
+    else if (propertyKind == 53 && nodeKind == 35) "node"          /*on node TAG_NODE_PAIR*/
+    else if (propertyKind == 54 && nodeKind == 35) "tag"           /*on node TAG_NODE_PAIR*/
     else null
   }
 
   override def getPropertyKindByName(label: String): Int =
     nodePropertyByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
-  override def getNumberOfPropertyKinds: Int = 54
+  override def getNumberOfPropertyKinds: Int = 55
   override def makeNode(graph: flatgraph.Graph, nodeKind: Short, seq: Int): nodes.StoredNode =
     nodeFactories(nodeKind)(graph, seq)
   override def makeEdge(
