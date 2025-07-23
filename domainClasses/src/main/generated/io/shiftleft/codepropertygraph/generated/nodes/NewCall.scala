@@ -1615,7 +1615,7 @@ object NewCall {
         }
       }
     }
-    object NewNodeInserter_Call_staticBaseType extends flatgraph.NewNodePropertyInsertionHelper {
+    object NewNodeInserter_Call_staticReceiver extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
         dst: AnyRef,
@@ -1630,7 +1630,7 @@ object NewCall {
           val nn = newNodes(idx)
           nn match {
             case generated: NewCall =>
-              generated.staticBaseType match {
+              generated.staticReceiver match {
                 case Some(item) =>
                   dstCast(offset) = item
                   offset += 1
@@ -1697,7 +1697,7 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
   var order: Int                                     = -1: Int
   var possibleTypes: IndexedSeq[String]              = ArraySeq.empty
   var signature: String                              = "": String
-  var staticBaseType: Option[String]                 = None
+  var staticReceiver: Option[String]                 = None
   var typeFullName: String                           = "<empty>": String
   def argumentIndex(value: Int): this.type           = { this.argumentIndex = value; this }
   def argumentName(value: Option[String]): this.type = { this.argumentName = value; this }
@@ -1720,8 +1720,8 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
   def order(value: Int): this.type                          = { this.order = value; this }
   def possibleTypes(value: IterableOnce[String]): this.type = { this.possibleTypes = value.iterator.to(ArraySeq); this }
   def signature(value: String): this.type                   = { this.signature = value; this }
-  def staticBaseType(value: Option[String]): this.type      = { this.staticBaseType = value; this }
-  def staticBaseType(value: String): this.type              = { this.staticBaseType = Option(value); this }
+  def staticReceiver(value: Option[String]): this.type      = { this.staticReceiver = value; this }
+  def staticReceiver(value: String): this.type              = { this.staticReceiver = Option(value); this }
   def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
@@ -1738,7 +1738,7 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
     interface.countProperty(this, 40, 1)
     interface.countProperty(this, 43, possibleTypes.size)
     interface.countProperty(this, 45, 1)
-    interface.countProperty(this, 46, staticBaseType.size)
+    interface.countProperty(this, 46, staticReceiver.size)
     interface.countProperty(this, 48, 1)
   }
 
@@ -1758,7 +1758,7 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
     newInstance.order = this.order
     newInstance.possibleTypes = this.possibleTypes
     newInstance.signature = this.signature
-    newInstance.staticBaseType = this.staticBaseType
+    newInstance.staticReceiver = this.staticReceiver
     newInstance.typeFullName = this.typeFullName
     newInstance.asInstanceOf[this.type]
   }
@@ -1779,7 +1779,7 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
       case 11 => "order"
       case 12 => "possibleTypes"
       case 13 => "signature"
-      case 14 => "staticBaseType"
+      case 14 => "staticReceiver"
       case 15 => "typeFullName"
       case _  => ""
     }
@@ -1800,7 +1800,7 @@ class NewCall extends NewNode(nodeKind = 7) with CallBase with CallReprNew with 
       case 11 => this.order
       case 12 => this.possibleTypes
       case 13 => this.signature
-      case 14 => this.staticBaseType
+      case 14 => this.staticReceiver
       case 15 => this.typeFullName
       case _  => null
     }

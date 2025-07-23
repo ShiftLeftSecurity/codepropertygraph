@@ -15,7 +15,7 @@ trait CallEMT
     with HasDynamicTypeHintFullNameEMT
     with HasMethodFullNameEMT
     with HasPossibleTypesEMT
-    with HasStaticBaseTypeEMT
+    with HasStaticReceiverEMT
     with HasTypeFullNameEMT
 
 trait CallBase extends AbstractNode with CallReprBase with ExpressionBase with StaticType[CallEMT] {
@@ -39,7 +39,7 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase with S
     val tmpPossibleTypes = this.possibleTypes;
     if (tmpPossibleTypes.nonEmpty) res.put("POSSIBLE_TYPES", tmpPossibleTypes)
     if (("": String) != this.signature) res.put("SIGNATURE", this.signature)
-    this.staticBaseType.foreach { p => res.put("STATIC_BASE_TYPE", p) }
+    this.staticReceiver.foreach { p => res.put("STATIC_RECEIVER", p) }
     if (("<empty>": String) != this.typeFullName) res.put("TYPE_FULL_NAME", this.typeFullName)
     res
   }
@@ -108,10 +108,10 @@ object Call {
   * enforce a strict format for the signature, that is, it can be chosen by the frontend implementor to fit the source
   * language.
   *
-  * ▸ StaticBaseType (String); Cardinality `ZeroOrOne` (optional); The `STATIC_BASE_TYPE` field is used to keep track of
+  * ▸ StaticReceiver (String); Cardinality `ZeroOrOne` (optional); The `STATIC_RECEIVER` field is used to keep track of
   * the type on which a static method is called for static methods which may be inherited. This information can then be
   * used to find the true `METHOD_FULL_NAME` of the method being called during call linking. For example, if a class
-  * `Foo` defines a static method `foo` and a class `Bar extends Foo`, then the `STATIC_BASE_TYPE` of a`Bar.foo()` call
+  * `Foo` defines a static method `foo` and a class `Bar extends Foo`, then the `STATIC_RECEIVER` of a`Bar.foo()` call
   * is `Bar` and the `METHOD_FULL_NAME` of the `foo` call is rewritten to `Foo.foo:<signature>`.
   *
   * ▸ TypeFullName (String); Cardinality `one` (mandatory with default value `<empty>`); This field contains the
@@ -142,7 +142,7 @@ class Call(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 11 => "order"
       case 12 => "possibleTypes"
       case 13 => "signature"
-      case 14 => "staticBaseType"
+      case 14 => "staticReceiver"
       case 15 => "typeFullName"
       case _  => ""
     }
@@ -163,7 +163,7 @@ class Call(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 11 => this.order
       case 12 => this.possibleTypes
       case 13 => this.signature
-      case 14 => this.staticBaseType
+      case 14 => this.staticReceiver
       case 15 => this.typeFullName
       case _  => null
     }

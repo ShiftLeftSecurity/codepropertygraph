@@ -247,13 +247,13 @@ object PropertyNames {
     */
   val Signature: String = "SIGNATURE"
 
-  /** The `STATIC_BASE_TYPE` field is used to keep track of the type on which a static method is called for static
+  /** The `STATIC_RECEIVER` field is used to keep track of the type on which a static method is called for static
     * methods which may be inherited. This information can then be used to find the true `METHOD_FULL_NAME` of the
     * method being called during call linking. For example, if a class `Foo` defines a static method `foo` and a class
-    * `Bar extends Foo`, then the `STATIC_BASE_TYPE` of a`Bar.foo()` call is `Bar` and the `METHOD_FULL_NAME` of the
+    * `Bar extends Foo`, then the `STATIC_RECEIVER` of a`Bar.foo()` call is `Bar` and the `METHOD_FULL_NAME` of the
     * `foo` call is rewritten to `Foo.foo:<signature>`.
     */
-  val StaticBaseType: String = "STATIC_BASE_TYPE"
+  val StaticReceiver: String = "STATIC_RECEIVER"
 
   /** The static type decl of a TYPE. This property is matched against the FULL_NAME of TYPE_DECL nodes. It is required
     * to have exactly one TYPE_DECL for each different TYPE_DECL_FULL_NAME
@@ -338,7 +338,7 @@ object PropertyNames {
       Root,
       SecondaryId,
       Signature,
-      StaticBaseType,
+      StaticReceiver,
       TypeDeclFullName,
       TypeFullName,
       Value,

@@ -277,7 +277,7 @@ object GraphSchema extends flatgraph.Schema {
     "POSSIBLE_TYPES",
     "ROOT",
     "SIGNATURE",
-    "STATIC_BASE_TYPE",
+    "STATIC_RECEIVER",
     "TYPE_DECL_FULL_NAME",
     "TYPE_FULL_NAME",
     "VALUE",
@@ -430,7 +430,7 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(3713) = FormalQtyType.QtyMulti
     nodePropertyDescriptors(3884) = FormalQtyType.StringType // CALL.SIGNATURE
     nodePropertyDescriptors(3885) = FormalQtyType.QtyOne
-    nodePropertyDescriptors(3970) = FormalQtyType.StringType // CALL.STATIC_BASE_TYPE
+    nodePropertyDescriptors(3970) = FormalQtyType.StringType // CALL.STATIC_RECEIVER
     nodePropertyDescriptors(3971) = FormalQtyType.QtyOption
     nodePropertyDescriptors(4142) = FormalQtyType.StringType // CALL.TYPE_FULL_NAME
     nodePropertyDescriptors(4143) = FormalQtyType.QtyOne
@@ -1096,7 +1096,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters(3454) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_order
     _newNodeInserters(3712) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_possibleTypes
     _newNodeInserters(3884) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_signature
-    _newNodeInserters(3970) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_staticBaseType
+    _newNodeInserters(3970) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_staticReceiver
     _newNodeInserters(4142) = nodes.NewCall.InsertionHelpers.NewNodeInserter_Call_typeFullName
     _newNodeInserters(532) = nodes.NewClosureBinding.InsertionHelpers.NewNodeInserter_ClosureBinding_closureBindingId
     _newNodeInserters(1392) = nodes.NewClosureBinding.InsertionHelpers.NewNodeInserter_ClosureBinding_evaluationStrategy
@@ -1468,7 +1468,7 @@ object GraphSchema extends flatgraph.Schema {
           "ORDER",
           "POSSIBLE_TYPES",
           "SIGNATURE",
-          "STATIC_BASE_TYPE",
+          "STATIC_RECEIVER",
           "TYPE_FULL_NAME"
         )
       case "CLOSURE_BINDING" => Set("CLOSURE_BINDING_ID", "EVALUATION_STRATEGY")

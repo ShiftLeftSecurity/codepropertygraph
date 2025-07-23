@@ -316,8 +316,8 @@ object Accessors {
       default = "": String
     )
   }
-  final class AccessPropertyStaticBaseType(val node: nodes.StoredNode) extends AnyVal {
-    def staticBaseType: Option[String] = flatgraph.Accessors
+  final class AccessPropertyStaticReceiver(val node: nodes.StoredNode) extends AnyVal {
+    def staticReceiver: Option[String] = flatgraph.Accessors
       .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 46, seq = node.seq)
   }
   final class AccessPropertyTypeDeclFullName(val node: nodes.StoredNode) extends AnyVal {
@@ -423,9 +423,9 @@ object Accessors {
       case stored: nodes.StoredNode => new AccessPropertyPossibleTypes(stored).possibleTypes
       case newNode: nodes.NewCall   => newNode.possibleTypes
     }
-    def staticBaseType: Option[String] = node match {
-      case stored: nodes.StoredNode => new AccessPropertyStaticBaseType(stored).staticBaseType
-      case newNode: nodes.NewCall   => newNode.staticBaseType
+    def staticReceiver: Option[String] = node match {
+      case stored: nodes.StoredNode => new AccessPropertyStaticReceiver(stored).staticReceiver
+      case newNode: nodes.NewCall   => newNode.staticReceiver
     }
     def typeFullName: String = node match {
       case stored: nodes.StoredNode => new AccessPropertyTypeFullName(stored).typeFullName
@@ -1120,9 +1120,9 @@ trait ConcreteStoredConversions extends ConcreteBaseConversions {
   implicit def accessPropertySignature(
     node: nodes.StoredNode & nodes.StaticType[nodes.HasSignatureEMT]
   ): AccessPropertySignature = new AccessPropertySignature(node)
-  implicit def accessPropertyStaticBaseType(
-    node: nodes.StoredNode & nodes.StaticType[nodes.HasStaticBaseTypeEMT]
-  ): AccessPropertyStaticBaseType = new AccessPropertyStaticBaseType(node)
+  implicit def accessPropertyStaticReceiver(
+    node: nodes.StoredNode & nodes.StaticType[nodes.HasStaticReceiverEMT]
+  ): AccessPropertyStaticReceiver = new AccessPropertyStaticReceiver(node)
   implicit def accessPropertyTypeDeclFullName(
     node: nodes.StoredNode & nodes.StaticType[nodes.HasTypeDeclFullNameEMT]
   ): AccessPropertyTypeDeclFullName = new AccessPropertyTypeDeclFullName(node)
