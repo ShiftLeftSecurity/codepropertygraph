@@ -27,7 +27,12 @@ final class AccessNeighborsForMethod(val node: nodes.Method) extends AnyVal {
 
   /** Traverse to CALL via CALL IN edge.
     */
-  def _callViaCallIn: Iterator[nodes.Call] = callIn.collectAll[nodes.Call]
+  @deprecated("please use staticCallIn instead")
+  def _callViaCallIn: Iterator[nodes.Call] = staticCallIn
+
+  /** Traverse to CALL via CALL IN edge.
+    */
+  def staticCallIn: Iterator[nodes.Call] = callIn.collectAll[nodes.Call]
 
   /** Traverse to CALL via CONTAINS OUT edge.
     */
@@ -351,6 +356,11 @@ final class AccessNeighborsForMethodTraversal(val traversal: Iterator[nodes.Meth
 
   /** Traverse to CALL via CALL IN edge.
     */
+  def staticCallIn: Iterator[nodes.Call] = traversal.flatMap(_.staticCallIn)
+
+  /** Traverse to CALL via CALL IN edge.
+    */
+  @deprecated("please use staticCallIn instead")
   def _callViaCallIn: Iterator[nodes.Call] = traversal.flatMap(_._callViaCallIn)
 
   /** Traverse to CALL via CONTAINS OUT edge.
