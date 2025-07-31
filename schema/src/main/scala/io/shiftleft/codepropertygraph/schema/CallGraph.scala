@@ -195,7 +195,7 @@ object CallGraph extends SchemaBase {
       .addProperties(dispatchType, staticReceiver)
 
     callNode
-      .addOutEdge(edge = call, inNode = method, stepNameIn = "staticCallIn", stepNameOut = "staticCallOut")
+      .addOutEdge(edge = call, inNode = method)
 
     callNode
       .addProperty(methodFullName)
