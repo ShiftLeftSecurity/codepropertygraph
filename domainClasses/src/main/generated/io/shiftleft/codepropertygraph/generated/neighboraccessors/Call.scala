@@ -335,7 +335,7 @@ final class AccessNeighborsForCall(val node: nodes.Call) extends AnyVal {
 
   /** Traverse to METHOD via CALL OUT edge.
     */
-  def staticCallOut: Iterator[nodes.Method] = callOut.collectAll[nodes.Method]
+  def staticCallOut: Iterator[nodes.Method] = staticCallOut.collectAll[nodes.Method]
 
   /** Traverse to METHOD via CONTAINS IN edge.
     */
@@ -573,8 +573,6 @@ final class AccessNeighborsForCall(val node: nodes.Call) extends AnyVal {
 
   def astOut: Iterator[nodes.Expression] = node._astOut.cast[nodes.Expression]
 
-  def callOut: Iterator[nodes.Method] = node._callOut.cast[nodes.Method]
-
   def cdgIn: Iterator[nodes.CfgNode] = node._cdgIn.cast[nodes.CfgNode]
 
   def cdgOut: Iterator[nodes.CfgNode] = node._cdgOut.cast[nodes.CfgNode]
@@ -608,6 +606,8 @@ final class AccessNeighborsForCall(val node: nodes.Call) extends AnyVal {
   def receiverOut: Iterator[nodes.Expression] = node._receiverOut.cast[nodes.Expression]
 
   def refOut: Iterator[nodes.Member] = node._refOut.cast[nodes.Member]
+
+  def staticCallOut: Iterator[nodes.Method] = node._callOut.cast[nodes.Method]
 
   def taggedByOut: Iterator[nodes.Tag] = node._taggedByOut.cast[nodes.Tag]
 }
@@ -1180,8 +1180,6 @@ final class AccessNeighborsForCallTraversal(val traversal: Iterator[nodes.Call])
 
   def astOut: Iterator[nodes.Expression] = traversal.flatMap(_.astOut)
 
-  def callOut: Iterator[nodes.Method] = traversal.flatMap(_.callOut)
-
   def cdgIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgIn)
 
   def cdgOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgOut)
@@ -1215,6 +1213,8 @@ final class AccessNeighborsForCallTraversal(val traversal: Iterator[nodes.Call])
   def receiverOut: Iterator[nodes.Expression] = traversal.flatMap(_.receiverOut)
 
   def refOut: Iterator[nodes.Member] = traversal.flatMap(_.refOut)
+
+  def staticCallOut: Iterator[nodes.Method] = traversal.flatMap(_.staticCallOut)
 
   def taggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.taggedByOut)
 }

@@ -131,6 +131,7 @@ object CallGraph extends SchemaBase {
             |automatically as the CPG is first loaded.
             |""".stripMargin
       )
+      .withDefaultAccessorName("STATIC_CALL")
       .protoId(ProtoIds.CallEdge)
 
     val argument = builder
