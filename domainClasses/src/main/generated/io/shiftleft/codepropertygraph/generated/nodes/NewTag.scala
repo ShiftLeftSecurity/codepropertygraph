@@ -104,8 +104,8 @@ class NewTag extends NewNode(nodeKind = 34) with TagBase {
   def name(value: String): this.type  = { this.name = value; this }
   def value(value: String): this.type = { this.value = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 37, 1)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {

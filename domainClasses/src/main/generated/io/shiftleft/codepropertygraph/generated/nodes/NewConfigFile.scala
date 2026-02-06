@@ -79,8 +79,8 @@ class NewConfigFile extends NewNode(nodeKind = 10) with ConfigFileBase {
   def content(value: String): this.type = { this.content = value; this }
   def name(value: String): this.type    = { this.name = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 11, 1)
-    interface.countProperty(this, 37, 1)
+    interface.countProperty(this, 12, 1)
+    interface.countProperty(this, 38, 1)
   }
 
   override def copy: this.type = {

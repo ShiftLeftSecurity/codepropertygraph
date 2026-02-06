@@ -39,7 +39,7 @@ final class TraversalPropertyHash[NodeType <: nodes.StoredNode & nodes.StaticTyp
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 22, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 23, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ =>
       traversal.filter { node =>

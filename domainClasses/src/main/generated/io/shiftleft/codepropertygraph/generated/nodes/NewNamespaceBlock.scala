@@ -1519,15 +1519,15 @@ class NewNamespaceBlock extends NewNode(nodeKind = 32) with NamespaceBlockBase w
   def offsetEnd(value: Option[Int]): this.type    = { this.offsetEnd = value; this }
   def order(value: Int): this.type                = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 7, 1)
-    interface.countProperty(this, 8, columnNumber.size)
-    interface.countProperty(this, 19, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
     interface.countProperty(this, 20, 1)
-    interface.countProperty(this, 33, lineNumber.size)
-    interface.countProperty(this, 37, 1)
-    interface.countProperty(this, 38, offset.size)
-    interface.countProperty(this, 39, offsetEnd.size)
-    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 21, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
   }
 
   override def copy: this.type = {

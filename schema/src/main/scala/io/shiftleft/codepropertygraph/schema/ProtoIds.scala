@@ -133,6 +133,7 @@ object ProtoIds {
   val FileName                  = 106
   val Overlays                  = 118
   val Hash                      = 120
+  val ArgumentLabel             = 129
   val ArgumentName              = 130
   val Key                       = 131
   val ClassShortName            = 132

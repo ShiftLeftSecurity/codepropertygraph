@@ -18,6 +18,11 @@ package object traversals {
     ](traversal: IterableOnce[NodeType]): TraversalPropertyArgumentIndex[NodeType] = new TraversalPropertyArgumentIndex(
       traversal.iterator
     )
+    implicit def accessPropertyArgumentLabelTraversal[
+      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasArgumentLabelEMT]
+    ](traversal: IterableOnce[NodeType]): TraversalPropertyArgumentLabel[NodeType] = new TraversalPropertyArgumentLabel(
+      traversal.iterator
+    )
     implicit def accessPropertyArgumentNameTraversal[
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasArgumentNameEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyArgumentName[NodeType] = new TraversalPropertyArgumentName(

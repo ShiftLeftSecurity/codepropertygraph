@@ -18,8 +18,18 @@ object PropertyNames {
     */
   val ArgumentIndex: String = "ARGUMENT_INDEX"
 
+  /** This field is used to keep track of the argument label for languages that support them, such as Swift. It is used
+    * in addition to `ARGUMENT_INDEX` and can be used to reconstruct the original call syntax more faithfully. For
+    * example, in Swift, a method call may look like `foo(arg1: 42, arg2: "hello")` where `arg1` and `arg2` are argument
+    * labels. In this case, the `ARGUMENT_LABEL` field for the first argument would be set to `arg1` and for the second
+    * argument it would be set to `arg2`. Contrary to the `ARGUMENT_NAME` the label should not be expected to match the
+    * name of any parameter, and is not needed for dataflow purposes at all.
+    */
+  val ArgumentLabel: String = "ARGUMENT_LABEL"
+
   /** For calls involving named parameters, the `ARGUMENT_NAME` field holds the name of the parameter initialized by the
-    * expression. For all other calls, this field is unset.
+    * expression. For all other calls, this field is unset. Note that the `ARGUMENT_NAME` should be an exact match of
+    * the NAME of a METHOD_PARAMETER_{IN,OUT}. It overrides ARGUMENT_INDEX for dataflow purposes.
     */
   val ArgumentName: String = "ARGUMENT_NAME"
 
@@ -293,6 +303,7 @@ object PropertyNames {
     Seq(
       AliasTypeFullName,
       ArgumentIndex,
+      ArgumentLabel,
       ArgumentName,
       AstParentFullName,
       AstParentType,

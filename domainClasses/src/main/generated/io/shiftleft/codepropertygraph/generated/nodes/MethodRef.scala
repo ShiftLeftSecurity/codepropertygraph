@@ -21,6 +21,7 @@ trait MethodRefBase extends AbstractNode with ExpressionBase with StaticType[Met
     import io.shiftleft.codepropertygraph.generated.accessors.languagebootstrap.*
     val res = new java.util.HashMap[String, Any]()
     if ((-1: Int) != this.argumentIndex) res.put("ARGUMENT_INDEX", this.argumentIndex)
+    this.argumentLabel.foreach { p => res.put("ARGUMENT_LABEL", p) }
     this.argumentName.foreach { p => res.put("ARGUMENT_NAME", p) }
     if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
@@ -51,9 +52,18 @@ object MethodRef {
   * this case, the last argument index determines the return expression of a BLOCK expression. If the `PARAMETER_NAME`
   * field is set, then the `ARGUMENT_INDEX` field is ignored. It is suggested to set it to -1.
   *
+  * ▸ ArgumentLabel (String); Cardinality `ZeroOrOne` (optional); This field is used to keep track of the argument label
+  * for languages that support them, such as Swift. It is used in addition to `ARGUMENT_INDEX` and can be used to
+  * reconstruct the original call syntax more faithfully. For example, in Swift, a method call may look like
+  * `foo(arg1: 42, arg2: "hello")` where `arg1` and `arg2` are argument labels. In this case, the `ARGUMENT_LABEL` field
+  * for the first argument would be set to `arg1` and for the second argument it would be set to `arg2`. Contrary to the
+  * `ARGUMENT_NAME` the label should not be expected to match the name of any parameter, and is not needed for dataflow
+  * purposes at all.
+  *
   * ▸ ArgumentName (String); Cardinality `ZeroOrOne` (optional); For calls involving named parameters, the
   * `ARGUMENT_NAME` field holds the name of the parameter initialized by the expression. For all other calls, this field
-  * is unset.
+  * is unset. Note that the `ARGUMENT_NAME` should be an exact match of the NAME of a METHOD_PARAMETER_{IN,OUT}. It
+  * overrides ARGUMENT_INDEX for dataflow purposes.
   *
   * ▸ Code (String); Cardinality `one` (mandatory with default value `<empty>`); This field holds the code snippet that
   * the node represents.
@@ -101,39 +111,41 @@ class MethodRef(graph_4762: flatgraph.Graph, seq_4762: Int)
   override def productElementName(n: Int): String =
     n match {
       case 0  => "argumentIndex"
-      case 1  => "argumentName"
-      case 2  => "code"
-      case 3  => "columnNumber"
-      case 4  => "dynamicTypeHintFullName"
-      case 5  => "lineNumber"
-      case 6  => "methodFullName"
-      case 7  => "offset"
-      case 8  => "offsetEnd"
-      case 9  => "order"
-      case 10 => "possibleTypes"
-      case 11 => "typeFullName"
+      case 1  => "argumentLabel"
+      case 2  => "argumentName"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "dynamicTypeHintFullName"
+      case 6  => "lineNumber"
+      case 7  => "methodFullName"
+      case 8  => "offset"
+      case 9  => "offsetEnd"
+      case 10 => "order"
+      case 11 => "possibleTypes"
+      case 12 => "typeFullName"
       case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0  => this.argumentIndex
-      case 1  => this.argumentName
-      case 2  => this.code
-      case 3  => this.columnNumber
-      case 4  => this.dynamicTypeHintFullName
-      case 5  => this.lineNumber
-      case 6  => this.methodFullName
-      case 7  => this.offset
-      case 8  => this.offsetEnd
-      case 9  => this.order
-      case 10 => this.possibleTypes
-      case 11 => this.typeFullName
+      case 1  => this.argumentLabel
+      case 2  => this.argumentName
+      case 3  => this.code
+      case 4  => this.columnNumber
+      case 5  => this.dynamicTypeHintFullName
+      case 6  => this.lineNumber
+      case 7  => this.methodFullName
+      case 8  => this.offset
+      case 9  => this.offsetEnd
+      case 10 => this.order
+      case 11 => this.possibleTypes
+      case 12 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix = "MethodRef"
-  override def productArity  = 12
+  override def productArity  = 13
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[MethodRef]
 }
