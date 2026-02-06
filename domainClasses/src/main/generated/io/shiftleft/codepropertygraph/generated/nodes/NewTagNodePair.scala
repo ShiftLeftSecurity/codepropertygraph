@@ -83,9 +83,9 @@ class NewTagNodePair extends NewNode(nodeKind = 35) with TagNodePairBase {
   def node(value: AbstractNode): this.type = { this.node = value; this }
   def tag(value: TagBase): this.type       = { this.tag = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 53, 1)
-    interface.visitContainedNode(node)
     interface.countProperty(this, 54, 1)
+    interface.visitContainedNode(node)
+    interface.countProperty(this, 55, 1)
     interface.visitContainedNode(tag)
   }
 

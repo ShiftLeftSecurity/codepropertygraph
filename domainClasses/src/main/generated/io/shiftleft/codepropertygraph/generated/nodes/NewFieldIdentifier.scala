@@ -1266,6 +1266,35 @@ object NewFieldIdentifier {
         }
       }
     }
+    object NewNodeInserter_FieldIdentifier_argumentLabel extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewFieldIdentifier =>
+              generated.argumentLabel match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_FieldIdentifier_argumentName extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1500,44 +1529,49 @@ class NewFieldIdentifier extends NewNode(nodeKind = 13) with FieldIdentifierBase
     NewFieldIdentifier.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  var argumentIndex: Int                             = -1: Int
-  var argumentName: Option[String]                   = None
-  var canonicalName: String                          = "<empty>": String
-  var code: String                                   = "<empty>": String
-  var columnNumber: Option[Int]                      = None
-  var lineNumber: Option[Int]                        = None
-  var offset: Option[Int]                            = None
-  var offsetEnd: Option[Int]                         = None
-  var order: Int                                     = -1: Int
-  def argumentIndex(value: Int): this.type           = { this.argumentIndex = value; this }
-  def argumentName(value: Option[String]): this.type = { this.argumentName = value; this }
-  def argumentName(value: String): this.type         = { this.argumentName = Option(value); this }
-  def canonicalName(value: String): this.type        = { this.canonicalName = value; this }
-  def code(value: String): this.type                 = { this.code = value; this }
-  def columnNumber(value: Int): this.type            = { this.columnNumber = Option(value); this }
-  def columnNumber(value: Option[Int]): this.type    = { this.columnNumber = value; this }
-  def lineNumber(value: Int): this.type              = { this.lineNumber = Option(value); this }
-  def lineNumber(value: Option[Int]): this.type      = { this.lineNumber = value; this }
-  def offset(value: Int): this.type                  = { this.offset = Option(value); this }
-  def offset(value: Option[Int]): this.type          = { this.offset = value; this }
-  def offsetEnd(value: Int): this.type               = { this.offsetEnd = Option(value); this }
-  def offsetEnd(value: Option[Int]): this.type       = { this.offsetEnd = value; this }
-  def order(value: Int): this.type                   = { this.order = value; this }
+  var argumentIndex: Int                              = -1: Int
+  var argumentLabel: Option[String]                   = None
+  var argumentName: Option[String]                    = None
+  var canonicalName: String                           = "<empty>": String
+  var code: String                                    = "<empty>": String
+  var columnNumber: Option[Int]                       = None
+  var lineNumber: Option[Int]                         = None
+  var offset: Option[Int]                             = None
+  var offsetEnd: Option[Int]                          = None
+  var order: Int                                      = -1: Int
+  def argumentIndex(value: Int): this.type            = { this.argumentIndex = value; this }
+  def argumentLabel(value: Option[String]): this.type = { this.argumentLabel = value; this }
+  def argumentLabel(value: String): this.type         = { this.argumentLabel = Option(value); this }
+  def argumentName(value: Option[String]): this.type  = { this.argumentName = value; this }
+  def argumentName(value: String): this.type          = { this.argumentName = Option(value); this }
+  def canonicalName(value: String): this.type         = { this.canonicalName = value; this }
+  def code(value: String): this.type                  = { this.code = value; this }
+  def columnNumber(value: Int): this.type             = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type     = { this.columnNumber = value; this }
+  def lineNumber(value: Int): this.type               = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type       = { this.lineNumber = value; this }
+  def offset(value: Int): this.type                   = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type           = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type                = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type        = { this.offsetEnd = value; this }
+  def order(value: Int): this.type                    = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
-    interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 5, 1)
-    interface.countProperty(this, 7, 1)
-    interface.countProperty(this, 8, columnNumber.size)
-    interface.countProperty(this, 33, lineNumber.size)
-    interface.countProperty(this, 38, offset.size)
-    interface.countProperty(this, 39, offsetEnd.size)
-    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 2, argumentLabel.size)
+    interface.countProperty(this, 3, argumentName.size)
+    interface.countProperty(this, 6, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
   }
 
   override def copy: this.type = {
     val newInstance = new NewFieldIdentifier
     newInstance.argumentIndex = this.argumentIndex
+    newInstance.argumentLabel = this.argumentLabel
     newInstance.argumentName = this.argumentName
     newInstance.canonicalName = this.canonicalName
     newInstance.code = this.code
@@ -1552,32 +1586,34 @@ class NewFieldIdentifier extends NewNode(nodeKind = 13) with FieldIdentifierBase
   override def productElementName(n: Int): String =
     n match {
       case 0 => "argumentIndex"
-      case 1 => "argumentName"
-      case 2 => "canonicalName"
-      case 3 => "code"
-      case 4 => "columnNumber"
-      case 5 => "lineNumber"
-      case 6 => "offset"
-      case 7 => "offsetEnd"
-      case 8 => "order"
+      case 1 => "argumentLabel"
+      case 2 => "argumentName"
+      case 3 => "canonicalName"
+      case 4 => "code"
+      case 5 => "columnNumber"
+      case 6 => "lineNumber"
+      case 7 => "offset"
+      case 8 => "offsetEnd"
+      case 9 => "order"
       case _ => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0 => this.argumentIndex
-      case 1 => this.argumentName
-      case 2 => this.canonicalName
-      case 3 => this.code
-      case 4 => this.columnNumber
-      case 5 => this.lineNumber
-      case 6 => this.offset
-      case 7 => this.offsetEnd
-      case 8 => this.order
+      case 1 => this.argumentLabel
+      case 2 => this.argumentName
+      case 3 => this.canonicalName
+      case 4 => this.code
+      case 5 => this.columnNumber
+      case 6 => this.lineNumber
+      case 7 => this.offset
+      case 8 => this.offsetEnd
+      case 9 => this.order
       case _ => null
     }
 
   override def productPrefix                = "NewFieldIdentifier"
-  override def productArity                 = 9
+  override def productArity                 = 10
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewFieldIdentifier]
 }

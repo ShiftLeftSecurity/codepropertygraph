@@ -44,9 +44,9 @@ class Finding(graph_4762: flatgraph.Graph, seq_4762: Int)
     with FindingBase
     with StaticType[FindingEMT] {
   def evidence: IndexedSeq[StoredNode] =
-    flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind = nodeKind, propertyKind = 51, seq = seq)
+    flatgraph.Accessors.getNodePropertyMulti[StoredNode](graph, nodeKind = nodeKind, propertyKind = 52, seq = seq)
   def keyValuePairs: IndexedSeq[KeyValuePair] =
-    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind = nodeKind, propertyKind = 52, seq = seq)
+    flatgraph.Accessors.getNodePropertyMulti[KeyValuePair](graph, nodeKind = nodeKind, propertyKind = 53, seq = seq)
 
   override def productElementName(n: Int): String =
     n match {

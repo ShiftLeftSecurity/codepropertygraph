@@ -33,7 +33,7 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 12, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 13, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.controlStructureType == value }
   }
@@ -47,7 +47,7 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 12, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 13, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>
@@ -101,7 +101,7 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 42, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 43, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.parserTypeName == value }
   }
@@ -115,7 +115,7 @@ final class TraversalControlstructureBase[NodeType <: nodes.ControlStructureBase
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 42, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 43, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

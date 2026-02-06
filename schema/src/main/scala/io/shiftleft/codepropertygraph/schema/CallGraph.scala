@@ -51,6 +51,20 @@ object CallGraph extends SchemaBase {
       )
       .protoId(ProtoIds.ArgumentName)
 
+    val argumentLabel = builder
+      .addProperty(
+        name = "ARGUMENT_LABEL",
+        valueType = ValueType.String,
+        comment = """
+            |This field is used to keep track of the argument label for languages that support them, such as Swift.
+            |It is used in addition to `ARGUMENT_INDEX` and can be used to reconstruct the original call syntax more faithfully.
+            |For example, in Swift, a method call may look like `foo(arg1: 42, arg2: "hello")` where `arg1` and `arg2`
+            |are argument labels. In this case, the `ARGUMENT_LABEL` field for the first argument would be set to `arg1`
+            |and for the second argument it would be set to `arg2`.
+            |""".stripMargin
+      )
+      .protoId(ProtoIds.ArgumentLabel)
+
     val methodFullName = builder
       .addProperty(
         name = "METHOD_FULL_NAME",
@@ -61,7 +75,7 @@ object CallGraph extends SchemaBase {
       .mandatory(PropertyDefaults.String)
       .protoId(ProtoIds.MethodFullName)
 
-    expression.addProperties(argumentIndex, argumentName)
+    expression.addProperties(argumentIndex, argumentName, argumentLabel)
 
     val evaluationStrategy = builder
       .addProperty(

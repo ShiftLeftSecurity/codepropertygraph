@@ -38,14 +38,14 @@ class TagNodePair(graph_4762: flatgraph.Graph, seq_4762: Int)
   def node: StoredNode = flatgraph.Accessors.getNodePropertySingle(
     graph,
     nodeKind = nodeKind,
-    propertyKind = 53,
+    propertyKind = 54,
     seq = seq,
     default = null: StoredNode
   )
   def tag: Tag = flatgraph.Accessors.getNodePropertySingle(
     graph,
     nodeKind = nodeKind,
-    propertyKind = 54,
+    propertyKind = 55,
     seq = seq,
     default = null: Tag
   )

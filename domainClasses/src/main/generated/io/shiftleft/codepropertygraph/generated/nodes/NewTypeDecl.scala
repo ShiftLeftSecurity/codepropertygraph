@@ -1691,20 +1691,20 @@ class NewTypeDecl extends NewNode(nodeKind = 39) with TypeDeclBase with AstNodeN
   def order(value: Int): this.type              = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 0, aliasTypeFullName.size)
-    interface.countProperty(this, 3, 1)
     interface.countProperty(this, 4, 1)
-    interface.countProperty(this, 7, 1)
-    interface.countProperty(this, 8, columnNumber.size)
-    interface.countProperty(this, 19, 1)
+    interface.countProperty(this, 5, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
     interface.countProperty(this, 20, 1)
     interface.countProperty(this, 21, 1)
-    interface.countProperty(this, 26, inheritsFromTypeFullName.size)
-    interface.countProperty(this, 28, 1)
-    interface.countProperty(this, 33, lineNumber.size)
-    interface.countProperty(this, 37, 1)
-    interface.countProperty(this, 38, offset.size)
-    interface.countProperty(this, 39, offsetEnd.size)
-    interface.countProperty(this, 40, 1)
+    interface.countProperty(this, 22, 1)
+    interface.countProperty(this, 27, inheritsFromTypeFullName.size)
+    interface.countProperty(this, 29, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
   }
 
   override def copy: this.type = {

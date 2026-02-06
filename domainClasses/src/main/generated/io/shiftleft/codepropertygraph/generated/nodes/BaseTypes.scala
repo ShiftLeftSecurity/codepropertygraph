@@ -85,10 +85,15 @@ trait DeclarationNew extends NewNode with DeclarationBase with StaticType[Declar
   def name(value: String): this.type
 }
 
-trait ExpressionEMT extends AnyRef with CfgNodeEMT with HasArgumentIndexEMT with HasArgumentNameEMT
+trait ExpressionEMT
+    extends AnyRef
+    with CfgNodeEMT
+    with HasArgumentIndexEMT
+    with HasArgumentLabelEMT
+    with HasArgumentNameEMT
 
 trait ExpressionBase extends AbstractNode with CfgNodeBase with StaticType[ExpressionEMT]
-// new properties: ARGUMENT_INDEX, ARGUMENT_NAME
+// new properties: ARGUMENT_INDEX, ARGUMENT_LABEL, ARGUMENT_NAME
 // inherited properties: CODE, COLUMN_NUMBER, LINE_NUMBER, OFFSET, OFFSET_END, ORDER
 // inherited interfaces: AST_NODE
 // implementing nodes: ANNOTATION, ANNOTATION_LITERAL, ARRAY_INITIALIZER, BLOCK, CALL, CONTROL_STRUCTURE, FIELD_IDENTIFIER, IDENTIFIER, LITERAL, METHOD_REF, RETURN, TEMPLATE_DOM, TYPE_REF, UNKNOWN
@@ -98,6 +103,10 @@ trait ExpressionNew extends NewNode with ExpressionBase with AstNodeNew with Cfg
   def argumentIndex: Int
   def argumentIndex_=(value: Int): Unit
   def argumentIndex(value: Int): this.type
+  def argumentLabel: Option[String]
+  def argumentLabel_=(value: Option[String]): Unit
+  def argumentLabel(value: Option[String]): this.type
+  def argumentLabel(value: String): this.type
   def argumentName: Option[String]
   def argumentName_=(value: Option[String]): Unit
   def argumentName(value: Option[String]): this.type
@@ -113,6 +122,11 @@ trait HasAliasTypeFullNameEMT
   * trait", it exists only at compile time in order to improve type safety.
   */
 trait HasArgumentIndexEMT
+
+/** Node types with this marker trait are guaranteed to have the ARGUMENT_LABEL property. EMT stands for: "erased marker
+  * trait", it exists only at compile time in order to improve type safety.
+  */
+trait HasArgumentLabelEMT
 
 /** Node types with this marker trait are guaranteed to have the ARGUMENT_NAME property. EMT stands for: "erased marker
   * trait", it exists only at compile time in order to improve type safety.

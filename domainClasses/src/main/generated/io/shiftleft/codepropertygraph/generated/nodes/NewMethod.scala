@@ -1750,23 +1750,23 @@ class NewMethod extends NewNode(nodeKind = 25) with MethodBase with AstNodeNew w
   def order(value: Int): this.type                   = { this.order = value; this }
   def signature(value: String): this.type            = { this.signature = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 3, 1)
     interface.countProperty(this, 4, 1)
-    interface.countProperty(this, 7, 1)
-    interface.countProperty(this, 8, columnNumber.size)
-    interface.countProperty(this, 9, columnNumberEnd.size)
-    interface.countProperty(this, 19, 1)
+    interface.countProperty(this, 5, 1)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 10, columnNumberEnd.size)
     interface.countProperty(this, 20, 1)
     interface.countProperty(this, 21, 1)
-    interface.countProperty(this, 22, hash.size)
-    interface.countProperty(this, 28, 1)
-    interface.countProperty(this, 33, lineNumber.size)
-    interface.countProperty(this, 34, lineNumberEnd.size)
-    interface.countProperty(this, 37, 1)
-    interface.countProperty(this, 38, offset.size)
-    interface.countProperty(this, 39, offsetEnd.size)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 45, 1)
+    interface.countProperty(this, 22, 1)
+    interface.countProperty(this, 23, hash.size)
+    interface.countProperty(this, 29, 1)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 35, lineNumberEnd.size)
+    interface.countProperty(this, 38, 1)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 46, 1)
   }
 
   override def copy: this.type = {

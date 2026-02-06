@@ -1266,6 +1266,35 @@ object NewUnknown {
         }
       }
     }
+    object NewNodeInserter_Unknown_argumentLabel extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[String]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewUnknown =>
+              generated.argumentLabel match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Unknown_argumentName extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1604,26 +1633,29 @@ class NewUnknown extends NewNode(nodeKind = 42) with UnknownBase with Expression
     NewUnknown.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  var argumentIndex: Int                             = -1: Int
-  var argumentName: Option[String]                   = None
-  var code: String                                   = "<empty>": String
-  var columnNumber: Option[Int]                      = None
-  var containedRef: String                           = "<empty>": String
-  var dynamicTypeHintFullName: IndexedSeq[String]    = ArraySeq.empty
-  var lineNumber: Option[Int]                        = None
-  var offset: Option[Int]                            = None
-  var offsetEnd: Option[Int]                         = None
-  var order: Int                                     = -1: Int
-  var parserTypeName: String                         = "<empty>": String
-  var possibleTypes: IndexedSeq[String]              = ArraySeq.empty
-  var typeFullName: String                           = "<empty>": String
-  def argumentIndex(value: Int): this.type           = { this.argumentIndex = value; this }
-  def argumentName(value: Option[String]): this.type = { this.argumentName = value; this }
-  def argumentName(value: String): this.type         = { this.argumentName = Option(value); this }
-  def code(value: String): this.type                 = { this.code = value; this }
-  def columnNumber(value: Int): this.type            = { this.columnNumber = Option(value); this }
-  def columnNumber(value: Option[Int]): this.type    = { this.columnNumber = value; this }
-  def containedRef(value: String): this.type         = { this.containedRef = value; this }
+  var argumentIndex: Int                              = -1: Int
+  var argumentLabel: Option[String]                   = None
+  var argumentName: Option[String]                    = None
+  var code: String                                    = "<empty>": String
+  var columnNumber: Option[Int]                       = None
+  var containedRef: String                            = "<empty>": String
+  var dynamicTypeHintFullName: IndexedSeq[String]     = ArraySeq.empty
+  var lineNumber: Option[Int]                         = None
+  var offset: Option[Int]                             = None
+  var offsetEnd: Option[Int]                          = None
+  var order: Int                                      = -1: Int
+  var parserTypeName: String                          = "<empty>": String
+  var possibleTypes: IndexedSeq[String]               = ArraySeq.empty
+  var typeFullName: String                            = "<empty>": String
+  def argumentIndex(value: Int): this.type            = { this.argumentIndex = value; this }
+  def argumentLabel(value: Option[String]): this.type = { this.argumentLabel = value; this }
+  def argumentLabel(value: String): this.type         = { this.argumentLabel = Option(value); this }
+  def argumentName(value: Option[String]): this.type  = { this.argumentName = value; this }
+  def argumentName(value: String): this.type          = { this.argumentName = Option(value); this }
+  def code(value: String): this.type                  = { this.code = value; this }
+  def columnNumber(value: Int): this.type             = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type     = { this.columnNumber = value; this }
+  def containedRef(value: String): this.type          = { this.containedRef = value; this }
   def dynamicTypeHintFullName(value: IterableOnce[String]): this.type = {
     this.dynamicTypeHintFullName = value.iterator.to(ArraySeq); this
   }
@@ -1639,23 +1671,25 @@ class NewUnknown extends NewNode(nodeKind = 42) with UnknownBase with Expression
   def typeFullName(value: String): this.type                = { this.typeFullName = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 1, 1)
-    interface.countProperty(this, 2, argumentName.size)
-    interface.countProperty(this, 7, 1)
-    interface.countProperty(this, 8, columnNumber.size)
-    interface.countProperty(this, 10, 1)
-    interface.countProperty(this, 15, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 33, lineNumber.size)
-    interface.countProperty(this, 38, offset.size)
-    interface.countProperty(this, 39, offsetEnd.size)
-    interface.countProperty(this, 40, 1)
-    interface.countProperty(this, 42, 1)
-    interface.countProperty(this, 43, possibleTypes.size)
-    interface.countProperty(this, 48, 1)
+    interface.countProperty(this, 2, argumentLabel.size)
+    interface.countProperty(this, 3, argumentName.size)
+    interface.countProperty(this, 8, 1)
+    interface.countProperty(this, 9, columnNumber.size)
+    interface.countProperty(this, 11, 1)
+    interface.countProperty(this, 16, dynamicTypeHintFullName.size)
+    interface.countProperty(this, 34, lineNumber.size)
+    interface.countProperty(this, 39, offset.size)
+    interface.countProperty(this, 40, offsetEnd.size)
+    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 43, 1)
+    interface.countProperty(this, 44, possibleTypes.size)
+    interface.countProperty(this, 49, 1)
   }
 
   override def copy: this.type = {
     val newInstance = new NewUnknown
     newInstance.argumentIndex = this.argumentIndex
+    newInstance.argumentLabel = this.argumentLabel
     newInstance.argumentName = this.argumentName
     newInstance.code = this.code
     newInstance.columnNumber = this.columnNumber
@@ -1674,40 +1708,42 @@ class NewUnknown extends NewNode(nodeKind = 42) with UnknownBase with Expression
   override def productElementName(n: Int): String =
     n match {
       case 0  => "argumentIndex"
-      case 1  => "argumentName"
-      case 2  => "code"
-      case 3  => "columnNumber"
-      case 4  => "containedRef"
-      case 5  => "dynamicTypeHintFullName"
-      case 6  => "lineNumber"
-      case 7  => "offset"
-      case 8  => "offsetEnd"
-      case 9  => "order"
-      case 10 => "parserTypeName"
-      case 11 => "possibleTypes"
-      case 12 => "typeFullName"
+      case 1  => "argumentLabel"
+      case 2  => "argumentName"
+      case 3  => "code"
+      case 4  => "columnNumber"
+      case 5  => "containedRef"
+      case 6  => "dynamicTypeHintFullName"
+      case 7  => "lineNumber"
+      case 8  => "offset"
+      case 9  => "offsetEnd"
+      case 10 => "order"
+      case 11 => "parserTypeName"
+      case 12 => "possibleTypes"
+      case 13 => "typeFullName"
       case _  => ""
     }
 
   override def productElement(n: Int): Any =
     n match {
       case 0  => this.argumentIndex
-      case 1  => this.argumentName
-      case 2  => this.code
-      case 3  => this.columnNumber
-      case 4  => this.containedRef
-      case 5  => this.dynamicTypeHintFullName
-      case 6  => this.lineNumber
-      case 7  => this.offset
-      case 8  => this.offsetEnd
-      case 9  => this.order
-      case 10 => this.parserTypeName
-      case 11 => this.possibleTypes
-      case 12 => this.typeFullName
+      case 1  => this.argumentLabel
+      case 2  => this.argumentName
+      case 3  => this.code
+      case 4  => this.columnNumber
+      case 5  => this.containedRef
+      case 6  => this.dynamicTypeHintFullName
+      case 7  => this.lineNumber
+      case 8  => this.offset
+      case 9  => this.offsetEnd
+      case 10 => this.order
+      case 11 => this.parserTypeName
+      case 12 => this.possibleTypes
+      case 13 => this.typeFullName
       case _  => null
     }
 
   override def productPrefix                = "NewUnknown"
-  override def productArity                 = 13
+  override def productArity                 = 14
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewUnknown]
 }

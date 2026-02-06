@@ -85,8 +85,8 @@ class NewClosureBinding extends NewNode(nodeKind = 8) with ClosureBindingBase {
   def closureBindingId(value: String): this.type         = { this.closureBindingId = Option(value); this }
   def evaluationStrategy(value: String): this.type       = { this.evaluationStrategy = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
-    interface.countProperty(this, 6, closureBindingId.size)
-    interface.countProperty(this, 16, 1)
+    interface.countProperty(this, 7, closureBindingId.size)
+    interface.countProperty(this, 17, 1)
   }
 
   override def copy: this.type = {

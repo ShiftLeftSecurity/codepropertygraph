@@ -33,7 +33,7 @@ final class TraversalFieldidentifierBase[NodeType <: nodes.FieldIdentifierBase](
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 5, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 6, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.canonicalName == value }
   }
@@ -47,7 +47,7 @@ final class TraversalFieldidentifierBase[NodeType <: nodes.FieldIdentifierBase](
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 5, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 6, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>
