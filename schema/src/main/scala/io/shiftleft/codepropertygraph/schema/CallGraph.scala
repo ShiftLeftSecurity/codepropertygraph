@@ -47,6 +47,8 @@ object CallGraph extends SchemaBase {
             |For calls involving named parameters, the `ARGUMENT_NAME` field holds the
             |name of the parameter initialized by the expression. For all other calls,
             |this field is unset.
+            |Note that the `ARGUMENT_NAME` should be an exact match of the NAME of a
+            |METHOD_PARAMETER_{IN,OUT}. It overrides ARGUMENT_INDEX for dataflow purposes.
             |""".stripMargin
       )
       .protoId(ProtoIds.ArgumentName)
@@ -61,6 +63,8 @@ object CallGraph extends SchemaBase {
             |For example, in Swift, a method call may look like `foo(arg1: 42, arg2: "hello")` where `arg1` and `arg2`
             |are argument labels. In this case, the `ARGUMENT_LABEL` field for the first argument would be set to `arg1`
             |and for the second argument it would be set to `arg2`.
+            |Contrary to the `ARGUMENT_NAME` the label should not be expected to match the name of any parameter,
+            |and is not needed for dataflow purposes at all.
             |""".stripMargin
       )
       .protoId(ProtoIds.ArgumentLabel)
