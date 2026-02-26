@@ -62,7 +62,9 @@ ThisBuild / scalacOptions ++= Seq(
   // "-explain",
   // "-Xfatal-warnings",
   // "-Wconf:cat=deprecation:w,any:e",
-  "-language:implicitConversions"
+  "-language:implicitConversions",
+  "-old-syntax",
+  "-no-indent"
 )
 
 ThisBuild / javacOptions ++= Seq(
