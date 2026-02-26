@@ -6,7 +6,7 @@ enablePlugins(ProtobufPlugin)
 val protocLocalDir   = "protoc"
 val protocBinaryPath = s"$protocLocalDir/bin/protoc"
 ProtobufConfig / protobufProtoc := protocBinaryPath
-ProtobufConfig / version        := "3.18.0"
+ProtobufConfig / version        := "3.20.1"
 ProtobufConfig / sourceDirectories += (ProtobufConfig / protobufExternalIncludePath).value
 ProtobufConfig / protobufGenerate := (ProtobufConfig / protobufGenerate)
   .dependsOn(copyLatestCpgProto)
@@ -35,7 +35,9 @@ installProtoc := {
   if (!isAlreadyInstalled) {
     val platform = (System.getProperty("os.name"), System.getProperty("os.arch")) match {
       case ("Linux", "amd64")                                                      => "linux-x86_64"
+      case ("Linux", "aarch64")                                                    => "linux-aarch_64"
       case (name, "amd64") if name.startsWith("Windows")                           => "win64"
+      case ("Mac OS X", "aarch64")                                                 => "osx-aarch_64"
       case (name, arch) if name.toLowerCase.contains("mac") && arch.contains("64") => "osx-x86_64"
       case (name, arch) =>
         throw new AssertionError(
