@@ -54,6 +54,7 @@ object ProtoIds {
   val Try                       = 10
   val Ref                       = 10
   val Ghidra                    = 10
+  val Kotlin                    = 11
   val ReadOnly                  = 11
   val Throw                     = 11
   val ColumnNumber              = 11
