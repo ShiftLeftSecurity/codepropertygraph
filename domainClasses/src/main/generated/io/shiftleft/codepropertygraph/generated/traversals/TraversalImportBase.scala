@@ -169,6 +169,15 @@ final class TraversalImportBase[NodeType <: nodes.ImportBase](val traversal: Ite
   def isExplicit(value: Boolean): Iterator[NodeType] =
     traversal.filter { node => node.isExplicit.isDefined && node.isExplicit.get == value }
 
+  /** Traverse to isModuleImport property */
+  def isModuleImport: Iterator[Boolean] =
+    traversal.flatMap(_.isModuleImport)
+
+  /** Traverse to nodes where the isModuleImport equals the given `value`
+    */
+  def isModuleImport(value: Boolean): Iterator[NodeType] =
+    traversal.filter { node => node.isModuleImport.isDefined && node.isModuleImport.get == value }
+
   /** Traverse to isWildcard property */
   def isWildcard: Iterator[Boolean] =
     traversal.flatMap(_.isWildcard)

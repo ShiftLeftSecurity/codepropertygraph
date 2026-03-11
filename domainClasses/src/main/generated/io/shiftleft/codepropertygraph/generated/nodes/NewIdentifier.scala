@@ -1649,13 +1649,13 @@ class NewIdentifier extends NewNode(nodeKind = 16) with IdentifierBase with Expr
     interface.countProperty(this, 8, 1)
     interface.countProperty(this, 9, columnNumber.size)
     interface.countProperty(this, 16, dynamicTypeHintFullName.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
-    interface.countProperty(this, 44, possibleTypes.size)
-    interface.countProperty(this, 49, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 40, offset.size)
+    interface.countProperty(this, 41, offsetEnd.size)
+    interface.countProperty(this, 42, 1)
+    interface.countProperty(this, 45, possibleTypes.size)
+    interface.countProperty(this, 50, 1)
   }
 
   override def copy: this.type = {

@@ -14,6 +14,7 @@ trait ImportEMT
     with HasImportedAsEMT
     with HasImportedEntityEMT
     with HasIsExplicitEMT
+    with HasIsModuleImportEMT
     with HasIsWildcardEMT
 
 trait ImportBase extends AbstractNode with AstNodeBase with StaticType[ImportEMT] {
@@ -27,6 +28,7 @@ trait ImportBase extends AbstractNode with AstNodeBase with StaticType[ImportEMT
     this.importedAs.foreach { p => res.put("IMPORTED_AS", p) }
     this.importedEntity.foreach { p => res.put("IMPORTED_ENTITY", p) }
     this.isExplicit.foreach { p => res.put("IS_EXPLICIT", p) }
+    this.isModuleImport.foreach { p => res.put("IS_MODULE_IMPORT", p) }
     this.isWildcard.foreach { p => res.put("IS_WILDCARD", p) }
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     this.offset.foreach { p => res.put("OFFSET", p) }
@@ -64,6 +66,10 @@ object Import {
   * languages have implicit default imports of some standard library elements and this flag is used to distinguish those
   * from explicit imports found in the code base.
   *
+  * ▸ IsModuleImport (Boolean); Cardinality `ZeroOrOne` (optional); Specifies whether this is a module import. This is
+  * used for languages like Java >= 25 where packages exported by a module can be imported via the module name (which
+  * does not need to match the package names in any way).
+  *
   * ▸ IsWildcard (Boolean); Cardinality `ZeroOrOne` (optional); Specifies whether this is a wildcard import. For a Java
   * import like "import java.nio.*;" IS_WILDCARD would be "true" and IMPORTED_ENTITY would be "java.nio". For wildcard
   * imports the IMPORTED_AS property is ignored.
@@ -98,11 +104,12 @@ class Import(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 3  => "importedAs"
       case 4  => "importedEntity"
       case 5  => "isExplicit"
-      case 6  => "isWildcard"
-      case 7  => "lineNumber"
-      case 8  => "offset"
-      case 9  => "offsetEnd"
-      case 10 => "order"
+      case 6  => "isModuleImport"
+      case 7  => "isWildcard"
+      case 8  => "lineNumber"
+      case 9  => "offset"
+      case 10 => "offsetEnd"
+      case 11 => "order"
       case _  => ""
     }
 
@@ -114,16 +121,17 @@ class Import(graph_4762: flatgraph.Graph, seq_4762: Int)
       case 3  => this.importedAs
       case 4  => this.importedEntity
       case 5  => this.isExplicit
-      case 6  => this.isWildcard
-      case 7  => this.lineNumber
-      case 8  => this.offset
-      case 9  => this.offsetEnd
-      case 10 => this.order
+      case 6  => this.isModuleImport
+      case 7  => this.isWildcard
+      case 8  => this.lineNumber
+      case 9  => this.offset
+      case 10 => this.offsetEnd
+      case 11 => this.order
       case _  => null
     }
 
   override def productPrefix = "Import"
-  override def productArity  = 11
+  override def productArity  = 12
 
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[Import]
 }
