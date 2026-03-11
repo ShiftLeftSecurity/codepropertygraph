@@ -18,6 +18,9 @@ public static final String GOLANG = "GOLANG";
 public static final String CSHARP = "CSHARP";
 
 
+public static final String ABAP = "ABAP";
+
+
 public static final String C = "C";
 
 
@@ -64,6 +67,7 @@ add(JAVA);
 add(JAVASCRIPT);
 add(GOLANG);
 add(CSHARP);
+add(ABAP);
 add(C);
 add(PYTHON);
 add(LLVM);
