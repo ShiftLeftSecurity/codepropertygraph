@@ -81,17 +81,11 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
         baseLogger.error(s"Pass ${name} failed", exc)
         throw exc
     } finally {
-      try {
-        finish()
-      } finally {
-        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
-        // in the reported timings, and we must have our final log message if finish() throws
-        val nanosStop = System.nanoTime()
-        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
-        baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
-        )
-      }
+      val nanosStop = System.nanoTime()
+      val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+      baseLogger.info(
+        f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms ($fracRun%.0f%% on mutations). $nDiff%d + ${nDiffT - nDiff}%d changes committed from $nParts%d parts."
+      )
     }
   }
 
