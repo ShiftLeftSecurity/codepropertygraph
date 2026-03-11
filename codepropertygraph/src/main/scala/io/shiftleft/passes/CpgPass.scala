@@ -78,20 +78,14 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
       nDiffT = flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
     } catch {
       case exc: Exception =>
-        baseLogger.error(s"Pass ${name} failed", exc)
+        baseLogger.error(s"Pass $name failed", exc)
         throw exc
     } finally {
-      try {
-        finish()
-      } finally {
-        // the nested finally is somewhat ugly -- but we promised to clean up with finish(), we want to include finish()
-        // in the reported timings, and we must have our final log message if finish() throws
-        val nanosStop = System.nanoTime()
-        val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
-        baseLogger.info(
-          f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms (${fracRun}%.0f%% on mutations). ${nDiff}%d + ${nDiffT - nDiff}%d changes committed from ${nParts}%d parts."
-        )
-      }
+      val nanosStop = System.nanoTime()
+      val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+      baseLogger.info(
+        f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms ($fracRun%.0f%% on mutations). $nDiff%d + ${nDiffT - nDiff}%d changes committed from $nParts%d parts."
+      )
     }
   }
 
@@ -106,27 +100,12 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
           runOnPart(externalBuilder, parts(0).asInstanceOf[T])
         case _ =>
           val stream =
-            if (!isParallel)
-              java.util.Arrays
-                .stream(parts)
-                .sequential()
-            else
-              java.util.Arrays
-                .stream(parts)
-                .parallel()
+            if (!isParallel) java.util.Arrays.stream(parts).sequential()
+            else java.util.Arrays.stream(parts).parallel()
           val diff = stream.collect(
-            new Supplier[DiffGraphBuilder] {
-              override def get(): DiffGraphBuilder =
-                Cpg.newDiffGraphBuilder
-            },
-            new BiConsumer[DiffGraphBuilder, AnyRef] {
-              override def accept(builder: DiffGraphBuilder, part: AnyRef): Unit =
-                runOnPart(builder, part.asInstanceOf[T])
-            },
-            new BiConsumer[DiffGraphBuilder, DiffGraphBuilder] {
-              override def accept(leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder): Unit =
-                leftBuilder.absorb(rightBuilder)
-            }
+            () => Cpg.newDiffGraphBuilder,
+            (builder: DiffGraphBuilder, part: AnyRef) => runOnPart(builder, part.asInstanceOf[T]),
+            (leftBuilder: DiffGraphBuilder, rightBuilder: DiffGraphBuilder) => leftBuilder.absorb(rightBuilder)
           )
           externalBuilder.absorb(diff)
       }
@@ -152,12 +131,12 @@ trait CpgPassBase {
   @deprecated("Please use createAndApply")
   def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit
 
-  /** Name of the pass. By default it is inferred from the name of the class, override if needed.
+  /** Name of the pass. By default, it is inferred from the name of the class, override if needed.
     */
   def name: String = getClass.getName
 
   /** Runs the cpg pass, adding changes to the passed builder. Use with caution -- API is unstable. Returns max(nParts,
-    * 1), where nParts is either the number of parallel parts, or the number of iterarator elements in case of legacy
+    * 1), where nParts is either the number of parallel parts, or the number of iterator elements in case of legacy
     * passes. Includes init() and finish() logic.
     */
   def runWithBuilder(builder: DiffGraphBuilder): Int
@@ -172,11 +151,11 @@ trait CpgPassBase {
     Try(runWithBuilder(builder)) match {
       case Success(nParts) =>
         baseLogger.info(
-          f"Pass ${name} completed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms.  ${builder.size - size0}%d changes generated from ${nParts}%d parts."
+          f"Pass $name completed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms.  ${builder.size - size0}%d changes generated from $nParts%d parts."
         )
         nParts
       case Failure(exception) =>
-        baseLogger.warn(f"Pass ${name} failed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms", exception)
+        baseLogger.warn(f"Pass $name failed in ${(System.nanoTime() - nanoStart) * 1e-6}%.0f ms", exception)
         -1
     }
   }
