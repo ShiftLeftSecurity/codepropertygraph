@@ -40,7 +40,7 @@ final class TraversalPropertyStaticReceiver[
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 47, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 48, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ =>
       traversal.filter { node =>

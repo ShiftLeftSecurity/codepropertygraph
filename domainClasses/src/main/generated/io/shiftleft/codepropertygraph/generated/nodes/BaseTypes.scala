@@ -263,6 +263,11 @@ trait HasIsExplicitEMT
   */
 trait HasIsExternalEMT
 
+/** Node types with this marker trait are guaranteed to have the IS_MODULE_IMPORT property. EMT stands for: "erased
+  * marker trait", it exists only at compile time in order to improve type safety.
+  */
+trait HasIsModuleImportEMT
+
 /** Node types with this marker trait are guaranteed to have the IS_VARIADIC property. EMT stands for: "erased marker
   * trait", it exists only at compile time in order to improve type safety.
   */

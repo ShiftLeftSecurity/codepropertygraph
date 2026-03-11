@@ -1523,11 +1523,11 @@ class NewNamespaceBlock extends NewNode(nodeKind = 32) with NamespaceBlockBase w
     interface.countProperty(this, 9, columnNumber.size)
     interface.countProperty(this, 20, 1)
     interface.countProperty(this, 21, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 40, offset.size)
+    interface.countProperty(this, 41, offsetEnd.size)
+    interface.countProperty(this, 42, 1)
   }
 
   override def copy: this.type = {

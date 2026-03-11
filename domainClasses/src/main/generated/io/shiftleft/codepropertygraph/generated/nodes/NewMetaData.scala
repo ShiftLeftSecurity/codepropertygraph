@@ -168,10 +168,10 @@ class NewMetaData extends NewNode(nodeKind = 24) with MetaDataBase {
   def version(value: String): this.type                = { this.version = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 23, hash.size)
-    interface.countProperty(this, 33, 1)
-    interface.countProperty(this, 42, overlays.size)
-    interface.countProperty(this, 45, 1)
-    interface.countProperty(this, 51, 1)
+    interface.countProperty(this, 34, 1)
+    interface.countProperty(this, 43, overlays.size)
+    interface.countProperty(this, 46, 1)
+    interface.countProperty(this, 52, 1)
   }
 
   override def copy: this.type = {

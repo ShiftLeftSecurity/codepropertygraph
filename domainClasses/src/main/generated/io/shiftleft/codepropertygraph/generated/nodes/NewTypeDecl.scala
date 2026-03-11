@@ -1700,11 +1700,11 @@ class NewTypeDecl extends NewNode(nodeKind = 39) with TypeDeclBase with AstNodeN
     interface.countProperty(this, 22, 1)
     interface.countProperty(this, 27, inheritsFromTypeFullName.size)
     interface.countProperty(this, 29, 1)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 38, 1)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 39, 1)
+    interface.countProperty(this, 40, offset.size)
+    interface.countProperty(this, 41, offsetEnd.size)
+    interface.countProperty(this, 42, 1)
   }
 
   override def copy: this.type = {

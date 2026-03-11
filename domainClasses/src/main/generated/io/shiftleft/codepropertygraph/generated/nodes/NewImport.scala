@@ -1411,6 +1411,35 @@ object NewImport {
         }
       }
     }
+    object NewNodeInserter_Import_isModuleImport extends flatgraph.NewNodePropertyInsertionHelper {
+      override def insertNewNodeProperties(
+        newNodes: mutable.ArrayBuffer[flatgraph.DNode],
+        dst: AnyRef,
+        offsets: Array[Int]
+      ): Unit = {
+        if (newNodes.isEmpty) return
+        val dstCast = dst.asInstanceOf[Array[Boolean]]
+        val seq     = newNodes.head.storedRef.get.seq()
+        var offset  = offsets(seq)
+        var idx     = 0
+        while (idx < newNodes.length) {
+          val nn = newNodes(idx)
+          nn match {
+            case generated: NewImport =>
+              generated.isModuleImport match {
+                case Some(item) =>
+                  dstCast(offset) = item
+                  offset += 1
+                case _ =>
+              }
+            case _ =>
+          }
+          assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
+          idx += 1
+          offsets(idx + seq) = offset
+        }
+      }
+    }
     object NewNodeInserter_Import_isWildcard extends flatgraph.NewNodePropertyInsertionHelper {
       override def insertNewNodeProperties(
         newNodes: mutable.ArrayBuffer[flatgraph.DNode],
@@ -1566,37 +1595,40 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
     NewImport.inNeighbors.getOrElse(edgeLabel, Set.empty).contains(n.label)
   }
 
-  var code: String                                     = "<empty>": String
-  var columnNumber: Option[Int]                        = None
-  var explicitAs: Option[Boolean]                      = None
-  var importedAs: Option[String]                       = None
-  var importedEntity: Option[String]                   = None
-  var isExplicit: Option[Boolean]                      = None
-  var isWildcard: Option[Boolean]                      = None
-  var lineNumber: Option[Int]                          = None
-  var offset: Option[Int]                              = None
-  var offsetEnd: Option[Int]                           = None
-  var order: Int                                       = -1: Int
-  def code(value: String): this.type                   = { this.code = value; this }
-  def columnNumber(value: Int): this.type              = { this.columnNumber = Option(value); this }
-  def columnNumber(value: Option[Int]): this.type      = { this.columnNumber = value; this }
-  def explicitAs(value: Boolean): this.type            = { this.explicitAs = Option(value); this }
-  def explicitAs(value: Option[Boolean]): this.type    = { this.explicitAs = value; this }
-  def importedAs(value: Option[String]): this.type     = { this.importedAs = value; this }
-  def importedAs(value: String): this.type             = { this.importedAs = Option(value); this }
-  def importedEntity(value: Option[String]): this.type = { this.importedEntity = value; this }
-  def importedEntity(value: String): this.type         = { this.importedEntity = Option(value); this }
-  def isExplicit(value: Boolean): this.type            = { this.isExplicit = Option(value); this }
-  def isExplicit(value: Option[Boolean]): this.type    = { this.isExplicit = value; this }
-  def isWildcard(value: Boolean): this.type            = { this.isWildcard = Option(value); this }
-  def isWildcard(value: Option[Boolean]): this.type    = { this.isWildcard = value; this }
-  def lineNumber(value: Int): this.type                = { this.lineNumber = Option(value); this }
-  def lineNumber(value: Option[Int]): this.type        = { this.lineNumber = value; this }
-  def offset(value: Int): this.type                    = { this.offset = Option(value); this }
-  def offset(value: Option[Int]): this.type            = { this.offset = value; this }
-  def offsetEnd(value: Int): this.type                 = { this.offsetEnd = Option(value); this }
-  def offsetEnd(value: Option[Int]): this.type         = { this.offsetEnd = value; this }
-  def order(value: Int): this.type                     = { this.order = value; this }
+  var code: String                                      = "<empty>": String
+  var columnNumber: Option[Int]                         = None
+  var explicitAs: Option[Boolean]                       = None
+  var importedAs: Option[String]                        = None
+  var importedEntity: Option[String]                    = None
+  var isExplicit: Option[Boolean]                       = None
+  var isModuleImport: Option[Boolean]                   = None
+  var isWildcard: Option[Boolean]                       = None
+  var lineNumber: Option[Int]                           = None
+  var offset: Option[Int]                               = None
+  var offsetEnd: Option[Int]                            = None
+  var order: Int                                        = -1: Int
+  def code(value: String): this.type                    = { this.code = value; this }
+  def columnNumber(value: Int): this.type               = { this.columnNumber = Option(value); this }
+  def columnNumber(value: Option[Int]): this.type       = { this.columnNumber = value; this }
+  def explicitAs(value: Boolean): this.type             = { this.explicitAs = Option(value); this }
+  def explicitAs(value: Option[Boolean]): this.type     = { this.explicitAs = value; this }
+  def importedAs(value: Option[String]): this.type      = { this.importedAs = value; this }
+  def importedAs(value: String): this.type              = { this.importedAs = Option(value); this }
+  def importedEntity(value: Option[String]): this.type  = { this.importedEntity = value; this }
+  def importedEntity(value: String): this.type          = { this.importedEntity = Option(value); this }
+  def isExplicit(value: Boolean): this.type             = { this.isExplicit = Option(value); this }
+  def isExplicit(value: Option[Boolean]): this.type     = { this.isExplicit = value; this }
+  def isModuleImport(value: Boolean): this.type         = { this.isModuleImport = Option(value); this }
+  def isModuleImport(value: Option[Boolean]): this.type = { this.isModuleImport = value; this }
+  def isWildcard(value: Boolean): this.type             = { this.isWildcard = Option(value); this }
+  def isWildcard(value: Option[Boolean]): this.type     = { this.isWildcard = value; this }
+  def lineNumber(value: Int): this.type                 = { this.lineNumber = Option(value); this }
+  def lineNumber(value: Option[Int]): this.type         = { this.lineNumber = value; this }
+  def offset(value: Int): this.type                     = { this.offset = Option(value); this }
+  def offset(value: Option[Int]): this.type             = { this.offset = value; this }
+  def offsetEnd(value: Int): this.type                  = { this.offsetEnd = Option(value); this }
+  def offsetEnd(value: Option[Int]): this.type          = { this.offsetEnd = value; this }
+  def order(value: Int): this.type                      = { this.order = value; this }
   override def countAndVisitProperties(interface: flatgraph.BatchedUpdateInterface): Unit = {
     interface.countProperty(this, 8, 1)
     interface.countProperty(this, 9, columnNumber.size)
@@ -1604,11 +1636,12 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
     interface.countProperty(this, 24, importedAs.size)
     interface.countProperty(this, 25, importedEntity.size)
     interface.countProperty(this, 28, isExplicit.size)
-    interface.countProperty(this, 31, isWildcard.size)
-    interface.countProperty(this, 34, lineNumber.size)
-    interface.countProperty(this, 39, offset.size)
-    interface.countProperty(this, 40, offsetEnd.size)
-    interface.countProperty(this, 41, 1)
+    interface.countProperty(this, 30, isModuleImport.size)
+    interface.countProperty(this, 32, isWildcard.size)
+    interface.countProperty(this, 35, lineNumber.size)
+    interface.countProperty(this, 40, offset.size)
+    interface.countProperty(this, 41, offsetEnd.size)
+    interface.countProperty(this, 42, 1)
   }
 
   override def copy: this.type = {
@@ -1619,6 +1652,7 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
     newInstance.importedAs = this.importedAs
     newInstance.importedEntity = this.importedEntity
     newInstance.isExplicit = this.isExplicit
+    newInstance.isModuleImport = this.isModuleImport
     newInstance.isWildcard = this.isWildcard
     newInstance.lineNumber = this.lineNumber
     newInstance.offset = this.offset
@@ -1635,11 +1669,12 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
       case 3  => "importedAs"
       case 4  => "importedEntity"
       case 5  => "isExplicit"
-      case 6  => "isWildcard"
-      case 7  => "lineNumber"
-      case 8  => "offset"
-      case 9  => "offsetEnd"
-      case 10 => "order"
+      case 6  => "isModuleImport"
+      case 7  => "isWildcard"
+      case 8  => "lineNumber"
+      case 9  => "offset"
+      case 10 => "offsetEnd"
+      case 11 => "order"
       case _  => ""
     }
 
@@ -1651,15 +1686,16 @@ class NewImport extends NewNode(nodeKind = 17) with ImportBase with AstNodeNew {
       case 3  => this.importedAs
       case 4  => this.importedEntity
       case 5  => this.isExplicit
-      case 6  => this.isWildcard
-      case 7  => this.lineNumber
-      case 8  => this.offset
-      case 9  => this.offsetEnd
-      case 10 => this.order
+      case 6  => this.isModuleImport
+      case 7  => this.isWildcard
+      case 8  => this.lineNumber
+      case 9  => this.offset
+      case 10 => this.offsetEnd
+      case 11 => this.order
       case _  => null
     }
 
   override def productPrefix                = "NewImport"
-  override def productArity                 = 11
+  override def productArity                 = 12
   override def canEqual(that: Any): Boolean = that != null && that.isInstanceOf[NewImport]
 }

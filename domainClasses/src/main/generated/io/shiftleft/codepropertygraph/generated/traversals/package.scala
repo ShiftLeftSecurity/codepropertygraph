@@ -135,6 +135,10 @@ package object traversals {
     ](traversal: IterableOnce[NodeType]): TraversalPropertyIsExternal[NodeType] = new TraversalPropertyIsExternal(
       traversal.iterator
     )
+    implicit def accessPropertyIsModuleImportTraversal[
+      NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasIsModuleImportEMT]
+    ](traversal: IterableOnce[NodeType]): TraversalPropertyIsModuleImport[NodeType] =
+      new TraversalPropertyIsModuleImport(traversal.iterator)
     implicit def accessPropertyIsVariadicTraversal[
       NodeType <: nodes.StoredNode & nodes.StaticType[nodes.HasIsVariadicEMT]
     ](traversal: IterableOnce[NodeType]): TraversalPropertyIsVariadic[NodeType] = new TraversalPropertyIsVariadic(

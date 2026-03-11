@@ -101,7 +101,7 @@ final class TraversalAnnotationBase[NodeType <: nodes.AnnotationBase](val traver
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
       val someNode = init.next
       flatgraph.Accessors
-        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 38, value)
+        .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
         .asInstanceOf[Iterator[NodeType]]
     case _ => traversal.filter { _.name == value }
   }
@@ -115,7 +115,7 @@ final class TraversalAnnotationBase[NodeType <: nodes.AnnotationBase](val traver
         val someNode = init.next
         values.iterator.flatMap { value =>
           flatgraph.Accessors
-            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 38, value)
+            .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
             .asInstanceOf[Iterator[NodeType]]
         }
       case _ =>

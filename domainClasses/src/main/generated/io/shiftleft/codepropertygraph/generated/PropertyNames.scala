@@ -169,6 +169,11 @@ object PropertyNames {
     */
   val IsExternal: String = "IS_EXTERNAL"
 
+  /** Specifies whether this is a module import. This is used for languages like Java >= 25 where packages exported by a
+    * module can be imported via the module name (which does not need to match the package names in any way).
+    */
+  val IsModuleImport: String = "IS_MODULE_IMPORT"
+
   /** Specifies whether a parameter is the variadic argument handling parameter of a variadic method. Only one parameter
     * of a method is allowed to have this property set to true.
     */
@@ -331,6 +336,7 @@ object PropertyNames {
       InheritsFromTypeFullName,
       IsExplicit,
       IsExternal,
+      IsModuleImport,
       IsVariadic,
       IsWildcard,
       Key,
