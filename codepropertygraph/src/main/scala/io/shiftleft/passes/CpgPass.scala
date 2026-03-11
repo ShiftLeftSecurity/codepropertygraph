@@ -5,8 +5,10 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.{Cpg, DiffGraphBuilder}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.{BiConsumer, Supplier}
 import scala.annotation.nowarn
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.duration.DurationLong
 import scala.util.{Failure, Success, Try}
 
@@ -135,6 +137,62 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
     createAndApply()
   }
 
+}
+
+/** A [[ForkJoinParallelCpgPass]] that additionally maintains a thread-local accumulator of type [[R]] which is merged
+  * across all threads after processing completes. This enables map-reduce style aggregation alongside the usual
+  * DiffGraph-based graph modifications.
+  *
+  * Each thread gets its own accumulator instance (via [[newAccumulator]]). After all parts are processed, the
+  * accumulators are merged using [[mergeAccumulators]] and the result is passed to [[onAccumulatorComplete]].
+  *
+  * @tparam T
+  *   the part type (same as in [[ForkJoinParallelCpgPass]])
+  * @tparam R
+  *   the accumulator type
+  */
+abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, R](cpg: Cpg, outName: String = "")
+    extends ForkJoinParallelCpgPass[T](cpg, outName) {
+
+  /** Create a fresh, empty accumulator. Called once per thread. */
+  protected def newAccumulator(): R
+
+  /** Merge two accumulators. Must be associative. The result may reuse either argument. */
+  protected def mergeAccumulators(left: R, right: R): R
+
+  /** Process a single part, writing graph changes to `builder` and aggregated data to `acc`. */
+  protected def runOnPartWithAccumulator(builder: DiffGraphBuilder, acc: R, part: T): Unit
+
+  /** Called after all parts are processed with the fully merged accumulator. */
+  protected def onAccumulatorComplete(acc: R): Unit = {}
+
+  private val accumulators = new ConcurrentLinkedQueue[R]()
+
+  private val threadLocalAcc: ThreadLocal[R] = new ThreadLocal[R]()
+
+  final override def runOnPart(builder: DiffGraphBuilder, part: T): Unit = {
+    var acc = threadLocalAcc.get()
+    if (acc == null) {
+      acc = newAccumulator()
+      threadLocalAcc.set(acc)
+      accumulators.add(acc)
+    }
+    runOnPartWithAccumulator(builder, acc, part)
+  }
+
+  override def init(): Unit = {
+    accumulators.clear()
+    threadLocalAcc.remove()
+    super.init()
+  }
+
+  override def finish(): Unit = {
+    val merged = accumulators.asScala.reduceOption(mergeAccumulators).getOrElse(newAccumulator())
+    onAccumulatorComplete(merged)
+    accumulators.clear()
+    threadLocalAcc.remove()
+    super.finish()
+  }
 }
 
 trait CpgPassBase {
