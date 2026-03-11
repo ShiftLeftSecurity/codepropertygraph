@@ -245,11 +245,22 @@ object Hidden extends SchemaBase {
             |""".stripMargin
       )
 
+    val isModuleImport = builder
+      .addProperty(
+        name = "IS_MODULE_IMPORT",
+        valueType = ValueType.Boolean,
+        comment = """Specifies whether this is a module import.
+            |This is used for languages like Java >= 25 where packages exported by a module
+            |can be imported via the module name (which does not need to match the package names in
+            |any way).""".stripMargin
+      )
+
     importNode.addProperty(importedEntity)
     importNode.addProperty(importedAs)
     importNode.addProperty(explicitAs)
     importNode.addProperty(isWildcard)
     importNode.addProperty(isExplicit)
+    importNode.addProperty(isModuleImport)
 
     val imports = builder
       .addEdgeType(name = "IMPORTS", comment = "Edge from imports to dependencies")
