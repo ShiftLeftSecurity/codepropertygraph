@@ -184,12 +184,12 @@ abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, R](cpg: Cpg, 
   /** Container pairing a per-fork DiffGraphBuilder with a per-fork accumulator. */
   private class BuilderWithAccumulator(val builder: DiffGraphBuilder, var acc: R)
 
-  @volatile private var _accResult: R    = uninitialized
+  @volatile private var _accResult: R       = uninitialized
   @volatile private var _hasResult: Boolean = false
 
-  /** Release large data structures and external resources. The default implementation calls
-    * [[onAccumulatorComplete]] with the merged accumulator (or a fresh one if processing failed). Subclasses that
-    * override this method must call `super.finish()` to ensure the accumulator callback fires.
+  /** Release large data structures and external resources. The default implementation calls [[onAccumulatorComplete]]
+    * with the merged accumulator (or a fresh one if processing failed). Subclasses that override this method must call
+    * `super.finish()` to ensure the accumulator callback fires.
     */
   def finish(): Unit = {
     val acc = if (_hasResult) _accResult else newAccumulator()
