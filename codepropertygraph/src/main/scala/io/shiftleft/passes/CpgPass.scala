@@ -5,10 +5,9 @@ import io.shiftleft.SerializedCpg
 import io.shiftleft.codepropertygraph.generated.{Cpg, DiffGraphBuilder}
 import org.slf4j.{Logger, LoggerFactory, MDC}
 
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.{BiConsumer, Supplier}
 import scala.annotation.nowarn
-import scala.jdk.CollectionConverters.*
+import scala.compiletime.uninitialized
 import scala.concurrent.duration.DurationLong
 import scala.util.{Failure, Success, Try}
 
@@ -146,15 +145,29 @@ abstract class ForkJoinParallelCpgPass[T <: AnyRef](cpg: Cpg, @nowarn outName: S
   * Each thread gets its own accumulator instance (via [[newAccumulator]]). After all parts are processed, the
   * accumulators are merged using [[mergeAccumulators]] and the result is passed to [[onAccumulatorComplete]].
   *
+  * This variant uses the `stream.collect` / `BiConsumer` API (just like [[ForkJoinParallelCpgPass]]) with a combined
+  * container that holds both a [[DiffGraphBuilder]] and an accumulator per fork, so no `ThreadLocal` or
+  * `ConcurrentLinkedQueue` is needed.
+  *
   * @tparam T
   *   the part type (same as in [[ForkJoinParallelCpgPass]])
   * @tparam R
   *   the accumulator type
   */
-abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, R](cpg: Cpg, outName: String = "")
-    extends ForkJoinParallelCpgPass[T](cpg, outName) {
+abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, R](cpg: Cpg, @nowarn outName: String = "")
+    extends CpgPassBase {
+  type DiffGraphBuilder = io.shiftleft.codepropertygraph.generated.DiffGraphBuilder
 
-  /** Create a fresh, empty accumulator. Called once per thread. */
+  /** Generate Array of parts that can be processed in parallel. */
+  def generateParts(): Array[? <: AnyRef]
+
+  /** Setup large data structures, acquire external resources. */
+  def init(): Unit = {}
+
+  /** Override this to disable parallelism of passes. Useful for debugging. */
+  def isParallel: Boolean = true
+
+  /** Create a fresh, empty accumulator. Called once per fork (thread). */
   protected def newAccumulator(): R
 
   /** Merge two accumulators. Must be associative. The result may reuse either argument. */
@@ -163,35 +176,106 @@ abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, R](cpg: Cpg, 
   /** Process a single part, writing graph changes to `builder` and aggregated data to `acc`. */
   protected def runOnPartWithAccumulator(builder: DiffGraphBuilder, acc: R, part: T): Unit
 
-  /** Called after all parts are processed with the fully merged accumulator. */
+  /** Called after all parts are processed with the fully merged accumulator. Override `finish()` if you need to release
+    * resources; `onAccumulatorComplete` is invoked from within the default `finish()` implementation.
+    */
   protected def onAccumulatorComplete(acc: R): Unit = {}
 
-  private val accumulators = new ConcurrentLinkedQueue[R]()
+  /** Container pairing a per-fork DiffGraphBuilder with a per-fork accumulator. */
+  private class BuilderWithAccumulator(val builder: DiffGraphBuilder, var acc: R)
 
-  private val threadLocalAcc: ThreadLocal[R] = new ThreadLocal[R]()
+  @volatile private var _accResult: R    = uninitialized
+  @volatile private var _hasResult: Boolean = false
 
-  final override def runOnPart(builder: DiffGraphBuilder, part: T): Unit = {
-    var acc = threadLocalAcc.get()
-    if (acc == null) {
-      acc = newAccumulator()
-      threadLocalAcc.set(acc)
-      accumulators.add(acc)
+  /** Release large data structures and external resources. The default implementation calls
+    * [[onAccumulatorComplete]] with the merged accumulator (or a fresh one if processing failed). Subclasses that
+    * override this method must call `super.finish()` to ensure the accumulator callback fires.
+    */
+  def finish(): Unit = {
+    val acc = if (_hasResult) _accResult else newAccumulator()
+    onAccumulatorComplete(acc)
+    _hasResult = false
+  }
+
+  override def createAndApply(): Unit = {
+    baseLogger.info(s"Start of pass: $name")
+    val nanosStart = System.nanoTime()
+    var nParts     = 0
+    var nanosBuilt = -1L
+    var nDiff      = -1
+    var nDiffT     = -1
+    try {
+      val diffGraph = Cpg.newDiffGraphBuilder
+      nParts = runWithBuilder(diffGraph)
+      nanosBuilt = System.nanoTime()
+      nDiff = diffGraph.size
+
+      nDiffT = flatgraph.DiffGraphApplier.applyDiff(cpg.graph, diffGraph)
+    } catch {
+      case exc: Exception =>
+        baseLogger.error(s"Pass ${name} failed", exc)
+        throw exc
+    } finally {
+      val nanosStop = System.nanoTime()
+      val fracRun   = if (nanosBuilt == -1) 0.0 else (nanosStop - nanosBuilt) * 100.0 / (nanosStop - nanosStart + 1)
+      baseLogger.info(
+        f"Pass $name completed in ${(nanosStop - nanosStart) * 1e-6}%.0f ms ($fracRun%.0f%% on mutations). $nDiff%d + ${nDiffT - nDiff}%d changes committed from $nParts%d parts."
+      )
     }
-    runOnPartWithAccumulator(builder, acc, part)
   }
 
-  override def init(): Unit = {
-    accumulators.clear()
-    threadLocalAcc.remove()
-    super.init()
+  override def runWithBuilder(externalBuilder: DiffGraphBuilder): Int = {
+    _hasResult = false
+    try {
+      init()
+      val parts  = generateParts()
+      val nParts = parts.size
+      _accResult = nParts match {
+        case 0 =>
+          newAccumulator()
+        case 1 =>
+          val acc = newAccumulator()
+          runOnPartWithAccumulator(externalBuilder, acc, parts(0).asInstanceOf[T])
+          acc
+        case _ =>
+          val stream =
+            if (!isParallel)
+              java.util.Arrays
+                .stream(parts)
+                .sequential()
+            else
+              java.util.Arrays
+                .stream(parts)
+                .parallel()
+          val result = stream.collect(
+            new Supplier[BuilderWithAccumulator] {
+              override def get(): BuilderWithAccumulator =
+                new BuilderWithAccumulator(Cpg.newDiffGraphBuilder, newAccumulator())
+            },
+            new BiConsumer[BuilderWithAccumulator, AnyRef] {
+              override def accept(bwa: BuilderWithAccumulator, part: AnyRef): Unit =
+                runOnPartWithAccumulator(bwa.builder, bwa.acc, part.asInstanceOf[T])
+            },
+            new BiConsumer[BuilderWithAccumulator, BuilderWithAccumulator] {
+              override def accept(left: BuilderWithAccumulator, right: BuilderWithAccumulator): Unit = {
+                left.builder.absorb(right.builder)
+                left.acc = mergeAccumulators(left.acc, right.acc)
+              }
+            }
+          )
+          externalBuilder.absorb(result.builder)
+          result.acc
+      }
+      _hasResult = true
+      nParts
+    } finally {
+      finish()
+    }
   }
 
-  override def finish(): Unit = {
-    val merged = accumulators.asScala.reduceOption(mergeAccumulators).getOrElse(newAccumulator())
-    onAccumulatorComplete(merged)
-    accumulators.clear()
-    threadLocalAcc.remove()
-    super.finish()
+  @deprecated("Please use createAndApply")
+  override def createApplySerializeAndStore(serializedCpg: SerializedCpg, prefix: String = ""): Unit = {
+    createAndApply()
   }
 }
 
