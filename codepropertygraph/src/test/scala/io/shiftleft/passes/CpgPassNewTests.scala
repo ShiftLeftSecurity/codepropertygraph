@@ -8,6 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
 class CpgPassNewTests extends AnyWordSpec with Matchers {
 
@@ -86,6 +87,111 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
       }
 
       // all events should be in the expected order and should only occur once even if run fails
+      events.toSeq shouldBe Seq("init", "run", "finish")
+    }
+  }
+
+  "ForkJoinParallelCpgPassWithAccumulator" should {
+    "merge accumulators and invoke completion callback once" in {
+      val cpg       = Cpg.empty
+      val completed = ArrayBuffer.empty[Int]
+
+      val pass: ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]] =
+        new ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]](cpg, "acc-pass") {
+          override def createAccumulator(): ArrayBuffer[Int] = ArrayBuffer.empty[Int]
+          override def mergeAccumulator(left: ArrayBuffer[Int], accumulator: ArrayBuffer[Int]): Unit = {
+            left ++= accumulator
+          }
+          override def runOnPart(builder: DiffGraphBuilder, part: String, acc: ArrayBuffer[Int]): Unit =
+            acc += part.length
+          override def onAccumulatorComplete(builder: DiffGraphBuilder, acc: ArrayBuffer[Int]): Unit =
+            completed += acc.sum
+          override def generateParts(): Array[String] = Array("a", "bb", "ccc")
+          override def isParallel: Boolean            = false
+        }
+
+      pass.createAndApply()
+
+      completed.toSeq shouldBe Seq(6)
+    }
+
+    "use a fresh accumulator when there are no parts" in {
+      val cpg       = Cpg.empty
+      val completed = ArrayBuffer.empty[Int]
+
+      val pass: ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]] =
+        new ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]](cpg, "acc-empty") {
+          override def createAccumulator(): ArrayBuffer[Int] = ArrayBuffer(42)
+          override def mergeAccumulator(left: ArrayBuffer[Int], accumulator: ArrayBuffer[Int]): Unit = {
+            left ++= accumulator
+          }
+          override def runOnPart(builder: DiffGraphBuilder, part: String, acc: ArrayBuffer[Int]): Unit = ()
+          override def onAccumulatorComplete(builder: DiffGraphBuilder, acc: ArrayBuffer[Int]): Unit =
+            completed += acc.sum
+          override def generateParts(): Array[String] = Array.empty
+        }
+
+      pass.createAndApply()
+
+      completed.toSeq shouldBe Seq(42)
+    }
+
+    "clear accumulator state between runs" in {
+      val cpg       = Cpg.empty
+      val completed = ArrayBuffer.empty[Int]
+
+      val pass: ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]] =
+        new ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[Int]](cpg, "acc-rerun") {
+          override def createAccumulator(): ArrayBuffer[Int] = ArrayBuffer.empty[Int]
+          override def mergeAccumulator(left: ArrayBuffer[Int], accumulator: ArrayBuffer[Int]): Unit = {
+            left ++= accumulator
+          }
+          override def runOnPart(builder: DiffGraphBuilder, part: String, acc: ArrayBuffer[Int]): Unit =
+            acc += part.toInt
+          override def onAccumulatorComplete(builder: DiffGraphBuilder, acc: ArrayBuffer[Int]): Unit =
+            completed += acc.sum
+          override def generateParts(): Array[String] = Array("1", "2", "3")
+          override def isParallel: Boolean            = false
+        }
+
+      pass.createAndApply()
+      pass.createAndApply()
+
+      completed.toSeq shouldBe Seq(6, 6)
+    }
+
+    "call finish when a part fails" in {
+      val cpg    = Cpg.empty
+      val events = ArrayBuffer.empty[String]
+
+      val pass: ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[String]] =
+        new ForkJoinParallelCpgPassWithAccumulator[String, ArrayBuffer[String]](cpg, "acc-fail") {
+          override def createAccumulator(): ArrayBuffer[String] = ArrayBuffer.empty[String]
+          override def mergeAccumulator(left: ArrayBuffer[String], accumulator: ArrayBuffer[String]): Unit = {
+            left ++= accumulator
+          }
+          override def runOnPart(builder: DiffGraphBuilder, part: String, acc: ArrayBuffer[String]): Unit = {
+            events += "run"
+            throw new RuntimeException("boom")
+          }
+          override def onAccumulatorComplete(builder: DiffGraphBuilder, acc: ArrayBuffer[String]): Unit =
+            events += "final"
+          override def generateParts(): Array[String] = Array("p1")
+          override def isParallel: Boolean            = false
+          override def init(): Unit = {
+            events += "init"
+            super.init()
+          }
+          override def finish(): Unit = {
+            events += "finish"
+            super.finish()
+          }
+        }
+
+      intercept[RuntimeException] {
+        pass.createAndApply()
+      }
+
       events.toSeq shouldBe Seq("init", "run", "finish")
     }
   }
