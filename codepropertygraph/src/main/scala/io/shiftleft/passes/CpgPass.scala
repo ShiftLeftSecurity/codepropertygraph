@@ -220,7 +220,7 @@ abstract class ForkJoinParallelCpgPassWithAccumulator[T <: AnyRef, Accumulator <
             rightConsumedArg: (DiffGraphBuilder, Accumulator)
           ): Unit = {
             val (leftDiff, leftAcc)   = leftConsumedArg
-            val (rightDiff, rightAcc) = leftConsumedArg
+            val (rightDiff, rightAcc) = rightConsumedArg
             leftDiff.absorb(rightDiff)
             mergeAccumulator(leftAcc, rightAcc)
           }
