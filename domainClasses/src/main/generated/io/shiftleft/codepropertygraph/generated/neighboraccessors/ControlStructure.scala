@@ -13,6 +13,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _blockViaAstOut: Iterator[nodes.Block] = astOut.collectAll[nodes.Block]
 
+  /** Traverse to BLOCK via CATCH_BODY OUT edge.
+    */
+  def _blockViaCatchBodyOut: Iterator[nodes.Block] = catchBodyOut.collectAll[nodes.Block]
+
   /** Traverse to BLOCK via CDG IN edge.
     */
   def _blockViaCdgIn: Iterator[nodes.Block] = cdgIn.collectAll[nodes.Block]
@@ -33,6 +37,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _blockViaDominateOut: Iterator[nodes.Block] = dominateOut.collectAll[nodes.Block]
 
+  /** Traverse to BLOCK via DO_BODY OUT edge.
+    */
+  def _blockViaDoBodyOut: Iterator[nodes.Block] = doBodyOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via FALSE_BODY OUT edge.
+    */
+  def _blockViaFalseBodyOut: Iterator[nodes.Block] = falseBodyOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via FINALLY_BODY OUT edge.
+    */
+  def _blockViaFinallyBodyOut: Iterator[nodes.Block] = finallyBodyOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via FOR_BODY OUT edge.
+    */
+  def _blockViaForBodyOut: Iterator[nodes.Block] = forBodyOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via FOR_INIT OUT edge.
+    */
+  def _blockViaForInitOut: Iterator[nodes.Block] = forInitOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via FOR_UPDATE OUT edge.
+    */
+  def _blockViaForUpdateOut: Iterator[nodes.Block] = forUpdateOut.collectAll[nodes.Block]
+
   /** Traverse to BLOCK via POST_DOMINATE IN edge.
     */
   def _blockViaPostDominateIn: Iterator[nodes.Block] = postDominateIn.collectAll[nodes.Block]
@@ -40,6 +68,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to BLOCK via POST_DOMINATE OUT edge.
     */
   def _blockViaPostDominateOut: Iterator[nodes.Block] = postDominateOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via TRUE_BODY OUT edge.
+    */
+  def _blockViaTrueBodyOut: Iterator[nodes.Block] = trueBodyOut.collectAll[nodes.Block]
+
+  /** Traverse to BLOCK via TRY_BODY OUT edge.
+    */
+  def _blockViaTryBodyOut: Iterator[nodes.Block] = tryBodyOut.collectAll[nodes.Block]
 
   /** Traverse to CALL via ARGUMENT IN edge.
     */
@@ -52,6 +88,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to CALL via AST OUT edge.
     */
   def _callViaAstOut: Iterator[nodes.Call] = astOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via CATCH_BODY OUT edge.
+    */
+  def _callViaCatchBodyOut: Iterator[nodes.Call] = catchBodyOut.collectAll[nodes.Call]
 
   /** Traverse to CALL via CDG IN edge.
     */
@@ -73,6 +113,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _callViaDominateOut: Iterator[nodes.Call] = dominateOut.collectAll[nodes.Call]
 
+  /** Traverse to CALL via DO_BODY OUT edge.
+    */
+  def _callViaDoBodyOut: Iterator[nodes.Call] = doBodyOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via FALSE_BODY OUT edge.
+    */
+  def _callViaFalseBodyOut: Iterator[nodes.Call] = falseBodyOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via FINALLY_BODY OUT edge.
+    */
+  def _callViaFinallyBodyOut: Iterator[nodes.Call] = finallyBodyOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via FOR_BODY OUT edge.
+    */
+  def _callViaForBodyOut: Iterator[nodes.Call] = forBodyOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via FOR_INIT OUT edge.
+    */
+  def _callViaForInitOut: Iterator[nodes.Call] = forInitOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via FOR_UPDATE OUT edge.
+    */
+  def _callViaForUpdateOut: Iterator[nodes.Call] = forUpdateOut.collectAll[nodes.Call]
+
   /** Traverse to CALL via POST_DOMINATE IN edge.
     */
   def _callViaPostDominateIn: Iterator[nodes.Call] = postDominateIn.collectAll[nodes.Call]
@@ -89,6 +153,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _callViaReceiverIn: Iterator[nodes.Call] = receiverIn.collectAll[nodes.Call]
 
+  /** Traverse to CALL via TRUE_BODY OUT edge.
+    */
+  def _callViaTrueBodyOut: Iterator[nodes.Call] = trueBodyOut.collectAll[nodes.Call]
+
+  /** Traverse to CALL via TRY_BODY OUT edge.
+    */
+  def _callViaTryBodyOut: Iterator[nodes.Call] = tryBodyOut.collectAll[nodes.Call]
+
   /** Traverse to CFG_NODE via CFG OUT edge.
     */
   def _cfgNodeViaCfgOut: Iterator[nodes.CfgNode] = cfgOut.collectAll[nodes.CfgNode]
@@ -100,6 +172,15 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to CONTROL_STRUCTURE via AST OUT edge.
     */
   def _controlStructureViaAstOut: Iterator[nodes.ControlStructure] = astOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY IN edge.
+    */
+  def _controlStructureViaCatchBodyIn: Iterator[nodes.ControlStructure] = catchBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY OUT edge.
+    */
+  def _controlStructureViaCatchBodyOut: Iterator[nodes.ControlStructure] =
+    catchBodyOut.collectAll[nodes.ControlStructure]
 
   /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
     */
@@ -126,6 +207,58 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _controlStructureViaDominateOut: Iterator[nodes.ControlStructure] = dominateOut.collectAll[nodes.ControlStructure]
 
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY IN edge.
+    */
+  def _controlStructureViaDoBodyIn: Iterator[nodes.ControlStructure] = doBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY OUT edge.
+    */
+  def _controlStructureViaDoBodyOut: Iterator[nodes.ControlStructure] = doBodyOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY IN edge.
+    */
+  def _controlStructureViaFalseBodyIn: Iterator[nodes.ControlStructure] = falseBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY OUT edge.
+    */
+  def _controlStructureViaFalseBodyOut: Iterator[nodes.ControlStructure] =
+    falseBodyOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY IN edge.
+    */
+  def _controlStructureViaFinallyBodyIn: Iterator[nodes.ControlStructure] =
+    finallyBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY OUT edge.
+    */
+  def _controlStructureViaFinallyBodyOut: Iterator[nodes.ControlStructure] =
+    finallyBodyOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY IN edge.
+    */
+  def _controlStructureViaForBodyIn: Iterator[nodes.ControlStructure] = forBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY OUT edge.
+    */
+  def _controlStructureViaForBodyOut: Iterator[nodes.ControlStructure] = forBodyOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT IN edge.
+    */
+  def _controlStructureViaForInitIn: Iterator[nodes.ControlStructure] = forInitIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT OUT edge.
+    */
+  def _controlStructureViaForInitOut: Iterator[nodes.ControlStructure] = forInitOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE IN edge.
+    */
+  def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] = forUpdateIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE OUT edge.
+    */
+  def _controlStructureViaForUpdateOut: Iterator[nodes.ControlStructure] =
+    forUpdateOut.collectAll[nodes.ControlStructure]
+
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
   def _controlStructureViaPostDominateIn: Iterator[nodes.ControlStructure] =
@@ -135,6 +268,22 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _controlStructureViaPostDominateOut: Iterator[nodes.ControlStructure] =
     postDominateOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY IN edge.
+    */
+  def _controlStructureViaTrueBodyIn: Iterator[nodes.ControlStructure] = trueBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY OUT edge.
+    */
+  def _controlStructureViaTrueBodyOut: Iterator[nodes.ControlStructure] = trueBodyOut.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY IN edge.
+    */
+  def _controlStructureViaTryBodyIn: Iterator[nodes.ControlStructure] = tryBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY OUT edge.
+    */
+  def _controlStructureViaTryBodyOut: Iterator[nodes.ControlStructure] = tryBodyOut.collectAll[nodes.ControlStructure]
 
   /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
     */
@@ -166,6 +315,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _identifierViaAstOut: Iterator[nodes.Identifier] = astOut.collectAll[nodes.Identifier]
 
+  /** Traverse to IDENTIFIER via CATCH_BODY OUT edge.
+    */
+  def _identifierViaCatchBodyOut: Iterator[nodes.Identifier] = catchBodyOut.collectAll[nodes.Identifier]
+
   /** Traverse to IDENTIFIER via CDG IN edge.
     */
   def _identifierViaCdgIn: Iterator[nodes.Identifier] = cdgIn.collectAll[nodes.Identifier]
@@ -186,6 +339,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _identifierViaDominateOut: Iterator[nodes.Identifier] = dominateOut.collectAll[nodes.Identifier]
 
+  /** Traverse to IDENTIFIER via DO_BODY OUT edge.
+    */
+  def _identifierViaDoBodyOut: Iterator[nodes.Identifier] = doBodyOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via FALSE_BODY OUT edge.
+    */
+  def _identifierViaFalseBodyOut: Iterator[nodes.Identifier] = falseBodyOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via FINALLY_BODY OUT edge.
+    */
+  def _identifierViaFinallyBodyOut: Iterator[nodes.Identifier] = finallyBodyOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via FOR_BODY OUT edge.
+    */
+  def _identifierViaForBodyOut: Iterator[nodes.Identifier] = forBodyOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via FOR_INIT OUT edge.
+    */
+  def _identifierViaForInitOut: Iterator[nodes.Identifier] = forInitOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via FOR_UPDATE OUT edge.
+    */
+  def _identifierViaForUpdateOut: Iterator[nodes.Identifier] = forUpdateOut.collectAll[nodes.Identifier]
+
   /** Traverse to IDENTIFIER via POST_DOMINATE IN edge.
     */
   def _identifierViaPostDominateIn: Iterator[nodes.Identifier] = postDominateIn.collectAll[nodes.Identifier]
@@ -198,6 +375,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _identifierViaReachingDefOut: Iterator[nodes.Identifier] = reachingDefOut.collectAll[nodes.Identifier]
 
+  /** Traverse to IDENTIFIER via TRUE_BODY OUT edge.
+    */
+  def _identifierViaTrueBodyOut: Iterator[nodes.Identifier] = trueBodyOut.collectAll[nodes.Identifier]
+
+  /** Traverse to IDENTIFIER via TRY_BODY OUT edge.
+    */
+  def _identifierViaTryBodyOut: Iterator[nodes.Identifier] = tryBodyOut.collectAll[nodes.Identifier]
+
   /** Traverse to JUMP_LABEL via AST OUT edge.
     */
   def _jumpLabelViaAstOut: Iterator[nodes.JumpLabel] = astOut.collectAll[nodes.JumpLabel]
@@ -205,6 +390,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to JUMP_TARGET via AST OUT edge.
     */
   def _jumpTargetViaAstOut: Iterator[nodes.JumpTarget] = astOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via CATCH_BODY OUT edge.
+    */
+  def _jumpTargetViaCatchBodyOut: Iterator[nodes.JumpTarget] = catchBodyOut.collectAll[nodes.JumpTarget]
 
   /** Traverse to JUMP_TARGET via CDG IN edge.
     */
@@ -226,6 +415,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _jumpTargetViaDominateOut: Iterator[nodes.JumpTarget] = dominateOut.collectAll[nodes.JumpTarget]
 
+  /** Traverse to JUMP_TARGET via DO_BODY OUT edge.
+    */
+  def _jumpTargetViaDoBodyOut: Iterator[nodes.JumpTarget] = doBodyOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via FALSE_BODY OUT edge.
+    */
+  def _jumpTargetViaFalseBodyOut: Iterator[nodes.JumpTarget] = falseBodyOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via FINALLY_BODY OUT edge.
+    */
+  def _jumpTargetViaFinallyBodyOut: Iterator[nodes.JumpTarget] = finallyBodyOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via FOR_BODY OUT edge.
+    */
+  def _jumpTargetViaForBodyOut: Iterator[nodes.JumpTarget] = forBodyOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via FOR_INIT OUT edge.
+    */
+  def _jumpTargetViaForInitOut: Iterator[nodes.JumpTarget] = forInitOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via FOR_UPDATE OUT edge.
+    */
+  def _jumpTargetViaForUpdateOut: Iterator[nodes.JumpTarget] = forUpdateOut.collectAll[nodes.JumpTarget]
+
   /** Traverse to JUMP_TARGET via POST_DOMINATE IN edge.
     */
   def _jumpTargetViaPostDominateIn: Iterator[nodes.JumpTarget] = postDominateIn.collectAll[nodes.JumpTarget]
@@ -234,9 +447,21 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _jumpTargetViaPostDominateOut: Iterator[nodes.JumpTarget] = postDominateOut.collectAll[nodes.JumpTarget]
 
+  /** Traverse to JUMP_TARGET via TRUE_BODY OUT edge.
+    */
+  def _jumpTargetViaTrueBodyOut: Iterator[nodes.JumpTarget] = trueBodyOut.collectAll[nodes.JumpTarget]
+
+  /** Traverse to JUMP_TARGET via TRY_BODY OUT edge.
+    */
+  def _jumpTargetViaTryBodyOut: Iterator[nodes.JumpTarget] = tryBodyOut.collectAll[nodes.JumpTarget]
+
   /** Traverse to LITERAL via AST OUT edge.
     */
   def _literalViaAstOut: Iterator[nodes.Literal] = astOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via CATCH_BODY OUT edge.
+    */
+  def _literalViaCatchBodyOut: Iterator[nodes.Literal] = catchBodyOut.collectAll[nodes.Literal]
 
   /** Traverse to LITERAL via CDG IN edge.
     */
@@ -258,6 +483,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _literalViaDominateOut: Iterator[nodes.Literal] = dominateOut.collectAll[nodes.Literal]
 
+  /** Traverse to LITERAL via DO_BODY OUT edge.
+    */
+  def _literalViaDoBodyOut: Iterator[nodes.Literal] = doBodyOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via FALSE_BODY OUT edge.
+    */
+  def _literalViaFalseBodyOut: Iterator[nodes.Literal] = falseBodyOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via FINALLY_BODY OUT edge.
+    */
+  def _literalViaFinallyBodyOut: Iterator[nodes.Literal] = finallyBodyOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via FOR_BODY OUT edge.
+    */
+  def _literalViaForBodyOut: Iterator[nodes.Literal] = forBodyOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via FOR_INIT OUT edge.
+    */
+  def _literalViaForInitOut: Iterator[nodes.Literal] = forInitOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via FOR_UPDATE OUT edge.
+    */
+  def _literalViaForUpdateOut: Iterator[nodes.Literal] = forUpdateOut.collectAll[nodes.Literal]
+
   /** Traverse to LITERAL via POST_DOMINATE IN edge.
     */
   def _literalViaPostDominateIn: Iterator[nodes.Literal] = postDominateIn.collectAll[nodes.Literal]
@@ -269,6 +518,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to LITERAL via REACHING_DEF OUT edge.
     */
   def _literalViaReachingDefOut: Iterator[nodes.Literal] = reachingDefOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via TRUE_BODY OUT edge.
+    */
+  def _literalViaTrueBodyOut: Iterator[nodes.Literal] = trueBodyOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via TRY_BODY OUT edge.
+    */
+  def _literalViaTryBodyOut: Iterator[nodes.Literal] = tryBodyOut.collectAll[nodes.Literal]
 
   /** Traverse to LOCAL via AST OUT edge.
     */
@@ -291,6 +548,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _methodRefViaAstOut: Iterator[nodes.MethodRef] = astOut.collectAll[nodes.MethodRef]
 
+  /** Traverse to METHOD_REF via CATCH_BODY OUT edge.
+    */
+  def _methodRefViaCatchBodyOut: Iterator[nodes.MethodRef] = catchBodyOut.collectAll[nodes.MethodRef]
+
   /** Traverse to METHOD_REF via CDG IN edge.
     */
   def _methodRefViaCdgIn: Iterator[nodes.MethodRef] = cdgIn.collectAll[nodes.MethodRef]
@@ -311,6 +572,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _methodRefViaDominateOut: Iterator[nodes.MethodRef] = dominateOut.collectAll[nodes.MethodRef]
 
+  /** Traverse to METHOD_REF via DO_BODY OUT edge.
+    */
+  def _methodRefViaDoBodyOut: Iterator[nodes.MethodRef] = doBodyOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via FALSE_BODY OUT edge.
+    */
+  def _methodRefViaFalseBodyOut: Iterator[nodes.MethodRef] = falseBodyOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via FINALLY_BODY OUT edge.
+    */
+  def _methodRefViaFinallyBodyOut: Iterator[nodes.MethodRef] = finallyBodyOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via FOR_BODY OUT edge.
+    */
+  def _methodRefViaForBodyOut: Iterator[nodes.MethodRef] = forBodyOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via FOR_INIT OUT edge.
+    */
+  def _methodRefViaForInitOut: Iterator[nodes.MethodRef] = forInitOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via FOR_UPDATE OUT edge.
+    */
+  def _methodRefViaForUpdateOut: Iterator[nodes.MethodRef] = forUpdateOut.collectAll[nodes.MethodRef]
+
   /** Traverse to METHOD_REF via POST_DOMINATE IN edge.
     */
   def _methodRefViaPostDominateIn: Iterator[nodes.MethodRef] = postDominateIn.collectAll[nodes.MethodRef]
@@ -322,6 +607,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to METHOD_REF via REACHING_DEF OUT edge.
     */
   def _methodRefViaReachingDefOut: Iterator[nodes.MethodRef] = reachingDefOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via TRUE_BODY OUT edge.
+    */
+  def _methodRefViaTrueBodyOut: Iterator[nodes.MethodRef] = trueBodyOut.collectAll[nodes.MethodRef]
+
+  /** Traverse to METHOD_REF via TRY_BODY OUT edge.
+    */
+  def _methodRefViaTryBodyOut: Iterator[nodes.MethodRef] = tryBodyOut.collectAll[nodes.MethodRef]
 
   /** Traverse to METHOD_RETURN via CDG OUT edge.
     */
@@ -351,6 +644,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _returnViaAstOut: Iterator[nodes.Return] = astOut.collectAll[nodes.Return]
 
+  /** Traverse to RETURN via CATCH_BODY OUT edge.
+    */
+  def _returnViaCatchBodyOut: Iterator[nodes.Return] = catchBodyOut.collectAll[nodes.Return]
+
   /** Traverse to RETURN via CDG OUT edge.
     */
   def _returnViaCdgOut: Iterator[nodes.Return] = cdgOut.collectAll[nodes.Return]
@@ -367,6 +664,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _returnViaDominateOut: Iterator[nodes.Return] = dominateOut.collectAll[nodes.Return]
 
+  /** Traverse to RETURN via DO_BODY OUT edge.
+    */
+  def _returnViaDoBodyOut: Iterator[nodes.Return] = doBodyOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via FALSE_BODY OUT edge.
+    */
+  def _returnViaFalseBodyOut: Iterator[nodes.Return] = falseBodyOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via FINALLY_BODY OUT edge.
+    */
+  def _returnViaFinallyBodyOut: Iterator[nodes.Return] = finallyBodyOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via FOR_BODY OUT edge.
+    */
+  def _returnViaForBodyOut: Iterator[nodes.Return] = forBodyOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via FOR_INIT OUT edge.
+    */
+  def _returnViaForInitOut: Iterator[nodes.Return] = forInitOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via FOR_UPDATE OUT edge.
+    */
+  def _returnViaForUpdateOut: Iterator[nodes.Return] = forUpdateOut.collectAll[nodes.Return]
+
   /** Traverse to RETURN via POST_DOMINATE IN edge.
     */
   def _returnViaPostDominateIn: Iterator[nodes.Return] = postDominateIn.collectAll[nodes.Return]
@@ -379,6 +700,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _returnViaReachingDefOut: Iterator[nodes.Return] = reachingDefOut.collectAll[nodes.Return]
 
+  /** Traverse to RETURN via TRUE_BODY OUT edge.
+    */
+  def _returnViaTrueBodyOut: Iterator[nodes.Return] = trueBodyOut.collectAll[nodes.Return]
+
+  /** Traverse to RETURN via TRY_BODY OUT edge.
+    */
+  def _returnViaTryBodyOut: Iterator[nodes.Return] = tryBodyOut.collectAll[nodes.Return]
+
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: Iterator[nodes.Tag] = taggedByOut.collectAll[nodes.Tag]
@@ -390,6 +719,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to TYPE_REF via AST OUT edge.
     */
   def _typeRefViaAstOut: Iterator[nodes.TypeRef] = astOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via CATCH_BODY OUT edge.
+    */
+  def _typeRefViaCatchBodyOut: Iterator[nodes.TypeRef] = catchBodyOut.collectAll[nodes.TypeRef]
 
   /** Traverse to TYPE_REF via CDG IN edge.
     */
@@ -411,6 +744,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _typeRefViaDominateOut: Iterator[nodes.TypeRef] = dominateOut.collectAll[nodes.TypeRef]
 
+  /** Traverse to TYPE_REF via DO_BODY OUT edge.
+    */
+  def _typeRefViaDoBodyOut: Iterator[nodes.TypeRef] = doBodyOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via FALSE_BODY OUT edge.
+    */
+  def _typeRefViaFalseBodyOut: Iterator[nodes.TypeRef] = falseBodyOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via FINALLY_BODY OUT edge.
+    */
+  def _typeRefViaFinallyBodyOut: Iterator[nodes.TypeRef] = finallyBodyOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via FOR_BODY OUT edge.
+    */
+  def _typeRefViaForBodyOut: Iterator[nodes.TypeRef] = forBodyOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via FOR_INIT OUT edge.
+    */
+  def _typeRefViaForInitOut: Iterator[nodes.TypeRef] = forInitOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via FOR_UPDATE OUT edge.
+    */
+  def _typeRefViaForUpdateOut: Iterator[nodes.TypeRef] = forUpdateOut.collectAll[nodes.TypeRef]
+
   /** Traverse to TYPE_REF via POST_DOMINATE IN edge.
     */
   def _typeRefViaPostDominateIn: Iterator[nodes.TypeRef] = postDominateIn.collectAll[nodes.TypeRef]
@@ -423,6 +780,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _typeRefViaReachingDefOut: Iterator[nodes.TypeRef] = reachingDefOut.collectAll[nodes.TypeRef]
 
+  /** Traverse to TYPE_REF via TRUE_BODY OUT edge.
+    */
+  def _typeRefViaTrueBodyOut: Iterator[nodes.TypeRef] = trueBodyOut.collectAll[nodes.TypeRef]
+
+  /** Traverse to TYPE_REF via TRY_BODY OUT edge.
+    */
+  def _typeRefViaTryBodyOut: Iterator[nodes.TypeRef] = tryBodyOut.collectAll[nodes.TypeRef]
+
   /** Traverse to UNKNOWN via AST IN edge.
     */
   def _unknownViaAstIn: Iterator[nodes.Unknown] = astIn.collectAll[nodes.Unknown]
@@ -430,6 +795,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to UNKNOWN via AST OUT edge.
     */
   def _unknownViaAstOut: Iterator[nodes.Unknown] = astOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via CATCH_BODY OUT edge.
+    */
+  def _unknownViaCatchBodyOut: Iterator[nodes.Unknown] = catchBodyOut.collectAll[nodes.Unknown]
 
   /** Traverse to UNKNOWN via CDG IN edge.
     */
@@ -451,6 +820,30 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _unknownViaDominateOut: Iterator[nodes.Unknown] = dominateOut.collectAll[nodes.Unknown]
 
+  /** Traverse to UNKNOWN via DO_BODY OUT edge.
+    */
+  def _unknownViaDoBodyOut: Iterator[nodes.Unknown] = doBodyOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via FALSE_BODY OUT edge.
+    */
+  def _unknownViaFalseBodyOut: Iterator[nodes.Unknown] = falseBodyOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via FINALLY_BODY OUT edge.
+    */
+  def _unknownViaFinallyBodyOut: Iterator[nodes.Unknown] = finallyBodyOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via FOR_BODY OUT edge.
+    */
+  def _unknownViaForBodyOut: Iterator[nodes.Unknown] = forBodyOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via FOR_INIT OUT edge.
+    */
+  def _unknownViaForInitOut: Iterator[nodes.Unknown] = forInitOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via FOR_UPDATE OUT edge.
+    */
+  def _unknownViaForUpdateOut: Iterator[nodes.Unknown] = forUpdateOut.collectAll[nodes.Unknown]
+
   /** Traverse to UNKNOWN via POST_DOMINATE IN edge.
     */
   def _unknownViaPostDominateIn: Iterator[nodes.Unknown] = postDominateIn.collectAll[nodes.Unknown]
@@ -459,11 +852,23 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _unknownViaPostDominateOut: Iterator[nodes.Unknown] = postDominateOut.collectAll[nodes.Unknown]
 
+  /** Traverse to UNKNOWN via TRUE_BODY OUT edge.
+    */
+  def _unknownViaTrueBodyOut: Iterator[nodes.Unknown] = trueBodyOut.collectAll[nodes.Unknown]
+
+  /** Traverse to UNKNOWN via TRY_BODY OUT edge.
+    */
+  def _unknownViaTryBodyOut: Iterator[nodes.Unknown] = tryBodyOut.collectAll[nodes.Unknown]
+
   def argumentIn: Iterator[nodes.Expression] = node._argumentIn.cast[nodes.Expression]
 
   def astIn: Iterator[nodes.Expression] = node._astIn.cast[nodes.Expression]
 
   def astOut: Iterator[nodes.AstNode] = node._astOut.cast[nodes.AstNode]
+
+  def catchBodyIn: Iterator[nodes.ControlStructure] = node._catchBodyIn.cast[nodes.ControlStructure]
+
+  def catchBodyOut: Iterator[nodes.CfgNode] = node._catchBodyOut.cast[nodes.CfgNode]
 
   def cdgIn: Iterator[nodes.CfgNode] = node._cdgIn.cast[nodes.CfgNode]
 
@@ -477,11 +882,35 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
 
   def containsIn: Iterator[nodes.Method] = node._containsIn.cast[nodes.Method]
 
+  def doBodyIn: Iterator[nodes.ControlStructure] = node._doBodyIn.cast[nodes.ControlStructure]
+
+  def doBodyOut: Iterator[nodes.CfgNode] = node._doBodyOut.cast[nodes.CfgNode]
+
   def dominateIn: Iterator[nodes.CfgNode] = node._dominateIn.cast[nodes.CfgNode]
 
   def dominateOut: Iterator[nodes.CfgNode] = node._dominateOut.cast[nodes.CfgNode]
 
   def evalTypeOut: Iterator[nodes.Type] = node._evalTypeOut.cast[nodes.Type]
+
+  def falseBodyIn: Iterator[nodes.ControlStructure] = node._falseBodyIn.cast[nodes.ControlStructure]
+
+  def falseBodyOut: Iterator[nodes.CfgNode] = node._falseBodyOut.cast[nodes.CfgNode]
+
+  def finallyBodyIn: Iterator[nodes.ControlStructure] = node._finallyBodyIn.cast[nodes.ControlStructure]
+
+  def finallyBodyOut: Iterator[nodes.CfgNode] = node._finallyBodyOut.cast[nodes.CfgNode]
+
+  def forBodyIn: Iterator[nodes.ControlStructure] = node._forBodyIn.cast[nodes.ControlStructure]
+
+  def forBodyOut: Iterator[nodes.CfgNode] = node._forBodyOut.cast[nodes.CfgNode]
+
+  def forInitIn: Iterator[nodes.ControlStructure] = node._forInitIn.cast[nodes.ControlStructure]
+
+  def forInitOut: Iterator[nodes.CfgNode] = node._forInitOut.cast[nodes.CfgNode]
+
+  def forUpdateIn: Iterator[nodes.ControlStructure] = node._forUpdateIn.cast[nodes.ControlStructure]
+
+  def forUpdateOut: Iterator[nodes.CfgNode] = node._forUpdateOut.cast[nodes.CfgNode]
 
   def postDominateIn: Iterator[nodes.CfgNode] = node._postDominateIn.cast[nodes.CfgNode]
 
@@ -492,6 +921,14 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   def receiverIn: Iterator[nodes.Call] = node._receiverIn.cast[nodes.Call]
 
   def taggedByOut: Iterator[nodes.Tag] = node._taggedByOut.cast[nodes.Tag]
+
+  def trueBodyIn: Iterator[nodes.ControlStructure] = node._trueBodyIn.cast[nodes.ControlStructure]
+
+  def trueBodyOut: Iterator[nodes.CfgNode] = node._trueBodyOut.cast[nodes.CfgNode]
+
+  def tryBodyIn: Iterator[nodes.ControlStructure] = node._tryBodyIn.cast[nodes.ControlStructure]
+
+  def tryBodyOut: Iterator[nodes.CfgNode] = node._tryBodyOut.cast[nodes.CfgNode]
 }
 
 final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[nodes.ControlStructure])
@@ -504,6 +941,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to BLOCK via AST OUT edge.
     */
   def _blockViaAstOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaAstOut)
+
+  /** Traverse to BLOCK via CATCH_BODY OUT edge.
+    */
+  def _blockViaCatchBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaCatchBodyOut)
 
   /** Traverse to BLOCK via CDG IN edge.
     */
@@ -525,6 +966,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _blockViaDominateOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaDominateOut)
 
+  /** Traverse to BLOCK via DO_BODY OUT edge.
+    */
+  def _blockViaDoBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaDoBodyOut)
+
+  /** Traverse to BLOCK via FALSE_BODY OUT edge.
+    */
+  def _blockViaFalseBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaFalseBodyOut)
+
+  /** Traverse to BLOCK via FINALLY_BODY OUT edge.
+    */
+  def _blockViaFinallyBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaFinallyBodyOut)
+
+  /** Traverse to BLOCK via FOR_BODY OUT edge.
+    */
+  def _blockViaForBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaForBodyOut)
+
+  /** Traverse to BLOCK via FOR_INIT OUT edge.
+    */
+  def _blockViaForInitOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaForInitOut)
+
+  /** Traverse to BLOCK via FOR_UPDATE OUT edge.
+    */
+  def _blockViaForUpdateOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaForUpdateOut)
+
   /** Traverse to BLOCK via POST_DOMINATE IN edge.
     */
   def _blockViaPostDominateIn: Iterator[nodes.Block] = traversal.flatMap(_._blockViaPostDominateIn)
@@ -532,6 +997,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to BLOCK via POST_DOMINATE OUT edge.
     */
   def _blockViaPostDominateOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaPostDominateOut)
+
+  /** Traverse to BLOCK via TRUE_BODY OUT edge.
+    */
+  def _blockViaTrueBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaTrueBodyOut)
+
+  /** Traverse to BLOCK via TRY_BODY OUT edge.
+    */
+  def _blockViaTryBodyOut: Iterator[nodes.Block] = traversal.flatMap(_._blockViaTryBodyOut)
 
   /** Traverse to CALL via ARGUMENT IN edge.
     */
@@ -544,6 +1017,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to CALL via AST OUT edge.
     */
   def _callViaAstOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaAstOut)
+
+  /** Traverse to CALL via CATCH_BODY OUT edge.
+    */
+  def _callViaCatchBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaCatchBodyOut)
 
   /** Traverse to CALL via CDG IN edge.
     */
@@ -565,6 +1042,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _callViaDominateOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaDominateOut)
 
+  /** Traverse to CALL via DO_BODY OUT edge.
+    */
+  def _callViaDoBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaDoBodyOut)
+
+  /** Traverse to CALL via FALSE_BODY OUT edge.
+    */
+  def _callViaFalseBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaFalseBodyOut)
+
+  /** Traverse to CALL via FINALLY_BODY OUT edge.
+    */
+  def _callViaFinallyBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaFinallyBodyOut)
+
+  /** Traverse to CALL via FOR_BODY OUT edge.
+    */
+  def _callViaForBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaForBodyOut)
+
+  /** Traverse to CALL via FOR_INIT OUT edge.
+    */
+  def _callViaForInitOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaForInitOut)
+
+  /** Traverse to CALL via FOR_UPDATE OUT edge.
+    */
+  def _callViaForUpdateOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaForUpdateOut)
+
   /** Traverse to CALL via POST_DOMINATE IN edge.
     */
   def _callViaPostDominateIn: Iterator[nodes.Call] = traversal.flatMap(_._callViaPostDominateIn)
@@ -581,6 +1082,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _callViaReceiverIn: Iterator[nodes.Call] = traversal.flatMap(_._callViaReceiverIn)
 
+  /** Traverse to CALL via TRUE_BODY OUT edge.
+    */
+  def _callViaTrueBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaTrueBodyOut)
+
+  /** Traverse to CALL via TRY_BODY OUT edge.
+    */
+  def _callViaTryBodyOut: Iterator[nodes.Call] = traversal.flatMap(_._callViaTryBodyOut)
+
   /** Traverse to CFG_NODE via CFG OUT edge.
     */
   def _cfgNodeViaCfgOut: Iterator[nodes.CfgNode] = traversal.flatMap(_._cfgNodeViaCfgOut)
@@ -592,6 +1101,16 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to CONTROL_STRUCTURE via AST OUT edge.
     */
   def _controlStructureViaAstOut: Iterator[nodes.ControlStructure] = traversal.flatMap(_._controlStructureViaAstOut)
+
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY IN edge.
+    */
+  def _controlStructureViaCatchBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaCatchBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY OUT edge.
+    */
+  def _controlStructureViaCatchBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaCatchBodyOut)
 
   /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
     */
@@ -621,6 +1140,65 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   def _controlStructureViaDominateOut: Iterator[nodes.ControlStructure] =
     traversal.flatMap(_._controlStructureViaDominateOut)
 
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY IN edge.
+    */
+  def _controlStructureViaDoBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_._controlStructureViaDoBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY OUT edge.
+    */
+  def _controlStructureViaDoBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaDoBodyOut)
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY IN edge.
+    */
+  def _controlStructureViaFalseBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFalseBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY OUT edge.
+    */
+  def _controlStructureViaFalseBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFalseBodyOut)
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY IN edge.
+    */
+  def _controlStructureViaFinallyBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFinallyBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY OUT edge.
+    */
+  def _controlStructureViaFinallyBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFinallyBodyOut)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY IN edge.
+    */
+  def _controlStructureViaForBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY OUT edge.
+    */
+  def _controlStructureViaForBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForBodyOut)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT IN edge.
+    */
+  def _controlStructureViaForInitIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForInitIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT OUT edge.
+    */
+  def _controlStructureViaForInitOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForInitOut)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE IN edge.
+    */
+  def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForUpdateIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE OUT edge.
+    */
+  def _controlStructureViaForUpdateOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForUpdateOut)
+
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
   def _controlStructureViaPostDominateIn: Iterator[nodes.ControlStructure] =
@@ -630,6 +1208,26 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _controlStructureViaPostDominateOut: Iterator[nodes.ControlStructure] =
     traversal.flatMap(_._controlStructureViaPostDominateOut)
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY IN edge.
+    */
+  def _controlStructureViaTrueBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTrueBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY OUT edge.
+    */
+  def _controlStructureViaTrueBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTrueBodyOut)
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY IN edge.
+    */
+  def _controlStructureViaTryBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTryBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY OUT edge.
+    */
+  def _controlStructureViaTryBodyOut: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTryBodyOut)
 
   /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
     */
@@ -663,6 +1261,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _identifierViaAstOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaAstOut)
 
+  /** Traverse to IDENTIFIER via CATCH_BODY OUT edge.
+    */
+  def _identifierViaCatchBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaCatchBodyOut)
+
   /** Traverse to IDENTIFIER via CDG IN edge.
     */
   def _identifierViaCdgIn: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaCdgIn)
@@ -683,6 +1285,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _identifierViaDominateOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaDominateOut)
 
+  /** Traverse to IDENTIFIER via DO_BODY OUT edge.
+    */
+  def _identifierViaDoBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaDoBodyOut)
+
+  /** Traverse to IDENTIFIER via FALSE_BODY OUT edge.
+    */
+  def _identifierViaFalseBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaFalseBodyOut)
+
+  /** Traverse to IDENTIFIER via FINALLY_BODY OUT edge.
+    */
+  def _identifierViaFinallyBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaFinallyBodyOut)
+
+  /** Traverse to IDENTIFIER via FOR_BODY OUT edge.
+    */
+  def _identifierViaForBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaForBodyOut)
+
+  /** Traverse to IDENTIFIER via FOR_INIT OUT edge.
+    */
+  def _identifierViaForInitOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaForInitOut)
+
+  /** Traverse to IDENTIFIER via FOR_UPDATE OUT edge.
+    */
+  def _identifierViaForUpdateOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaForUpdateOut)
+
   /** Traverse to IDENTIFIER via POST_DOMINATE IN edge.
     */
   def _identifierViaPostDominateIn: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaPostDominateIn)
@@ -695,6 +1321,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _identifierViaReachingDefOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaReachingDefOut)
 
+  /** Traverse to IDENTIFIER via TRUE_BODY OUT edge.
+    */
+  def _identifierViaTrueBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaTrueBodyOut)
+
+  /** Traverse to IDENTIFIER via TRY_BODY OUT edge.
+    */
+  def _identifierViaTryBodyOut: Iterator[nodes.Identifier] = traversal.flatMap(_._identifierViaTryBodyOut)
+
   /** Traverse to JUMP_LABEL via AST OUT edge.
     */
   def _jumpLabelViaAstOut: Iterator[nodes.JumpLabel] = traversal.flatMap(_._jumpLabelViaAstOut)
@@ -702,6 +1336,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to JUMP_TARGET via AST OUT edge.
     */
   def _jumpTargetViaAstOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaAstOut)
+
+  /** Traverse to JUMP_TARGET via CATCH_BODY OUT edge.
+    */
+  def _jumpTargetViaCatchBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaCatchBodyOut)
 
   /** Traverse to JUMP_TARGET via CDG IN edge.
     */
@@ -723,6 +1361,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _jumpTargetViaDominateOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaDominateOut)
 
+  /** Traverse to JUMP_TARGET via DO_BODY OUT edge.
+    */
+  def _jumpTargetViaDoBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaDoBodyOut)
+
+  /** Traverse to JUMP_TARGET via FALSE_BODY OUT edge.
+    */
+  def _jumpTargetViaFalseBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaFalseBodyOut)
+
+  /** Traverse to JUMP_TARGET via FINALLY_BODY OUT edge.
+    */
+  def _jumpTargetViaFinallyBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaFinallyBodyOut)
+
+  /** Traverse to JUMP_TARGET via FOR_BODY OUT edge.
+    */
+  def _jumpTargetViaForBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaForBodyOut)
+
+  /** Traverse to JUMP_TARGET via FOR_INIT OUT edge.
+    */
+  def _jumpTargetViaForInitOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaForInitOut)
+
+  /** Traverse to JUMP_TARGET via FOR_UPDATE OUT edge.
+    */
+  def _jumpTargetViaForUpdateOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaForUpdateOut)
+
   /** Traverse to JUMP_TARGET via POST_DOMINATE IN edge.
     */
   def _jumpTargetViaPostDominateIn: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaPostDominateIn)
@@ -731,9 +1393,21 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _jumpTargetViaPostDominateOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaPostDominateOut)
 
+  /** Traverse to JUMP_TARGET via TRUE_BODY OUT edge.
+    */
+  def _jumpTargetViaTrueBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaTrueBodyOut)
+
+  /** Traverse to JUMP_TARGET via TRY_BODY OUT edge.
+    */
+  def _jumpTargetViaTryBodyOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaTryBodyOut)
+
   /** Traverse to LITERAL via AST OUT edge.
     */
   def _literalViaAstOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaAstOut)
+
+  /** Traverse to LITERAL via CATCH_BODY OUT edge.
+    */
+  def _literalViaCatchBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaCatchBodyOut)
 
   /** Traverse to LITERAL via CDG IN edge.
     */
@@ -755,6 +1429,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _literalViaDominateOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaDominateOut)
 
+  /** Traverse to LITERAL via DO_BODY OUT edge.
+    */
+  def _literalViaDoBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaDoBodyOut)
+
+  /** Traverse to LITERAL via FALSE_BODY OUT edge.
+    */
+  def _literalViaFalseBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaFalseBodyOut)
+
+  /** Traverse to LITERAL via FINALLY_BODY OUT edge.
+    */
+  def _literalViaFinallyBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaFinallyBodyOut)
+
+  /** Traverse to LITERAL via FOR_BODY OUT edge.
+    */
+  def _literalViaForBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaForBodyOut)
+
+  /** Traverse to LITERAL via FOR_INIT OUT edge.
+    */
+  def _literalViaForInitOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaForInitOut)
+
+  /** Traverse to LITERAL via FOR_UPDATE OUT edge.
+    */
+  def _literalViaForUpdateOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaForUpdateOut)
+
   /** Traverse to LITERAL via POST_DOMINATE IN edge.
     */
   def _literalViaPostDominateIn: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaPostDominateIn)
@@ -766,6 +1464,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to LITERAL via REACHING_DEF OUT edge.
     */
   def _literalViaReachingDefOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaReachingDefOut)
+
+  /** Traverse to LITERAL via TRUE_BODY OUT edge.
+    */
+  def _literalViaTrueBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaTrueBodyOut)
+
+  /** Traverse to LITERAL via TRY_BODY OUT edge.
+    */
+  def _literalViaTryBodyOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaTryBodyOut)
 
   /** Traverse to LOCAL via AST OUT edge.
     */
@@ -788,6 +1494,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _methodRefViaAstOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaAstOut)
 
+  /** Traverse to METHOD_REF via CATCH_BODY OUT edge.
+    */
+  def _methodRefViaCatchBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaCatchBodyOut)
+
   /** Traverse to METHOD_REF via CDG IN edge.
     */
   def _methodRefViaCdgIn: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaCdgIn)
@@ -808,6 +1518,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _methodRefViaDominateOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaDominateOut)
 
+  /** Traverse to METHOD_REF via DO_BODY OUT edge.
+    */
+  def _methodRefViaDoBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaDoBodyOut)
+
+  /** Traverse to METHOD_REF via FALSE_BODY OUT edge.
+    */
+  def _methodRefViaFalseBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaFalseBodyOut)
+
+  /** Traverse to METHOD_REF via FINALLY_BODY OUT edge.
+    */
+  def _methodRefViaFinallyBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaFinallyBodyOut)
+
+  /** Traverse to METHOD_REF via FOR_BODY OUT edge.
+    */
+  def _methodRefViaForBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaForBodyOut)
+
+  /** Traverse to METHOD_REF via FOR_INIT OUT edge.
+    */
+  def _methodRefViaForInitOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaForInitOut)
+
+  /** Traverse to METHOD_REF via FOR_UPDATE OUT edge.
+    */
+  def _methodRefViaForUpdateOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaForUpdateOut)
+
   /** Traverse to METHOD_REF via POST_DOMINATE IN edge.
     */
   def _methodRefViaPostDominateIn: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaPostDominateIn)
@@ -819,6 +1553,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to METHOD_REF via REACHING_DEF OUT edge.
     */
   def _methodRefViaReachingDefOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaReachingDefOut)
+
+  /** Traverse to METHOD_REF via TRUE_BODY OUT edge.
+    */
+  def _methodRefViaTrueBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaTrueBodyOut)
+
+  /** Traverse to METHOD_REF via TRY_BODY OUT edge.
+    */
+  def _methodRefViaTryBodyOut: Iterator[nodes.MethodRef] = traversal.flatMap(_._methodRefViaTryBodyOut)
 
   /** Traverse to METHOD_RETURN via CDG OUT edge.
     */
@@ -848,6 +1590,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _returnViaAstOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaAstOut)
 
+  /** Traverse to RETURN via CATCH_BODY OUT edge.
+    */
+  def _returnViaCatchBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaCatchBodyOut)
+
   /** Traverse to RETURN via CDG OUT edge.
     */
   def _returnViaCdgOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaCdgOut)
@@ -864,6 +1610,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _returnViaDominateOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaDominateOut)
 
+  /** Traverse to RETURN via DO_BODY OUT edge.
+    */
+  def _returnViaDoBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaDoBodyOut)
+
+  /** Traverse to RETURN via FALSE_BODY OUT edge.
+    */
+  def _returnViaFalseBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaFalseBodyOut)
+
+  /** Traverse to RETURN via FINALLY_BODY OUT edge.
+    */
+  def _returnViaFinallyBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaFinallyBodyOut)
+
+  /** Traverse to RETURN via FOR_BODY OUT edge.
+    */
+  def _returnViaForBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaForBodyOut)
+
+  /** Traverse to RETURN via FOR_INIT OUT edge.
+    */
+  def _returnViaForInitOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaForInitOut)
+
+  /** Traverse to RETURN via FOR_UPDATE OUT edge.
+    */
+  def _returnViaForUpdateOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaForUpdateOut)
+
   /** Traverse to RETURN via POST_DOMINATE IN edge.
     */
   def _returnViaPostDominateIn: Iterator[nodes.Return] = traversal.flatMap(_._returnViaPostDominateIn)
@@ -876,6 +1646,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _returnViaReachingDefOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaReachingDefOut)
 
+  /** Traverse to RETURN via TRUE_BODY OUT edge.
+    */
+  def _returnViaTrueBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaTrueBodyOut)
+
+  /** Traverse to RETURN via TRY_BODY OUT edge.
+    */
+  def _returnViaTryBodyOut: Iterator[nodes.Return] = traversal.flatMap(_._returnViaTryBodyOut)
+
   /** Traverse to TAG via TAGGED_BY OUT edge.
     */
   def _tagViaTaggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_._tagViaTaggedByOut)
@@ -887,6 +1665,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to TYPE_REF via AST OUT edge.
     */
   def _typeRefViaAstOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaAstOut)
+
+  /** Traverse to TYPE_REF via CATCH_BODY OUT edge.
+    */
+  def _typeRefViaCatchBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaCatchBodyOut)
 
   /** Traverse to TYPE_REF via CDG IN edge.
     */
@@ -908,6 +1690,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _typeRefViaDominateOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaDominateOut)
 
+  /** Traverse to TYPE_REF via DO_BODY OUT edge.
+    */
+  def _typeRefViaDoBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaDoBodyOut)
+
+  /** Traverse to TYPE_REF via FALSE_BODY OUT edge.
+    */
+  def _typeRefViaFalseBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaFalseBodyOut)
+
+  /** Traverse to TYPE_REF via FINALLY_BODY OUT edge.
+    */
+  def _typeRefViaFinallyBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaFinallyBodyOut)
+
+  /** Traverse to TYPE_REF via FOR_BODY OUT edge.
+    */
+  def _typeRefViaForBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaForBodyOut)
+
+  /** Traverse to TYPE_REF via FOR_INIT OUT edge.
+    */
+  def _typeRefViaForInitOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaForInitOut)
+
+  /** Traverse to TYPE_REF via FOR_UPDATE OUT edge.
+    */
+  def _typeRefViaForUpdateOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaForUpdateOut)
+
   /** Traverse to TYPE_REF via POST_DOMINATE IN edge.
     */
   def _typeRefViaPostDominateIn: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaPostDominateIn)
@@ -920,6 +1726,14 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _typeRefViaReachingDefOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaReachingDefOut)
 
+  /** Traverse to TYPE_REF via TRUE_BODY OUT edge.
+    */
+  def _typeRefViaTrueBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaTrueBodyOut)
+
+  /** Traverse to TYPE_REF via TRY_BODY OUT edge.
+    */
+  def _typeRefViaTryBodyOut: Iterator[nodes.TypeRef] = traversal.flatMap(_._typeRefViaTryBodyOut)
+
   /** Traverse to UNKNOWN via AST IN edge.
     */
   def _unknownViaAstIn: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaAstIn)
@@ -927,6 +1741,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to UNKNOWN via AST OUT edge.
     */
   def _unknownViaAstOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaAstOut)
+
+  /** Traverse to UNKNOWN via CATCH_BODY OUT edge.
+    */
+  def _unknownViaCatchBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaCatchBodyOut)
 
   /** Traverse to UNKNOWN via CDG IN edge.
     */
@@ -948,6 +1766,30 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _unknownViaDominateOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaDominateOut)
 
+  /** Traverse to UNKNOWN via DO_BODY OUT edge.
+    */
+  def _unknownViaDoBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaDoBodyOut)
+
+  /** Traverse to UNKNOWN via FALSE_BODY OUT edge.
+    */
+  def _unknownViaFalseBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaFalseBodyOut)
+
+  /** Traverse to UNKNOWN via FINALLY_BODY OUT edge.
+    */
+  def _unknownViaFinallyBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaFinallyBodyOut)
+
+  /** Traverse to UNKNOWN via FOR_BODY OUT edge.
+    */
+  def _unknownViaForBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaForBodyOut)
+
+  /** Traverse to UNKNOWN via FOR_INIT OUT edge.
+    */
+  def _unknownViaForInitOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaForInitOut)
+
+  /** Traverse to UNKNOWN via FOR_UPDATE OUT edge.
+    */
+  def _unknownViaForUpdateOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaForUpdateOut)
+
   /** Traverse to UNKNOWN via POST_DOMINATE IN edge.
     */
   def _unknownViaPostDominateIn: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaPostDominateIn)
@@ -956,11 +1798,23 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _unknownViaPostDominateOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaPostDominateOut)
 
+  /** Traverse to UNKNOWN via TRUE_BODY OUT edge.
+    */
+  def _unknownViaTrueBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaTrueBodyOut)
+
+  /** Traverse to UNKNOWN via TRY_BODY OUT edge.
+    */
+  def _unknownViaTryBodyOut: Iterator[nodes.Unknown] = traversal.flatMap(_._unknownViaTryBodyOut)
+
   def argumentIn: Iterator[nodes.Expression] = traversal.flatMap(_.argumentIn)
 
   def astIn: Iterator[nodes.Expression] = traversal.flatMap(_.astIn)
 
   def astOut: Iterator[nodes.AstNode] = traversal.flatMap(_.astOut)
+
+  def catchBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.catchBodyIn)
+
+  def catchBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.catchBodyOut)
 
   def cdgIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgIn)
 
@@ -974,11 +1828,35 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
 
   def containsIn: Iterator[nodes.Method] = traversal.flatMap(_.containsIn)
 
+  def doBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.doBodyIn)
+
+  def doBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.doBodyOut)
+
   def dominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.dominateIn)
 
   def dominateOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.dominateOut)
 
   def evalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_.evalTypeOut)
+
+  def falseBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.falseBodyIn)
+
+  def falseBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.falseBodyOut)
+
+  def finallyBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.finallyBodyIn)
+
+  def finallyBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.finallyBodyOut)
+
+  def forBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forBodyIn)
+
+  def forBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.forBodyOut)
+
+  def forInitIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forInitIn)
+
+  def forInitOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.forInitOut)
+
+  def forUpdateIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forUpdateIn)
+
+  def forUpdateOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.forUpdateOut)
 
   def postDominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.postDominateIn)
 
@@ -989,4 +1867,12 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   def receiverIn: Iterator[nodes.Call] = traversal.flatMap(_.receiverIn)
 
   def taggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.taggedByOut)
+
+  def trueBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.trueBodyIn)
+
+  def trueBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.trueBodyOut)
+
+  def tryBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.tryBodyIn)
+
+  def tryBodyOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.tryBodyOut)
 }

@@ -127,6 +127,15 @@ object ProtoIds {
   val AstParentFullName         = 57
   val DependencyGroupId         = 58
   val StaticReceiver            = 59
+  val TrueBody                  = 60
+  val FalseBody                 = 61
+  val DoBody                    = 62
+  val ForInit                   = 63
+  val ForUpdate                 = 64
+  val ForBody                   = 65
+  val TryBody                   = 66
+  val CatchBody                 = 67
+  val FinallyBody               = 68
   val Symbol                    = 100
   val MethodShortName           = 102
   val PackageName               = 103

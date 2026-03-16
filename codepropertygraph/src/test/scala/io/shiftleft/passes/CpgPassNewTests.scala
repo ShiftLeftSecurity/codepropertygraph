@@ -2,8 +2,9 @@ package io.shiftleft.passes
 
 import flatgraph.SchemaViolationException
 import io.shiftleft.codepropertygraph.generated.Cpg
+import io.shiftleft.codepropertygraph.generated.ControlStructureTypes
 import io.shiftleft.codepropertygraph.generated.language.*
-import io.shiftleft.codepropertygraph.generated.nodes.NewFile
+import io.shiftleft.codepropertygraph.generated.nodes.{NewBlock, NewControlStructure, NewFile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -49,6 +50,28 @@ class CpgPassNewTests extends AnyWordSpec with Matchers {
 
       // the above DiffGraph is not schema conform, applying it must throw an exception
       intercept[SchemaViolationException] {
+        pass.createAndApply()
+      }
+    }
+
+    "accept explicit control-structure body edges" in {
+      val cpg = Cpg.empty
+      val pass = new CpgPass(cpg, "pass1-control-structure-edges") {
+        override def run(dst: DiffGraphBuilder): Unit = {
+          val controlStructure = NewControlStructure().controlStructureType(ControlStructureTypes.IF)
+          val trueBody         = NewBlock()
+          val falseBody        = NewBlock()
+
+          dst
+            .addNode(controlStructure)
+            .addNode(trueBody)
+            .addNode(falseBody)
+            .addEdge(controlStructure, trueBody, "TRUE_BODY")
+            .addEdge(controlStructure, falseBody, "FALSE_BODY")
+        }
+      }
+
+      noException shouldBe thrownBy {
         pass.createAndApply()
       }
     }

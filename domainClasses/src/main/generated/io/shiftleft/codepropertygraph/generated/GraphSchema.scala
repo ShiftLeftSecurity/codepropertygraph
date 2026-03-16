@@ -58,12 +58,19 @@ object GraphSchema extends flatgraph.Schema {
     "CALL",
     "CAPTURE",
     "CAPTURED_BY",
+    "CATCH_BODY",
     "CDG",
     "CFG",
     "CONDITION",
     "CONTAINS",
     "DOMINATE",
+    "DO_BODY",
     "EVAL_TYPE",
+    "FALSE_BODY",
+    "FINALLY_BODY",
+    "FOR_BODY",
+    "FOR_INIT",
+    "FOR_UPDATE",
     "IMPORTS",
     "INHERITS_FROM",
     "IS_CALL_FOR_IMPORT",
@@ -73,7 +80,9 @@ object GraphSchema extends flatgraph.Schema {
     "RECEIVER",
     "REF",
     "SOURCE_FILE",
-    "TAGGED_BY"
+    "TAGGED_BY",
+    "TRUE_BODY",
+    "TRY_BODY"
   )
   val edgeKindByLabel = edgeLabels.zipWithIndex.toMap
   val edgePropertyAllocators: Array[Int => Array[?]] = Array(
@@ -96,7 +105,16 @@ object GraphSchema extends flatgraph.Schema {
     size => null,
     size => null,
     size => null,
-    size => Array.fill(size)("<empty>") /* label = REACHING_DEF, id = 19 */,
+    size => null,
+    size => null,
+    size => null,
+    size => null,
+    size => null,
+    size => null,
+    size => null,
+    size => Array.fill(size)("<empty>") /* label = REACHING_DEF, id = 26 */,
+    size => null,
+    size => null,
     size => null,
     size => null,
     size => null,
@@ -156,12 +174,19 @@ object GraphSchema extends flatgraph.Schema {
     (s, d, subseq, p) => new edges.Call(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Capture(s, d, subseq, p),
     (s, d, subseq, p) => new edges.CapturedBy(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.CatchBody(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Cdg(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Cfg(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Condition(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Contains(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Dominate(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.DoBody(s, d, subseq, p),
     (s, d, subseq, p) => new edges.EvalType(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.FalseBody(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.FinallyBody(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.ForBody(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.ForInit(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.ForUpdate(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Imports(s, d, subseq, p),
     (s, d, subseq, p) => new edges.InheritsFrom(s, d, subseq, p),
     (s, d, subseq, p) => new edges.IsCallForImport(s, d, subseq, p),
@@ -171,7 +196,9 @@ object GraphSchema extends flatgraph.Schema {
     (s, d, subseq, p) => new edges.Receiver(s, d, subseq, p),
     (s, d, subseq, p) => new edges.Ref(s, d, subseq, p),
     (s, d, subseq, p) => new edges.SourceFile(s, d, subseq, p),
-    (s, d, subseq, p) => new edges.TaggedBy(s, d, subseq, p)
+    (s, d, subseq, p) => new edges.TaggedBy(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.TrueBody(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.TryBody(s, d, subseq, p)
   )
   val nodePropertyAllocators: Array[Int => Array[?]] = Array(
     size => new Array[String](size),
@@ -1450,7 +1477,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters
   }
   override def getNumberOfNodeKinds: Int              = 43
-  override def getNumberOfEdgeKinds: Int              = 24
+  override def getNumberOfEdgeKinds: Int              = 33
   override def getNodeLabel(nodeKind: Int): String    = nodeLabels(nodeKind)
   override def getNodeKindByLabel(label: String): Int = nodeKindByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
   override def getEdgeLabel(nodeKind: Int, edgeKind: Int): String = edgeLabels(edgeKind)
