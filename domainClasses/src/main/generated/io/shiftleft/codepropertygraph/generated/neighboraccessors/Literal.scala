@@ -107,6 +107,10 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
     }
   }
 
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY IN edge.
+    */
+  def _controlStructureViaCatchBodyIn: Iterator[nodes.ControlStructure] = catchBodyIn.collectAll[nodes.ControlStructure]
+
   /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
     */
   def _controlStructureViaCdgIn: Iterator[nodes.ControlStructure] = cdgIn.collectAll[nodes.ControlStructure]
@@ -127,6 +131,31 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
     */
   def _controlStructureViaDominateOut: Iterator[nodes.ControlStructure] = dominateOut.collectAll[nodes.ControlStructure]
 
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY IN edge.
+    */
+  def _controlStructureViaDoBodyIn: Iterator[nodes.ControlStructure] = doBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY IN edge.
+    */
+  def _controlStructureViaFalseBodyIn: Iterator[nodes.ControlStructure] = falseBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY IN edge.
+    */
+  def _controlStructureViaFinallyBodyIn: Iterator[nodes.ControlStructure] =
+    finallyBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY IN edge.
+    */
+  def _controlStructureViaForBodyIn: Iterator[nodes.ControlStructure] = forBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT IN edge.
+    */
+  def _controlStructureViaForInitIn: Iterator[nodes.ControlStructure] = forInitIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE IN edge.
+    */
+  def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] = forUpdateIn.collectAll[nodes.ControlStructure]
+
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
   def _controlStructureViaPostDominateIn: Iterator[nodes.ControlStructure] =
@@ -141,6 +170,14 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
     */
   def _controlStructureViaReachingDefIn: Iterator[nodes.ControlStructure] =
     reachingDefIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY IN edge.
+    */
+  def _controlStructureViaTrueBodyIn: Iterator[nodes.ControlStructure] = trueBodyIn.collectAll[nodes.ControlStructure]
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY IN edge.
+    */
+  def _controlStructureViaTryBodyIn: Iterator[nodes.ControlStructure] = tryBodyIn.collectAll[nodes.ControlStructure]
 
   /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
     */
@@ -441,6 +478,8 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
 
   def astOut: Iterator[nodes.Annotation] = node._astOut.cast[nodes.Annotation]
 
+  def catchBodyIn: Iterator[nodes.ControlStructure] = node._catchBodyIn.cast[nodes.ControlStructure]
+
   def cdgIn: Iterator[nodes.CfgNode] = node._cdgIn.cast[nodes.CfgNode]
 
   def cdgOut: Iterator[nodes.CfgNode] = node._cdgOut.cast[nodes.CfgNode]
@@ -451,11 +490,23 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
 
   def containsIn: Iterator[nodes.Method] = node._containsIn.cast[nodes.Method]
 
+  def doBodyIn: Iterator[nodes.ControlStructure] = node._doBodyIn.cast[nodes.ControlStructure]
+
   def dominateIn: Iterator[nodes.CfgNode] = node._dominateIn.cast[nodes.CfgNode]
 
   def dominateOut: Iterator[nodes.CfgNode] = node._dominateOut.cast[nodes.CfgNode]
 
   def evalTypeOut: Iterator[nodes.Type] = node._evalTypeOut.cast[nodes.Type]
+
+  def falseBodyIn: Iterator[nodes.ControlStructure] = node._falseBodyIn.cast[nodes.ControlStructure]
+
+  def finallyBodyIn: Iterator[nodes.ControlStructure] = node._finallyBodyIn.cast[nodes.ControlStructure]
+
+  def forBodyIn: Iterator[nodes.ControlStructure] = node._forBodyIn.cast[nodes.ControlStructure]
+
+  def forInitIn: Iterator[nodes.ControlStructure] = node._forInitIn.cast[nodes.ControlStructure]
+
+  def forUpdateIn: Iterator[nodes.ControlStructure] = node._forUpdateIn.cast[nodes.ControlStructure]
 
   def postDominateIn: Iterator[nodes.CfgNode] = node._postDominateIn.cast[nodes.CfgNode]
 
@@ -468,6 +519,10 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
   def receiverIn: Iterator[nodes.Call] = node._receiverIn.cast[nodes.Call]
 
   def taggedByOut: Iterator[nodes.Tag] = node._taggedByOut.cast[nodes.Tag]
+
+  def trueBodyIn: Iterator[nodes.ControlStructure] = node._trueBodyIn.cast[nodes.ControlStructure]
+
+  def tryBodyIn: Iterator[nodes.ControlStructure] = node._tryBodyIn.cast[nodes.ControlStructure]
 }
 
 final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Literal]) extends AnyVal {
@@ -564,6 +619,11 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
     */
   def _controlStructureViaAstIn: Iterator[nodes.ControlStructure] = traversal.map(_._controlStructureViaAstIn)
 
+  /** Traverse to CONTROL_STRUCTURE via CATCH_BODY IN edge.
+    */
+  def _controlStructureViaCatchBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaCatchBodyIn)
+
   /** Traverse to CONTROL_STRUCTURE via CDG IN edge.
     */
   def _controlStructureViaCdgIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_._controlStructureViaCdgIn)
@@ -587,6 +647,35 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
   def _controlStructureViaDominateOut: Iterator[nodes.ControlStructure] =
     traversal.flatMap(_._controlStructureViaDominateOut)
 
+  /** Traverse to CONTROL_STRUCTURE via DO_BODY IN edge.
+    */
+  def _controlStructureViaDoBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_._controlStructureViaDoBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FALSE_BODY IN edge.
+    */
+  def _controlStructureViaFalseBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFalseBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FINALLY_BODY IN edge.
+    */
+  def _controlStructureViaFinallyBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaFinallyBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_BODY IN edge.
+    */
+  def _controlStructureViaForBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_INIT IN edge.
+    */
+  def _controlStructureViaForInitIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForInitIn)
+
+  /** Traverse to CONTROL_STRUCTURE via FOR_UPDATE IN edge.
+    */
+  def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaForUpdateIn)
+
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
   def _controlStructureViaPostDominateIn: Iterator[nodes.ControlStructure] =
@@ -601,6 +690,16 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
     */
   def _controlStructureViaReachingDefIn: Iterator[nodes.ControlStructure] =
     traversal.flatMap(_._controlStructureViaReachingDefIn)
+
+  /** Traverse to CONTROL_STRUCTURE via TRUE_BODY IN edge.
+    */
+  def _controlStructureViaTrueBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTrueBodyIn)
+
+  /** Traverse to CONTROL_STRUCTURE via TRY_BODY IN edge.
+    */
+  def _controlStructureViaTryBodyIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaTryBodyIn)
 
   /** Traverse to FIELD_IDENTIFIER via CDG IN edge.
     */
@@ -903,6 +1002,8 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
 
   def astOut: Iterator[nodes.Annotation] = traversal.flatMap(_.astOut)
 
+  def catchBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.catchBodyIn)
+
   def cdgIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgIn)
 
   def cdgOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.cdgOut)
@@ -913,11 +1014,23 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
 
   def containsIn: Iterator[nodes.Method] = traversal.flatMap(_.containsIn)
 
+  def doBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.doBodyIn)
+
   def dominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.dominateIn)
 
   def dominateOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.dominateOut)
 
   def evalTypeOut: Iterator[nodes.Type] = traversal.flatMap(_.evalTypeOut)
+
+  def falseBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.falseBodyIn)
+
+  def finallyBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.finallyBodyIn)
+
+  def forBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forBodyIn)
+
+  def forInitIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forInitIn)
+
+  def forUpdateIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forUpdateIn)
 
   def postDominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.postDominateIn)
 
@@ -930,4 +1043,8 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
   def receiverIn: Iterator[nodes.Call] = traversal.flatMap(_.receiverIn)
 
   def taggedByOut: Iterator[nodes.Tag] = traversal.flatMap(_.taggedByOut)
+
+  def trueBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.trueBodyIn)
+
+  def tryBodyIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.tryBodyIn)
 }

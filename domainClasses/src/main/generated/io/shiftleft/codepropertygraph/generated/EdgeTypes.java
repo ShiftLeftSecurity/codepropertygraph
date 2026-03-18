@@ -41,6 +41,9 @@ public static final String CAPTURE = "CAPTURE";
 /** Connection between a captured LOCAL and the corresponding CLOSURE_BINDING */
 public static final String CAPTURED_BY = "CAPTURED_BY";
 
+/** The edge connects try control structure nodes to catch/handler bodies. */
+public static final String CATCH_BODY = "CATCH_BODY";
+
 /** A CDG edge expresses that the destination node is control dependent on the source node. */
 public static final String CDG = "CDG";
 
@@ -53,11 +56,29 @@ public static final String CONDITION = "CONDITION";
 /** This edge connects a node to the method that contains it. */
 public static final String CONTAINS = "CONTAINS";
 
+/** The edge connects do-while control structure nodes to their body. */
+public static final String DO_BODY = "DO_BODY";
+
 /** This edge indicates that the source node immediately dominates the destination node. */
 public static final String DOMINATE = "DOMINATE";
 
 /** This edge connects a node to its evaluation type. */
 public static final String EVAL_TYPE = "EVAL_TYPE";
+
+/** The edge connects control structure nodes to their false branch/body. */
+public static final String FALSE_BODY = "FALSE_BODY";
+
+/** The edge connects try control structure nodes to their finally body. */
+public static final String FINALLY_BODY = "FINALLY_BODY";
+
+/** The edge connects for-loop control structure nodes to their body. */
+public static final String FOR_BODY = "FOR_BODY";
+
+/** The edge connects for-loop control structure nodes to their initialization expression(s). */
+public static final String FOR_INIT = "FOR_INIT";
+
+/** The edge connects for-loop control structure nodes to their update/step expression(s). */
+public static final String FOR_UPDATE = "FOR_UPDATE";
 
 /** Edge from imports to dependencies */
 public static final String IMPORTS = "IMPORTS";
@@ -104,6 +125,12 @@ public static final String SOURCE_FILE = "SOURCE_FILE";
 /** Edges from nodes to the tags they are tagged by. */
 public static final String TAGGED_BY = "TAGGED_BY";
 
+/** The edge connects control structure nodes to their true branch/body. */
+public static final String TRUE_BODY = "TRUE_BODY";
+
+/** The edge connects try control structure nodes to their try body. */
+public static final String TRY_BODY = "TRY_BODY";
+
 public static Set<String> ALL = new HashSet<String>() {{
 add(ALIAS_OF);
 add(ARGUMENT);
@@ -113,12 +140,19 @@ add(BINDS_TO);
 add(CALL);
 add(CAPTURE);
 add(CAPTURED_BY);
+add(CATCH_BODY);
 add(CDG);
 add(CFG);
 add(CONDITION);
 add(CONTAINS);
+add(DO_BODY);
 add(DOMINATE);
 add(EVAL_TYPE);
+add(FALSE_BODY);
+add(FINALLY_BODY);
+add(FOR_BODY);
+add(FOR_INIT);
+add(FOR_UPDATE);
 add(IMPORTS);
 add(INHERITS_FROM);
 add(IS_CALL_FOR_IMPORT);
@@ -129,6 +163,8 @@ add(RECEIVER);
 add(REF);
 add(SOURCE_FILE);
 add(TAGGED_BY);
+add(TRUE_BODY);
+add(TRY_BODY);
 }};
 
 }

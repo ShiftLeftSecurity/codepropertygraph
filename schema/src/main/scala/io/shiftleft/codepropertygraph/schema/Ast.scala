@@ -430,6 +430,57 @@ object Ast extends SchemaBase {
       )
       .protoId(ProtoIds.Condition)
 
+    val trueBody = builder
+      .addEdgeType(name = "TRUE_BODY", comment = "The edge connects control structure nodes to their true branch/body.")
+      .protoId(ProtoIds.TrueBody)
+
+    val falseBody = builder
+      .addEdgeType(
+        name = "FALSE_BODY",
+        comment = "The edge connects control structure nodes to their false branch/body."
+      )
+      .protoId(ProtoIds.FalseBody)
+
+    val doBody = builder
+      .addEdgeType(name = "DO_BODY", comment = "The edge connects do-while control structure nodes to their body.")
+      .protoId(ProtoIds.DoBody)
+
+    val forInit = builder
+      .addEdgeType(
+        name = "FOR_INIT",
+        comment = "The edge connects for-loop control structure nodes to their initialization expression(s)."
+      )
+      .protoId(ProtoIds.ForInit)
+
+    val forUpdate = builder
+      .addEdgeType(
+        name = "FOR_UPDATE",
+        comment = "The edge connects for-loop control structure nodes to their update/step expression(s)."
+      )
+      .protoId(ProtoIds.ForUpdate)
+
+    val forBody = builder
+      .addEdgeType(name = "FOR_BODY", comment = "The edge connects for-loop control structure nodes to their body.")
+      .protoId(ProtoIds.ForBody)
+
+    val tryBody = builder
+      .addEdgeType(name = "TRY_BODY", comment = "The edge connects try control structure nodes to their try body.")
+      .protoId(ProtoIds.TryBody)
+
+    val catchBody = builder
+      .addEdgeType(
+        name = "CATCH_BODY",
+        comment = "The edge connects try control structure nodes to catch/handler bodies."
+      )
+      .protoId(ProtoIds.CatchBody)
+
+    val finallyBody = builder
+      .addEdgeType(
+        name = "FINALLY_BODY",
+        comment = "The edge connects try control structure nodes to their finally body."
+      )
+      .protoId(ProtoIds.FinallyBody)
+
     file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     member.addOutEdge(edge = ast, inNode = modifier)
@@ -552,6 +603,105 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = condition, inNode = unknown)
       .addOutEdge(edge = condition, inNode = controlStructure)
 
+    controlStructure
+      .addOutEdge(edge = trueBody, inNode = literal)
+      .addOutEdge(edge = trueBody, inNode = identifier)
+      .addOutEdge(edge = trueBody, inNode = ret)
+      .addOutEdge(edge = trueBody, inNode = block)
+      .addOutEdge(edge = trueBody, inNode = methodRef)
+      .addOutEdge(edge = trueBody, inNode = typeRef)
+      .addOutEdge(edge = trueBody, inNode = controlStructure)
+      .addOutEdge(edge = trueBody, inNode = jumpTarget)
+      .addOutEdge(edge = trueBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = falseBody, inNode = literal)
+      .addOutEdge(edge = falseBody, inNode = identifier)
+      .addOutEdge(edge = falseBody, inNode = ret)
+      .addOutEdge(edge = falseBody, inNode = block)
+      .addOutEdge(edge = falseBody, inNode = methodRef)
+      .addOutEdge(edge = falseBody, inNode = typeRef)
+      .addOutEdge(edge = falseBody, inNode = controlStructure)
+      .addOutEdge(edge = falseBody, inNode = jumpTarget)
+      .addOutEdge(edge = falseBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = doBody, inNode = literal)
+      .addOutEdge(edge = doBody, inNode = identifier)
+      .addOutEdge(edge = doBody, inNode = ret)
+      .addOutEdge(edge = doBody, inNode = block)
+      .addOutEdge(edge = doBody, inNode = methodRef)
+      .addOutEdge(edge = doBody, inNode = typeRef)
+      .addOutEdge(edge = doBody, inNode = controlStructure)
+      .addOutEdge(edge = doBody, inNode = jumpTarget)
+      .addOutEdge(edge = doBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = forInit, inNode = literal)
+      .addOutEdge(edge = forInit, inNode = identifier)
+      .addOutEdge(edge = forInit, inNode = ret)
+      .addOutEdge(edge = forInit, inNode = block)
+      .addOutEdge(edge = forInit, inNode = methodRef)
+      .addOutEdge(edge = forInit, inNode = typeRef)
+      .addOutEdge(edge = forInit, inNode = controlStructure)
+      .addOutEdge(edge = forInit, inNode = jumpTarget)
+      .addOutEdge(edge = forInit, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = forUpdate, inNode = literal)
+      .addOutEdge(edge = forUpdate, inNode = identifier)
+      .addOutEdge(edge = forUpdate, inNode = ret)
+      .addOutEdge(edge = forUpdate, inNode = block)
+      .addOutEdge(edge = forUpdate, inNode = methodRef)
+      .addOutEdge(edge = forUpdate, inNode = typeRef)
+      .addOutEdge(edge = forUpdate, inNode = controlStructure)
+      .addOutEdge(edge = forUpdate, inNode = jumpTarget)
+      .addOutEdge(edge = forUpdate, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = forBody, inNode = literal)
+      .addOutEdge(edge = forBody, inNode = identifier)
+      .addOutEdge(edge = forBody, inNode = ret)
+      .addOutEdge(edge = forBody, inNode = block)
+      .addOutEdge(edge = forBody, inNode = methodRef)
+      .addOutEdge(edge = forBody, inNode = typeRef)
+      .addOutEdge(edge = forBody, inNode = controlStructure)
+      .addOutEdge(edge = forBody, inNode = jumpTarget)
+      .addOutEdge(edge = forBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = tryBody, inNode = literal)
+      .addOutEdge(edge = tryBody, inNode = identifier)
+      .addOutEdge(edge = tryBody, inNode = ret)
+      .addOutEdge(edge = tryBody, inNode = block)
+      .addOutEdge(edge = tryBody, inNode = methodRef)
+      .addOutEdge(edge = tryBody, inNode = typeRef)
+      .addOutEdge(edge = tryBody, inNode = controlStructure)
+      .addOutEdge(edge = tryBody, inNode = jumpTarget)
+      .addOutEdge(edge = tryBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = catchBody, inNode = literal)
+      .addOutEdge(edge = catchBody, inNode = identifier)
+      .addOutEdge(edge = catchBody, inNode = ret)
+      .addOutEdge(edge = catchBody, inNode = block)
+      .addOutEdge(edge = catchBody, inNode = methodRef)
+      .addOutEdge(edge = catchBody, inNode = typeRef)
+      .addOutEdge(edge = catchBody, inNode = controlStructure)
+      .addOutEdge(edge = catchBody, inNode = jumpTarget)
+      .addOutEdge(edge = catchBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = finallyBody, inNode = literal)
+      .addOutEdge(edge = finallyBody, inNode = identifier)
+      .addOutEdge(edge = finallyBody, inNode = ret)
+      .addOutEdge(edge = finallyBody, inNode = block)
+      .addOutEdge(edge = finallyBody, inNode = methodRef)
+      .addOutEdge(edge = finallyBody, inNode = typeRef)
+      .addOutEdge(edge = finallyBody, inNode = controlStructure)
+      .addOutEdge(edge = finallyBody, inNode = jumpTarget)
+      .addOutEdge(edge = finallyBody, inNode = unknown)
+
     typeDecl
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)
       .addOutEdge(edge = ast, inNode = method, cardinalityIn = Cardinality.ZeroOrOne)
@@ -628,6 +778,15 @@ object Ast extends SchemaBase {
     controlStructure.addOutEdge(edge = ast, inNode = callNode, cardinalityIn = Cardinality.One)
     unknown.addOutEdge(edge = ast, inNode = callNode)
     controlStructure.addOutEdge(edge = condition, inNode = callNode)
+    controlStructure.addOutEdge(edge = trueBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = falseBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = doBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = forInit, inNode = callNode)
+    controlStructure.addOutEdge(edge = forUpdate, inNode = callNode)
+    controlStructure.addOutEdge(edge = forBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = tryBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = catchBody, inNode = callNode)
+    controlStructure.addOutEdge(edge = finallyBody, inNode = callNode)
 
     block.addOutEdge(edge = ast, inNode = callNode)
 

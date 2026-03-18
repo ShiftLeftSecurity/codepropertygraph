@@ -26,6 +26,9 @@ extension (iterator: Iterator[StoredNode]) {
   final def _capturedByOut: Iterator[StoredNode] = iterator.flatMap(_._capturedByOut)
   final def _capturedByIn: Iterator[StoredNode]  = iterator.flatMap(_._capturedByIn)
 
+  final def _catchBodyOut: Iterator[StoredNode] = iterator.flatMap(_._catchBodyOut)
+  final def _catchBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._catchBodyIn)
+
   final def _cdgOut: Iterator[StoredNode] = iterator.flatMap(_._cdgOut)
   final def _cdgIn: Iterator[StoredNode]  = iterator.flatMap(_._cdgIn)
 
@@ -38,11 +41,29 @@ extension (iterator: Iterator[StoredNode]) {
   final def _containsOut: Iterator[StoredNode] = iterator.flatMap(_._containsOut)
   final def _containsIn: Iterator[StoredNode]  = iterator.flatMap(_._containsIn)
 
+  final def _doBodyOut: Iterator[StoredNode] = iterator.flatMap(_._doBodyOut)
+  final def _doBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._doBodyIn)
+
   final def _dominateOut: Iterator[StoredNode] = iterator.flatMap(_._dominateOut)
   final def _dominateIn: Iterator[StoredNode]  = iterator.flatMap(_._dominateIn)
 
   final def _evalTypeOut: Iterator[StoredNode] = iterator.flatMap(_._evalTypeOut)
   final def _evalTypeIn: Iterator[StoredNode]  = iterator.flatMap(_._evalTypeIn)
+
+  final def _falseBodyOut: Iterator[StoredNode] = iterator.flatMap(_._falseBodyOut)
+  final def _falseBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._falseBodyIn)
+
+  final def _finallyBodyOut: Iterator[StoredNode] = iterator.flatMap(_._finallyBodyOut)
+  final def _finallyBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._finallyBodyIn)
+
+  final def _forBodyOut: Iterator[StoredNode] = iterator.flatMap(_._forBodyOut)
+  final def _forBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._forBodyIn)
+
+  final def _forInitOut: Iterator[StoredNode] = iterator.flatMap(_._forInitOut)
+  final def _forInitIn: Iterator[StoredNode]  = iterator.flatMap(_._forInitIn)
+
+  final def _forUpdateOut: Iterator[StoredNode] = iterator.flatMap(_._forUpdateOut)
+  final def _forUpdateIn: Iterator[StoredNode]  = iterator.flatMap(_._forUpdateIn)
 
   final def _importsOut: Iterator[StoredNode] = iterator.flatMap(_._importsOut)
   final def _importsIn: Iterator[StoredNode]  = iterator.flatMap(_._importsIn)
@@ -73,5 +94,11 @@ extension (iterator: Iterator[StoredNode]) {
 
   final def _taggedByOut: Iterator[StoredNode] = iterator.flatMap(_._taggedByOut)
   final def _taggedByIn: Iterator[StoredNode]  = iterator.flatMap(_._taggedByIn)
+
+  final def _trueBodyOut: Iterator[StoredNode] = iterator.flatMap(_._trueBodyOut)
+  final def _trueBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._trueBodyIn)
+
+  final def _tryBodyOut: Iterator[StoredNode] = iterator.flatMap(_._tryBodyOut)
+  final def _tryBodyIn: Iterator[StoredNode]  = iterator.flatMap(_._tryBodyIn)
 
 }
