@@ -8,18 +8,18 @@ object Cpg {
   val defaultDocSearchPackage = DocSearchPackages.default.withAdditionalPackage(getClass.getPackage.getName)
 
   @scala.annotation.implicitNotFound("""If you're using flatgraph purely without a schema and associated generated domain classes, you can
-    |start with `given DocSearchPackages = DocSearchPackages.default`.
-    |If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
-    |If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
-    |""".stripMargin)
+start with `given DocSearchPackages = DocSearchPackages.default`.
+If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
+If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
+""")
   def help(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
     flatgraph.help.TraversalHelp(searchPackageNames).forTraversalSources(verbose = false)
 
   @scala.annotation.implicitNotFound("""If you're using flatgraph purely without a schema and associated generated domain classes, you can
-    |start with `given DocSearchPackages = DocSearchPackages.default`.
-    |If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
-    |If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
-    |""".stripMargin)
+start with `given DocSearchPackages = DocSearchPackages.default`.
+If you have generated domain classes, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage`.
+If you have additional custom extension steps that specify help texts via @Doc annotations, use `given DocSearchPackages = MyDomain.defaultDocSearchPackage.withAdditionalPackage("my.custom.package)"`
+""")
   def helpVerbose(implicit searchPackageNames: DocSearchPackages, availableWidthProvider: AvailableWidthProvider) =
     flatgraph.help.TraversalHelp(searchPackageNames).forTraversalSources(verbose = true)
 

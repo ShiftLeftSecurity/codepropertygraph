@@ -14,7 +14,7 @@ class ZipArchive(inputFile: String) extends Closeable {
   private def root: Path = zipFileSystem.getRootDirectories.iterator.next
 
   private def walk(rootPath: Path): Seq[Path] = {
-    val entries = ArraySeq.newBuilder[Path]()
+    val entries = ArraySeq.newBuilder[Path]
     Files.walkFileTree(
       rootPath,
       new SimpleFileVisitor[Path]() {
