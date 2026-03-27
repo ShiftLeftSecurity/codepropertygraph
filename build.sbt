@@ -1,12 +1,12 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val flatgraphVersion = "0.1.29"
+val flatgraphVersion = "0.1.31"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "3.6.4",
+    scalaVersion       := "3.7.4",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
@@ -62,8 +62,8 @@ ThisBuild / scalacOptions ++= Seq(
   // "-explain",
   // "-Xfatal-warnings",
   // "-Wconf:cat=deprecation:w,any:e",
+  "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s",
   "-language:implicitConversions",
-  "-old-syntax",
   "-no-indent"
 )
 
