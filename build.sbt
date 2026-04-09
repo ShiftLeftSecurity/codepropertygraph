@@ -64,7 +64,8 @@ ThisBuild / scalacOptions ++= Seq(
   // "-Wconf:cat=deprecation:w,any:e",
   "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s",
   "-language:implicitConversions",
-  "-no-indent"
+  "-no-indent", // Require classical {...} syntax, indentation is not significant.
+  "-old-syntax" // Require `(...)` around conditions.
 )
 
 ThisBuild / javacOptions ++= Seq(
