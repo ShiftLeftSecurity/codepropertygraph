@@ -83,6 +83,7 @@ object ProtoIds {
   val Language                  = 19
   val CSharpSrc                 = 19
   val ABAP                      = 20
+  val Rust                      = 21
   val Content                   = 20
   val Code                      = 21
   val EvalType                  = 21

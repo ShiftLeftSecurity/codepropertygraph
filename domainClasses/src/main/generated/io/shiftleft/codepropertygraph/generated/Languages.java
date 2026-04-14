@@ -62,6 +62,9 @@ public static final String SWIFTSRC = "SWIFTSRC";
 /** Source-based frontend for C# and .NET */
 public static final String CSHARPSRC = "CSHARPSRC";
 
+
+public static final String RUST = "RUST";
+
 public static Set<String> ALL = new HashSet<String>() {{
 add(JAVA);
 add(JAVASCRIPT);
@@ -82,6 +85,7 @@ add(JSSRC);
 add(RUBYSRC);
 add(SWIFTSRC);
 add(CSHARPSRC);
+add(RUST);
 }};
 
 }
