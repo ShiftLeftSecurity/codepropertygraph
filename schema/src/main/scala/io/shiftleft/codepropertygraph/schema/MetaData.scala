@@ -138,7 +138,8 @@ object MetaData extends SchemaBase {
         value = "CSHARPSRC",
         valueType = ValueType.String,
         comment = "Source-based frontend for C# and .NET"
-      ).protoId(ProtoIds.CSharpSrc)
+      ).protoId(ProtoIds.CSharpSrc),
+      Constant(name = "RUST", value = "RUST", valueType = ValueType.String, comment = "").protoId(ProtoIds.Rust)
     )
   }
 }
