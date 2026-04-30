@@ -137,6 +137,7 @@ object ProtoIds {
   val TryBody                   = 66
   val CatchBody                 = 67
   val FinallyBody               = 68
+  val JumpArgument              = 69
   val Symbol                    = 100
   val MethodShortName           = 102
   val PackageName               = 103

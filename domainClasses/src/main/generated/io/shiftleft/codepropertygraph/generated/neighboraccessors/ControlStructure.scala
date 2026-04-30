@@ -387,6 +387,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
     */
   def _jumpLabelViaAstOut: Iterator[nodes.JumpLabel] = astOut.collectAll[nodes.JumpLabel]
 
+  /** Traverse to JUMP_LABEL via JUMP_ARGUMENT OUT edge.
+    */
+  def _jumpLabelViaJumpArgumentOut: Iterator[nodes.JumpLabel] = jumpArgumentOut.collectAll[nodes.JumpLabel]
+
   /** Traverse to JUMP_TARGET via AST OUT edge.
     */
   def _jumpTargetViaAstOut: Iterator[nodes.JumpTarget] = astOut.collectAll[nodes.JumpTarget]
@@ -506,6 +510,10 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   /** Traverse to LITERAL via FOR_UPDATE OUT edge.
     */
   def _literalViaForUpdateOut: Iterator[nodes.Literal] = forUpdateOut.collectAll[nodes.Literal]
+
+  /** Traverse to LITERAL via JUMP_ARGUMENT OUT edge.
+    */
+  def _literalViaJumpArgumentOut: Iterator[nodes.Literal] = jumpArgumentOut.collectAll[nodes.Literal]
 
   /** Traverse to LITERAL via POST_DOMINATE IN edge.
     */
@@ -911,6 +919,8 @@ final class AccessNeighborsForControlStructure(val node: nodes.ControlStructure)
   def forUpdateIn: Iterator[nodes.ControlStructure] = node._forUpdateIn.cast[nodes.ControlStructure]
 
   def forUpdateOut: Iterator[nodes.CfgNode] = node._forUpdateOut.cast[nodes.CfgNode]
+
+  def jumpArgumentOut: Iterator[nodes.AstNode] = node._jumpArgumentOut.cast[nodes.AstNode]
 
   def postDominateIn: Iterator[nodes.CfgNode] = node._postDominateIn.cast[nodes.CfgNode]
 
@@ -1333,6 +1343,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
     */
   def _jumpLabelViaAstOut: Iterator[nodes.JumpLabel] = traversal.flatMap(_._jumpLabelViaAstOut)
 
+  /** Traverse to JUMP_LABEL via JUMP_ARGUMENT OUT edge.
+    */
+  def _jumpLabelViaJumpArgumentOut: Iterator[nodes.JumpLabel] = traversal.flatMap(_._jumpLabelViaJumpArgumentOut)
+
   /** Traverse to JUMP_TARGET via AST OUT edge.
     */
   def _jumpTargetViaAstOut: Iterator[nodes.JumpTarget] = traversal.flatMap(_._jumpTargetViaAstOut)
@@ -1452,6 +1466,10 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   /** Traverse to LITERAL via FOR_UPDATE OUT edge.
     */
   def _literalViaForUpdateOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaForUpdateOut)
+
+  /** Traverse to LITERAL via JUMP_ARGUMENT OUT edge.
+    */
+  def _literalViaJumpArgumentOut: Iterator[nodes.Literal] = traversal.flatMap(_._literalViaJumpArgumentOut)
 
   /** Traverse to LITERAL via POST_DOMINATE IN edge.
     */
@@ -1857,6 +1875,8 @@ final class AccessNeighborsForControlStructureTraversal(val traversal: Iterator[
   def forUpdateIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forUpdateIn)
 
   def forUpdateOut: Iterator[nodes.CfgNode] = traversal.flatMap(_.forUpdateOut)
+
+  def jumpArgumentOut: Iterator[nodes.AstNode] = traversal.flatMap(_.jumpArgumentOut)
 
   def postDominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.postDominateIn)
 
