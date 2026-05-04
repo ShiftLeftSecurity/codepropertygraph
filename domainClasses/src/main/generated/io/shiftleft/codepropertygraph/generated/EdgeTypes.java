@@ -94,6 +94,9 @@ public static final String INHERITS_FROM = "INHERITS_FROM";
 ￼        | */
 public static final String IS_CALL_FOR_IMPORT = "IS_CALL_FOR_IMPORT";
 
+/** The edge connects jump-like control structures to the node encoding their jump target. */
+public static final String JUMP_ARGUMENT = "JUMP_ARGUMENT";
+
 /** This edge connects a method input parameter to the corresponding
 method output parameter. */
 public static final String PARAMETER_LINK = "PARAMETER_LINK";
@@ -156,6 +159,7 @@ add(FOR_UPDATE);
 add(IMPORTS);
 add(INHERITS_FROM);
 add(IS_CALL_FOR_IMPORT);
+add(JUMP_ARGUMENT);
 add(PARAMETER_LINK);
 add(POST_DOMINATE);
 add(REACHING_DEF);

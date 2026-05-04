@@ -481,6 +481,13 @@ object Ast extends SchemaBase {
       )
       .protoId(ProtoIds.FinallyBody)
 
+    val jumpArgument = builder
+      .addEdgeType(
+        name = "JUMP_ARGUMENT",
+        comment = "The edge connects jump-like control structures to the node encoding their jump target."
+      )
+      .protoId(ProtoIds.JumpArgument)
+
     file.addOutEdge(edge = ast, inNode = namespaceBlock, cardinalityIn = Cardinality.ZeroOrOne)
 
     member.addOutEdge(edge = ast, inNode = modifier)
@@ -701,6 +708,10 @@ object Ast extends SchemaBase {
       .addOutEdge(edge = finallyBody, inNode = controlStructure)
       .addOutEdge(edge = finallyBody, inNode = jumpTarget)
       .addOutEdge(edge = finallyBody, inNode = unknown)
+
+    controlStructure
+      .addOutEdge(edge = jumpArgument, inNode = literal)
+      .addOutEdge(edge = jumpArgument, inNode = jumpLabel)
 
     typeDecl
       .addOutEdge(edge = ast, inNode = typeDecl, cardinalityIn = Cardinality.ZeroOrOne)

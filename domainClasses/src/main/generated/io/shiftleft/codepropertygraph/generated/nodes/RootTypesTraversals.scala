@@ -74,6 +74,9 @@ extension (iterator: Iterator[StoredNode]) {
   final def _isCallForImportOut: Iterator[StoredNode] = iterator.flatMap(_._isCallForImportOut)
   final def _isCallForImportIn: Iterator[StoredNode]  = iterator.flatMap(_._isCallForImportIn)
 
+  final def _jumpArgumentOut: Iterator[StoredNode] = iterator.flatMap(_._jumpArgumentOut)
+  final def _jumpArgumentIn: Iterator[StoredNode]  = iterator.flatMap(_._jumpArgumentIn)
+
   final def _parameterLinkOut: Iterator[StoredNode] = iterator.flatMap(_._parameterLinkOut)
   final def _parameterLinkIn: Iterator[StoredNode]  = iterator.flatMap(_._parameterLinkIn)
 

@@ -74,6 +74,7 @@ object GraphSchema extends flatgraph.Schema {
     "IMPORTS",
     "INHERITS_FROM",
     "IS_CALL_FOR_IMPORT",
+    "JUMP_ARGUMENT",
     "PARAMETER_LINK",
     "POST_DOMINATE",
     "REACHING_DEF",
@@ -112,7 +113,8 @@ object GraphSchema extends flatgraph.Schema {
     size => null,
     size => null,
     size => null,
-    size => Array.fill(size)("<empty>") /* label = REACHING_DEF, id = 26 */,
+    size => null,
+    size => Array.fill(size)("<empty>") /* label = REACHING_DEF, id = 27 */,
     size => null,
     size => null,
     size => null,
@@ -190,6 +192,7 @@ object GraphSchema extends flatgraph.Schema {
     (s, d, subseq, p) => new edges.Imports(s, d, subseq, p),
     (s, d, subseq, p) => new edges.InheritsFrom(s, d, subseq, p),
     (s, d, subseq, p) => new edges.IsCallForImport(s, d, subseq, p),
+    (s, d, subseq, p) => new edges.JumpArgument(s, d, subseq, p),
     (s, d, subseq, p) => new edges.ParameterLink(s, d, subseq, p),
     (s, d, subseq, p) => new edges.PostDominate(s, d, subseq, p),
     (s, d, subseq, p) => new edges.ReachingDef(s, d, subseq, p),
@@ -1477,7 +1480,7 @@ object GraphSchema extends flatgraph.Schema {
     _newNodeInserters
   }
   override def getNumberOfNodeKinds: Int              = 43
-  override def getNumberOfEdgeKinds: Int              = 33
+  override def getNumberOfEdgeKinds: Int              = 34
   override def getNodeLabel(nodeKind: Int): String    = nodeLabels(nodeKind)
   override def getNodeKindByLabel(label: String): Int = nodeKindByLabel.getOrElse(label, flatgraph.Schema.UndefinedKind)
   override def getEdgeLabel(nodeKind: Int, edgeKind: Int): String = edgeLabels(edgeKind)

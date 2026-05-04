@@ -156,6 +156,11 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
     */
   def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] = forUpdateIn.collectAll[nodes.ControlStructure]
 
+  /** Traverse to CONTROL_STRUCTURE via JUMP_ARGUMENT IN edge.
+    */
+  def _controlStructureViaJumpArgumentIn: Iterator[nodes.ControlStructure] =
+    jumpArgumentIn.collectAll[nodes.ControlStructure]
+
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
   def _controlStructureViaPostDominateIn: Iterator[nodes.ControlStructure] =
@@ -508,6 +513,8 @@ final class AccessNeighborsForLiteral(val node: nodes.Literal) extends AnyVal {
 
   def forUpdateIn: Iterator[nodes.ControlStructure] = node._forUpdateIn.cast[nodes.ControlStructure]
 
+  def jumpArgumentIn: Iterator[nodes.ControlStructure] = node._jumpArgumentIn.cast[nodes.ControlStructure]
+
   def postDominateIn: Iterator[nodes.CfgNode] = node._postDominateIn.cast[nodes.CfgNode]
 
   def postDominateOut: Iterator[nodes.CfgNode] = node._postDominateOut.cast[nodes.CfgNode]
@@ -675,6 +682,11 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
     */
   def _controlStructureViaForUpdateIn: Iterator[nodes.ControlStructure] =
     traversal.flatMap(_._controlStructureViaForUpdateIn)
+
+  /** Traverse to CONTROL_STRUCTURE via JUMP_ARGUMENT IN edge.
+    */
+  def _controlStructureViaJumpArgumentIn: Iterator[nodes.ControlStructure] =
+    traversal.flatMap(_._controlStructureViaJumpArgumentIn)
 
   /** Traverse to CONTROL_STRUCTURE via POST_DOMINATE IN edge.
     */
@@ -1031,6 +1043,8 @@ final class AccessNeighborsForLiteralTraversal(val traversal: Iterator[nodes.Lit
   def forInitIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forInitIn)
 
   def forUpdateIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.forUpdateIn)
+
+  def jumpArgumentIn: Iterator[nodes.ControlStructure] = traversal.flatMap(_.jumpArgumentIn)
 
   def postDominateIn: Iterator[nodes.CfgNode] = traversal.flatMap(_.postDominateIn)
 
