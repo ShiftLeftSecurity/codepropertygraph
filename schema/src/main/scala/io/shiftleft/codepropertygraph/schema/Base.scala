@@ -73,7 +73,6 @@ object Base extends SchemaBase {
                     | self / this parameter.
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Int)
       .protoId(ProtoIds.Index)
 
     val name = builder

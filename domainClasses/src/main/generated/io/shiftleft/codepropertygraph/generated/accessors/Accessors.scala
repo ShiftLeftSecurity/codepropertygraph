@@ -177,13 +177,8 @@ object Accessors {
       .getNodePropertyOption[String](node.graph, nodeKind = node.nodeKind, propertyKind = 25, seq = node.seq)
   }
   final class AccessPropertyIndex(val node: nodes.StoredNode) extends AnyVal {
-    def index: Int = flatgraph.Accessors.getNodePropertySingle(
-      node.graph,
-      nodeKind = node.nodeKind,
-      propertyKind = 26,
-      seq = node.seq(),
-      default = -1: Int
-    )
+    def index: Option[Int] = flatgraph.Accessors
+      .getNodePropertyOption[Int](node.graph, nodeKind = node.nodeKind, propertyKind = 26, seq = node.seq)
   }
   final class AccessPropertyInheritsFromTypeFullName(val node: nodes.StoredNode) extends AnyVal {
     def inheritsFromTypeFullName: IndexedSeq[String] = flatgraph.Accessors
@@ -733,7 +728,7 @@ object Accessors {
       case stored: nodes.StoredNode            => new AccessPropertyEvaluationStrategy(stored).evaluationStrategy
       case newNode: nodes.NewMethodParameterIn => newNode.evaluationStrategy
     }
-    def index: Int = node match {
+    def index: Option[Int] = node match {
       case stored: nodes.StoredNode            => new AccessPropertyIndex(stored).index
       case newNode: nodes.NewMethodParameterIn => newNode.index
     }
@@ -755,7 +750,7 @@ object Accessors {
       case stored: nodes.StoredNode             => new AccessPropertyEvaluationStrategy(stored).evaluationStrategy
       case newNode: nodes.NewMethodParameterOut => newNode.evaluationStrategy
     }
-    def index: Int = node match {
+    def index: Option[Int] = node match {
       case stored: nodes.StoredNode             => new AccessPropertyIndex(stored).index
       case newNode: nodes.NewMethodParameterOut => newNode.index
     }

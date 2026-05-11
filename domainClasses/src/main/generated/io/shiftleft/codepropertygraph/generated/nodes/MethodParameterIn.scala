@@ -34,7 +34,7 @@ trait MethodParameterInBase
     val tmpDynamicTypeHintFullName = this.dynamicTypeHintFullName;
     if (tmpDynamicTypeHintFullName.nonEmpty) res.put("DYNAMIC_TYPE_HINT_FULL_NAME", tmpDynamicTypeHintFullName)
     if (("<empty>": String) != this.evaluationStrategy) res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
-    if ((-1: Int) != this.index) res.put("INDEX", this.index)
+    this.index.foreach { p => res.put("INDEX", p) }
     if ((false: Boolean) != this.isVariadic) res.put("IS_VARIADIC", this.isVariadic)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
@@ -72,9 +72,8 @@ object MethodParameterIn {
   * passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a pointer/reference and it is shared with
   * the caller/callee. While a copy of the pointer is made, a copy of the object that it points to is not made.
   *
-  * ▸ Index (Int); Cardinality `one` (mandatory with default value `-1`); Specifies an index, e.g., for a parameter or
-  * argument. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
-  * parameter.
+  * ▸ Index (Int); Cardinality `ZeroOrOne` (optional); Specifies an index, e.g., for a parameter or argument. Explicit
+  * parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this parameter.
   *
   * ▸ IsVariadic (Boolean); Cardinality `one` (mandatory with default value `false`); Specifies whether a parameter is
   * the variadic argument handling parameter of a variadic method. Only one parameter of a method is allowed to have
