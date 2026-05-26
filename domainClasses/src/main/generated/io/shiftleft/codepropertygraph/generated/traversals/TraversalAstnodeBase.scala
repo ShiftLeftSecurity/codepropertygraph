@@ -84,6 +84,19 @@ final class TraversalAstnodeBase[NodeType <: nodes.AstNodeBase](val traversal: I
       val tmp = node.columnNumber; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the columnNumber equals the given `value`. If `value` is None, only nodes where
+    * columnNumber is not set are included.
+    */
+  def columnNumber(value: Option[Int]): Iterator[NodeType] =
+    value match {
+      case Some(_val) => columnNumber(_val); case None => traversal.filter { node => node.columnNumber.isEmpty }
+    }
+
+  /** Traverse to nodes where the columnNumber equals the given `value`, or no results if `value` is None.
+    */
+  def columnNumberIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => columnNumber(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the columnNumber equals at least one of the given `values`
     */
   def columnNumber(values: Int*): Iterator[NodeType] = {
@@ -147,6 +160,19 @@ final class TraversalAstnodeBase[NodeType <: nodes.AstNodeBase](val traversal: I
     traversal.filter { node =>
       val tmp = node.lineNumber; tmp.isDefined && tmp.get == value
     }
+
+  /** Traverse to nodes where the lineNumber equals the given `value`. If `value` is None, only nodes where lineNumber
+    * is not set are included.
+    */
+  def lineNumber(value: Option[Int]): Iterator[NodeType] =
+    value match {
+      case Some(_val) => lineNumber(_val); case None => traversal.filter { node => node.lineNumber.isEmpty }
+    }
+
+  /** Traverse to nodes where the lineNumber equals the given `value`, or no results if `value` is None.
+    */
+  def lineNumberIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => lineNumber(_val); case None => Iterator.empty }
 
   /** Traverse to nodes where the lineNumber equals at least one of the given `values`
     */
@@ -212,6 +238,17 @@ final class TraversalAstnodeBase[NodeType <: nodes.AstNodeBase](val traversal: I
       val tmp = node.offset; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the offset equals the given `value`. If `value` is None, only nodes where offset is not
+    * set are included.
+    */
+  def offset(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offset(_val); case None => traversal.filter { node => node.offset.isEmpty } }
+
+  /** Traverse to nodes where the offset equals the given `value`, or no results if `value` is None.
+    */
+  def offsetIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offset(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the offset equals at least one of the given `values`
     */
   def offset(values: Int*): Iterator[NodeType] = {
@@ -276,6 +313,17 @@ final class TraversalAstnodeBase[NodeType <: nodes.AstNodeBase](val traversal: I
       val tmp = node.offsetEnd; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the offsetEnd equals the given `value`. If `value` is None, only nodes where offsetEnd is
+    * not set are included.
+    */
+  def offsetEnd(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offsetEnd(_val); case None => traversal.filter { node => node.offsetEnd.isEmpty } }
+
+  /** Traverse to nodes where the offsetEnd equals the given `value`, or no results if `value` is None.
+    */
+  def offsetEndIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offsetEnd(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the offsetEnd equals at least one of the given `values`
     */
   def offsetEnd(values: Int*): Iterator[NodeType] = {
@@ -337,6 +385,11 @@ final class TraversalAstnodeBase[NodeType <: nodes.AstNodeBase](val traversal: I
     */
   def order(value: Int): Iterator[NodeType] =
     traversal.filter { _.order == value }
+
+  /** Traverse to nodes where the order equals the given `value`, or no results if `value` is None
+    */
+  def order(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => order(_val); case None => Iterator.empty }
 
   /** Traverse to nodes where the order equals at least one of the given `values`
     */

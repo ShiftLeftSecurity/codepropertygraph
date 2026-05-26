@@ -18,6 +18,17 @@ final class TraversalPropertyIndex[NodeType <: nodes.StoredNode & nodes.StaticTy
       val tmp = node.index; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the index equals the given `value`. If `value` is None, only nodes where index is not set
+    * are included.
+    */
+  def index(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => index(_val); case None => traversal.filter { node => node.index.isEmpty } }
+
+  /** Traverse to nodes where the index equals the given `value`, or no results if `value` is None.
+    */
+  def indexIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => index(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the index equals at least one of the given `values`
     */
   def index(values: Int*): Iterator[NodeType] = {
