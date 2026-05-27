@@ -18,6 +18,19 @@ final class TraversalPropertyColumnNumber[NodeType <: nodes.StoredNode & nodes.S
       val tmp = node.columnNumber; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the columnNumber equals the given `value`. If `value` is None, only nodes where
+    * columnNumber is not set are included.
+    */
+  def columnNumber(value: Option[Int]): Iterator[NodeType] =
+    value match {
+      case Some(_val) => columnNumber(_val); case None => traversal.filter { node => node.columnNumber.isEmpty }
+    }
+
+  /** Traverse to nodes where the columnNumber equals the given `value`, or no results if `value` is None.
+    */
+  def columnNumberIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => columnNumber(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the columnNumber equals at least one of the given `values`
     */
   def columnNumber(values: Int*): Iterator[NodeType] = {

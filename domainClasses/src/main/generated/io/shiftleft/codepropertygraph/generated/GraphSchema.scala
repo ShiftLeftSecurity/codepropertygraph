@@ -789,7 +789,7 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(1514) = FormalQtyType.StringType // METHOD_PARAMETER_IN.EVALUATION_STRATEGY
     nodePropertyDescriptors(1515) = FormalQtyType.QtyOne
     nodePropertyDescriptors(2288) = FormalQtyType.IntType // METHOD_PARAMETER_IN.INDEX
-    nodePropertyDescriptors(2289) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(2289) = FormalQtyType.QtyOption
     nodePropertyDescriptors(2718) = FormalQtyType.BoolType // METHOD_PARAMETER_IN.IS_VARIADIC
     nodePropertyDescriptors(2719) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3062) = FormalQtyType.IntType // METHOD_PARAMETER_IN.LINE_NUMBER
@@ -813,7 +813,7 @@ object GraphSchema extends flatgraph.Schema {
     nodePropertyDescriptors(1516) = FormalQtyType.StringType // METHOD_PARAMETER_OUT.EVALUATION_STRATEGY
     nodePropertyDescriptors(1517) = FormalQtyType.QtyOne
     nodePropertyDescriptors(2290) = FormalQtyType.IntType // METHOD_PARAMETER_OUT.INDEX
-    nodePropertyDescriptors(2291) = FormalQtyType.QtyOne
+    nodePropertyDescriptors(2291) = FormalQtyType.QtyOption
     nodePropertyDescriptors(2720) = FormalQtyType.BoolType // METHOD_PARAMETER_OUT.IS_VARIADIC
     nodePropertyDescriptors(2721) = FormalQtyType.QtyOne
     nodePropertyDescriptors(3064) = FormalQtyType.IntType // METHOD_PARAMETER_OUT.LINE_NUMBER
