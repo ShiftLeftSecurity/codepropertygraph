@@ -2151,12 +2151,8 @@ object NewMethodParameterIn {
           val nn = newNodes(idx)
           nn match {
             case generated: NewMethodParameterIn =>
-              generated.index match {
-                case Some(item) =>
-                  dstCast(offset) = item
-                  offset += 1
-                case _ =>
-              }
+              dstCast(offset) = generated.index
+              offset += 1
             case _ =>
           }
           assert(seq + idx == nn.storedRef.get.seq(), "internal consistency check")
@@ -2403,7 +2399,7 @@ class NewMethodParameterIn
   var columnNumber: Option[Int]                          = None
   var dynamicTypeHintFullName: IndexedSeq[String]        = ArraySeq.empty
   var evaluationStrategy: String                         = "<empty>": String
-  var index: Option[Int]                                 = None
+  var index: Int                                         = -1: Int
   var isVariadic: Boolean                                = false: Boolean
   var lineNumber: Option[Int]                            = None
   var name: String                                       = "<empty>": String
@@ -2421,8 +2417,7 @@ class NewMethodParameterIn
     this.dynamicTypeHintFullName = value.iterator.to(ArraySeq); this
   }
   def evaluationStrategy(value: String): this.type          = { this.evaluationStrategy = value; this }
-  def index(value: Int): this.type                          = { this.index = Option(value); this }
-  def index(value: Option[Int]): this.type                  = { this.index = value; this }
+  def index(value: Int): this.type                          = { this.index = value; this }
   def isVariadic(value: Boolean): this.type                 = { this.isVariadic = value; this }
   def lineNumber(value: Int): this.type                     = { this.lineNumber = Option(value); this }
   def lineNumber(value: Option[Int]): this.type             = { this.lineNumber = value; this }
@@ -2440,7 +2435,7 @@ class NewMethodParameterIn
     interface.countProperty(this, 9, columnNumber.size)
     interface.countProperty(this, 16, dynamicTypeHintFullName.size)
     interface.countProperty(this, 17, 1)
-    interface.countProperty(this, 26, index.size)
+    interface.countProperty(this, 26, 1)
     interface.countProperty(this, 31, 1)
     interface.countProperty(this, 35, lineNumber.size)
     interface.countProperty(this, 39, 1)

@@ -18,19 +18,6 @@ final class TraversalPropertyLineNumberEnd[NodeType <: nodes.StoredNode & nodes.
       val tmp = node.lineNumberEnd; tmp.isDefined && tmp.get == value
     }
 
-  /** Traverse to nodes where the lineNumberEnd equals the given `value`. If `value` is None, only nodes where
-    * lineNumberEnd is not set are included.
-    */
-  def lineNumberEnd(value: Option[Int]): Iterator[NodeType] =
-    value match {
-      case Some(_val) => lineNumberEnd(_val); case None => traversal.filter { node => node.lineNumberEnd.isEmpty }
-    }
-
-  /** Traverse to nodes where the lineNumberEnd equals the given `value`, or no results if `value` is None.
-    */
-  def lineNumberEndIfPresent(value: Option[Int]): Iterator[NodeType] =
-    value match { case Some(_val) => lineNumberEnd(_val); case None => Iterator.empty }
-
   /** Traverse to nodes where the lineNumberEnd equals at least one of the given `values`
     */
   def lineNumberEnd(values: Int*): Iterator[NodeType] = {

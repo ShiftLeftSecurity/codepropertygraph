@@ -18,19 +18,6 @@ final class TraversalPropertyLineNumber[NodeType <: nodes.StoredNode & nodes.Sta
       val tmp = node.lineNumber; tmp.isDefined && tmp.get == value
     }
 
-  /** Traverse to nodes where the lineNumber equals the given `value`. If `value` is None, only nodes where lineNumber
-    * is not set are included.
-    */
-  def lineNumber(value: Option[Int]): Iterator[NodeType] =
-    value match {
-      case Some(_val) => lineNumber(_val); case None => traversal.filter { node => node.lineNumber.isEmpty }
-    }
-
-  /** Traverse to nodes where the lineNumber equals the given `value`, or no results if `value` is None.
-    */
-  def lineNumberIfPresent(value: Option[Int]): Iterator[NodeType] =
-    value match { case Some(_val) => lineNumber(_val); case None => Iterator.empty }
-
   /** Traverse to nodes where the lineNumber equals at least one of the given `values`
     */
   def lineNumber(values: Int*): Iterator[NodeType] = {
