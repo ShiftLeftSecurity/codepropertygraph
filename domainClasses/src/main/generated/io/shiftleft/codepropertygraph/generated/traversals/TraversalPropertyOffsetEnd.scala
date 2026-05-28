@@ -18,17 +18,6 @@ final class TraversalPropertyOffsetEnd[NodeType <: nodes.StoredNode & nodes.Stat
       val tmp = node.offsetEnd; tmp.isDefined && tmp.get == value
     }
 
-  /** Traverse to nodes where the offsetEnd equals the given `value`. If `value` is None, only nodes where offsetEnd is
-    * not set are included.
-    */
-  def offsetEnd(value: Option[Int]): Iterator[NodeType] =
-    value match { case Some(_val) => offsetEnd(_val); case None => traversal.filter { node => node.offsetEnd.isEmpty } }
-
-  /** Traverse to nodes where the offsetEnd equals the given `value`, or no results if `value` is None.
-    */
-  def offsetEndIfPresent(value: Option[Int]): Iterator[NodeType] =
-    value match { case Some(_val) => offsetEnd(_val); case None => Iterator.empty }
-
   /** Traverse to nodes where the offsetEnd equals at least one of the given `values`
     */
   def offsetEnd(values: Int*): Iterator[NodeType] = {

@@ -16,11 +16,6 @@ final class TraversalPropertyArgumentIndex[NodeType <: nodes.StoredNode & nodes.
   def argumentIndex(value: Int): Iterator[NodeType] =
     traversal.filter { _.argumentIndex == value }
 
-  /** Traverse to nodes where the argumentIndex equals the given `value`, or no results if `value` is None
-    */
-  def argumentIndex(value: Option[Int]): Iterator[NodeType] =
-    value match { case Some(_val) => argumentIndex(_val); case None => Iterator.empty }
-
   /** Traverse to nodes where the argumentIndex equals at least one of the given `values`
     */
   def argumentIndex(values: Int*): Iterator[NodeType] = {
