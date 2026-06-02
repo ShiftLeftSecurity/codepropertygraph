@@ -74,7 +74,7 @@ object Base extends SchemaBase {
                     |""".stripMargin
       )
       // We use a default value that is different from -1 because some code working with parameters and return
-      // values, represent then in a single number plane where -1 encodes the return value and we do not want
+      // values represent them in a single number plane where -1 encodes the return value and we do not want
       // the "value unset" default value to collide with that.
       .mandatory(-2)
       .protoId(ProtoIds.Index)
