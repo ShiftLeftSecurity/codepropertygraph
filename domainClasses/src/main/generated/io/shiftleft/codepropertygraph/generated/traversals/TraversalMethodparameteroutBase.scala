@@ -83,6 +83,11 @@ final class TraversalMethodparameteroutBase[NodeType <: nodes.MethodParameterOut
   def index(value: Int): Iterator[NodeType] =
     traversal.filter { _.index == value }
 
+  /** Traverse to nodes where the index equals the given `value`, or no results if `value` is None
+    */
+  def index(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => index(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the index equals at least one of the given `values`
     */
   def index(values: Int*): Iterator[NodeType] = {

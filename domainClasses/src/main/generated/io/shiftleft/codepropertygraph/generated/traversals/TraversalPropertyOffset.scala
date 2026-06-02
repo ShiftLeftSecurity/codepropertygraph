@@ -18,6 +18,17 @@ final class TraversalPropertyOffset[NodeType <: nodes.StoredNode & nodes.StaticT
       val tmp = node.offset; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the offset equals the given `value`. If `value` is None, only nodes where offset is not
+    * set are included.
+    */
+  def offset(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offset(_val); case None => traversal.filter { node => node.offset.isEmpty } }
+
+  /** Traverse to nodes where the offset equals the given `value`, or no results if `value` is None.
+    */
+  def offsetIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => offset(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the offset equals at least one of the given `values`
     */
   def offset(values: Int*): Iterator[NodeType] = {

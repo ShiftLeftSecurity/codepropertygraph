@@ -16,6 +16,11 @@ final class TraversalPropertyOrder[NodeType <: nodes.StoredNode & nodes.StaticTy
   def order(value: Int): Iterator[NodeType] =
     traversal.filter { _.order == value }
 
+  /** Traverse to nodes where the order equals the given `value`, or no results if `value` is None
+    */
+  def order(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => order(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the order equals at least one of the given `values`
     */
   def order(values: Int*): Iterator[NodeType] = {
