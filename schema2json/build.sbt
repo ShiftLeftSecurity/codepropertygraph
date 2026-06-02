@@ -14,3 +14,5 @@ Test / fork := true
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
 
 enablePlugins(JavaAppPackaging)
+
+stage := stage.dependsOn(Projects.schema / Compile / generateDomainClasses).value

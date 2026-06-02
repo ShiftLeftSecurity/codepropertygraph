@@ -47,6 +47,25 @@ Additional build-time dependencies are automatically downloaded as
 part of the build process. To build and install into your local Maven
 cache, issue the command `sbt clean test publishM2`.
 
+# Domain class generation
+
+The Scala domain classes under `domainClasses/src/main/generated/` are generated from the schema defined in `schema/src/main/scala/io/shiftleft/codepropertygraph/schema/`. They are checked into the repository, so you only need to regenerate them when the schema changes.
+
+Generation is handled by the `sbt-flatgraph` plugin via the `generateDomainClasses` task in the `schema` subproject. It reads `CpgSchema.instance`, which composes all schema modules, and writes Scala source files to `domainClasses/src/main/generated/`.
+
+The task is wired as a dependency of `domainClasses/compile` and `stage`, so it runs automatically when you compile or stage:
+
+```
+sbt compile   # triggers generateDomainClasses, then compiles
+sbt stage     # triggers generateDomainClasses, then packages
+```
+
+To run generation on its own:
+
+```
+sbt schema/generateDomainClasses
+```
+
 # Code style
 
 Code style is automatically verified by [scalafmt](https://github.com/scalameta/scalafmt)
