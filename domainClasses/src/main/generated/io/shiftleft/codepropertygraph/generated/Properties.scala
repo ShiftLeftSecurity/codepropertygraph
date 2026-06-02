@@ -152,7 +152,7 @@ object Properties {
   /** Specifies an index, e.g., for a parameter or argument. Explicit parameters are numbered from 1 to N, while index 0
     * is reserved for implicit self / this parameter.
     */
-  val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -1: Int)
+  val Index = flatgraph.SinglePropertyKey[Int](kind = 26, name = "INDEX", default = -2: Int)
 
   /** The static types a TYPE_DECL inherits from. This property is matched against the FULL_NAME of TYPE nodes and thus
     * it is required to have at least one TYPE node for each TYPE_FULL_NAME

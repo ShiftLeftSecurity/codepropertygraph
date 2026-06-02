@@ -2399,7 +2399,7 @@ class NewMethodParameterIn
   var columnNumber: Option[Int]                          = None
   var dynamicTypeHintFullName: IndexedSeq[String]        = ArraySeq.empty
   var evaluationStrategy: String                         = "<empty>": String
-  var index: Int                                         = -1: Int
+  var index: Int                                         = -2: Int
   var isVariadic: Boolean                                = false: Boolean
   var lineNumber: Option[Int]                            = None
   var name: String                                       = "<empty>": String

@@ -14,7 +14,7 @@ object PropertyDefaults {
   val Filename             = "<empty>"
   val FullName             = "<empty>"
   val GenericSignature     = "<empty>"
-  val Index                = -1: Int
+  val Index                = -2: Int
   val IsExternal           = false
   val IsVariadic           = false
   val Key                  = "<empty>"
