@@ -2314,7 +2314,7 @@ class NewMethodParameterOut
   var code: String                                 = "<empty>": String
   var columnNumber: Option[Int]                    = None
   var evaluationStrategy: String                   = "<empty>": String
-  var index: Int                                   = -1: Int
+  var index: Int                                   = -2: Int
   var isVariadic: Boolean                          = false: Boolean
   var lineNumber: Option[Int]                      = None
   var name: String                                 = "<empty>": String

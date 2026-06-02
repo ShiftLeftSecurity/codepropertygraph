@@ -182,7 +182,7 @@ object Accessors {
       nodeKind = node.nodeKind,
       propertyKind = 26,
       seq = node.seq(),
-      default = -1: Int
+      default = -2: Int
     )
   }
   final class AccessPropertyInheritsFromTypeFullName(val node: nodes.StoredNode) extends AnyVal {

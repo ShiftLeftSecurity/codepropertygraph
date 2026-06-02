@@ -28,7 +28,7 @@ trait MethodParameterOutBase
     if (("<empty>": String) != this.code) res.put("CODE", this.code)
     this.columnNumber.foreach { p => res.put("COLUMN_NUMBER", p) }
     if (("<empty>": String) != this.evaluationStrategy) res.put("EVALUATION_STRATEGY", this.evaluationStrategy)
-    if ((-1: Int) != this.index) res.put("INDEX", this.index)
+    if ((-2: Int) != this.index) res.put("INDEX", this.index)
     if ((false: Boolean) != this.isVariadic) res.put("IS_VARIADIC", this.isVariadic)
     this.lineNumber.foreach { p => res.put("LINE_NUMBER", p) }
     if (("<empty>": String) != this.name) res.put("NAME", this.name)
@@ -58,7 +58,7 @@ object MethodParameterOut {
   * passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a pointer/reference and it is shared with
   * the caller/callee. While a copy of the pointer is made, a copy of the object that it points to is not made.
   *
-  * ▸ Index (Int); Cardinality `one` (mandatory with default value `-1`); Specifies an index, e.g., for a parameter or
+  * ▸ Index (Int); Cardinality `one` (mandatory with default value `-2`); Specifies an index, e.g., for a parameter or
   * argument. Explicit parameters are numbered from 1 to N, while index 0 is reserved for implicit self / this
   * parameter.
   *
