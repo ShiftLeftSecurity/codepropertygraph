@@ -73,7 +73,10 @@ object Base extends SchemaBase {
                     | self / this parameter.
                     |""".stripMargin
       )
-      .mandatory(PropertyDefaults.Int)
+      // We use a default value that is different from -1 because some code working with parameters and return
+      // values, represent then in a single number plane where -1 encodes the return value and we do not want
+      // the "value unset" default value to collide with that.
+      .mandatory(-2)
       .protoId(ProtoIds.Index)
 
     val name = builder
