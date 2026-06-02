@@ -19,6 +19,19 @@ final class TraversalPropertyColumnNumberEnd[
       val tmp = node.columnNumberEnd; tmp.isDefined && tmp.get == value
     }
 
+  /** Traverse to nodes where the columnNumberEnd equals the given `value`. If `value` is None, only nodes where
+    * columnNumberEnd is not set are included.
+    */
+  def columnNumberEnd(value: Option[Int]): Iterator[NodeType] =
+    value match {
+      case Some(_val) => columnNumberEnd(_val); case None => traversal.filter { node => node.columnNumberEnd.isEmpty }
+    }
+
+  /** Traverse to nodes where the columnNumberEnd equals the given `value`, or no results if `value` is None.
+    */
+  def columnNumberEndIfPresent(value: Option[Int]): Iterator[NodeType] =
+    value match { case Some(_val) => columnNumberEnd(_val); case None => Iterator.empty }
+
   /** Traverse to nodes where the columnNumberEnd equals at least one of the given `values`
     */
   def columnNumberEnd(values: Int*): Iterator[NodeType] = {
