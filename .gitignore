@@ -104,3 +104,8 @@ _deps
 .nfs*
 
 # End of https://www.gitignore.io/api/c++,cmake,linux
+##############
+# Bazel      #
+##############
+user.bazelrc
+bazel-*
