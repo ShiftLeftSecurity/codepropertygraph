@@ -14,12 +14,11 @@ class SamplePass(cpg: Cpg) extends SimpleCpgPass(cpg) {
 }
 
 object SamplePassMain extends App {
-  val filename = "src_cpg.bin.zip"
-  val odbConfig    = new overflowdb.Config().withStorageLocation(filename)
-  val loaderConfig = CpgLoaderConfig().withOverflowConfig(odbConfig)
-  val cpg = CpgLoader.loadFromOverflowDb(loaderConfig)
+  val filename      = "src_cpg.bin.zip"
+  val odbConfig     = new overflowdb.Config().withStorageLocation(filename)
+  val loaderConfig  = CpgLoaderConfig().withOverflowConfig(odbConfig)
+  val cpg           = CpgLoader.loadFromOverflowDb(loaderConfig)
   val serializedCpg = new SerializedCpg("/tmp/dst.bin.zip")
-  val pass = new SamplePass(cpg)
+  val pass          = new SamplePass(cpg)
   pass.createApplySerializeAndStore(serializedCpg)
 }
-

@@ -136,7 +136,7 @@ object ProtoCpgLoader {
   def loadOverlays(fileName: String): Try[Iterator[CpgOverlay]] =
     loadOverlays(fileName, CpgOverlay.parseFrom)
 
-  private def loadOverlays[T <: GeneratedMessageV3](fileName: String, f: InputStream => T): Try[Iterator[T]] =
+  private def loadOverlays(fileName: String, f: InputStream => CpgOverlay): Try[Iterator[CpgOverlay]] =
     Using(new ZipArchive(fileName)) { zip =>
       zip.entries
         .sortWith(compareOverlayPath)

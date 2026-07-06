@@ -1,0 +1,77 @@
+module(name = "codepropertygraph")
+
+bazel_dep(name = "protobuf", version = "34.1")
+bazel_dep(name = "bazel_tooling")
+bazel_dep(name = "rules_jvm_external", version = "7.0")
+bazel_dep(name = "aspect_rules_lint", version = "2.5.2")
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
+
+JOERN_VERSION = "db325972fdf72e53f76beba77b72e84b2c469905"
+
+git_override(
+    module_name = "bazel_tooling",
+    commit = "{}".format(JOERN_VERSION),
+    remote = "git@github.com:joernio/joern.git",
+    strip_prefix = "bazel/tooling",
+)
+
+bazel_dep(name = "rules_scala", version = "7.2.4")
+
+scala_config = use_extension(
+    "@rules_scala//scala/extensions:config.bzl",
+    "scala_config",
+)
+scala_config.settings(
+    scala_version = "3.7.4",
+)
+
+scala_deps = use_extension(
+    "@rules_scala//scala/extensions:deps.bzl",
+    "scala_deps",
+)
+scala_deps.scala()
+scala_deps.scalatest()
+
+register_toolchains("@bazel_tooling//scala_toolchain:plus_one_toolchain")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    artifacts = [
+        "org.slf4j:slf4j-api:2.0.17",
+        "io.joern:flatgraph-core_3:0.1.31",
+        "io.joern:flatgraph-help_3:0.1.31",
+        "io.joern:flatgraph-domain-classes-generator_3:0.1.31",
+        "io.joern:flatgraph-odb-convert_3:0.1.31",
+        "net.sf.trove4j:core:3.1.0",
+        "com.google.protobuf:protobuf-java:4.34.1",
+        "org.json4s:json4s-native_3:4.0.3",
+        "com.lihaoyi:os-lib_3:0.11.4",
+    ],
+    excluded_artifacts = [
+        # Exclude any scala libraries which might come in transitively.
+        # rules_scala will add the correct scala library for the configured Scala version.
+        # That way we do not have conflicts between different scala library versions on
+        # the build classpath.
+        "org.scala-lang:scala3-library_3",
+        "org.scala-lang:scala-library",
+    ],
+    fetch_sources = True,
+    lock_file = "//:maven_install.json",
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+use_repo(maven, "maven")
+
+maven.install(
+    name = "format_maven",
+    artifacts = [
+        "org.scalameta:scalafmt-cli_2.13:3.9.6",
+    ],
+    lock_file = "//:format_maven_install.json",
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+use_repo(maven, "format_maven")
