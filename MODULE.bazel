@@ -6,13 +6,12 @@ bazel_dep(name = "rules_jvm_external", version = "7.0")
 bazel_dep(name = "aspect_rules_lint", version = "2.5.2")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 
-JOERN_VERSION = "db325972fdf72e53f76beba77b72e84b2c469905"
+BAZEL_TOOLING_VERSION = "a07fda4f8bc736081ad9921831bc9973e77e6e19"
 
 git_override(
     module_name = "bazel_tooling",
-    commit = "{}".format(JOERN_VERSION),
-    remote = "git@github.com:joernio/joern.git",
-    strip_prefix = "bazel/tooling",
+    commit = "{}".format(BAZEL_TOOLING_VERSION),
+    remote = "git@github.com:joernio/bazel_tooling.git",
 )
 
 bazel_dep(name = "rules_scala", version = "7.2.4")

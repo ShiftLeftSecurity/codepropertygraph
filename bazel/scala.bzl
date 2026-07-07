@@ -11,7 +11,8 @@ _rules = make_scala_rules(
         "-deprecation",
         "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s",
     ],
-    common_scalatest_runtime_deps = [],
+    common_scala_binary_runtime_deps = [],
+    common_scala_test_runtime_deps = [],
 )
 
 scala_library = _rules.scala_library
