@@ -83,7 +83,19 @@ genrule(
 )
 
 java_import(
-    name = "domainClasses",
+    name = "domainClassesNeverLinked",
+    jars = [":domainClasses_jar"],
+    srcjar = ":domainClasses_src_jar",
+    visibility = ["//visibility:public"],
+    exports = [
+        "@maven//:io_joern_flatgraph_core_3",
+        "@maven//:io_joern_flatgraph_help_3",
+    ],
+    neverlink = True,
+)
+
+java_import(
+    name = "domainClassesLinked",
     jars = [":domainClasses_jar"],
     srcjar = ":domainClasses_src_jar",
     visibility = ["//visibility:public"],
