@@ -8,7 +8,7 @@ scala_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//schema:domainClasses",
+        "//schema:domainClassesNeverLinked",
         "//schema:java_proto",
         "@maven//:com_google_protobuf_protobuf_java",
         "@maven//:io_joern_flatgraph_core_3",

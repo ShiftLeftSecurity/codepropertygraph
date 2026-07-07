@@ -12,4 +12,7 @@ scala_binary(
         "@maven//:org_json4s_json4s_ast_3",
         "@maven//:org_json4s_json4s_native_3",
     ],
+    runtime_deps = [
+        "//schema:domainClassesLinked",
+    ],
 )
