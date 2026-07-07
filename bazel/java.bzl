@@ -9,6 +9,8 @@ _rules = make_java_rules(
         "-Xlint:-cast",
         "-XepDisableAllChecks",
     ],
+    common_java_binary_runtime_deps = [],
+    common_java_test_runtime_deps = [],
 )
 
 java_library = _rules.java_library
