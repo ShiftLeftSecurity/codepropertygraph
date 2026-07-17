@@ -32,7 +32,7 @@ final class TraversalPropertyContainedRef[NodeType <: nodes.StoredNode & nodes.S
     */
   def containedRefExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 11, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -45,7 +45,7 @@ final class TraversalPropertyContainedRef[NodeType <: nodes.StoredNode & nodes.S
     if (values.length == 1) return containedRefExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 11, value)

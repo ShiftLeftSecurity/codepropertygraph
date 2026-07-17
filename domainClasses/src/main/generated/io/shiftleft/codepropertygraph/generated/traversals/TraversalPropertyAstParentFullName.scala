@@ -33,7 +33,7 @@ final class TraversalPropertyAstParentFullName[
     */
   def astParentFullNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 4, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -46,7 +46,7 @@ final class TraversalPropertyAstParentFullName[
     if (values.length == 1) return astParentFullNameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 4, value)

@@ -84,7 +84,7 @@ final class TraversalJumptargetBase[NodeType <: nodes.JumpTargetBase](val traver
     */
   def nameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -97,7 +97,7 @@ final class TraversalJumptargetBase[NodeType <: nodes.JumpTargetBase](val traver
     if (values.length == 1) return nameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
@@ -152,7 +152,7 @@ final class TraversalJumptargetBase[NodeType <: nodes.JumpTargetBase](val traver
     */
   def parserTypeNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 44, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -165,7 +165,7 @@ final class TraversalJumptargetBase[NodeType <: nodes.JumpTargetBase](val traver
     if (values.length == 1) return parserTypeNameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 44, value)

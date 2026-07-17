@@ -30,7 +30,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def astParentFullNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 4, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -43,7 +43,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return astParentFullNameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 4, value)
@@ -98,7 +98,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def astParentTypeExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 5, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -111,7 +111,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return astParentTypeExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 5, value)
@@ -243,7 +243,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def filenameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 20, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -256,7 +256,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return filenameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 20, value)
@@ -311,7 +311,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def fullNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 21, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -324,7 +324,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return fullNameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 21, value)
@@ -379,7 +379,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def genericSignatureExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 22, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -392,7 +392,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return genericSignatureExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 22, value)
@@ -452,7 +452,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def hashExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 23, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -606,7 +606,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     */
   def signatureExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 47, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -619,7 +619,7 @@ final class TraversalMethodBase[NodeType <: nodes.MethodBase](val traversal: Ite
     if (values.length == 1) return signatureExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 47, value)
