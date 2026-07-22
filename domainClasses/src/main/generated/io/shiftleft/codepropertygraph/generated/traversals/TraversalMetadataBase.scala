@@ -35,7 +35,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     */
   def hashExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 23, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -103,7 +103,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     */
   def languageExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 34, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -116,7 +116,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     if (values.length == 1) return languageExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 34, value)
@@ -175,7 +175,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     */
   def rootExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 46, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -188,7 +188,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     if (values.length == 1) return rootExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 46, value)
@@ -243,7 +243,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     */
   def versionExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 52, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -256,7 +256,7 @@ final class TraversalMetadataBase[NodeType <: nodes.MetaDataBase](val traversal:
     if (values.length == 1) return versionExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 52, value)

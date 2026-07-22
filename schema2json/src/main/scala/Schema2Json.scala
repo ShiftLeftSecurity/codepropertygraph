@@ -6,20 +6,22 @@ import org.json4s.{Formats, NoTypeHints}
 import flatgraph.schema.Property.Cardinality
 import flatgraph.schema.{AbstractNodeType, NodeBaseType, NodeType, Property, SchemaInfo}
 
-object Schema2Json extends App {
+object Schema2Json {
 
   val schema = CpgSchema.instance
 
   implicit val formats: AnyRef & Formats =
     Serialization.formats(NoTypeHints)
 
-  val json =
-    ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
+  def main(args: Array[String]): Unit = {
+    val json =
+      ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
 
-  val outFileName = "/tmp/schema.json"
-  os.write(os.Path(outFileName), compact(render(json)))
-  // Files.writeString(Paths.get(outFileName), compact(render(json)))
-  println(s"Schema written to: $outFileName")
+    val outFileName = "/tmp/schema.json"
+    os.write(os.Path(outFileName), compact(render(json)))
+    // Files.writeString(Paths.get(outFileName), compact(render(json)))
+    println(s"Schema written to: $outFileName")
+  }
 
   private def schemaName(nodeType: AbstractNodeType): String =
     schemaName(nodeType.schemaInfo)

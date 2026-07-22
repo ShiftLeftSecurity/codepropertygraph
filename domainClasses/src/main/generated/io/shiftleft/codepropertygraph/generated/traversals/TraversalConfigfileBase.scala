@@ -31,7 +31,7 @@ final class TraversalConfigfileBase[NodeType <: nodes.ConfigFileBase](val traver
     */
   def contentExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 12, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -44,7 +44,7 @@ final class TraversalConfigfileBase[NodeType <: nodes.ConfigFileBase](val traver
     if (values.length == 1) return contentExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 12, value)
@@ -99,7 +99,7 @@ final class TraversalConfigfileBase[NodeType <: nodes.ConfigFileBase](val traver
     */
   def nameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -112,7 +112,7 @@ final class TraversalConfigfileBase[NodeType <: nodes.ConfigFileBase](val traver
     if (values.length == 1) return nameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)

@@ -37,7 +37,7 @@ final class TraversalPropertyImportedAs[NodeType <: nodes.StoredNode & nodes.Sta
     */
   def importedAsExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 24, value)
         .asInstanceOf[Iterator[NodeType]]

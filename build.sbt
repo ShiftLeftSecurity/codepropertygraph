@@ -1,12 +1,12 @@
 name := "codepropertygraph"
 
 // parsed by project/Versions.scala, updated by updateDependencies.sh
-val flatgraphVersion = "0.1.32"
+val flatgraphVersion = "0.1.34"
 
 inThisBuild(
   List(
     organization       := "io.shiftleft",
-    scalaVersion       := "3.7.4",
+    scalaVersion       := "3.8.3",
     resolvers ++= Seq(Resolver.mavenLocal, "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public"),
     packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
@@ -56,7 +56,7 @@ lazy val codepropertygraph = Projects.codepropertygraph
 lazy val schema2json       = Projects.schema2json
 
 ThisBuild / scalacOptions ++= Seq(
-  "-release", "8",
+  "-release", "17",
   "-deprecation",
   "-feature",
   // "-explain",
@@ -70,7 +70,7 @@ ThisBuild / scalacOptions ++= Seq(
 
 ThisBuild / javacOptions ++= Seq(
   "-g", // debug symbols
-  "--release", "8"
+  "--release", "17"
 )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
