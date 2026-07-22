@@ -32,7 +32,7 @@ final class TraversalPropertyLanguage[NodeType <: nodes.StoredNode & nodes.Stati
     */
   def languageExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 34, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -45,7 +45,7 @@ final class TraversalPropertyLanguage[NodeType <: nodes.StoredNode & nodes.Stati
     if (values.length == 1) return languageExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 34, value)

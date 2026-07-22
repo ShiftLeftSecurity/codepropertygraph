@@ -1,7 +1,7 @@
 load("@bazel_tooling//:scala_rule_factory.bzl", "make_scala_rules")
 
 _rules = make_scala_rules(
-    scala_version = "3.7.4",
+    scala_version = "3.8.3",
     common_scalacopts = [
         "-java-output-version",
         "17",

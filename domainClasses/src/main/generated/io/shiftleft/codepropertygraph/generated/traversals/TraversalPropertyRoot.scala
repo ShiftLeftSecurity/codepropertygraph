@@ -32,7 +32,7 @@ final class TraversalPropertyRoot[NodeType <: nodes.StoredNode & nodes.StaticTyp
     */
   def rootExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 46, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -45,7 +45,7 @@ final class TraversalPropertyRoot[NodeType <: nodes.StoredNode & nodes.StaticTyp
     if (values.length == 1) return rootExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 46, value)

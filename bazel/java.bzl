@@ -4,7 +4,7 @@ _rules = make_java_rules(
     java_common_opts = [
         "-g",
         "--release",
-        "11",
+        "17",
         "-Xlint:all",
         "-Xlint:-cast",
         "-XepDisableAllChecks",

@@ -36,7 +36,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     */
   def closureBindingIdExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 7, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -104,7 +104,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     */
   def evaluationStrategyExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 17, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -117,7 +117,7 @@ final class TraversalClosurebindingBase[NodeType <: nodes.ClosureBindingBase](va
     if (values.length == 1) return evaluationStrategyExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 17, value)

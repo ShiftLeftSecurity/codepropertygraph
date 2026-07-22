@@ -35,7 +35,7 @@ final class TraversalIdentifierBase[NodeType <: nodes.IdentifierBase](val traver
     */
   def nameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -48,7 +48,7 @@ final class TraversalIdentifierBase[NodeType <: nodes.IdentifierBase](val traver
     if (values.length == 1) return nameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 39, value)
@@ -107,7 +107,7 @@ final class TraversalIdentifierBase[NodeType <: nodes.IdentifierBase](val traver
     */
   def typeFullNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 50, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -120,7 +120,7 @@ final class TraversalIdentifierBase[NodeType <: nodes.IdentifierBase](val traver
     if (values.length == 1) return typeFullNameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 50, value)

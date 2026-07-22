@@ -32,7 +32,7 @@ final class TraversalPropertyFilename[NodeType <: nodes.StoredNode & nodes.Stati
     */
   def filenameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 20, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -45,7 +45,7 @@ final class TraversalPropertyFilename[NodeType <: nodes.StoredNode & nodes.Stati
     if (values.length == 1) return filenameExact(values.head)
     traversal match {
       case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-        val someNode = init.next
+        val someNode = init.next()
         values.iterator.flatMap { value =>
           flatgraph.Accessors
             .getWithInverseIndex(someNode.graph, someNode.nodeKind, 20, value)

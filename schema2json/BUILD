@@ -6,13 +6,13 @@ scala_binary(
         "src/main/scala/**/*.scala",
     ]),
     main_class = "Schema2Json",
+    runtime_deps = [
+        "//schema:domainClassesLinked",
+    ],
     deps = [
         "//schema",
         "@maven//:com_lihaoyi_os_lib_3",
         "@maven//:org_json4s_json4s_ast_3",
         "@maven//:org_json4s_json4s_native_3",
-    ],
-    runtime_deps = [
-        "//schema:domainClassesLinked",
     ],
 )

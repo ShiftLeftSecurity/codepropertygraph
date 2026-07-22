@@ -89,7 +89,7 @@ final class TraversalExpressionBase[NodeType <: nodes.ExpressionBase](val traver
     */
   def argumentLabelExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 2, value)
         .asInstanceOf[Iterator[NodeType]]
@@ -162,7 +162,7 @@ final class TraversalExpressionBase[NodeType <: nodes.ExpressionBase](val traver
     */
   def argumentNameExact(value: String): Iterator[NodeType] = traversal match {
     case init: flatgraph.misc.InitNodeIterator[flatgraph.GNode @unchecked] if init.isVirgin && init.hasNext =>
-      val someNode = init.next
+      val someNode = init.next()
       flatgraph.Accessors
         .getWithInverseIndex(someNode.graph, someNode.nodeKind, 3, value)
         .asInstanceOf[Iterator[NodeType]]
