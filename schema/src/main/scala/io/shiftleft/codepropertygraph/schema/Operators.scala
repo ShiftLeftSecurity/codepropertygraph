@@ -338,6 +338,12 @@ object Operators extends SchemaBase {
         value = "<operator>.alloc",
         valueType = ValueType.String,
         comment = "Allocates memory for an object of a specific type"
+      ),
+      Constant(
+        name = "importCall",
+        value = "<operator>.import",
+        valueType = ValueType.String,
+        comment = "Imports a package"
       )
     )
 

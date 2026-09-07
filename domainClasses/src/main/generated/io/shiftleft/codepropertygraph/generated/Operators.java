@@ -224,6 +224,9 @@ public static final String tryCatch = "<operator>.tryCatch";
 /** Allocates memory for an object of a specific type */
 public static final String alloc = "<operator>.alloc";
 
+/** Imports a package */
+public static final String importCall = "<operator>.import";
+
 public static Set<String> ALL = new HashSet<String>() {{
 add(addition);
 add(subtraction);
@@ -298,6 +301,7 @@ add(lengthOf);
 add(safeNavigation);
 add(tryCatch);
 add(alloc);
+add(importCall);
 }};
 
 }
