@@ -6,15 +6,12 @@ bazel_dep(name = "rules_jvm_external", version = "7.0")
 bazel_dep(name = "aspect_rules_lint", version = "2.5.2")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 
-# Adds the mandatory common_javacopts parameter to make_scala_rules.
-# TODO https://github.com/joernio/bazel_tooling/pull/1: once merged, point
-# back at joernio/bazel_tooling and update to the merge commit.
-BAZEL_TOOLING_VERSION = "e4b086cdb35b8709f7cfd8136dd5ad5f5e8c4acc"
+BAZEL_TOOLING_VERSION = "fbdfc66995360c408ecf94d34837a0355aa7ac4d"
 
 git_override(
     module_name = "bazel_tooling",
     commit = "{}".format(BAZEL_TOOLING_VERSION),
-    remote = "git@github.com:max-leuthaeuser/bazel_tooling.git",
+    remote = "git@github.com:joernio/bazel_tooling.git",
 )
 
 bazel_dep(name = "rules_scala", version = "7.2.5")
