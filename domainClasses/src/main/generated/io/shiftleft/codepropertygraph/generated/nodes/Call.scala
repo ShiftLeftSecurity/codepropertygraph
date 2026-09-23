@@ -48,6 +48,25 @@ trait CallBase extends AbstractNode with CallReprBase with ExpressionBase with S
 
 object Call {
   val Label = "CALL"
+  def unapply(node: CallBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dispatchType = node.dispatchType,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    lineNumber = node.lineNumber,
+    methodFullName = node.methodFullName,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    signature = node.signature,
+    staticReceiver = node.staticReceiver,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

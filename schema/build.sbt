@@ -7,6 +7,8 @@ enablePlugins(FlatgraphCodegenSbtPlugin)
 generateDomainClasses/classWithSchema := "io.shiftleft.codepropertygraph.schema.CpgSchema$"
 generateDomainClasses/fieldName       := "instance"
 generateDomainClasses/outputDir       := (Projects.domainClasses / generatedSrcDir).value
+generateDomainClasses/scala3          := true
+generateDomainClassesCheck/scala3     := true
 
 val generateProtobuf = taskKey[File]("generate protobuf definitions: cpg.proto")
 generateProtobuf := Def.taskDyn {

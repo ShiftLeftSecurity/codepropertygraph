@@ -29,6 +29,17 @@ trait FileBase extends AbstractNode with AstNodeBase with StaticType[FileEMT] {
 
 object File {
   val Label = "FILE"
+  def unapply(node: FileBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    content = node.content,
+    hash = node.hash,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

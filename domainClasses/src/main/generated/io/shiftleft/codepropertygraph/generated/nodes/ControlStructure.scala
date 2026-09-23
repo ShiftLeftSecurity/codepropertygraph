@@ -31,6 +31,19 @@ trait ControlStructureBase extends AbstractNode with ExpressionBase with StaticT
 
 object ControlStructure {
   val Label = "CONTROL_STRUCTURE"
+  def unapply(node: ControlStructureBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    controlStructureType = node.controlStructureType,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    parserTypeName = node.parserTypeName
+  )
 }
 
 /** * NODE PROPERTIES:

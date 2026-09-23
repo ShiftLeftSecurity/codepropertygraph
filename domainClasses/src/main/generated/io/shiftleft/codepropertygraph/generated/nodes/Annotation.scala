@@ -31,6 +31,19 @@ trait AnnotationBase extends AbstractNode with ExpressionBase with StaticType[An
 
 object Annotation {
   val Label = "ANNOTATION"
+  def unapply(node: AnnotationBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    fullName = node.fullName,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

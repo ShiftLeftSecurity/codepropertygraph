@@ -42,6 +42,19 @@ trait MethodParameterOutBase
 
 object MethodParameterOut {
   val Label = "METHOD_PARAMETER_OUT"
+  def unapply(node: MethodParameterOutBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    evaluationStrategy = node.evaluationStrategy,
+    index = node.index,
+    isVariadic = node.isVariadic,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

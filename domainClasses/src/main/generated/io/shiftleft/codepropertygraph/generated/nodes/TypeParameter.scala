@@ -27,6 +27,15 @@ trait TypeParameterBase extends AbstractNode with AstNodeBase with StaticType[Ty
 
 object TypeParameter {
   val Label = "TYPE_PARAMETER"
+  def unapply(node: TypeParameterBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

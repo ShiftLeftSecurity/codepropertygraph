@@ -47,6 +47,23 @@ trait TypeDeclBase extends AbstractNode with AstNodeBase with StaticType[TypeDec
 
 object TypeDecl {
   val Label = "TYPE_DECL"
+  def unapply(node: TypeDeclBase) = (
+    aliasTypeFullName = node.aliasTypeFullName,
+    astParentFullName = node.astParentFullName,
+    astParentType = node.astParentType,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    filename = node.filename,
+    fullName = node.fullName,
+    genericSignature = node.genericSignature,
+    inheritsFromTypeFullName = node.inheritsFromTypeFullName,
+    isExternal = node.isExternal,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

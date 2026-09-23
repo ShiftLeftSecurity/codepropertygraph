@@ -22,7 +22,8 @@ trait TypeBase extends AbstractNode with StaticType[TypeEMT] {
 }
 
 object Type {
-  val Label = "TYPE"
+  val Label                   = "TYPE"
+  def unapply(node: TypeBase) = (fullName = node.fullName, name = node.name, typeDeclFullName = node.typeDeclFullName)
 }
 
 /** * NODE PROPERTIES:

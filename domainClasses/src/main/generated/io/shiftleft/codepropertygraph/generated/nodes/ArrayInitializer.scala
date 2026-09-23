@@ -29,6 +29,17 @@ trait ArrayInitializerBase extends AbstractNode with ExpressionBase with StaticT
 
 object ArrayInitializer {
   val Label = "ARRAY_INITIALIZER"
+  def unapply(node: ArrayInitializerBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

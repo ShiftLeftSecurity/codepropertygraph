@@ -22,6 +22,8 @@ trait ClosureBindingBase extends AbstractNode with StaticType[ClosureBindingEMT]
 
 object ClosureBinding {
   val Label = "CLOSURE_BINDING"
+  def unapply(node: ClosureBindingBase) =
+    (closureBindingId = node.closureBindingId, evaluationStrategy = node.evaluationStrategy)
 }
 
 /** * NODE PROPERTIES:

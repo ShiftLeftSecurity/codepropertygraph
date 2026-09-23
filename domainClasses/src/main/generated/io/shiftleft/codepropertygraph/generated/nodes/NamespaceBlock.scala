@@ -29,6 +29,17 @@ trait NamespaceBlockBase extends AbstractNode with AstNodeBase with StaticType[N
 
 object NamespaceBlock {
   val Label = "NAMESPACE_BLOCK"
+  def unapply(node: NamespaceBlockBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    filename = node.filename,
+    fullName = node.fullName,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

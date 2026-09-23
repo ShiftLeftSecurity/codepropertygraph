@@ -31,6 +31,8 @@ trait MetaDataBase extends AbstractNode with StaticType[MetaDataEMT] {
 
 object MetaData {
   val Label = "META_DATA"
+  def unapply(node: MetaDataBase) =
+    (hash = node.hash, language = node.language, overlays = node.overlays, root = node.root, version = node.version)
 }
 
 /** * NODE PROPERTIES:

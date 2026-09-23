@@ -30,6 +30,18 @@ trait TemplateDomBase extends AbstractNode with ExpressionBase with StaticType[T
 
 object TemplateDom {
   val Label = "TEMPLATE_DOM"
+  def unapply(node: TemplateDomBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:
