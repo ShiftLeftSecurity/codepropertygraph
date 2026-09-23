@@ -27,7 +27,7 @@ genrule(
     name = "run_codegen",
     outs = ["generated_classes.srcjar"],
     cmd = """
-  $(location :codegen) -c 'io.shiftleft.codepropertygraph.schema.CpgSchema$$' -f instance -o $(RULEDIR)/generated_classes
+  $(location :codegen) --scala3 -c 'io.shiftleft.codepropertygraph.schema.CpgSchema$$' -f instance -o $(RULEDIR)/generated_classes
   $(JAVABASE)/bin/jar --create --file $@ -C $(RULEDIR)/generated_classes .
   """,
     toolchains = ["@bazel_tools//tools/jdk:current_java_runtime"],
