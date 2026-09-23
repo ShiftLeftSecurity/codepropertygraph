@@ -25,6 +25,8 @@ trait FindingBase extends AbstractNode with StaticType[FindingEMT] {
 
 object Finding {
   val Label = "FINDING"
+  def unapply(node: FindingBase) =
+    (evidenceDescription = node.evidenceDescription, evidence = node.evidence, keyValuePairs = node.keyValuePairs)
 }
 
 /** * NODE PROPERTIES:

@@ -22,7 +22,8 @@ trait BindingBase extends AbstractNode with StaticType[BindingEMT] {
 }
 
 object Binding {
-  val Label = "BINDING"
+  val Label                      = "BINDING"
+  def unapply(node: BindingBase) = (methodFullName = node.methodFullName, name = node.name, signature = node.signature)
 }
 
 /** * NODE PROPERTIES:

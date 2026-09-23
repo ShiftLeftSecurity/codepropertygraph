@@ -21,7 +21,8 @@ trait ConfigFileBase extends AbstractNode with StaticType[ConfigFileEMT] {
 }
 
 object ConfigFile {
-  val Label = "CONFIG_FILE"
+  val Label                         = "CONFIG_FILE"
+  def unapply(node: ConfigFileBase) = (content = node.content, name = node.name)
 }
 
 /** * NODE PROPERTIES:

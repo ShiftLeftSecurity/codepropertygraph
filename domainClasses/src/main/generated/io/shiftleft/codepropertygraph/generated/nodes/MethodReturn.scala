@@ -38,6 +38,18 @@ trait MethodReturnBase extends AbstractNode with CfgNodeBase with StaticType[Met
 
 object MethodReturn {
   val Label = "METHOD_RETURN"
+  def unapply(node: MethodReturnBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    evaluationStrategy = node.evaluationStrategy,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

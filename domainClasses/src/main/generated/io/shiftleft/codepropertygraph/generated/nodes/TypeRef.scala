@@ -39,6 +39,20 @@ trait TypeRefBase extends AbstractNode with ExpressionBase with StaticType[TypeR
 
 object TypeRef {
   val Label = "TYPE_REF"
+  def unapply(node: TypeRefBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

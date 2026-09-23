@@ -21,7 +21,8 @@ trait KeyValuePairBase extends AbstractNode with StaticType[KeyValuePairEMT] {
 }
 
 object KeyValuePair {
-  val Label = "KEY_VALUE_PAIR"
+  val Label                           = "KEY_VALUE_PAIR"
+  def unapply(node: KeyValuePairBase) = (key = node.key, value = node.value)
 }
 
 /** * NODE PROPERTIES:

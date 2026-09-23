@@ -30,6 +30,18 @@ trait FieldIdentifierBase extends AbstractNode with ExpressionBase with StaticTy
 
 object FieldIdentifier {
   val Label = "FIELD_IDENTIFIER"
+  def unapply(node: FieldIdentifierBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    canonicalName = node.canonicalName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

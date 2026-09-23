@@ -50,6 +50,22 @@ trait MethodParameterInBase
 
 object MethodParameterIn {
   val Label = "METHOD_PARAMETER_IN"
+  def unapply(node: MethodParameterInBase) = (
+    closureBindingId = node.closureBindingId,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    evaluationStrategy = node.evaluationStrategy,
+    index = node.index,
+    isVariadic = node.isVariadic,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

@@ -27,6 +27,15 @@ trait CommentBase extends AbstractNode with AstNodeBase with StaticType[CommentE
 
 object Comment {
   val Label = "COMMENT"
+  def unapply(node: CommentBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    filename = node.filename,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

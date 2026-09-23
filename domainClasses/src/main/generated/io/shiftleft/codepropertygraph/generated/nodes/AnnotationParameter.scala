@@ -26,6 +26,14 @@ trait AnnotationParameterBase extends AbstractNode with AstNodeBase with StaticT
 
 object AnnotationParameter {
   val Label = "ANNOTATION_PARAMETER"
+  def unapply(node: AnnotationParameterBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

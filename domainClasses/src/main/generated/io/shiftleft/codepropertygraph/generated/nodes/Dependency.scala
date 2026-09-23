@@ -23,6 +23,8 @@ trait DependencyBase extends AbstractNode with StaticType[DependencyEMT] {
 
 object Dependency {
   val Label = "DEPENDENCY"
+  def unapply(node: DependencyBase) =
+    (dependencyGroupId = node.dependencyGroupId, name = node.name, version = node.version)
 }
 
 /** * NODE PROPERTIES:

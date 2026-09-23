@@ -26,6 +26,14 @@ trait TypeArgumentBase extends AbstractNode with AstNodeBase with StaticType[Typ
 
 object TypeArgument {
   val Label = "TYPE_ARGUMENT"
+  def unapply(node: TypeArgumentBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

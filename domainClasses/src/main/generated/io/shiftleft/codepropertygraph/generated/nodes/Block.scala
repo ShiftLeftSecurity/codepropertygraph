@@ -39,6 +39,20 @@ trait BlockBase extends AbstractNode with ExpressionBase with StaticType[BlockEM
 
 object Block {
   val Label = "BLOCK"
+  def unapply(node: BlockBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

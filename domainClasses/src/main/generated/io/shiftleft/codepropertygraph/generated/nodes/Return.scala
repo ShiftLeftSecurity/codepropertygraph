@@ -29,6 +29,17 @@ trait ReturnBase extends AbstractNode with ExpressionBase with StaticType[Return
 
 object Return {
   val Label = "RETURN"
+  def unapply(node: ReturnBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

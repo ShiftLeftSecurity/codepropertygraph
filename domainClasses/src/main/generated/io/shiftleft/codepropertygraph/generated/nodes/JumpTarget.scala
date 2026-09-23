@@ -29,6 +29,17 @@ trait JumpTargetBase extends AbstractNode with CfgNodeBase with StaticType[JumpT
 
 object JumpTarget {
   val Label = "JUMP_TARGET"
+  def unapply(node: JumpTargetBase) = (
+    argumentIndex = node.argumentIndex,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    parserTypeName = node.parserTypeName
+  )
 }
 
 /** * NODE PROPERTIES:

@@ -27,6 +27,15 @@ trait ModifierBase extends AbstractNode with AstNodeBase with StaticType[Modifie
 
 object Modifier {
   val Label = "MODIFIER"
+  def unapply(node: ModifierBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    modifierType = node.modifierType,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

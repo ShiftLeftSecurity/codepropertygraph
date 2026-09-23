@@ -30,6 +30,18 @@ trait AnnotationLiteralBase extends AbstractNode with ExpressionBase with Static
 
 object AnnotationLiteral {
   val Label = "ANNOTATION_LITERAL"
+  def unapply(node: AnnotationLiteralBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

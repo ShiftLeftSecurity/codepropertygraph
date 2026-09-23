@@ -50,6 +50,25 @@ trait MethodBase extends AbstractNode with CfgNodeBase with DeclarationBase with
 
 object Method {
   val Label = "METHOD"
+  def unapply(node: MethodBase) = (
+    astParentFullName = node.astParentFullName,
+    astParentType = node.astParentType,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    columnNumberEnd = node.columnNumberEnd,
+    filename = node.filename,
+    fullName = node.fullName,
+    genericSignature = node.genericSignature,
+    hash = node.hash,
+    isExternal = node.isExternal,
+    lineNumber = node.lineNumber,
+    lineNumberEnd = node.lineNumberEnd,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    signature = node.signature
+  )
 }
 
 /** * NODE PROPERTIES:

@@ -44,6 +44,21 @@ trait MemberBase extends AbstractNode with AstNodeBase with DeclarationBase with
 
 object Member {
   val Label = "MEMBER"
+  def unapply(node: MemberBase) = (
+    astParentFullName = node.astParentFullName,
+    astParentType = node.astParentType,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    genericSignature = node.genericSignature,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

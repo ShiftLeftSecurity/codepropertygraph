@@ -28,6 +28,16 @@ trait JumpLabelBase extends AbstractNode with AstNodeBase with StaticType[JumpLa
 
 object JumpLabel {
   val Label = "JUMP_LABEL"
+  def unapply(node: JumpLabelBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    name = node.name,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    parserTypeName = node.parserTypeName
+  )
 }
 
 /** * NODE PROPERTIES:

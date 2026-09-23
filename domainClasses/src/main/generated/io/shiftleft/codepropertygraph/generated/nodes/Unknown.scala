@@ -43,6 +43,22 @@ trait UnknownBase extends AbstractNode with ExpressionBase with StaticType[Unkno
 
 object Unknown {
   val Label = "UNKNOWN"
+  def unapply(node: UnknownBase) = (
+    argumentIndex = node.argumentIndex,
+    argumentLabel = node.argumentLabel,
+    argumentName = node.argumentName,
+    code = node.code,
+    columnNumber = node.columnNumber,
+    containedRef = node.containedRef,
+    dynamicTypeHintFullName = node.dynamicTypeHintFullName,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order,
+    parserTypeName = node.parserTypeName,
+    possibleTypes = node.possibleTypes,
+    typeFullName = node.typeFullName
+  )
 }
 
 /** * NODE PROPERTIES:

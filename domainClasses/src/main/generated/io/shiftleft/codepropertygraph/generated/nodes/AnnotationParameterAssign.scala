@@ -29,6 +29,14 @@ trait AnnotationParameterAssignBase
 
 object AnnotationParameterAssign {
   val Label = "ANNOTATION_PARAMETER_ASSIGN"
+  def unapply(node: AnnotationParameterAssignBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

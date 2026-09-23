@@ -40,6 +40,20 @@ trait ImportBase extends AbstractNode with AstNodeBase with StaticType[ImportEMT
 
 object Import {
   val Label = "IMPORT"
+  def unapply(node: ImportBase) = (
+    code = node.code,
+    columnNumber = node.columnNumber,
+    explicitAs = node.explicitAs,
+    importedAs = node.importedAs,
+    importedEntity = node.importedEntity,
+    isExplicit = node.isExplicit,
+    isModuleImport = node.isModuleImport,
+    isWildcard = node.isWildcard,
+    lineNumber = node.lineNumber,
+    offset = node.offset,
+    offsetEnd = node.offsetEnd,
+    order = node.order
+  )
 }
 
 /** * NODE PROPERTIES:

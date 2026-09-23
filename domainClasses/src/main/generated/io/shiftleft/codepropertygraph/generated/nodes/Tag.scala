@@ -21,7 +21,8 @@ trait TagBase extends AbstractNode with StaticType[TagEMT] {
 }
 
 object Tag {
-  val Label = "TAG"
+  val Label                  = "TAG"
+  def unapply(node: TagBase) = (name = node.name, value = node.value)
 }
 
 /** * NODE PROPERTIES:
