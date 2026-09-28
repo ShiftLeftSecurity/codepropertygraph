@@ -12,7 +12,6 @@ scala_binary(
     deps = [
         "//schema",
         "@maven//:com_lihaoyi_os_lib_3",
-        "@maven//:org_json4s_json4s_ast_3",
-        "@maven//:org_json4s_json4s_native_3",
+        "@maven//:com_lihaoyi_ujson_3",
     ],
 )

@@ -1,8 +1,4 @@
 import io.shiftleft.codepropertygraph.schema.CpgSchema
-import org.json4s.JsonDSL._
-import org.json4s.native.JsonMethods._
-import org.json4s.native.Serialization
-import org.json4s.{Formats, NoTypeHints}
 import flatgraph.schema.Property.Cardinality
 import flatgraph.schema.{AbstractNodeType, NodeBaseType, NodeType, Property, SchemaInfo}
 
@@ -10,16 +6,17 @@ object Schema2Json {
 
   val schema = CpgSchema.instance
 
-  implicit val formats: AnyRef & Formats =
-    Serialization.formats(NoTypeHints)
-
   def main(args: Array[String]): Unit = {
-    val json =
-      ("schemas" -> schemaSummary) ~ ("nodes" -> nodeTypesAsJson) ~ ("edges" -> edgeTypesAsJson) ~ ("properties" -> propertiesAsJson)
+    val json = ujson.Obj(
+      "schemas"    -> schemaSummary,
+      "nodes"      -> nodeTypesAsJson,
+      "edges"      -> edgeTypesAsJson,
+      "properties" -> propertiesAsJson
+    )
 
     val outFileName = "/tmp/schema.json"
-    os.write(os.Path(outFileName), compact(render(json)))
-    // Files.writeString(Paths.get(outFileName), compact(render(json)))
+    os.write(os.Path(outFileName), ujson.write(json))
+    // Files.writeString(Paths.get(outFileName), ujson.write(json))
     println(s"Schema written to: $outFileName")
   }
 
@@ -51,9 +48,7 @@ object Schema2Json {
         val description = info.getDeclaringClass.getDeclaredMethod("description").invoke(null).asInstanceOf[String]
         val providedByFrontend =
           info.getDeclaringClass.getDeclaredMethod("providedByFrontend").invoke(null).asInstanceOf[Boolean]
-        ("name"        -> name) ~
-          ("description"        -> description) ~
-          ("providedByFrontend" -> providedByFrontend)
+        ujson.Obj("name" -> name, "description" -> description, "providedByFrontend" -> providedByFrontend)
       }
   }
 
@@ -74,29 +69,30 @@ object Schema2Json {
           }
           .toMap
           .toList
-          .map(x => (("baseType" -> x._2), ("name" -> x._1)))
 
-        val inheritedPropertyNames = inheritedProperties.map(_._2._2)
+        val inheritedPropertyNames = inheritedProperties.map(_._1)
         val nonInheritedProperties = allPropertyNames.filterNot(x => inheritedPropertyNames.contains(x))
 
         val containedNodes = nodeType match {
           case nt: NodeType if !isSchemaHidden(nt.schemaInfo) =>
             nt.containedNodes.map { n =>
-              Map("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> name(n.cardinality))
+              ujson.Obj("name" -> n.localName, "type" -> n.nodeType.name, "cardinality" -> name(n.cardinality))
             }
           case _ => List()
         }
-        val json = ("name" -> nodeType.name) ~
-          ("comment"             -> nodeType.comment) ~
-          ("extends"             -> baseTypeNames) ~
-          ("allProperties"       -> allPropertyNames) ~
-          ("cardinalities"       -> cardinalities) ~
-          ("inheritedProperties" -> inheritedProperties.map(x => x._1 ~ x._2)) ~
-          ("properties"          -> nonInheritedProperties) ~
-          ("schema"              -> schName) ~
-          ("schemaIndex"         -> schemaIndex(nodeType)) ~
-          ("isAbstract"          -> nodeType.isInstanceOf[NodeBaseType]) ~
-          ("containedNodes"      -> containedNodes)
+        val json = ujson.Obj("name" -> nodeType.name)
+        nodeType.comment.foreach(comment => json("comment") = comment)
+        json("extends") = baseTypeNames
+        json("allProperties") = allPropertyNames
+        json("cardinalities") = cardinalities
+        json("inheritedProperties") = inheritedProperties.map { case (propertyName, baseTypeName) =>
+          ujson.Obj("baseType" -> baseTypeName, "name" -> propertyName)
+        }
+        json("properties") = nonInheritedProperties
+        json("schema") = schName
+        json("schemaIndex") = schemaIndex(nodeType)
+        json("isAbstract") = nodeType.isInstanceOf[NodeBaseType]
+        json("containedNodes") = containedNodes
         Some(json)
       }
   }
@@ -107,11 +103,10 @@ object Schema2Json {
       .filterNot(x => isSchemaHidden(x.schemaInfo))
       .flatMap { edge =>
         val schName = schemaName(edge.schemaInfo)
-        Some(
-          ("name" -> edge.name) ~
-            ("comment" -> edge.comment) ~
-            ("schema"  -> schName)
-        )
+        val json    = ujson.Obj("name" -> edge.name)
+        edge.comment.foreach(comment => json("comment") = comment)
+        json("schema") = schName
+        Some(json)
       }
   }
 
@@ -121,11 +116,10 @@ object Schema2Json {
       .filterNot(x => isSchemaHidden(x.schemaInfo))
       .flatMap { prop =>
         val schName = schemaName(prop.schemaInfo)
-        Some(
-          ("name" -> prop.name) ~
-            ("comment" -> prop.comment) ~
-            ("schema"  -> schName)
-        )
+        val json    = ujson.Obj("name" -> prop.name)
+        prop.comment.foreach(comment => json("comment") = comment)
+        json("schema") = schName
+        Some(json)
       }
   }
 
