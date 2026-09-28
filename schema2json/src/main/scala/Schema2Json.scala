@@ -80,7 +80,6 @@ object Schema2Json {
             }
           case _ => List()
         }
-        // n.b. `comment` is an Option; absent comments are omitted from the json (rather than rendered as `null`)
         val json = ujson.Obj("name" -> nodeType.name)
         nodeType.comment.foreach(comment => json("comment") = comment)
         json("extends") = baseTypeNames
