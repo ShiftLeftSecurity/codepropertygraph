@@ -44,7 +44,7 @@ maven.install(
         "io.joern:flatgraph-odb-convert_3:0.1.35",
         "net.sf.trove4j:core:3.1.0",
         "com.google.protobuf:protobuf-java:4.34.1",
-        "org.json4s:json4s-native_3:4.0.3",
+        "com.lihaoyi:ujson_3:4.4.3",
         "com.lihaoyi:os-lib_3:0.11.4",
     ],
     excluded_artifacts = [

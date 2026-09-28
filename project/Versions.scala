@@ -2,7 +2,7 @@
 object Versions {
   val flatgraph = parseVersion("flatgraphVersion")
   val scalatest = "3.2.10"
-  val json4s    = "4.0.3"
+  val ujson     = "4.4.3"
 
   private def parseVersion(key: String): String = {
     val versionRegexp = s""".*val $key[ ]+=[ ]?"(.*?)"""".r

@@ -3,7 +3,7 @@ name := "schema2json"
 dependsOn(Projects.schema)
 
 libraryDependencies ++= Seq(
-  "org.json4s"            %% "json4s-native" % Versions.json4s,
+  "com.lihaoyi"           %% "ujson"         % Versions.ujson,
   "org.scalatest"         %% "scalatest"     % Versions.scalatest % Test
 )
 

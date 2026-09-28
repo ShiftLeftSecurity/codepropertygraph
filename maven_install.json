@@ -8,12 +8,12 @@
     "com.google.j2objc:j2objc-annotations": 2003271689,
     "com.google.protobuf:protobuf-java": 1237026331,
     "com.lihaoyi:os-lib_3": 899915638,
+    "com.lihaoyi:ujson_3": 1182647324,
     "io.joern:flatgraph-core_3": 1060140408,
     "io.joern:flatgraph-domain-classes-generator_3": -1894114436,
     "io.joern:flatgraph-help_3": -138228966,
     "io.joern:flatgraph-odb-convert_3": 1959782918,
     "net.sf.trove4j:core": 1808260229,
-    "org.json4s:json4s-native_3": 1421532977,
     "org.scala-lang:scala-library": 1230160761,
     "org.scala-lang:scala3-library_3": 1771369610,
     "org.slf4j:slf4j-api": -197708565,
@@ -45,23 +45,21 @@
     "com.lihaoyi:geny_3:jar:sources": 1575781288,
     "com.lihaoyi:os-lib_3": 695712032,
     "com.lihaoyi:os-lib_3:jar:sources": 1732147675,
-    "com.lihaoyi:ujson_3": 126745168,
-    "com.lihaoyi:ujson_3:jar:sources": 1676340764,
-    "com.lihaoyi:upickle-core_3": 911572118,
-    "com.lihaoyi:upickle-core_3:jar:sources": 1793823939,
-    "com.thoughtworks.paranamer:paranamer": 216030769,
-    "com.thoughtworks.paranamer:paranamer:jar:sources": 1185138559,
+    "com.lihaoyi:ujson_3": -675221214,
+    "com.lihaoyi:ujson_3:jar:sources": 1401892679,
+    "com.lihaoyi:upickle-core_3": -1369261776,
+    "com.lihaoyi:upickle-core_3:jar:sources": 1761591552,
     "com.typesafe:config": 1422037420,
     "com.typesafe:config:jar:sources": 1794326800,
     "io.get-coursier:interface": 1635041630,
     "io.get-coursier:interface:jar:sources": -37171318,
-    "io.joern:flatgraph-core_3": 839026010,
+    "io.joern:flatgraph-core_3": 1182992137,
     "io.joern:flatgraph-core_3:jar:sources": 575284637,
     "io.joern:flatgraph-domain-classes-generator_3": 170340065,
     "io.joern:flatgraph-domain-classes-generator_3:jar:sources": -123490520,
-    "io.joern:flatgraph-help_3": -1132428533,
+    "io.joern:flatgraph-help_3": 1193217379,
     "io.joern:flatgraph-help_3:jar:sources": -1476209185,
-    "io.joern:flatgraph-odb-convert_3": -1972259056,
+    "io.joern:flatgraph-odb-convert_3": -1299461830,
     "io.joern:flatgraph-odb-convert_3:jar:sources": 1706697962,
     "io.shiftleft:overflowdb-core_3": -1655377345,
     "io.shiftleft:overflowdb-core_3:jar:sources": 422126785,
@@ -77,16 +75,6 @@
     "org.checkerframework:checker-qual:jar:sources": -1750922234,
     "org.javassist:javassist": -448825381,
     "org.javassist:javassist:jar:sources": 1531561359,
-    "org.json4s:json4s-ast_3": 878798110,
-    "org.json4s:json4s-ast_3:jar:sources": 140325100,
-    "org.json4s:json4s-core_3": -1327401949,
-    "org.json4s:json4s-core_3:jar:sources": -2043024428,
-    "org.json4s:json4s-native-core_3": -1463802907,
-    "org.json4s:json4s-native-core_3:jar:sources": -1913200314,
-    "org.json4s:json4s-native_3": -1745325382,
-    "org.json4s:json4s-native_3:jar:sources": 650512086,
-    "org.json4s:json4s-scalap_3": 1632132590,
-    "org.json4s:json4s-scalap_3:jar:sources": -763259858,
     "org.msgpack:msgpack-core": -1705007667,
     "org.msgpack:msgpack-core:jar:sources": -1562951139,
     "org.scalameta:scalafmt-dynamic_2.13": -518206696,
@@ -194,24 +182,17 @@
     },
     "com.lihaoyi:ujson_3": {
       "shasums": {
-        "jar": "dd4109dc66963a3552154f59f20858e2907c13bc1a9410ae46573cdfa94e7517",
-        "sources": "082f8d8759a6f6db5bbed0bd13e274c404000eabb4777ff5e14a7232964d78d8"
+        "jar": "2fd8083aabc7fb4252c299909b19b2881326a03502eba8859d39d4b2ceb7a8b2",
+        "sources": "e64a5a38ab13502eb021c9fc1c8740fa825dbb11c717268fc9b308ee099ce3ae"
       },
-      "version": "4.4.1"
+      "version": "4.4.3"
     },
     "com.lihaoyi:upickle-core_3": {
       "shasums": {
-        "jar": "4b7566695c789c9a031167a296c67f08b06107124edfbb58e6e187caaa2dc592",
-        "sources": "ae95168d863b4df5d6f6e2c64caf02fb1da99a50b08d6d2f51b3c4ed10080a76"
+        "jar": "9b9be4b677ab6fbc6b82fe5486908a39664f51e9344d1903ada1c6766d251ce2",
+        "sources": "04a4d1a6df374a5d03f1a0ac7048dcfd60be5c4032c42355032117c375b7f647"
       },
-      "version": "4.4.1"
-    },
-    "com.thoughtworks.paranamer:paranamer": {
-      "shasums": {
-        "jar": "688cb118a6021d819138e855208c956031688be4b47a24bb615becc63acedf07",
-        "sources": "8a4bfc21755c36ccdd70f96d7ab891d842d5aebd6afa1b74e0efc6441e3df39c"
-      },
-      "version": "2.8"
+      "version": "4.4.3"
     },
     "com.typesafe:config": {
       "shasums": {
@@ -304,41 +285,6 @@
       },
       "version": "3.22.0-GA"
     },
-    "org.json4s:json4s-ast_3": {
-      "shasums": {
-        "jar": "9abf57acf0912ea87ee25950c2e717b1953c9fbd50e512005d4782ba7a014ec5",
-        "sources": "9a941cc22a939cadcd78fa50378bbb6f3ab09421a61af882ee8aa82257b5db4d"
-      },
-      "version": "4.0.3"
-    },
-    "org.json4s:json4s-core_3": {
-      "shasums": {
-        "jar": "02b5324658e08bc837a58800ee5863fb890df21b68db6c84391fa9b6d2558d1e",
-        "sources": "dd7784db655e6b5d41fffa9afe4bf8901a74a18785771fb404afa6109a8dd616"
-      },
-      "version": "4.0.3"
-    },
-    "org.json4s:json4s-native-core_3": {
-      "shasums": {
-        "jar": "e68cfc8f0c0c6a53778e6ab660d45264a8e3dc63d63c42aa9a612697583f92d9",
-        "sources": "80244e1308ce21e132b747be0d01ff26566a4d5082fc8ca913d86f5f3fd8d389"
-      },
-      "version": "4.0.3"
-    },
-    "org.json4s:json4s-native_3": {
-      "shasums": {
-        "jar": "678cbb3ee67453c7043c3784beb869bbfd51fcc66d425a4434ff100d52263dcb",
-        "sources": "7fc51eb72ce0b9af6bd07d14fffcb5f31ee1e5be2d7b6e6f18fc69515c503e6f"
-      },
-      "version": "4.0.3"
-    },
-    "org.json4s:json4s-scalap_3": {
-      "shasums": {
-        "jar": "9177935bb5f908fa5bc9a195391bffe6e822734ca711de579275bfd1922baee6",
-        "sources": "7abf8faab46fcaafd124dc3f4eadc4f31482dad1ff99758deb1752824ff45123"
-      },
-      "version": "4.0.3"
-    },
     "org.msgpack:msgpack-core": {
       "shasums": {
         "jar": "183abb2b7c604a8b13d5f76af487ccddd003b6f0404aef52021dcb20a4358524",
@@ -426,18 +372,6 @@
     ],
     "org.apache.commons:commons-text": [
       "org.apache.commons:commons-lang3"
-    ],
-    "org.json4s:json4s-core_3": [
-      "com.thoughtworks.paranamer:paranamer",
-      "org.json4s:json4s-ast_3",
-      "org.json4s:json4s-scalap_3"
-    ],
-    "org.json4s:json4s-native-core_3": [
-      "org.json4s:json4s-ast_3"
-    ],
-    "org.json4s:json4s-native_3": [
-      "org.json4s:json4s-core_3",
-      "org.json4s:json4s-native-core_3"
     ],
     "org.scalameta:scalafmt-dynamic_2.13": [
       "com.typesafe:config",
@@ -532,9 +466,6 @@
     "com.lihaoyi:upickle-core_3": [
       "upickle.core",
       "upickle.core.compat"
-    ],
-    "com.thoughtworks.paranamer:paranamer": [
-      "com.thoughtworks.paranamer"
     ],
     "com.typesafe:config": [
       "com.typesafe.config",
@@ -799,25 +730,6 @@
       "javassist.util",
       "javassist.util.proxy"
     ],
-    "org.json4s:json4s-ast_3": [
-      "org.json4s",
-      "org.json4s.prefs"
-    ],
-    "org.json4s:json4s-core_3": [
-      "org.json4s",
-      "org.json4s.prefs",
-      "org.json4s.reflect"
-    ],
-    "org.json4s:json4s-native-core_3": [
-      "org.json4s.native"
-    ],
-    "org.json4s:json4s-native_3": [
-      "org.json4s.native"
-    ],
-    "org.json4s:json4s-scalap_3": [
-      "org.json4s.scalap",
-      "org.json4s.scalap.scalasig"
-    ],
     "org.msgpack:msgpack-core": [
       "org.msgpack.core",
       "org.msgpack.core.annotations",
@@ -875,8 +787,6 @@
       "com.lihaoyi:ujson_3:jar:sources",
       "com.lihaoyi:upickle-core_3",
       "com.lihaoyi:upickle-core_3:jar:sources",
-      "com.thoughtworks.paranamer:paranamer",
-      "com.thoughtworks.paranamer:paranamer:jar:sources",
       "com.typesafe:config",
       "com.typesafe:config:jar:sources",
       "io.get-coursier:interface",
@@ -903,16 +813,6 @@
       "org.checkerframework:checker-qual:jar:sources",
       "org.javassist:javassist",
       "org.javassist:javassist:jar:sources",
-      "org.json4s:json4s-ast_3",
-      "org.json4s:json4s-ast_3:jar:sources",
-      "org.json4s:json4s-core_3",
-      "org.json4s:json4s-core_3:jar:sources",
-      "org.json4s:json4s-native-core_3",
-      "org.json4s:json4s-native-core_3:jar:sources",
-      "org.json4s:json4s-native_3",
-      "org.json4s:json4s-native_3:jar:sources",
-      "org.json4s:json4s-scalap_3",
-      "org.json4s:json4s-scalap_3:jar:sources",
       "org.msgpack:msgpack-core",
       "org.msgpack:msgpack-core:jar:sources",
       "org.scalameta:scalafmt-dynamic_2.13",
