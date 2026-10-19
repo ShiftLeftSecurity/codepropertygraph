@@ -9,7 +9,7 @@ import java.util.zip.{ZipEntry, ZipOutputStream}
 object TestProtoCpg {
 
   def createTestProtoCpg: Path = {
-    val outDir  = Files.createTempDirectory("cpgloadertests")
+    val outDir    = Files.createTempDirectory("cpgloadertests")
     val protoFile = outDir.resolve("1.proto")
     val outStream = Files.newOutputStream(protoFile)
     try {
