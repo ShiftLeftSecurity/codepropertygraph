@@ -6,7 +6,7 @@ bazel_dep(name = "rules_jvm_external", version = "7.0")
 bazel_dep(name = "aspect_rules_lint", version = "2.5.2")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 
-BAZEL_TOOLING_VERSION = "fbdfc66995360c408ecf94d34837a0355aa7ac4d"
+BAZEL_TOOLING_VERSION = "86bbf2be26dc7a2517a56c90e12fd9a6ed20dd25"
 
 git_override(
     module_name = "bazel_tooling",
@@ -14,14 +14,14 @@ git_override(
     remote = "git@github.com:joernio/bazel_tooling.git",
 )
 
-bazel_dep(name = "rules_scala", version = "7.2.5")
+bazel_dep(name = "rules_scala", version = "7.3.0")
 
 scala_config = use_extension(
     "@rules_scala//scala/extensions:config.bzl",
     "scala_config",
 )
 scala_config.settings(
-    scala_version = "3.8.3",
+    scala_version = "3.9.0",
 )
 
 scala_deps = use_extension(
@@ -38,10 +38,10 @@ maven.install(
     name = "maven",
     artifacts = [
         "org.slf4j:slf4j-api:2.0.17",
-        "io.joern:flatgraph-core_3:0.1.35",
-        "io.joern:flatgraph-help_3:0.1.35",
-        "io.joern:flatgraph-domain-classes-generator_3:0.1.35",
-        "io.joern:flatgraph-odb-convert_3:0.1.35",
+        "io.joern:flatgraph-core_3:0.1.36",
+        "io.joern:flatgraph-help_3:0.1.36",
+        "io.joern:flatgraph-domain-classes-generator_3:0.1.36",
+        "io.joern:flatgraph-odb-convert_3:0.1.36",
         "net.sf.trove4j:core:3.1.0",
         "com.google.protobuf:protobuf-java:4.34.1",
         "com.lihaoyi:ujson_3:4.4.3",
