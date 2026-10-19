@@ -2,6 +2,7 @@ module(name = "codepropertygraph")
 
 bazel_dep(name = "protobuf", version = "34.1")
 bazel_dep(name = "bazel_tooling")
+bazel_dep(name = "rules_java", version = "9.6.1")
 bazel_dep(name = "rules_jvm_external", version = "7.0")
 bazel_dep(name = "aspect_rules_lint", version = "2.5.2")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
@@ -46,6 +47,7 @@ maven.install(
         "com.google.protobuf:protobuf-java:4.34.1",
         "com.lihaoyi:ujson_3:4.4.3",
         "com.lihaoyi:os-lib_3:0.11.4",
+        "com.github.pathikrit:better-files_3:3.9.2",
     ],
     excluded_artifacts = [
         # Exclude any scala libraries which might come in transitively.

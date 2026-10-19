@@ -3,7 +3,7 @@ package io.shiftleft.codepropertygraph.cpgloading
 import flatgraph.{Accessors, DiffGraphApplier}
 import io.shiftleft.codepropertygraph.generated.Cpg
 import io.shiftleft.codepropertygraph.generated.nodes.NewMethod
-import io.shiftleft.utils.{ProjectRoot, TempFileCopy}
+import io.shiftleft.utils.{CpgRunfilesLocator, ProjectRoot, TempFileCopy}
 import io.shiftleft.codepropertygraph.generated.nodes.Type
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -37,7 +37,7 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
   }
 
   "allow loading of CPG in overflowdb format" in {
-    val odbCpg = ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.odb")
+    val odbCpg = testResource("cpg.odb")
     Using.resource(CpgLoader.load(odbCpg)) { cpg =>
       cpg.graph.nodes("METHOD").size shouldBe 7
     }
@@ -75,7 +75,13 @@ class CpgLoaderTests extends AnyWordSpec with Matchers with BeforeAndAfterAll {
   }
 
   /** this test graph was created by c2cpg for https://github.com/joernio/joern/blob/master/tests/code/c/test.c */
-  val flatgraphCpg = Paths.get(ProjectRoot.relativise("codepropertygraph/src/test/resources/cpg.fg"))
+  val flatgraphCpg = Paths.get(testResource("cpg.fg"))
+
+  /** Bazel runfiles lookup with fallback to the project root relative path (sbt, IDE) */
+  private def testResource(name: String): String =
+    CpgRunfilesLocator
+      .resolve(s"codepropertygraph/codepropertygraph/src/test/resources/$name")
+      .getOrElse(ProjectRoot.relativise(s"codepropertygraph/src/test/resources/$name"))
 
   /** flatgraph writes to this file on 'close', so we'll create a temporary copy */
   private def temporaryFlatgraphCpg(): TempFileCopy =
