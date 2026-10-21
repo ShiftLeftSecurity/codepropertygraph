@@ -27,7 +27,6 @@ lazy val installProtoc =
 installProtoc := {
   import sys.process._
   import java.nio.file.Files
-  // import better.files.FileExtensions
   val protocVersion      = (ProtobufConfig / version).value
   val protocBinary       = new File(protocBinaryPath)
   val isAlreadyInstalled = protocBinary.exists && s"$protocBinaryPath --version".!!.contains(protocVersion)

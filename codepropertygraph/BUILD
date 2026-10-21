@@ -44,7 +44,6 @@ scala_test(
         ":tests_java",
         "//schema:domainClassesNeverLinked",
         "//schema:java_proto",
-        "@maven//:com_github_pathikrit_better_files_3",
         "@maven//:io_joern_flatgraph_core_3",
         "@maven//:io_joern_flatgraph_help_3",
     ],
