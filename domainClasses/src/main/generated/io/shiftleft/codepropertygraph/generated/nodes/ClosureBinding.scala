@@ -35,7 +35,9 @@ object ClosureBinding {
   * parameters, output parameters, and return parameters, this field holds the evaluation strategy, which is one of the
   * following: 1) `BY_REFERENCE` indicates that the parameter is passed by reference, 2) `BY_VALUE` indicates that it is
   * passed by value, that is, a copy is made, 3) `BY_SHARING` the parameter is a pointer/reference and it is shared with
-  * the caller/callee. While a copy of the pointer is made, a copy of the object that it points to is not made.
+  * the caller/callee. While a copy of the pointer is made, a copy of the object that it points to is not made, 4)
+  * `BY_COPY` indicates that it is passed by value and the copy shares nothing with the argument, so the callee cannot
+  * change the argument.
   */
 class ClosureBinding(graph_4762: flatgraph.Graph, seq_4762: Int)
     extends StoredNode(graph_4762, 8, seq_4762)

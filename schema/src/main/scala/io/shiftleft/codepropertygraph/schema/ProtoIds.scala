@@ -25,6 +25,7 @@ object ProtoIds {
   val Order                     = 4
   val Do                        = 4
   val CSharp                    = 4
+  val ByCopy                    = 4
   val Abstract                  = 5
   val Annotation                = 5
   val For                       = 5

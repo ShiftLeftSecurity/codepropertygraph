@@ -14,10 +14,14 @@ public static final String BY_SHARING = "BY_SHARING";
 /** A parameter or return of a function passed by value which means a flat copy is used */
 public static final String BY_VALUE = "BY_VALUE";
 
+/** A parameter of a function passed by value whose copy shares nothing with the argument: it holds no pointer or reference, so the callee cannot change the argument */
+public static final String BY_COPY = "BY_COPY";
+
 public static Set<String> ALL = new HashSet<String>() {{
 add(BY_REFERENCE);
 add(BY_SHARING);
 add(BY_VALUE);
+add(BY_COPY);
 }};
 
 }
